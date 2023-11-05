@@ -2,7 +2,10 @@
 Menedżer TI to narzędzie pozwalające na szybkie i sprawne zarządzanie procesami i zadaniami związanych z działalnością związku zawodowego. 
 
 Database schema:
-![Screenshot of DB template.](https://github.com/Mat3u52/Dashboard/blob/main/Datasheet.png)
+![Screenshot of Database schema.](https://github.com/Mat3u52/TI_Management/tree/main/doc/TI_Management_Database_Schema.png)
 
-Below you can find UX / UI template of app:
-![Screenshot of UX template.](https://github.com/Mat3u52/Dashboard/blob/main/UX_Dashboard.drawio.png)
+UX & UI:
+![Screenshot of UX & UI.](https://github.com/Mat3u52/TI_Management/tree/main/doc/TI_Management_UI.png)
+
+Preview:
+![Screenshot of UX & UI.](https://github.com/Mat3u52/TI_Management/tree/main/doc/TI_Management_Figma.png)
