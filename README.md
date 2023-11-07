@@ -9,3 +9,6 @@ UX & UI:
 
 Preview:
 ![Screenshot of UX & UI.](https://github.com/Mat3u52/TI_Management/blob/main/doc/TI_Management_Figma.png)
+
+Technology:
+Django
