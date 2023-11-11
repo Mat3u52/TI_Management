@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'TI_Management_app',
+    'phone_field',
 ]
 
 MIDDLEWARE = [
