@@ -1,13 +1,15 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI
+from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad
+
+admin.site.site_header = 'Admin Panel TI Management'
 
 # admin.site.register(Groups)
 # admin.site.register(CardsRFID)
 # admin.site.register(Cards)
 # admin.site.register(CardStatus)
 # admin.site.register(MembersZZTI)
-admin.site.site_header = 'Admin Panel TI Management'
+# admin.site.register(Notepad)
 
 
 @admin.register(Groups)
@@ -85,4 +87,17 @@ class MembersZZTIAdmin(admin.ModelAdmin):
                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group',
                    'card_rfid', 'card_status', 'created_date')
     search_fields = ('surname',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(Notepad)
+class NotepadAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('title', 'published_date', 'importance', 'status', 'member', 'file', 'created_date')
+    list_filter = ('title', 'published_date', 'importance', 'status', 'member', 'file', 'created_date')
+    search_fields = ('title',)
     date_hierarchy = 'created_date'

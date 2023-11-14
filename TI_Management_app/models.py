@@ -85,7 +85,7 @@ class MembersZZTI(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to='images/')
 
     def __str__(self):
-        return self.surname
+        return f"{self.forename} {self.surname}"
 
     class Meta:
         verbose_name_plural = 'Członkowie'
@@ -113,7 +113,7 @@ class Notepad(models.Model):
     published_date = models.DateTimeField(default=timezone.now)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
     status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
-    member = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, null=True, blank=True)
     file = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
 
     def __str__(self):
