@@ -79,9 +79,9 @@ class MembersZZTI(models.Model):
     date_of_abandonment = models.DateTimeField(default=None, blank=True, null=True)
     type_of_contract = models.CharField(max_length=250, choices=CONTRACT_CHOICES, default=None)
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True)
-    card_rfid = models.ForeignKey(CardsRFID, on_delete=models.CASCADE, null=True)
-    card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
+    card_rfid = models.ForeignKey(CardsRFID, on_delete=models.CASCADE, null=True, blank=True)
+    card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True)
     image = models.ImageField(null=True, blank=True, upload_to='images/')
 
     def __str__(self):
@@ -89,4 +89,36 @@ class MembersZZTI(models.Model):
 
     class Meta:
         verbose_name_plural = 'Członkowie'
+
+
+# def user_directory_path(instance, filename):
+#     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
+#     return 'uploads/%Y/%m/%d/user_{0}/{1}'.format(instance.user.id, filename)
+
+
+class Notepad(models.Model):
+    IMPORTANCE_CHOICES = (
+        ('none', 'Nie dotyczy'),
+        ('standard', 'Standard'),
+        ('important', 'Ważny'),
+        ('critical', 'Krytyczny'),
+    )
+    STATUS_CHOICES = (
+        ('ongoing', 'W trakcie'),
+        ('closed', 'Zamknięty'),
+    )
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    content = models.TextField()
+    published_date = models.DateTimeField(default=timezone.now)
+    importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
+    status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
+    member = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True)
+    file = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Notatki'
 

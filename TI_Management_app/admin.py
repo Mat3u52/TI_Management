@@ -56,8 +56,8 @@ class CardStatusAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('card_identity', 'card_status', 'created_date')
-    list_filter = ('card_identity', 'card_status', 'created_date')
+    list_display = ('card', 'card_identity', 'card_status', 'created_date')
+    list_filter = ('card', 'card_identity', 'card_status', 'created_date')
     search_fields = ('card_identity', 'card_status')
     # raw_id_fields = ('author',)
     date_hierarchy = 'created_date'
@@ -72,7 +72,10 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
     def image_tag(self, obj):
-        return format_html('<img src="{}" width="50px"/>'.format(obj.image.url))
+        try:
+            return format_html('<img src="{}" width="50px"/>'.format(obj.image.url))
+        except:
+            pass
     image_tag.short_description = 'Image'
 
     list_display = ('id', 'forename', 'surname', 'sex', 'phone_number', 'email', 'date_of_accession',
