@@ -122,3 +122,17 @@ class Notepad(models.Model):
     class Meta:
         verbose_name_plural = 'Notatki'
 
+
+class Application(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    kind_of_application = models.CharField(max_length=350, null=False, blank=False)
+    date_of_application = models.DateTimeField(default=timezone.now)
+    date_of_payout = models.DateTimeField(default=timezone.now)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, null=True, blank=True)
+
+    def __str__(self):
+        return self.kind_of_application
+
+    class Meta:
+        verbose_name_plural = 'Wnioski'
+

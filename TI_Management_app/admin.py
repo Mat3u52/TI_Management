@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad
+from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application
 
 admin.site.site_header = 'Admin Panel TI Management'
 
@@ -10,6 +10,7 @@ admin.site.site_header = 'Admin Panel TI Management'
 # admin.site.register(CardStatus)
 # admin.site.register(MembersZZTI)
 # admin.site.register(Notepad)
+admin.site.register(Application)
 
 
 @admin.register(Groups)
