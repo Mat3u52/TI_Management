@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application
+from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application, Task
 
 admin.site.site_header = 'Admin Panel TI Management'
 
@@ -10,7 +10,8 @@ admin.site.site_header = 'Admin Panel TI Management'
 # admin.site.register(CardStatus)
 # admin.site.register(MembersZZTI)
 # admin.site.register(Notepad)
-admin.site.register(Application)
+# admin.site.register(Application)
+# admin.site.register(Task)
 
 
 @admin.register(Groups)
@@ -102,3 +103,39 @@ class NotepadAdmin(admin.ModelAdmin):
     list_filter = ('title', 'published_date', 'importance', 'status', 'member', 'file', 'created_date')
     search_fields = ('title',)
     date_hierarchy = 'created_date'
+
+
+# class MembersZZTIInline(admin.TabularInline):
+#     model = MembersZZTI
+
+
+@admin.register(Application)
+class ApplicationAdmin(admin.ModelAdmin):
+    # inlines = [
+    #     MembersZZTIInline
+    # ]
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('kind_of_application', 'date_of_application', 'date_of_payout', 'member', 'created_date')
+    list_filter = ('kind_of_application', 'date_of_application', 'date_of_payout', 'member', 'created_date')
+    search_fields = ('kind_of_application',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('task_name', 'category', 'deadline', 'frequency', 'member', 'importance', 'status', 'created_date')
+    list_filter = ('task_name', 'category', 'deadline', 'frequency', 'member', 'importance', 'status', 'created_date')
+    search_fields = ('task_name',)
+    date_hierarchy = 'created_date'
+

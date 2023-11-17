@@ -75,7 +75,7 @@ class MembersZZTI(models.Model):
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, default=None)
     phone_number = PhoneField(max_length=12, blank=True, help_text='Contact phone number')
     email = models.EmailField(max_length=250, blank=True, help_text='user@user.com')
-    date_of_accession = models.DateTimeField(default=timezone.now(), blank=True, null=True)
+    date_of_accession = models.DateTimeField(default=timezone.now, blank=True, null=True)
     date_of_abandonment = models.DateTimeField(default=None, blank=True, null=True)
     type_of_contract = models.CharField(max_length=250, choices=CONTRACT_CHOICES, default=None)
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
@@ -89,11 +89,6 @@ class MembersZZTI(models.Model):
 
     class Meta:
         verbose_name_plural = 'Członkowie'
-
-
-# def user_directory_path(instance, filename):
-#     # file will be uploaded to MEDIA_ROOT/user_<id>/<filename>
-#     return 'uploads/%Y/%m/%d/user_{0}/{1}'.format(instance.user.id, filename)
 
 
 class Notepad(models.Model):
@@ -136,3 +131,45 @@ class Application(models.Model):
     class Meta:
         verbose_name_plural = 'Wnioski'
 
+
+class Task(models.Model):
+    CATEGORY_CHOICES = (
+        ('other', 'Inny'),
+        ('bhp', 'BHP'),
+        ('hr', 'HR'),
+    )
+    FREQUENCY_CHOICES = (
+        ('none', 'Brak'),
+        ('daily', 'Codziennie'),
+        ('week', 'Tydzień'),
+        ('two_weeks', 'Dwa tygodnie'),
+        ('month', 'Miesiąc'),
+        ('quarter', 'Kwartał'),
+        ('half_year', 'Pół roku'),
+        ('year', 'Rok'),
+    )
+    IMPORTANCE_CHOICES = (
+        ('none', 'Nie dotyczy'),
+        ('standard', 'Standard'),
+        ('important', 'Ważny'),
+        ('critical', 'Krytyczny'),
+    )
+    STATUS_CHOICES = (
+        ('ongoing', 'W trakcie'),
+        ('closed', 'Zamknięty'),
+    )
+    created_date = models.DateTimeField(default=timezone.now)
+    task_name = models.CharField(max_length=350, null=False, blank=False)
+    category = models.CharField(max_length=250, choices=CATEGORY_CHOICES, default=None)
+    description = models.TextField()
+    deadline = models.DateTimeField(default=None, blank=True, null=True)
+    frequency = models.CharField(max_length=250, choices=FREQUENCY_CHOICES, default=None)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, null=True, blank=True)
+    importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
+    status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
+
+    def __str__(self):
+        return self.task_name
+
+    class Meta:
+        verbose_name_plural = 'Zadania'
