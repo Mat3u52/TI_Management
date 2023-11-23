@@ -8,6 +8,11 @@ from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
 
+def members_list(request):
+    members = MembersZZTI.objects.filter(published_date__lte=timezone.now().order_by('created_date'))
+    return render(request, 'TI_Management_app/members_list.html', {'members': members})
+
+
 class Image(TemplateView):
     form = MemberForm
     template_name = 'TI_Management_app/image.html'

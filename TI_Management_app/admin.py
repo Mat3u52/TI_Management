@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application, Task
 
-admin.site.site_header = 'Admin Panel TI Management'
+admin.site.site_header = 'Panel Administratora zzti LUMS'
 
 # admin.site.register(Groups)
 # admin.site.register(CardsRFID)

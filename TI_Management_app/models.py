@@ -72,6 +72,8 @@ class MembersZZTI(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     forename = models.CharField(max_length=250, blank=True, default=None)
     surname = models.CharField(max_length=250, blank=True, default=None)
+    role = models.CharField(max_length=250, blank=True, default=None)
+    member_nr = models.CharField(max_length=250, blank=True, default=None)
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, default=None)
     phone_number = PhoneField(max_length=12, blank=True, help_text='Contact phone number')
     email = models.EmailField(max_length=250, blank=True, help_text='user@user.com')
