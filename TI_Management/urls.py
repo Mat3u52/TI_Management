@@ -26,6 +26,9 @@ urlpatterns = [
     path('images/<int:pk>/', ImageDisplay.as_view(), name="image_display"),
 ]
 
+handler404 = 'TI_Management_app.views.error_404_view'
+# handler500 = 'TI_Management_app.views.error_500_view'
+
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

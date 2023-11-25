@@ -1,0 +1,19 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block content %}
+
+    <div class="hero-unit">
+      {% if member.created_date %}
+        <h2>
+            {{member.forename}} {{member.surname}} {{member.image}}
+        </h2>
+        <img src="{{ member.image.url }}" alt="image" width="250px">
+        <p>data dodania: {{member.created_date}}</p>
+<!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->
+<!--            Więcej informacji-->
+<!--        </a></p>-->
+      {% endif %}
+    </div>
+
+
+{% endblock %}

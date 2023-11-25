@@ -84,7 +84,7 @@ class MembersZZTI(models.Model):
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True)
     card_rfid = models.ForeignKey(CardsRFID, on_delete=models.CASCADE, null=True, blank=True)
     card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True)
-    image = models.ImageField(null=True, blank=True, upload_to='images/')
+    image = models.ImageField(null=True, blank=True, upload_to='images/', default='images/NoImage.png')
 
     def __str__(self):
         return f"{self.forename} {self.surname}"
