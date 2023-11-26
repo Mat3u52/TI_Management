@@ -4,11 +4,50 @@
 
     <div class="hero-unit">
       {% if member.created_date %}
-        <h2>
-            {{member.forename}} {{member.surname}} {{member.image}}
-        </h2>
-        <img src="{{ member.image.url }}" alt="image" width="250px">
-        <p>data dodania: {{member.created_date}}</p>
+        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
+
+        <table>
+          <tr>
+            <td><p class="tableCredential"><b>Uczestnik:</b></p></td>
+            <td><p>{{member.forename}} {{member.surname}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Funkcja:</b></p></td>
+            <td>{% if member.sex == 'role'%}<p>Brak</p>{% else %}<p>{{member.role}}</p>{% endif %}</td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
+            <td><p>{{member.member_nr}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Płeć: </b></p></td>
+            <td>{% if member.sex == 'male' %}<p>M</p>{% else %}<p>K</p>{% endif %}</td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
+            <td><p>{{member.phone_number}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>E-mail: </b></p></td>
+            <td><p>{{member.email}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
+            <td><p>{{member.date_of_accession}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
+            <td><p>{{member.date_of_abandonment}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
+            <td><p>{{member.type_of_contract}}</p></td>
+          </tr>
+          <tr>
+            <td class="tableCredential"><p><b>Data umowy: </b></p></td>
+            <td><p>{{member.date_of_contract}}</p></td>
+          </tr>
+        </table>
 <!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->
 <!--            Więcej informacji-->
 <!--        </a></p>-->

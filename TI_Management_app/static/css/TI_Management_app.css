@@ -3,6 +3,22 @@ body {
     padding-bottom: 40px;
 }
 
+a {
+    text-decoration: none;
+}
+
+a:hover {
+    text-decoration: none;
+}
+
+h1 a, h2 a {
+    text-decoration: none;
+}
+
+.hero-unit {
+    padding-bottom: 20px;
+}
+
 .sidebar-nav {
     padding: 9px 0;
 }
@@ -12,7 +28,6 @@ body {
     padding-left: 0px;
     padding-right: 5px;
     padding-top: 11px;
-    padding-bot: 0px;
     line-height: 1em;
     font-size: 10px;
 }
@@ -35,4 +50,16 @@ img {
     border-radius: 10px;
     float: left;
     margin: 10px;
+}
+
+.date{
+    clear: both;
+    font-size: 10pt;
+    color: #828282;
+    text-align: right;
+    padding-top: 5px;
+}
+
+.tableCredential {
+    padding-right: 15px;
 }

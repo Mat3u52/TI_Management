@@ -8,10 +8,34 @@
             {{member.forename}} {{member.surname}}
         </a></h2>
             <img src="{{ member.image.url }}" alt="image" width="150px">
-        <p>data dodania: {{member.created_date}}</p>
-        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">
+
+        <table>
+          <tr>
+            <td><p class="tableCredential"><b>Funkcja:</b></p></td>
+            <td><p>{{member.role}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
+            <td><p>{{member.member_nr}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Płeć: </b></p></td>
+            <td>{% if member.sex == 'male' %}<p>M</p>{% else %}<p>K</p>{% endif %}</td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
+            <td><p>{{member.phone_number}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>E-mail: </b></p></td>
+            <td><p>{{member.email}}</p></td>
+          </tr>
+        </table>
+
+        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
             Więcej informacji
         </a></p>
+        <div class="date"><p>Data dodania: {{member.created_date}}</p></div>
     </div>
 {% endfor %}
 
