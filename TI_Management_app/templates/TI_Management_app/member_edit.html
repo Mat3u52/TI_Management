@@ -1,9 +1,11 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block content %}
-
     <div class="hero-unit">
       {% if member.created_date %}
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {{ form.as_p }}
         <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
 
         <table>
@@ -13,7 +15,9 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Funkcja:</b></p></td>
-            <td><p>{{member.role}}</p></td>
+            <td><td>{% if member.sex == 'male' %}<p>M</p>
+                {% elif member.sex == 'female' %}<p>K</p>
+                {% else %}<p>None</p>{% endif %}</td></td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
@@ -21,11 +25,7 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Płeć: </b></p></td>
-            <td>
-              {% if member.sex == 'male' %}<p>M</p>
-              {% elif member.sex == 'female' %}<p>K</p>
-              {% else %}<p>None</p>{% endif %}
-            </td>
+            <td>{% if member.sex == 'male' %}<p>M</p>{% else %}<p>K</p>{% endif %}</td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
@@ -55,6 +55,8 @@
 <!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->
 <!--            Więcej informacji-->
 <!--        </a></p>-->
+            <a href="#" class="btn btn-primary btn-large pull-right">Zapisz</a>
+            </form>
       {% endif %}
     </div>
 

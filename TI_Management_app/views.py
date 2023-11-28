@@ -1,4 +1,4 @@
-from django.shortcuts import render, get_object_or_404
+from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import MembersZZTI
 from django.http import HttpResponseRedirect
@@ -44,4 +44,17 @@ def member_detail(request, pk):
 def error_404_view(request, exception):
     data = {"name": "TI_Management"}
     return render(request, 'TI_Management_app/404.html', data)
+
+
+def member_new(request):
+    if request.method == "POST":
+        form = MemberForm(request.POST, request.FILES)
+        if form.is_valid():
+            member = form.save(commit=False)
+            member.author = request.user
+            member.save()
+            return redirect('member_detail', pk=member.pk)
+    else:
+        form = MemberForm()
+    return render(request, 'TI_Management_app/member_new.html', {'form': form})
 

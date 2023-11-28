@@ -27,7 +27,7 @@
                             Management System
                         </p>
                         <p class="navbar-text pull-right">
-                            Użytkownik: <a href="#" class="navbar-link">Username</a>
+                            Użytkownik: <a href="#" class="navbar-link">{{user.username}}</a>
                         </p>
 <!--                        <ul class="nav">-->
 <!--                            <li class="active"><a href="#">Home</a></li>-->
@@ -47,8 +47,14 @@
                         <ul class="nav nav-list">
                             <li class="nav-header">Panel</li>
                             <li><a href="#">Dashboard</a></li>
-                            <li class="active"><a href="{% url 'members_list' %}">Członkowie</a></li>
-                            <li><a href="#">Link</a></li>
+                            <li class="active">
+                                <a href="{% url 'members_list' %}">Członkowie</a>
+                                <ul>
+                                    <li><a href="{% url 'member_new' %}">dodaj</a></li>
+                                </ul>
+                            </li>
+
+
                             <li><a href="#">Link</a></li>
                             <li><a href="#">Link</a></li>
                         </ul>
@@ -73,7 +79,7 @@
 
             <footer class="bg-body-tertiary text-center">
                 <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
-                    © 2023 Copyright:
+                    Copyright &#169; {% now "d-m-Y" %}r.
                     <a class="text-body" href="#">zzti</a>
                 </div>
             </footer>
