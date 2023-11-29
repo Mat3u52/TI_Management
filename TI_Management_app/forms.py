@@ -6,11 +6,13 @@ class MemberForm(forms.ModelForm):
         model = MembersZZTI
         fields = ['forename', 'surname', 'role',
                   'member_nr', 'sex', 'phone_number',
-                  'email', 'date_of_accession', 'type_of_contract',
+                  'email', 'date_of_accession', 'date_of_abandonment', 'type_of_contract',
                   'date_of_contract', 'group', 'card_rfid',
                   'card_status', 'image']
 
         widgets = {
             'date_of_accession': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_abandonment': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
         }
 

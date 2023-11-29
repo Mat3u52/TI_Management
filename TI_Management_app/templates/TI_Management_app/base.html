@@ -10,6 +10,18 @@
         <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap.css" rel="stylesheet">
         <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
         <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap-responsive.css" rel="stylesheet">
+
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function(){
+                $("#hide").click(function(){
+                    $("#obj1").hide(1000);
+                });
+                $("#show").click(function(){
+                    $("#obj1").show(1000);
+                });
+            });
+        </script>
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
         <div class="navbar navbar-inverse navbar-fixed-top">
@@ -50,7 +62,9 @@
                             <li class="active">
                                 <a href="{% url 'members_list' %}">Członkowie</a>
                                 <ul>
-                                    <li><a href="{% url 'member_new' %}">dodaj</a></li>
+                                    <li>
+                                        <a href="{% url 'member_new' %}">dodaj</a>
+                                    </li>
                                 </ul>
                             </li>
 

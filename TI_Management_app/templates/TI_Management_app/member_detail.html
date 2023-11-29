@@ -52,6 +52,15 @@
             <td><p>{{member.date_of_contract}}</p></td>
           </tr>
         </table>
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="show">Karta:</li>
+            {% for card in member.card_rfid.all %}
+              <li id="obj1" style="display: none"><p>{{card}}</p></li>
+              <p>{{card}}</p>
+            {% endfor %}
+          </ul>
+        </div>
 <!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->
 <!--            Więcej informacji-->
 <!--        </a></p>-->
