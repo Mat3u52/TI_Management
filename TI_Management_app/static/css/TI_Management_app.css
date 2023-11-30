@@ -16,7 +16,7 @@ h1 a, h2 a {
 }
 
 .hero-unit {
-    padding-bottom: 20px;
+    padding-bottom: 30px;
 }
 
 .sidebar-nav {
@@ -62,4 +62,11 @@ img {
 
 .tableCredential {
     padding-right: 15px;
+}
+
+.notepad {
+    background: #FFFFFF;
+    padding: 40px;
+    margin-top: 10px;
+    border-radius: 10px;
 }

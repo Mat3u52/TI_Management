@@ -55,10 +55,107 @@
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li class="nav-header" id="show">Karta:</li>
-            {% for card in member.card_rfid.all %}
-              <li id="obj1" style="display: none"><p>{{card}}</p></li>
-              <p>{{card}}</p>
-            {% endfor %}
+              <li id="obj1" style="display: none"><p>{{member.card}}</p></li>
+          </ul>
+        </div>
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showDocuments">Pliki:</li>
+              <li id="objDocuments" style="display: none">
+                {% for note in member.notepad.all %}
+
+                    <p>Plik: {{ note.file }}</p>
+
+                {% empty %}
+                  <p>Brak plików</p>
+                {% endfor %}
+              </li>
+          </ul>
+        </div>
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showFinance">Finanse:</li>
+              <li id="objFinance" style="display: none">
+
+                {% for app in member.application.all %}
+                    <div class="notepad">
+                      <p>Tytuł: {{ app.kind_of_application }}</p>
+                      <p>Treść: {{ app.description }}</p>
+                      <p>Data wniosku: {{ app.date_of_application }}</p>
+                      <p>Data wypłaty: {{ app.date_of_payout }}</p>
+                    </div>
+
+                {% empty %}
+                  <p>Brak informacji</p>
+                {% endfor %}
+
+              </li>
+          </ul>
+        </div>
+
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>
+              <li id="objCardsLoyality" style="display: none">
+
+                {% for card in member.cardStatus.all %}
+                    <div class="notepad">
+                      <p>{{ card.card }}</p>
+                      <p>{{ card.card_identity }}</p>
+                        {% if card.card_status == 'demandReceived' %}<p>Status: Zapotrzebowanie odebrane</p>
+                        {% elif card.card_status == 'requestSent' %}<p>Status: Zapotrzebowanie wysłane</p>
+                        {% elif card.card_status == 'sent' %}<p>Status: Przysłana</p>
+                        {% elif card.card_status == 'received' %}<p>Status: Odebrana</p>
+                        {% elif card.card_status == 'none' %}<p>Status: Brak statusu</p>
+                        {% else %}<p>Status: None</p>{% endif %}
+                      <p>Data: {{ card.date_of_action }}</p>
+                    </div>
+
+                {% empty %}
+                  <p>Brak informacji</p>
+                {% endfor %}
+
+              </li>
+          </ul>
+        </div>
+
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showGroup">Grupy:</li>
+              <li id="objGroup" style="display: none">
+                {% for group in member.groupsMember.all %}
+                    <p>{{ group.group }}</p>
+                {% empty %}
+                  <p>Brak grupy</p>
+                {% endfor %}
+              </li>
+          </ul>
+        </div>
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showNotepad">Komunikacja:</li>
+              <li id="objNotepad" style="display: none">
+
+                {% for note in member.notepad.all %}
+                    <div class="notepad">
+                      <p>Tytuł: {{ note.title }}</p>
+                      <p>Treść: {{ note.content }}</p>
+                        {% if note.importance == 'standard' %}<p>Ważnośc: Standard</p>
+                        {% elif note.importance == 'important' %}<p>Ważnośc: Ważny</p>
+                        {% elif note.importance == 'critical' %}<p>Ważnośc: Krytyczny</p>
+                        {% elif note.importance == 'none' %}<p>Ważnośc: Nie dotyczy</p>
+                        {% else %}<p>Ważnośc: None</p>{% endif %}
+                      <p>Status: {{ note.status }}</p>
+                      <p>Data dodanie: {{ note.created_date }}</p>
+                      <p>Data publikacji: {{ note.published_date }}</p>
+                      <p>Plik: {{ note.file }}</p>
+                    </div>
+
+                {% empty %}
+                  <p>Brak informacji</p>
+                {% endfor %}
+
+              </li>
           </ul>
         </div>
 <!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->

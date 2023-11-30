@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application, Task
+from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application, Task, GroupsMember
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -24,6 +24,19 @@ class GroupsAdmin(admin.ModelAdmin):
     list_display = ('group_name', 'created_date')
     list_filter = ('group_name', 'created_date')
     search_fields = ('group_name',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(GroupsMember)
+class GroupsMemberAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('member', 'group', 'created_date')
+    list_filter = ('member', 'group', 'created_date')
+    search_fields = ('group',)
     date_hierarchy = 'created_date'
 
 
@@ -60,8 +73,8 @@ class CardStatusAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('card', 'card_identity', 'card_status', 'created_date')
-    list_filter = ('card', 'card_identity', 'card_status', 'created_date')
+    list_display = ('card', 'card_identity', 'card_status', 'date_of_action', 'created_date')
+    list_filter = ('card', 'card_identity', 'card_status', 'date_of_action', 'created_date')
     search_fields = ('card_identity', 'card_status')
     # raw_id_fields = ('author',)
     date_hierarchy = 'created_date'
@@ -82,12 +95,14 @@ class MembersZZTIAdmin(admin.ModelAdmin):
             pass
     image_tag.short_description = 'Image'
 
-    list_display = ('id', 'forename', 'surname', 'sex', 'phone_number', 'email', 'date_of_accession',
-                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group',
-                    'card_rfid', 'card_status', 'image_tag', 'created_date')
-    list_filter = ('id', 'forename', 'surname', 'sex', 'phone_number', 'email', 'date_of_accession',
-                   'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group',
-                   'card_rfid', 'card_status', 'created_date')
+    list_display = ('id', 'forename', 'surname', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number', 'email',
+                    'date_of_accession',
+                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
+                    'image_tag', 'created_date')
+    list_filter = ('id', 'forename', 'surname', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number', 'email',
+                   'date_of_accession',
+                   'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
+                   'created_date')
     search_fields = ('surname',)
     date_hierarchy = 'created_date'
 
