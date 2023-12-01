@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import Groups, Cards, CardsRFID, CardStatus, MembersZZTI, Notepad, Application, Task, GroupsMember
+from .models import (Groups, Cards, CardsRFID, CardStatus,
+                     MembersZZTI, Notepad, Application, Task, GroupsMember, MembersFile)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -104,6 +105,19 @@ class MembersZZTIAdmin(admin.ModelAdmin):
                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
                    'created_date')
     search_fields = ('surname',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(MembersFile)
+class MembersFile(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('title', 'file', 'created_date')
+    list_filter = ('title', 'file', 'created_date')
+    search_fields = ('title',)
     date_hierarchy = 'created_date'
 
 

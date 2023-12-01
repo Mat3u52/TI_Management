@@ -11,3 +11,4 @@ db.sqlite3
 /TI_Management_app/migrations
 /media/images/*
 /media/uploads/*
+/media/uploadsMember/*

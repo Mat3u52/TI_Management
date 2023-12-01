@@ -54,11 +54,9 @@ class MembersZZTI(models.Model):
     role = models.CharField(max_length=250, blank=True, null=True, default=None)
     member_nr = models.CharField(max_length=250, blank=True, null=True, default=None)
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, blank=True, null=True, default=None)
-
     birthday = models.DateTimeField(default=None, blank=True, null=True)
     birthplace = models.CharField(max_length=250, blank=True, null=True, default=None)
     pin = models.CharField(max_length=250, blank=True, null=True, default=None)
-
     phone_number = PhoneField(max_length=12, blank=True, null=True, default=None, help_text='Contact phone number')
     email = models.EmailField(max_length=250, blank=True, null=True, default=None, help_text='user@user.com')
     date_of_accession = models.DateTimeField(default=timezone.now, blank=True, null=True)
@@ -76,6 +74,19 @@ class MembersZZTI(models.Model):
 
     class Meta:
         verbose_name_plural = 'Członkowie'
+
+
+class MembersFile(models.Model):
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='membersFile', null=True, blank=True)
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    file = models.FileField(null=True, blank=True, upload_to='uploadsMember/%Y/%m/%d/')
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Członkowie Pliki'
 
 
 class Notepad(models.Model):
@@ -153,6 +164,39 @@ class CardStatus(models.Model):
 
     class Meta:
         verbose_name_plural = 'Status Kart'
+
+
+class Activities(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    capacity = models.IntegerField(blank=True, null=True)
+    expiring_date = models.DateTimeField(default=None, blank=True, null=True)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Aktywności'
+
+
+class ActivityStatus(models.Model):
+    ACTIVITY_STATUS_CHOICES = (
+        ('none', 'Brak statusu'),
+        ('demandReceived', 'Odebrano'),
+        ('requestSent', 'Do odbioru'),
+    )
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='activityStatus', null=True, blank=True)
+    activities = models.ForeignKey(Activities, on_delete=models.CASCADE, null=True, blank=True)
+    created_date = models.DateTimeField(default=timezone.now)
+    activity_status = models.CharField(max_length=250, choices=ACTIVITY_STATUS_CHOICES, default='none')
+    spend = models.IntegerField(blank=True, null=True)
+    assigned_date = models.DateTimeField(default=timezone.now)
+
+    def __str__(self):
+        return self.member
+
+    class Meta:
+        verbose_name_plural = 'Aktywności Status'
 
 
 class Task(models.Model):

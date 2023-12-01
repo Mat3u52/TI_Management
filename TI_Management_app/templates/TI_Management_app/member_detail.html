@@ -28,6 +28,18 @@
             </td>
           </tr>
           <tr>
+            <td><p class="tableCredential"><b>Data urodzenia: </b></p></td>
+            <td><p>{{member.birthday}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
+            <td><p>{{member.birthplace}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>PIN: </b></p></td>
+            <td><p>{{member.pin}}</p></td>
+          </tr>
+          <tr>
             <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
             <td><p>{{member.phone_number}}</p></td>
           </tr>
@@ -62,10 +74,8 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showDocuments">Pliki:</li>
               <li id="objDocuments" style="display: none">
-                {% for note in member.notepad.all %}
-
-                    <p>Plik: {{ note.file }}</p>
-
+                {% for file in member.membersFile.all %}
+                    <p><a href="{{ file.file.url }}">{{ file.title }}</a> - {{ file.created_date }}</p>
                 {% empty %}
                   <p>Brak plików</p>
                 {% endfor %}
