@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (Groups, Cards, CardsRFID, CardStatus,
-                     MembersZZTI, Notepad, Application, Task, GroupsMember, MembersFile)
+                     MembersZZTI, Notepad, Application, Task, GroupsMember, MembersFile, Activities, ActivityStatus)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -152,6 +152,32 @@ class ApplicationAdmin(admin.ModelAdmin):
     list_display = ('kind_of_application', 'date_of_application', 'date_of_payout', 'member', 'created_date')
     list_filter = ('kind_of_application', 'date_of_application', 'date_of_payout', 'member', 'created_date')
     search_fields = ('kind_of_application',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(Activities)
+class CardsActivities(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('title', 'capacity', 'expiring_date', 'created_date')
+    list_filter = ('title', 'capacity', 'expiring_date', 'created_date')
+    search_fields = ('title',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(ActivityStatus)
+class CardsActivityStatus(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('activities', 'member', 'activity_status', 'description', 'spend', 'assigned_date', 'created_date')
+    list_filter = ('activities', 'member', 'activity_status', 'description', 'spend', 'assigned_date', 'created_date')
+    search_fields = ('activities',)
     date_hierarchy = 'created_date'
 
 
