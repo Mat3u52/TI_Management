@@ -182,18 +182,19 @@ class Activities(models.Model):
 class ActivityStatus(models.Model):
     ACTIVITY_STATUS_CHOICES = (
         ('none', 'Brak statusu'),
-        ('demandReceived', 'Odebrano'),
-        ('requestSent', 'Do odbioru'),
+        ('collect', 'Odebrano'),
+        ('forCollection', 'Do odbioru'),
     )
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='activityStatus', null=True, blank=True)
     activities = models.ForeignKey(Activities, on_delete=models.CASCADE, null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
+    description = models.TextField(null=True, blank=True, default=None)
     activity_status = models.CharField(max_length=250, choices=ACTIVITY_STATUS_CHOICES, default='none')
     spend = models.IntegerField(blank=True, null=True)
     assigned_date = models.DateTimeField(default=timezone.now)
 
-    def __str__(self):
-        return self.member
+    # def __str__(self):
+    #     return self.activities
 
     class Meta:
         verbose_name_plural = 'Aktywności Status'
