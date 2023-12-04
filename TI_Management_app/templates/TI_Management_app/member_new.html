@@ -4,6 +4,8 @@
     <div class="hero-unit">
         <form method="post" class="post-form">
             {% csrf_token %}
+            <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
+
             <table>
                 <tr>
                     <td><p class="tableCredential"><b>Imie:</b></p></td>

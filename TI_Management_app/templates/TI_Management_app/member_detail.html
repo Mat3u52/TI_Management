@@ -4,6 +4,7 @@
 
     <div class="hero-unit">
       {% if member.created_date %}
+
         <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
 
         <table>
@@ -64,6 +65,14 @@
             <td><p>{{member.date_of_contract}}</p></td>
           </tr>
         </table>
+        <a href="{% url 'member_edit' pk=member.pk %}">
+          <button type="submit" class="btn btn-primary btn-large pull-left">Modyfikuj</button>
+        </a>
+      <br/>
+      <br/>
+
+
+
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li class="nav-header" id="show">Karta:</li>
@@ -119,6 +128,33 @@
                         {% elif card.card_status == 'none' %}<p>Status: Brak statusu</p>
                         {% else %}<p>Status: None</p>{% endif %}
                       <p>Data: {{ card.date_of_action }}</p>
+                    </div>
+
+                {% empty %}
+                  <p>Brak informacji</p>
+                {% endfor %}
+
+              </li>
+          </ul>
+        </div>
+
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showActivity">Aktywności:</li>
+              <li id="objActivity" style="display: none">
+
+                {% for activity in member.activityStatus.all %}
+                    <div class="notepad">
+                      <p><b>{{ activity.activities }}</b> - Wybrana aktywność: {{ activity.description }}
+
+                        {% if activity.activity_status == 'collect' %} <b>Status:</b> Odebrano
+                        {% elif activity.activity_status == 'forCollection' %} <b>Status:</b> Do odbioru
+                        {% elif activity.activity_status == 'none' %} <b>Status:</b> Brak statusu
+                        {% else %} <b>Status:</b> None {% endif %}
+
+                        <b>Data:</b> {{ activity.assigned_date }}
+                        <b>Ilość pobrań:</b> {{ activity.spend }}
+                      </p>
                     </div>
 
                 {% empty %}

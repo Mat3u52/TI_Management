@@ -58,3 +58,18 @@ def member_new(request):
         form = MemberForm()
     return render(request, 'TI_Management_app/member_new.html', {'form': form})
 
+
+def member_edit(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    if request.method == "POST":
+        form = MemberForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            member = form.save(commit=False)
+            member.author = request.user
+            member.save()
+            return redirect('member_detail', pk=member.pk)
+    else:
+        form = MemberForm(instance=member)
+    return render(request, 'TI_Management_app/member_edit.html', {'form': form,
+                                                                  'member': member})
+

@@ -2,61 +2,79 @@
 
 {% block content %}
     <div class="hero-unit">
-      {% if member.created_date %}
         <form method="post" class="post-form">
             {% csrf_token %}
-            {{ form.as_p }}
-        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
+            <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
 
-        <table>
-          <tr>
-            <td><p class="tableCredential"><b>Uczestnik:</b></p></td>
-            <td><p>{{member.forename}} {{member.surname}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Funkcja:</b></p></td>
-            <td><p>{{member.role}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
-            <td><p>{{member.member_nr}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Płeć: </b></p></td>
-            <td>{% if member.sex == 'male' %}<p>M</p>{% else %}<p>K</p>{% endif %}</td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-            <td><p>{{member.phone_number}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>E-mail: </b></p></td>
-            <td><p>{{member.email}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
-            <td><p>{{member.date_of_accession}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
-            <td><p>{{member.date_of_abandonment}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
-            <td><p>{{member.type_of_contract}}</p></td>
-          </tr>
-          <tr>
-            <td class="tableCredential"><p><b>Data umowy: </b></p></td>
-            <td><p>{{member.date_of_contract}}</p></td>
-          </tr>
-        </table>
-<!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->
-<!--            Więcej informacji-->
-<!--        </a></p>-->
-            <a href="#" class="btn btn-primary btn-large pull-right">Zapisz</a>
-            </form>
-      {% endif %}
+            <table>
+                <tr>
+                    <td><p class="tableCredential"><b>Imie:</b></p></td>
+                    <td><p>{{form.forename}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Nazwisko:</b></p></td>
+                    <td><p>{{form.surname}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Funkcja:</b></p></td>
+                    <td><p>{{form.role}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
+                    <td><p>{{form.member_nr}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Płeć: </b></p></td>
+                    <td><p>{{form.sex}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Data urodzenia: </b></p></td>
+                    <td><p>{{form.birthday}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
+                    <td><p>{{form.birthplace}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>PIN: </b></p></td>
+                    <td><p>{{form.pin}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
+                    <td><p>{{form.phone_number}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>E-mail: </b></p></td>
+                    <td><p>{{form.email}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
+                    <td><p>{{form.date_of_accession}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
+                    <td><p>{{form.date_of_abandonment}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
+                    <td><p>{{form.type_of_contract}}</p></td>
+                </tr>
+                <tr>
+                    <td class="tableCredential"><p><b>Data umowy: </b></p></td>
+                    <td><p>{{form.date_of_contract}}</p></td>
+                </tr>
+                <tr>
+                    <td class="tableCredential"><p><b>Karta: </b></p></td>
+                    <td><p>{{form.card}}</p></td>
+                </tr>
+                <tr>
+                    <td class="tableCredential"><p><b>Zdjęcie: </b></p></td>
+                    <td><p>{{form.image}}</p></td>
+                </tr>
+            </table>
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        </form>
     </div>
-
 
 {% endblock %}
