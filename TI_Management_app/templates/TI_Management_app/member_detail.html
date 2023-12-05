@@ -65,13 +65,12 @@
             <td><p>{{member.date_of_contract}}</p></td>
           </tr>
         </table>
+
         <a href="{% url 'member_edit' pk=member.pk %}">
           <button type="submit" class="btn btn-primary btn-large pull-left">Modyfikuj</button>
         </a>
       <br/>
       <br/>
-
-
 
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
@@ -142,6 +141,33 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showActivity">Aktywności:</li>
               <li id="objActivity" style="display: none">
+
+                {% for activity in member.activityStatus.all %}
+                    <div class="notepad">
+                      <p><b>{{ activity.activities }}</b> - Wybrana aktywność: {{ activity.description }}
+
+                        {% if activity.activity_status == 'collect' %} <b>Status:</b> Odebrano
+                        {% elif activity.activity_status == 'forCollection' %} <b>Status:</b> Do odbioru
+                        {% elif activity.activity_status == 'none' %} <b>Status:</b> Brak statusu
+                        {% else %} <b>Status:</b> None {% endif %}
+
+                        <b>Data:</b> {{ activity.assigned_date }}
+                        <b>Ilość pobrań:</b> {{ activity.spend }}
+                      </p>
+                    </div>
+
+                {% empty %}
+                  <p>Brak informacji</p>
+                {% endfor %}
+
+              </li>
+          </ul>
+        </div>
+
+      <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showVoting">Głosowania:</li>
+              <li id="objVoting" style="display: none">
 
                 {% for activity in member.activityStatus.all %}
                     <div class="notepad">

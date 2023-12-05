@@ -39,6 +39,33 @@ class Cards(models.Model):
         verbose_name_plural = 'Karty Lojalnościowe'
 
 
+class Questions(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    question = models.CharField(max_length=450, blank=False, default=None, unique=True)
+
+    def __str__(self):
+        return self.question
+
+    class Meta:
+        verbose_name_plural = 'Pytania'
+
+
+class Vote(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    description = models.TextField(null=True, blank=True, default=None)
+    date_start = models.DateTimeField(default=None, blank=True, null=True)
+    date_end = models.DateTimeField(default=None, blank=True, null=True)
+    importance = models.BooleanField()
+    questions = models.ForeignKey(Questions, on_delete=models.CASCADE, null=True, blank=True, default=None)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Głosowanie'
+
+
 class MembersZZTI(models.Model):
     SEX_CHOICES = (
         ('female', 'Kobieta'),
@@ -68,6 +95,8 @@ class MembersZZTI(models.Model):
     card = models.CharField(max_length=350, blank=True, null=True, default=None)
     # card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/', default='images/NoImage.png')
+
+    #vote = models.ManyToManyField(Vote)
 
     def __str__(self):
         return f"{self.forename} {self.surname}"
