@@ -58,7 +58,11 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
-            <td><p>{{member.type_of_contract}}</p></td>
+            <td>
+              {% if member.type_of_contract == 'indefinite_period_of_time' %}<p>Na czas nieokreślony</p>
+              {% elif member.type_of_contract == 'limited_duration' %}<p>Na czas określony</p>
+              {% else %}<p>None</p>{% endif %}
+            </td>
           </tr>
           <tr>
             <td class="tableCredential"><p><b>Data umowy: </b></p></td>
@@ -97,10 +101,10 @@
 
                 {% for app in member.application.all %}
                     <div class="notepad">
-                      <p>Tytuł: {{ app.kind_of_application }}</p>
-                      <p>Treść: {{ app.description }}</p>
-                      <p>Data wniosku: {{ app.date_of_application }}</p>
-                      <p>Data wypłaty: {{ app.date_of_payout }}</p>
+                      <p><b>Tytuł:</b> {{ app.kind_of_application }}</p>
+                      <p><b>Treść:</b> {{ app.description }}</p>
+                      <p><b>Data wniosku:</b> {{ app.date_of_application }}</p>
+                      <p><b>Data wypłaty:</b> {{ app.date_of_payout }}</p>
                     </div>
 
                 {% empty %}
@@ -115,17 +119,19 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>
               <li id="objCardsLoyality" style="display: none">
-
+                <p><a href="#" class="btn btn-primary btn-large pull-right">
+                  Dodaj
+                </a></p>
                 {% for card in member.cardStatus.all %}
                     <div class="notepad">
                       <p>{{ card.card }}</p>
                       <p>{{ card.card_identity }}</p>
-                        {% if card.card_status == 'demandReceived' %}<p>Status: Zapotrzebowanie odebrane</p>
-                        {% elif card.card_status == 'requestSent' %}<p>Status: Zapotrzebowanie wysłane</p>
-                        {% elif card.card_status == 'sent' %}<p>Status: Przysłana</p>
-                        {% elif card.card_status == 'received' %}<p>Status: Odebrana</p>
-                        {% elif card.card_status == 'none' %}<p>Status: Brak statusu</p>
-                        {% else %}<p>Status: None</p>{% endif %}
+                        {% if card.card_status == 'demandReceived' %}<p><b>Status:</b> Zapotrzebowanie odebrane</p>
+                        {% elif card.card_status == 'requestSent' %}<p><b>Status:</b> Zapotrzebowanie wysłane</p>
+                        {% elif card.card_status == 'sent' %}<p><b>Status:</b> Przysłana</p>
+                        {% elif card.card_status == 'received' %}<p><b>Status:</b> Odebrana</p>
+                        {% elif card.card_status == 'none' %}<p><b>Status:</b> Brak statusu</p>
+                        {% else %}<p><b>Status:</b> None</p>{% endif %}
                       <p>Data: {{ card.date_of_action }}</p>
                     </div>
 
@@ -195,6 +201,9 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showGroup">Grupy:</li>
               <li id="objGroup" style="display: none">
+                <p><a href="#" class="btn btn-primary btn-large pull-right">
+                  Dodaj
+                </a></p>
                 {% for group in member.groupsMember.all %}
                     <p>{{ group.group }}</p>
                 {% empty %}
@@ -210,17 +219,18 @@
 
                 {% for note in member.notepad.all %}
                     <div class="notepad">
-                      <p>Tytuł: {{ note.title }}</p>
-                      <p>Treść: {{ note.content }}</p>
-                        {% if note.importance == 'standard' %}<p>Ważnośc: Standard</p>
-                        {% elif note.importance == 'important' %}<p>Ważnośc: Ważny</p>
-                        {% elif note.importance == 'critical' %}<p>Ważnośc: Krytyczny</p>
-                        {% elif note.importance == 'none' %}<p>Ważnośc: Nie dotyczy</p>
-                        {% else %}<p>Ważnośc: None</p>{% endif %}
-                      <p>Status: {{ note.status }}</p>
-                      <p>Data dodanie: {{ note.created_date }}</p>
-                      <p>Data publikacji: {{ note.published_date }}</p>
-                      <p>Plik: {{ note.file }}</p>
+                      <p><b>Sprawa: </b><a href="#">{{ note.title }}</a></p>
+                      <p><b>Opis: </b> {{ note.content }}</p>
+                        {% if note.importance == 'standard' %}<p><b>Ważnośc:</b> Standard</p>
+                        {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
+                        {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
+                        {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
+                        {% else %}<p><b>Ważnośc:</b> None</p>{% endif %}
+                      <p><b>Status:</b> {{ note.status }}</p>
+                      <p><b>Data dodanie:</b> {{ note.created_date }}</p>
+                      <p><b>Data publikacji:</b> {{ note.published_date }}</p>
+                      <p><b>Odpowiedzialny:</b> {{member.forename}} {{member.surname}}</p>
+                      <p><b>Plik:</b> {{ note.file }}</p>
                     </div>
 
                 {% empty %}

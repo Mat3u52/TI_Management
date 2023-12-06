@@ -73,3 +73,16 @@ def member_edit(request, pk):
     return render(request, 'TI_Management_app/member_edit.html', {'form': form,
                                                                   'member': member})
 
+
+def member_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        members = MembersZZTI.objects.filter(forename__contains=searched)
+        return render(request,
+                      'TI_Management_app/member_search.html',
+                      {'searched': searched,
+                       'members': members})
+    else:
+        return render(request,
+                      'TI_Management_app/member_search.html',
+                      {})
