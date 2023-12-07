@@ -7,6 +7,7 @@ from .forms import MemberForm
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 
+from django.db.models.query_utils import Q
 
 class Image(TemplateView):
     form = MemberForm
@@ -77,7 +78,7 @@ def member_edit(request, pk):
 def member_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        members = MembersZZTI.objects.filter(forename__contains=searched)
+        members = MembersZZTI.objects.filter(Q(forename__contains=searched) | Q(surname__contains=searched))
         return render(request,
                       'TI_Management_app/member_search.html',
                       {'searched': searched,

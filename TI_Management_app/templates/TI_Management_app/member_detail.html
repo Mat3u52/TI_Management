@@ -17,6 +17,10 @@
             <td><p>{{member.role}}</p></td>
           </tr>
           <tr>
+            <td><p class="tableCredential"><b>Zawód:</b></p></td>
+            <td><p>{{member.occupation}}</p></td>
+          </tr>
+          <tr>
             <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
             <td><p>{{member.member_nr}}</p></td>
           </tr>
@@ -150,16 +154,16 @@
 
                 {% for activity in member.activityStatus.all %}
                     <div class="notepad">
-                      <p><b>{{ activity.activities }}</b> - Wybrana aktywność: {{ activity.description }}
+                      <p><b>{{ activity.activities }}</b></p>
+                      <p><b>Wybrana aktywność:</b> {{ activity.description }}</p>
 
-                        {% if activity.activity_status == 'collect' %} <b>Status:</b> Odebrano
-                        {% elif activity.activity_status == 'forCollection' %} <b>Status:</b> Do odbioru
-                        {% elif activity.activity_status == 'none' %} <b>Status:</b> Brak statusu
-                        {% else %} <b>Status:</b> None {% endif %}
+                        {% if activity.activity_status == 'collect' %} <p><b>Status:</b> Odebrano</p>
+                        {% elif activity.activity_status == 'forCollection' %} <p><b>Status:</b> Do odbioru</p>
+                        {% elif activity.activity_status == 'none' %} <p><b>Status:</b> Brak statusu</p>
+                        {% else %} <p><b>Status:</b> None </p>{% endif %}
 
-                        <b>Data:</b> {{ activity.assigned_date }}
-                        <b>Ilość pobrań:</b> {{ activity.spend }}
-                      </p>
+                        <p><b>Data:</b> {{ activity.assigned_date }}</p>
+                        <p><b>Ilość pobrań:</b> {{ activity.spend }}</p>
                     </div>
 
                 {% empty %}

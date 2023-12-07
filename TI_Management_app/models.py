@@ -50,6 +50,16 @@ class Questions(models.Model):
         verbose_name_plural = 'Pytania'
 
 
+class Answers(models.Model):
+    answer = models.CharField(max_length=450, blank=False, default=None, unique=True)
+
+    def __str__(self):
+        return self.answer
+
+    class Meta:
+        verbose_name_plural = 'Odpowiedzi'
+
+
 class Vote(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=350, null=False, blank=False)
@@ -79,6 +89,7 @@ class MembersZZTI(models.Model):
     forename = models.CharField(max_length=250, blank=True, null=True, default=None)
     surname = models.CharField(max_length=250, blank=True, null=True, default=None)
     role = models.CharField(max_length=250, blank=True, null=True, default=None)
+    occupation = models.CharField(max_length=250, blank=True, null=True, default=None)
     member_nr = models.CharField(max_length=250, blank=True, null=True, default=None)
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, blank=True, null=True, default=None)
     birthday = models.DateTimeField(default=None, blank=True, null=True)
@@ -96,7 +107,7 @@ class MembersZZTI(models.Model):
     # card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/', default='images/NoImage.png')
 
-    #vote = models.ManyToManyField(Vote)
+    vote = models.ManyToManyField(Vote)
 
     def __str__(self):
         return f"{self.forename} {self.surname}"

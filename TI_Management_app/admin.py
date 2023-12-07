@@ -1,7 +1,9 @@
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (Groups, Cards, CardsRFID, CardStatus,
-                     MembersZZTI, Notepad, Application, Task, GroupsMember, MembersFile, Activities, ActivityStatus)
+                     MembersZZTI, Notepad, Application, Task,
+                     GroupsMember, MembersFile, Activities, ActivityStatus,
+                     Vote, Questions)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -13,6 +15,8 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Notepad)
 # admin.site.register(Application)
 # admin.site.register(Task)
+# admin.site.register(Vote)
+# admin.site.register(Question)
 
 
 @admin.register(Groups)
@@ -96,12 +100,12 @@ class MembersZZTIAdmin(admin.ModelAdmin):
             pass
     image_tag.short_description = 'Image'
 
-    list_display = ('id', 'forename', 'surname', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number', 'email',
-                    'date_of_accession',
+    list_display = ('id', 'forename', 'surname', 'role', 'occupation', 'member_nr', 'sex', 'birthday', 'birthplace',
+                    'pin', 'phone_number', 'email', 'date_of_accession',
                     'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
                     'image_tag', 'created_date')
-    list_filter = ('id', 'forename', 'surname', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number', 'email',
-                   'date_of_accession',
+    list_filter = ('id', 'forename', 'surname', 'role', 'occupation', 'member_nr', 'sex', 'birthday', 'birthplace',
+                   'pin', 'phone_number', 'email', 'date_of_accession',
                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
                    'created_date')
     search_fields = ('surname',)
@@ -192,5 +196,33 @@ class TaskAdmin(admin.ModelAdmin):
     list_display = ('task_name', 'category', 'deadline', 'frequency', 'member', 'importance', 'status', 'created_date')
     list_filter = ('task_name', 'category', 'deadline', 'frequency', 'member', 'importance', 'status', 'created_date')
     search_fields = ('task_name',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(Vote)
+class VoteAdmin(admin.ModelAdmin):
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('title', 'description', 'date_start', 'date_end', 'importance', 'questions')
+    list_filter = ('title', 'description', 'date_start', 'date_end', 'importance', 'questions')
+    search_fields = ('title',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(Questions)
+class QuestionsAdmin(admin.ModelAdmin):
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('question',)
+    list_filter = ('question',)
+    search_fields = ('question',)
     date_hierarchy = 'created_date'
 
