@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from .models import (Groups, Cards, CardsRFID, CardStatus,
                      MembersZZTI, Notepad, Application, Task,
                      GroupsMember, MembersFile, Activities, ActivityStatus,
-                     Vote, Questions)
+                     Vote, Questions, Answers)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -17,6 +17,7 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Task)
 # admin.site.register(Vote)
 # admin.site.register(Question)
+# admin.site.register(Answers)
 
 
 @admin.register(Groups)
@@ -207,8 +208,8 @@ class VoteAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('title', 'description', 'date_start', 'date_end', 'importance', 'questions')
-    list_filter = ('title', 'description', 'date_start', 'date_end', 'importance', 'questions')
+    list_display = ('title', 'description', 'date_start', 'date_end', 'importance',)
+    list_filter = ('title', 'description', 'date_start', 'date_end', 'importance',)
     search_fields = ('title',)
     date_hierarchy = 'created_date'
 
@@ -221,8 +222,22 @@ class QuestionsAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('question',)
-    list_filter = ('question',)
+    list_display = ('question', 'id',)
+    list_filter = ('question', 'id',)
     search_fields = ('question',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(Answers)
+class AnswersAdmin(admin.ModelAdmin):
+
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('answer', 'status', 'status_description',)
+    list_filter = ('answer', 'status', 'status_description',)
+    search_fields = ('answer',)
     date_hierarchy = 'created_date'
 

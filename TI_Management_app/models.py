@@ -39,19 +39,13 @@ class Cards(models.Model):
         verbose_name_plural = 'Karty Lojalnościowe'
 
 
-class Questions(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
-    question = models.CharField(max_length=450, blank=False, default=None, unique=True)
-
-    def __str__(self):
-        return self.question
-
-    class Meta:
-        verbose_name_plural = 'Pytania'
-
-
 class Answers(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
     answer = models.CharField(max_length=450, blank=False, default=None, unique=True)
+    status = models.BooleanField(default=False)
+    status_description = models.BooleanField(default=False)
+    # description = models.TextField(null=True, blank=True, default=None)
+    # status_description = models.BooleanField()
 
     def __str__(self):
         return self.answer
@@ -60,20 +54,18 @@ class Answers(models.Model):
         verbose_name_plural = 'Odpowiedzi'
 
 
-class Vote(models.Model):
+class Questions(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=350, null=False, blank=False)
-    description = models.TextField(null=True, blank=True, default=None)
-    date_start = models.DateTimeField(default=None, blank=True, null=True)
-    date_end = models.DateTimeField(default=None, blank=True, null=True)
-    importance = models.BooleanField()
-    questions = models.ForeignKey(Questions, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    question = models.CharField(max_length=450, blank=False, default=None, unique=True)
+    # answer = models.ForeignKey(Answers, on_delete=models.CASCADE, related_name='question', null=True, blank=True)
+
+    answer = models.ManyToManyField(Answers)
 
     def __str__(self):
-        return self.title
+        return self.question
 
     class Meta:
-        verbose_name_plural = 'Głosowanie'
+        verbose_name_plural = 'Pytania'
 
 
 class MembersZZTI(models.Model):
@@ -107,13 +99,33 @@ class MembersZZTI(models.Model):
     # card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/', default='images/NoImage.png')
 
-    vote = models.ManyToManyField(Vote)
+    # vote = models.ManyToManyField(Vote)
 
     def __str__(self):
         return f"{self.forename} {self.surname}"
 
     class Meta:
         verbose_name_plural = 'Członkowie'
+
+
+class Vote(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    description = models.TextField(null=True, blank=True, default=None)
+    date_start = models.DateTimeField(default=None, blank=True, null=True)
+    date_end = models.DateTimeField(default=None, blank=True, null=True)
+    importance = models.BooleanField()
+    # questions = models.ForeignKey(Questions, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # question = models.ManyToManyField(Questions)
+
+    questions = models.ManyToManyField(Questions)
+    members = models.ManyToManyField(MembersZZTI)
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Głosowanie'
 
 
 class MembersFile(models.Model):
