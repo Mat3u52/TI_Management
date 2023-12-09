@@ -31,6 +31,9 @@ h1 a, h2 a {
     line-height: 1em;
     font-size: 10px;
 }
+.nav-header {
+    font-size: 16px;
+}
 
 @media (max-width: 980px) {
 /* Enable use of floated navbar text */
