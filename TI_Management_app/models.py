@@ -114,12 +114,12 @@ class Vote(models.Model):
     description = models.TextField(null=True, blank=True, default=None)
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)
-    importance = models.BooleanField()
+    importance = models.BooleanField(default=False)
     # questions = models.ForeignKey(Questions, on_delete=models.CASCADE, null=True, blank=True, default=None)
     # question = models.ManyToManyField(Questions)
 
-    questions = models.ManyToManyField(Questions)
-    members = models.ManyToManyField(MembersZZTI)
+    questions = models.ManyToManyField(Questions, related_name='voteQuestion')
+    members = models.ManyToManyField(MembersZZTI, related_name='voteMember')
 
     def __str__(self):
         return self.title
