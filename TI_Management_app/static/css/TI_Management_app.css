@@ -15,6 +15,10 @@ h1 a, h2 a {
     text-decoration: none;
 }
 
+input {
+  width: 100%;
+}
+
 .hero-unit {
     padding-bottom: 30px;
 }
@@ -72,4 +76,30 @@ img {
     padding: 40px;
     margin-top: 10px;
     border-radius: 10px;
+}
+
+.errorlist {
+    font-size: 10pt;
+    color: #C30010;
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+.hint input[type=text] {
+    border: 2px solid #C30010;
+    background-color: #fdc5b9;
+    color: #000000;
+}
+
+.hint input[type=number] {
+    border: 2px solid #C30010;
+    background-color: #fdc5b9;
+    color: #000000;
+}
+
+.hint input[type=email] {
+    border: 2px solid #C30010;
+    background-color: #fdc5b9;
+    color: #000000;
 }

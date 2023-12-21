@@ -1,6 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
         <form method="post" class="post-form">
             {% csrf_token %}
@@ -8,23 +9,19 @@
 
             <table>
                 <tr>
-                    <td><p class="tableCredential"><b>Imie:</b></p></td>
+                    <td><p class="tableCredential"><b>Imie: </b></p></td>
                     <td><p>{{form.forename}}</p></td>
                 </tr>
                 <tr>
-                    <td><p class="tableCredential"><b>Nazwisko:</b></p></td>
+                    <td><p class="tableCredential"><b>Nazwisko: </b></p></td>
                     <td><p>{{form.surname}}</p></td>
                 </tr>
                 <tr>
-                    <td><p class="tableCredential"><b>Funkcja:</b></p></td>
+                    <td><p class="tableCredential"><b>Funkcja: </b></p></td>
                     <td><p>{{form.role}}</p></td>
                 </tr>
                 <tr>
-                    <td><p class="tableCredential"><b>Zawód:</b></p></td>
-                    <td><p>{{form.occupation}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
+                    <td><p class="tableCredential"><b>Numer uczestnika: </b></p></td>
                     <td><p>{{form.member_nr}}</p></td>
                 </tr>
                 <tr>
@@ -42,6 +39,10 @@
                 <tr>
                     <td><p class="tableCredential"><b>PIN: </b></p></td>
                     <td><p>{{form.pin}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Stanowisko: </b></p></td>
+                    <td><p>{{form.occupation}}</p></td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
@@ -64,8 +65,12 @@
                     <td><p>{{form.type_of_contract}}</p></td>
                 </tr>
                 <tr>
-                    <td class="tableCredential"><p><b>Data umowy: </b></p></td>
+                    <td class="tableCredential"><p><b>Data zatrudnienia: </b></p></td>
                     <td><p>{{form.date_of_contract}}</p></td>
+                </tr>
+                <tr>
+                    <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
+                    <td><p>{{form.expiration_date_contract}}</p></td>
                 </tr>
                 <tr>
                     <td class="tableCredential"><p><b>Karta: </b></p></td>
@@ -80,5 +85,5 @@
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
         </form>
     </div>
-
+{% endif %}
 {% endblock %}

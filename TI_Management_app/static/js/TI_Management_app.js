@@ -1,0 +1,32 @@
+$(document).ready(function(){
+    $("#hide").click(function(){
+        $("#obj1").hide(1000);
+    });
+    $("#show").click(function(){
+        $("#obj1").show(1000);
+    });
+    $("#showDocuments").click(function(){
+        $("#objDocuments").show(1000);
+    });
+    $("#showFinance").click(function(){
+        $("#objFinance").show(1000);
+    });
+    $("#showGroup").click(function(){
+        $("#objGroup").show(1000);
+    });
+    $("#showNotepad").click(function(){
+        $("#objNotepad").show(1000);
+    });
+    $("#showCardsLoyality").click(function(){
+        $("#objCardsLoyality").show(1000);
+    });
+    $("#showSideMenuMembers").click(function(){
+        $("#objSideMenuMembers").show(1000);
+    });
+    $("#showActivity").click(function(){
+        $("#objActivity").show(1000);
+    });
+    $("#showVoting").click(function(){
+        $("#objVoting").show(1000);
+    });
+});

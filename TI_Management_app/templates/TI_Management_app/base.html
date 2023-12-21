@@ -7,45 +7,15 @@
         <meta name="viewport" content="width=device-with, initial-scale=1.0">
         <meta name="description" content="zzti LUMS">
         <meta name="author" content="zzti LUMS">
-        <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap.css" rel="stylesheet">
+<!--        <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap.css" rel="stylesheet">-->
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
-        <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap-responsive.css" rel="stylesheet">
+        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
+<!--        <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap-responsive.css" rel="stylesheet">-->
 
         <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
-        <script>
-            $(document).ready(function(){
-                $("#hide").click(function(){
-                    $("#obj1").hide(1000);
-                });
-                $("#show").click(function(){
-                    $("#obj1").show(1000);
-                });
-                $("#showDocuments").click(function(){
-                    $("#objDocuments").show(1000);
-                });
-                $("#showFinance").click(function(){
-                    $("#objFinance").show(1000);
-                });
-                $("#showGroup").click(function(){
-                    $("#objGroup").show(1000);
-                });
-                $("#showNotepad").click(function(){
-                    $("#objNotepad").show(1000);
-                });
-                $("#showCardsLoyality").click(function(){
-                    $("#objCardsLoyality").show(1000);
-                });
-                $("#showSideMenuMembers").click(function(){
-                    $("#objSideMenuMembers").show(1000);
-                });
-                $("#showActivity").click(function(){
-                    $("#objActivity").show(1000);
-                });
-                $("#showVoting").click(function(){
-                    $("#objVoting").show(1000);
-                });
-            });
-        </script>
+        <script src="{% static 'js/TI_Management_app.js' %}"></script>
+
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
         <div class="navbar navbar-inverse navbar-fixed-top">
@@ -63,7 +33,12 @@
                             Management System
                         </p>
                         <p class="navbar-text pull-right">
-                            Użytkownik: <a href="#" class="navbar-link">{{user.username}}</a>
+                            Użytkownik:
+                            {% if user.is_authenticated %}
+                                <a href="{% url 'users:logout' %}?next=/" class="navbar-link">{{user.username}}</a>
+                            {% else %}
+                                <a href="{% url 'users:login' %}" class="navbar-link">Zaloguj</a>
+                            {% endif %}
                         </p>
 <!--                        <ul class="nav">-->
 <!--                            <li class="active"><a href="#">Home</a></li>-->
@@ -84,7 +59,7 @@
                             <li class="nav-header">Panel</li>
                             <li><a href="#">Dashboard</a></li>
                             <li class="active">
-                                <a href="{% url 'members_list' %}">Członkowie</a>
+                                <a href="{% url 'members_list' %}">Baza Członków</a>
                                 <ul>
                                     <li>
                                         <a href="{% url 'member_new' %}">dodaj</a>
@@ -100,18 +75,9 @@
                 </div>
 
                 <div class="span9">
-<!--                    {% for member in members %}-->
-<!--                    <div class="hero-unit">-->
-<!--                        <h2><a href="">{{member.forename}} {{member.surname}} {{member.image}}</a></h2>-->
-<!--                        <p>data dodania: {{member.created_date}}</p>-->
-<!--                        <p><a href="#" class="btn btn-primary btn-large">Więcej informacji</a></p>-->
-
-<!--                    </div>-->
-<!--                    {% endfor %}-->
                     {% block content %}
 
                     {% endblock %}
-
                 </div>
             </div>
 

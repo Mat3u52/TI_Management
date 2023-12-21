@@ -1,10 +1,20 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h3>
+            <p>{{form.pin.as_hidden}}</p>
+            <p>Karta:</p>
+            <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
+                   type="search" placeholder="{{ member.card }}" value="{{ member.card }}" aria-label="card" name="card" >
+            <br />
+            <br />
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

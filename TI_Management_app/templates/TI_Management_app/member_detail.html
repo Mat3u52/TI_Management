@@ -83,7 +83,12 @@
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
             <li class="nav-header" id="show">Karta:</li>
-              <li id="obj1" style="display: none"><p>{{member.card}}</p></li>
+              <li id="obj1" style="display: none">
+                <p><a href="{% url 'member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                  Zmień
+                </a></p>
+                <p>{{member.card}}</p>
+              </li>
           </ul>
         </div>
         <div class="well sidebar-nav">
@@ -179,22 +184,18 @@
             <li class="nav-header" id="showVoting">Głosowania:</li>
               <li id="objVoting" style="display: none">
 
-                {% for activity in member.activityStatus.all %}
+                {% for vote_member in member.voteMember.all %}
                     <div class="notepad">
-                      <p><b>{{ activity.activities }}</b> - Wybrana aktywność: {{ activity.description }}
-
-                        {% if activity.activity_status == 'collect' %} <b>Status:</b> Odebrano
-                        {% elif activity.activity_status == 'forCollection' %} <b>Status:</b> Do odbioru
-                        {% elif activity.activity_status == 'none' %} <b>Status:</b> Brak statusu
-                        {% else %} <b>Status:</b> None {% endif %}
-
-                        <b>Data:</b> {{ activity.assigned_date }}
-                        <b>Ilość pobrań:</b> {{ activity.spend }}
-                      </p>
+                      <p><b>{{ vote_member.title }}</b> : {{ vote_member.description|truncatewords:100 }}</p>
+                      {% if vote_member.importance is True %}
+                        <p><b>Rodzaj: </b> Niejawne</p>
+                      {% else %}
+                        <p><b>Rodzaj: </b> Jawne</p>
+                      {% endif %}
                     </div>
 
                 {% empty %}
-                  <p>Brak informacji</p>
+                  <p>Brak dostępnych głosowań</p>
                 {% endfor %}
 
               </li>
@@ -229,14 +230,13 @@
                         {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
                         {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
                         {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
-                        {% else %}<p><b>Ważnośc:</b> None</p>{% endif %}
+                        {% else %}<p><b>Ważność:</b> None</p>{% endif %}
                       <p><b>Status:</b> {{ note.status }}</p>
                       <p><b>Data dodanie:</b> {{ note.created_date }}</p>
                       <p><b>Data publikacji:</b> {{ note.published_date }}</p>
                       <p><b>Odpowiedzialny:</b> {{member.forename}} {{member.surname}}</p>
                       <p><b>Plik:</b> {{ note.file }}</p>
                     </div>
-
                 {% empty %}
                   <p>Brak informacji</p>
                 {% endfor %}
@@ -244,9 +244,6 @@
               </li>
           </ul>
         </div>
-<!--        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large">-->
-<!--            Więcej informacji-->
-<!--        </a></p>-->
       {% endif %}
     </div>
 

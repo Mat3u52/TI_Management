@@ -1,22 +1,23 @@
 {% extends 'TI_Management_app/base.html' %}
 {% block content %}
     {% if searched %}
-<h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
         <br />
-            {% for member in members %}
-                <div class="hero-unit">
+        {% for member in members %}
+            <div class="hero-unit">
                 <img src="{{ member.image.url }}" alt="image" width="100px">
                 <h2><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
-                <p><b>tel:</b> {{member.phone_number}}</p>
+                <p><b>Nr:</b> {{member.member_nr}} 	&#124;
+                    <b>tel:</b> {{member.phone_number}} &#124;
+                    <b>email:</b> {{member.email}}</p>
 
                 <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                     Więcej informacji
                 </a></p>
-                <div class="date"><p>published date: {{ member.created_date }}</p></div>
-                </div>
-            {% endfor %}
+                <div class="date"><p>Data dodania: {{ member.created_date }}</p></div>
+            </div>
+        {% endfor %}
     {% else %}
         <h2>Please, insert the phrase into the search area.</h2>
     {% endif %}
-
 {% endblock %}

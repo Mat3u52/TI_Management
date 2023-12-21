@@ -6,8 +6,9 @@ from django.urls import reverse_lazy
 from .forms import MemberForm
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
-
 from django.db.models.query_utils import Q
+from django.contrib.auth.decorators import login_required
+
 
 class Image(TemplateView):
     form = MemberForm
@@ -47,6 +48,7 @@ def error_404_view(request, exception):
     return render(request, 'TI_Management_app/404.html', data)
 
 
+@login_required
 def member_new(request):
     if request.method == "POST":
         form = MemberForm(request.POST, request.FILES)
@@ -60,6 +62,7 @@ def member_new(request):
     return render(request, 'TI_Management_app/member_new.html', {'form': form})
 
 
+@login_required
 def member_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
@@ -75,10 +78,31 @@ def member_edit(request, pk):
                                                                   'member': member})
 
 
+@login_required
+def member_card_edit(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    if request.method == "POST":
+        form = MemberForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            member = form.save(commit=False)
+            member.author = request.user
+            member.save()
+            return redirect('member_detail', pk=member.pk)
+    else:
+        form = MemberForm(instance=member)
+    return render(request, 'TI_Management_app/member_card_edit.html',
+                  {
+                      'form': form,
+                      'member': member}
+                  )
+
+
 def member_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        members = MembersZZTI.objects.filter(Q(forename__contains=searched) | Q(surname__contains=searched))
+        members = MembersZZTI.objects.filter(Q(forename__contains=searched) |
+                                             Q(surname__contains=searched) |
+                                             Q(member_nr__contains=searched))
         return render(request,
                       'TI_Management_app/member_search.html',
                       {'searched': searched,

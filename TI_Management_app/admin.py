@@ -103,12 +103,12 @@ class MembersZZTIAdmin(admin.ModelAdmin):
 
     list_display = ('id', 'forename', 'surname', 'role', 'occupation', 'member_nr', 'sex', 'birthday', 'birthplace',
                     'pin', 'phone_number', 'email', 'date_of_accession',
-                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
-                    'image_tag', 'created_date')
+                    'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'expiration_date_contract',
+                    'group', 'card', 'image_tag', 'created_date')
     list_filter = ('id', 'forename', 'surname', 'role', 'occupation', 'member_nr', 'sex', 'birthday', 'birthplace',
-                   'pin', 'phone_number', 'email', 'date_of_accession',
-                   'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'group', 'card',
-                   'created_date')
+                   'pin', 'phone_number', 'email', 'date_of_accession', 'expiration_date_contract',
+                   'date_of_abandonment', 'type_of_contract', 'date_of_contract',
+                   'group', 'card', 'created_date')
     search_fields = ('surname',)
     date_hierarchy = 'created_date'
 
