@@ -5,9 +5,11 @@ from .models import MembersZZTI
 
 
 class MemberForm(forms.ModelForm):
-    phone_number = forms.CharField(validators=[RegexValidator(r'^\+?1?\d{9,15}$',
+    phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
                                                               message="Wprowadź włąściwy numer telefonu.")])
     member_nr = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
+                                                              message="To pole musi być liczbą.")])
+    pin = forms.IntegerField(required=True, validators=[RegexValidator(r'^\d{0,8}$',
                                                               message="To pole musi być liczbą.")])
 
     class Meta:
@@ -25,28 +27,28 @@ class MemberForm(forms.ModelForm):
             'birthday': forms.TextInput(attrs={'type': 'datetime-local'}),
         }
 
-    def clean_pin(self, *args, **kwargs):
-        pin = self.cleaned_data.get("pin")
+    # def clean_pin(self, *args, **kwargs):
+    #     pin = self.cleaned_data.get("pin")
 
-        if MembersZZTI.objects.filter(pin=pin).exists():
-            raise forms.ValidationError("To pole musi być unikalne.")
+        # if MembersZZTI.objects.filter(pin=pin).exists():
+        #     raise forms.ValidationError("To pole musi być unikalne.")
 
         # if pin.is_integer() is False:
         # if type(pin) == float:
         #     raise forms.ValidationError('To pole musi być liczbą')
 
-        if len(str(pin)) != 8:
-            raise forms.ValidationError('To pole musi sładać się z 8 znaków.')
+        # if len(str(pin)) != 8:
+        #     raise forms.ValidationError('To pole musi sładać się z 8 znaków.')
+        #
+        # return pin
 
-        return pin
-
-    def clean_member_nr(self, *args, **kwargs):
-        member_nr = self.cleaned_data.get("member_nr")
-
-        if MembersZZTI.objects.filter(member_nr=member_nr).exists():
-            raise forms.ValidationError("To pole musi być unikalne.")
-
-        return member_nr
+    # def clean_member_nr(self, *args, **kwargs):
+    #     member_nr = self.cleaned_data.get("member_nr")
+    #
+    #     if MembersZZTI.objects.filter(member_nr=member_nr).exists():
+    #         raise forms.ValidationError("To pole musi być unikalne.")
+    #
+    #     return member_nr
 
 
 
