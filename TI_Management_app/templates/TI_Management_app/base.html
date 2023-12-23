@@ -32,6 +32,13 @@
                             Labour Union<br>
                             Management System
                         </p>
+
+                        &nbsp;&nbsp;&nbsp;&nbsp;
+                        <a href="{% url 'members_list' %}">Main </a>
+                        {% block breadcrumbs %}
+                        {% endblock %}
+
+
                         <p class="navbar-text pull-right">
                             Użytkownik:
                             {% if user.is_authenticated %}
@@ -62,7 +69,7 @@
                                 <a href="{% url 'members_list' %}">Baza Członków</a>
                                 <ul>
                                     <li>
-                                        <a href="{% url 'member_new' %}">dodaj</a>
+                                        <a href="{% url 'member_new' %}">dodaj uczestnika</a>
                                     </li>
                                 </ul>
                             </li>
