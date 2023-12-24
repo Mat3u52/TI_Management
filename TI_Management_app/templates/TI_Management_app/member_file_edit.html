@@ -1,0 +1,12 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block content %}
+<h2>Dodaj plik:</h2>
+
+<form method="post" class="post-form">
+    {{ form.as_p }}
+    {% csrf_token %}
+    <button type="submit" class="btn btn-outline-success">Dodaj plik</button>
+</form>
+
+{% endblock %}
