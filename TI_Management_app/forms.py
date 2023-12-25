@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import MembersZZTI
+from .models import MembersZZTI, MembersFile
 # from phone_field import PhoneField
 
 
@@ -51,6 +51,7 @@ class MemberForm(forms.ModelForm):
     #     return member_nr
 
 
-
-
-
+class MemberFileForm(forms.ModelForm):
+    class Meta:
+        model = MembersFile
+        fields = ('title', 'file')
