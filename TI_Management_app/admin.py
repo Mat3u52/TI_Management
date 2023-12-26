@@ -120,8 +120,8 @@ class MembersFile(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('title', 'file', 'created_date')
-    list_filter = ('title', 'file', 'created_date')
+    list_display = ('member', 'title', 'file', 'created_date')
+    list_filter = ('member', 'title', 'file', 'created_date')
     search_fields = ('title',)
     date_hierarchy = 'created_date'
 
