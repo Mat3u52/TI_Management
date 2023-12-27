@@ -1,11 +1,12 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import MembersZZTI
+from .models import MembersZZTI, MembersFile
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .forms import MemberForm
+from .forms import MemberForm, MemberFileForm
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
+from django.views.generic import CreateView
 from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
 
@@ -70,6 +71,7 @@ def member_edit(request, pk):
         if form.is_valid():
             member = form.save(commit=False)
             member.author = request.user
+            # member.save(update_fields=['forename'])
             member.save()
             return redirect('member_detail', pk=member.pk)
     else:
@@ -111,3 +113,17 @@ def member_search(request):
         return render(request,
                       'TI_Management_app/member_search.html',
                       {})
+
+
+# @login_required
+class MemberFileView(CreateView):
+    # member = get_object_or_404(MembersZZTI, pk=pk)
+    model = MembersFile
+    form_class = MemberFileForm
+    template_name = 'TI_Management_app/member_file_edit.html'
+
+    def form_valid(self, form):
+        form.instance.member_id = self.kwargs['pk']
+        return super().form_valid(form)
+
+    success_url = reverse_lazy('members_list')
