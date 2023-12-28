@@ -16,7 +16,7 @@ h1 a, h2 a {
 }
 
 input {
-  width: 100%;
+  width: 90%;
 }
 
 .hero-unit {
@@ -84,6 +84,12 @@ img {
     list-style-type: none;
     margin: 0;
     padding: 0;
+}
+.uniqueLink {
+    color: #C30010;
+    text-decoration: none;
+    padding: 0;
+    margin: 0;
 }
 
 .hint input[type=text] {
