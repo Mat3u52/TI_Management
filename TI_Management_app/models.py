@@ -137,7 +137,7 @@ class MembersFile(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='membersFile', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=350, null=False, blank=False)
-    file = models.FileField(null=True, blank=True, upload_to='uploadsMember/%Y/%m/%d/')
+    file = models.FileField(null=False, blank=False, upload_to='uploadsMember/%Y/%m/%d/')
 
     def __str__(self):
         return self.title
