@@ -106,6 +106,54 @@ img {
 
 .hint input[type=email] {
     border: 2px solid #C30010;
-    background-color: #fdc5b9;
+    background-color: #FDC5B9;
+    color: #000000;
+}
+
+.str-file{
+    color: #C000000;
+    font-size: 12px;
+    padding: 0;
+    margin: 0;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+.custom-file-upload {
+    color: #FFFFFF;
+    background: #006DCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.custom-file-upload {
+    color: #FFFFFF;
+    background: #006DCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.custom-file-upload-mod input[type="file"] {
+    color: #FFFFFF;
+    background: #006DCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+.custom-file-upload-mod a {
     color: #000000;
 }

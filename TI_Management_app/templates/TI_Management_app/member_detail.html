@@ -1,5 +1,10 @@
 {% extends 'TI_Management_app/base.html' %}
 
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}}</a>
+{% endblock %}
+
 {% block content %}
 
     <div class="hero-unit">
@@ -69,8 +74,12 @@
             </td>
           </tr>
           <tr>
-            <td class="tableCredential"><p><b>Data umowy: </b></p></td>
+            <td class="tableCredential"><p><b>Data zatrudnienia: </b></p></td>
             <td><p>{{member.date_of_contract}}</p></td>
+          </tr>
+          <tr>
+            <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
+            <td><p>{{member.expiration_date_contract}}</p></td>
           </tr>
         </table>
 
@@ -87,19 +96,41 @@
                 <p><a href="{% url 'member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Zmień
                 </a></p>
+                <br/>
                 <p>{{member.card}}</p>
               </li>
           </ul>
         </div>
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
-            <li class="nav-header" id="showDocuments">Pliki:</li>
+            <li class="nav-header" id="showDocuments">Dokumenty:</li>
               <li id="objDocuments" style="display: none">
+                <p><a href="{% url 'member_file_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                  Dodaj Plik
+                </a></p>
+                <br />
+                <br />
+                <table width="100%">
                 {% for file in member.membersFile.all %}
-                    <p><a href="{{ file.file.url }}">{{ file.title }}</a> - {{ file.created_date }}</p>
+<!--                    <p><a href="{{ file.file.url }}">{{ file.title }}</a> - {{ file.created_date }}</p>-->
+                  <tr>
+                    <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
+                    <td><p class="str-file">{{ file.file }}</p></td>
+                    <td><p class="str-file">{{ file.created_date }}</p></td>
+<!--                    <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="date-file-delete">usuń</a></td>-->
+                    <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a></td>
+                  </tr>
+
+
+
                 {% empty %}
-                  <p>Brak plików</p>
+                  <tr>
+                    <td>
+                      <p>Brak plików</p>
+                    </td>
+                  </tr>
                 {% endfor %}
+                  </table>
               </li>
           </ul>
         </div>
@@ -128,20 +159,23 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>
               <li id="objCardsLoyality" style="display: none">
-                <p><a href="#" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'member_loyalty_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Dodaj
                 </a></p>
+                <br />
+                <br />
                 {% for card in member.cardStatus.all %}
                     <div class="notepad">
-                      <p>{{ card.card }}</p>
-                      <p>{{ card.card_identity }}</p>
+                      <p><a href="#"><b>{{ card.card }}</b></a></p>
+                      <p><b>Nr:</b> {{ card.card_identity }}</p>
                         {% if card.card_status == 'demandReceived' %}<p><b>Status:</b> Zapotrzebowanie odebrane</p>
                         {% elif card.card_status == 'requestSent' %}<p><b>Status:</b> Zapotrzebowanie wysłane</p>
                         {% elif card.card_status == 'sent' %}<p><b>Status:</b> Przysłana</p>
                         {% elif card.card_status == 'received' %}<p><b>Status:</b> Odebrana</p>
                         {% elif card.card_status == 'none' %}<p><b>Status:</b> Brak statusu</p>
                         {% else %}<p><b>Status:</b> None</p>{% endif %}
-                      <p>Data: {{ card.date_of_action }}</p>
+                      <p><b>Data:</b> {{ card.date_of_action }}</p>
+                      <a href="#" class="btn btn-danger btn-sm pull-right">usuń</a>
                     </div>
 
                 {% empty %}

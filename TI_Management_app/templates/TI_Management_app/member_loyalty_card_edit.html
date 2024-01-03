@@ -1,10 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}}</a>
+<a href="{% url 'member_loyalty_card_edit' pk=member.pk %}"> / Karty Lojalnościowe</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+
+<!--        {% if form.errors %}-->
+<!--            <p>{{form.errors}}</p>-->
+<!--        {% endif %}-->
+
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h3>
+        <p>Karty Lojalnościowe</p>
+        <form method="post" class="post-form">
+<!--            {{ form.as_p }}-->
+            {% csrf_token %}
+<!--            <p>{{form.card}}</p>-->
+<!--            <p>{{form.card_identity}}</p>-->
+<!--            <p>{{form.card_status}}</p>-->
+<!--            <p>{{form.date_of_action}}</p>-->
+            <table width="100%">
+                <tr>
+                    <td>Rodzaj karty: </td>
+                    <td>{{form.card}}</td>
+                </tr>
+                <tr>
+                    <td>Numer karty: </td>
+<!--                    <td>{{form.card_identity}}</td>-->
+
+                    <td>
+                        {% if form.card_identity.errors %}
+                            <p class="hint">{{form.card_identity}}</p>
+                            <p>{{form.card_identity.errors}}</p>
+                        {% else %}
+                            <p>{{form.card_identity}}</p>
+                        {% endif %}
+                    </td>
+
+
+                </tr>
+                <tr>
+                    <td>Status karty: </td>
+                    <td>{{form.card_status}}</td>
+                </tr>
+                <tr>
+                    <td>Data modyfikacji: </td>
+                    <td>{{form.date_of_action}}</td>
+                </tr>
+            </table>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj karte</button>
+            <br />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

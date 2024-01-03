@@ -1,12 +1,43 @@
 {% extends 'TI_Management_app/base.html' %}
 
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}}</a>
+<a href="{% url 'member_file_edit' pk=member.pk %}"> / Dokumenty</a>
+{% endblock %}
+
 {% block content %}
-<h2>Dodaj plik:</h2>
+{% if user.is_authenticated and user.username == 'admin' %}
+   <div class="hero-unit">
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h3>
+        <p>Dokument</p>
+        <form method="post" class="post-form" enctype="multipart/form-data">
+<!--            {{ form.as_p }}-->
+            {% csrf_token %}
+<!--            <table width="100%">-->
+<!--                <tr>-->
+<!--                    <td>Nazwa dokumentu: </td>-->
+<!--                    <td>{{form.title}}</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>Wybierz dokument: </td>-->
+<!--                    <td>-->
+<!--                        <label class="custom-file-upload">-->
+<!--                            Dodaj dokument-->
+<!--                            {{form.file}}-->
+<!--                        </label>-->
+<!--                    </td>-->
+<!--                </tr>-->
+<!--            </table>-->
+            <p>{{form.title}}</p>
+            <label class="custom-file-upload">
+                Wybierz dokument
+                {{form.file}}
+            </label>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+            <br />
+        </form>
+    </div>
 
-<form method="post" class="post-form">
-    {{ form.as_p }}
-    {% csrf_token %}
-    <button type="submit" class="btn btn-outline-success">Dodaj plik</button>
-</form>
-
+{% endif %}
 {% endblock %}

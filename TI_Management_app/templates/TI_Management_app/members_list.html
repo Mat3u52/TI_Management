@@ -1,5 +1,9 @@
 {% extends 'TI_Management_app/base.html' %}
 
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+{% endblock %}
+
 {% block content %}
 <div class="hero-unit">
 <form class="d-flex" method=POST action="{% url 'member_search' %}">

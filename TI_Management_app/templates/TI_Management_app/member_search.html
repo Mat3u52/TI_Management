@@ -1,4 +1,9 @@
 {% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Wyszukiwarka</a>
+{% endblock %}
+
 {% block content %}
     {% if searched %}
         <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>

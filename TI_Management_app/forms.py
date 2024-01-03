@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import MembersZZTI, MembersFile
+from .models import MembersZZTI, MembersFile, CardStatus
 # from phone_field import PhoneField
 
 
@@ -55,3 +55,17 @@ class MemberFileForm(forms.ModelForm):
     class Meta:
         model = MembersFile
         fields = ('title', 'file')
+
+
+class CardStatusForm(forms.ModelForm):
+    card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
+                                                               message="To pole musi być liczbą.")])
+
+    class Meta:
+        model = CardStatus
+        fields = ('card', 'card_identity', 'card_status', 'date_of_action')
+
+        widgets = {
+            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'})
+        }
+

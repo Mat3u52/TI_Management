@@ -1,12 +1,21 @@
 {% extends 'TI_Management_app/base.html' %}
 
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}}</a>
+<a href="{% url 'member_edit' pk=member.pk %}"> / Modyfikuj</a>
+{% endblock %}
+
+
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
         <form method="post" class="post-form">
             {% csrf_token %}
+<!--            {% if form.errors %}-->
+<!--                <p>{{form.errors}}</p>-->
+<!--            {% endif %}-->
             <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
-
             <table>
                 <tr>
                     <td><p class="tableCredential"><b>Imie: </b></p></td>
@@ -22,7 +31,14 @@
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Numer uczestnika: </b></p></td>
-                    <td><p>{{form.member_nr}}</p></td>
+                    <td>
+                        {% if form.member_nr.errors %}
+                            <p class="hint">{{form.member_nr}}</p>
+                            <p>{{form.member_nr.errors}}</p>
+                        {% else %}
+                            <p>{{form.member_nr}}</p>
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Płeć: </b></p></td>
@@ -37,8 +53,18 @@
                     <td><p>{{form.birthplace}}</p></td>
                 </tr>
                 <tr>
-                    <td><p class="tableCredential"><b>PIN: </b></p></td>
-                    <td><p>{{form.pin}}</p></td>
+                    <td><p class="tableCredential"><b>PP ID: </b></p></td>
+                    <td>
+                        {% if form.pin.errors %}
+                            <p class="hint">{{form.pin}}</p>
+                            <p>{{form.pin.errors}}</p>
+                        {% else %}
+                            <p>{{form.pin}}</p>
+<!--                        <p>{{form.pin.disabled}}</p>-->
+<!--                            <input type="number" name="pin" value="{{ member.pin }}" maxlength="250" id="id_pin" disabled>-->
+<!--                            <a href="#">&#8629;</a>-->
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Stanowisko: </b></p></td>
@@ -46,11 +72,25 @@
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-                    <td><p>{{form.phone_number}}</p></td>
+                    <td>
+                        {% if form.phone_number.errors %}
+                            <p class="hint">{{form.phone_number}}</p>
+                            <p>{{form.phone_number.errors}}</p>
+                        {% else %}
+                            <p>{{form.phone_number}}</p>
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>E-mail: </b></p></td>
-                    <td><p>{{form.email}}</p></td>
+                    <td>
+                        {% if form.email.errors %}
+                            <p class="hint">{{form.email}}</p>
+                            <p>{{form.email.errors}}</p>
+                        {% else %}
+                            <p>{{form.email}}</p>
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
@@ -72,17 +112,22 @@
                     <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
                     <td><p>{{form.expiration_date_contract}}</p></td>
                 </tr>
-                <tr>
-                    <td class="tableCredential"><p><b>Karta: </b></p></td>
-                    <td><p>{{form.card}}</p></td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td class="tableCredential"><p><b>Karta: </b></p></td>-->
+<!--                    <td><p>{{form.card}}</p></td>-->
+<!--                </tr>-->
                 <tr>
                     <td class="tableCredential"><p><b>Zdjęcie: </b></p></td>
-                    <td><p>{{form.image}}</p></td>
+                    <td>
+<!--                        <p>{{form.image}}</p>-->
+                        <label class="custom-file-upload-mod">
+                            {{form.image}}
+                        </label>
+                    </td>
                 </tr>
             </table>
-
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
         </form>
     </div>
 {% endif %}

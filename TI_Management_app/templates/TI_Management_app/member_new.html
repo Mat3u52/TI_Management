@@ -1,15 +1,18 @@
 {% extends 'TI_Management_app/base.html' %}
 
+{% block breadcrumbs %}
+<a href="{% url 'member_new' %}"> / Dodaj Uczestnika</a>
+{% endblock %}
+
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
         <form method="post" class="post-form">
             {% csrf_token %}
-
 <!--            {% if form.errors %}-->
 <!--                <p>{{form.errors}}</p>-->
 <!--            {% endif %}-->
-            <table>
+            <table width="100%">
                 <tr>
                     <td><p class="tableCredential"><b>Imie: </b></p></td>
                     <td><p>{{form.forename}}</p></td>
@@ -46,7 +49,7 @@
                     <td><p>{{form.birthplace}}</p></td>
                 </tr>
                 <tr>
-                    <td><p class="tableCredential"><b>PIN: </b></p></td>
+                    <td><p class="tableCredential"><b>PP ID: </b></p></td>
                     <td>
                         {% if form.pin.errors %}
                             <p class="hint">{{form.pin}}</p>
@@ -113,7 +116,13 @@
                 </tr>
                 <tr>
                     <td class="tableCredential"><p><b>Zdjęcie: </b></p></td>
-                    <td><p>{{form.image}}</p></td>
+                    <td>
+<!--                        <p>{{form.image}}</p>-->
+                        <label class="custom-file-upload">
+                            Dodaj zdjęcie
+                            {{form.image}}
+                        </label>
+                    </td>
                 </tr>
             </table>
 

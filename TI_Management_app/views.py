@@ -1,14 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import MembersZZTI, MembersFile
+from .models import MembersZZTI, MembersFile, Cards
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .forms import MemberForm, MemberFileForm
+from .forms import MemberForm, MemberFileForm, CardStatusForm
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
 from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
 
 
 class Image(TemplateView):
@@ -115,15 +116,67 @@ def member_search(request):
                       {})
 
 
-# @login_required
-class MemberFileView(CreateView):
-    # member = get_object_or_404(MembersZZTI, pk=pk)
-    model = MembersFile
-    form_class = MemberFileForm
-    template_name = 'TI_Management_app/member_file_edit.html'
+@login_required
+def member_file_edit(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    if request.method == "POST":
+        form = MemberFileForm(request.POST, request.FILES)  # , instance = member
+        if form.is_valid():
+            member_file = form.save(commit=False)
+            member_file.member = member
+            member_file.author = request.user
+            member_file.save()
+            return redirect('member_detail', pk=member.pk)
+    else:
+        form = MemberFileForm()
+    return render(request, 'TI_Management_app/member_file_edit.html',
+                  {
+                      'form': form,
+                      'member': member}
+                  )
 
-    def form_valid(self, form):
-        form.instance.member_id = self.kwargs['pk']
-        return super().form_valid(form)
 
-    success_url = reverse_lazy('members_list')
+@login_required
+def member_file_delete(request, pk, pk1):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    member_file = get_object_or_404(MembersFile, pk=pk1)
+
+    member.author = request.user
+    member_file.file.delete()
+    member_file.delete()
+    return redirect('member_detail', pk=member.pk)
+
+
+@login_required
+def member_loyalty_card_edit(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    # member_loyalty_card = get_object_or_404(MembersZZTI, pk=pk)
+    if request.method == "POST":
+        form = CardStatusForm(request.POST)
+        if form.is_valid():
+            loyalty_card = form.save(commit=False)
+            loyalty_card.member = member
+            loyalty_card.author = request.user
+            loyalty_card.save()
+            return redirect('member_detail', pk=member.pk)
+    else:
+        form = CardStatusForm()
+    return render(request, 'TI_Management_app/member_loyalty_card_edit.html',
+                  {
+                      'form': form,
+                      'member': member}
+                  )
+
+
+# class MemberFileView(LoginRequiredMixin, CreateView):
+#     model = MembersFile
+#     form_class = MemberFileForm
+#     template_name = 'TI_Management_app/member_file_edit.html'
+#
+#     def form_valid(self, form):
+#         form.instance.member_id = self.kwargs['pk']
+#         return super().form_valid(form)
+#
+#     success_url = reverse_lazy('members_list')
+
+
