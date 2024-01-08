@@ -12,3 +12,7 @@ db.sqlite3
 /media/images/*
 /media/uploads/*
 /media/uploadsMember/*
+/media/uploadsNotepad/*
+/media/uploadsLoyaltyCards/*
+/media/uploadsLoyaltyCards_a/*
+
