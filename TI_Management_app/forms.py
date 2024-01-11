@@ -1,16 +1,15 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import MembersZZTI, MembersFile, CardStatus
-# from phone_field import PhoneField
+from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups
 
 
 class MemberForm(forms.ModelForm):
     phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
-                                                              message="Wprowadź włąściwy numer telefonu.")])
+                                                                              message="Wprowadź włąściwy numer telefonu.")])
     member_nr = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                              message="To pole musi być liczbą.")])
+                                                           message="To pole musi być liczbą.")])
     pin = forms.IntegerField(required=True, validators=[RegexValidator(r'^\d{0,8}$',
-                                                              message="To pole musi być liczbą.")])
+                                                                       message="To pole musi być liczbą.")])
 
     class Meta:
         model = MembersZZTI
@@ -60,12 +59,58 @@ class MemberFileForm(forms.ModelForm):
 class CardStatusForm(forms.ModelForm):
     card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
                                                                message="To pole musi być liczbą.")])
+    card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
+                                                                message="To pole musi być liczbą.")])
+
+    # responsible = forms.CharField(initial='admin')
+    # responsible = forms.CharField(initial=user.username)
+    # widget = forms.HiddenInput(),
+    responsible = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = CardStatus
-        fields = ('card', 'card_identity', 'card_status', 'date_of_action')
+        fields = ('card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+                  'file_name', 'file', 'file_name_a', 'file_a', 'responsible', 'confirmed')
 
         widgets = {
             'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'})
         }
 
+
+class GroupsMemberForm(forms.ModelForm):
+    class Meta:
+        model = GroupsMember
+        fields = ('group',)
+
+
+class NotepadMemberForm(forms.ModelForm):
+    class Meta:
+        responsible = forms.CharField(widget=forms.HiddenInput())
+
+        model = Notepad
+        fields = ['title', 'content', 'published_date', 'importance',
+                  'method', 'status', 'responsible', 'file', 'confirmed']
+
+        widgets = {
+            'published_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+        }
+
+
+class GroupsForm(forms.ModelForm):
+    class Meta:
+        model = Groups
+        fields = ('group_name',)
+
+
+class GroupsEditForm(forms.ModelForm):
+    class Meta:
+        model = Groups
+        fields = ('group_name',)
+
+
+class GroupAddMemberForm(forms.ModelForm):
+    # group = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = GroupsMember
+        fields = ('member', 'group')

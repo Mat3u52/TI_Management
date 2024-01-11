@@ -1,10 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'member_notepad_edit' pk=member.pk pk1=notepad.pk %}"> / Modyfikuj komunikację</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
+        <p>Komunikacja</p>
+        <form method="post" class="post-form" enctype="multipart/form-data">
+<!--            {{ form.as_p }}-->
+            {% csrf_token %}
+<!--            <p>{{form.card}}</p>-->
+<!--            <p>{{form.card_identity}}</p>-->
+<!--            <p>{{form.card_status}}</p>-->
+<!--            <p>{{form.date_of_action}}</p>-->
+            <table width="100%">
+                <tr>
+                    <td>Tytuł sprawy:
+                    {{ form.title }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Opis:<br/>
+                    {{ form.content }}</td>
+                </tr>
+<!--                <tr>-->
+<!--                    <td>Data zgłoszenia:-->
+<!--                    {{ form.published_date }}</td>-->
+<!--                </tr>-->
+                <tr>
+                    <td>Ważność:<br/>
+                    {{ form.importance }}</td>
+                </tr>
+                <tr>
+                    <td>Sposób zgłoszenia:<br/>
+                    {{ form.method }}</td>
+                </tr>
+                <tr>
+                    <td>Status:<br/>
+                    {{ form.status }}</td>
+                </tr>
+                <tr>
+                    <td>Odpowiedzialny:<br/>
+                    {{ form.responsible }}</td>
+                </tr>
+                <tr>
+                    <td class="tableCredential">
+                        <label class="custom-file-upload-mod">
+                            Dodaj plik:
+                            {{ form.file }}
+                        </label>
+                    </td>
+
+                </tr>
+                <tr>
+                    <td>{{form.confirmed}} Potwierdzenie zgłoszenia</td>
+                </tr>
+            </table>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

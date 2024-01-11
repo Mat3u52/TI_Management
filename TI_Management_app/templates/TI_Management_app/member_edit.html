@@ -10,7 +10,7 @@
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
-        <form method="post" class="post-form">
+        <form method="post" class="post-form" enctype="multipart/form-data">
             {% csrf_token %}
 <!--            {% if form.errors %}-->
 <!--                <p>{{form.errors}}</p>-->

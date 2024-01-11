@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}}</a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
 {% endblock %}
 
 {% block content %}
@@ -96,8 +96,11 @@
                 <p><a href="{% url 'member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Zmień
                 </a></p>
-                <br/>
-                <p>{{member.card}}</p>
+                <br />
+                <br />
+                <div class="notepad">
+                  <p>{{member.card}}</p>
+                </div>
               </li>
           </ul>
         </div>
@@ -110,6 +113,7 @@
                 </a></p>
                 <br />
                 <br />
+                <div class="notepad">
                 <table width="100%">
                 {% for file in member.membersFile.all %}
 <!--                    <p><a href="{{ file.file.url }}">{{ file.title }}</a> - {{ file.created_date }}</p>-->
@@ -130,7 +134,8 @@
                     </td>
                   </tr>
                 {% endfor %}
-                  </table>
+                </table>
+                </div>
               </li>
           </ul>
         </div>
@@ -159,23 +164,23 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>
               <li id="objCardsLoyality" style="display: none">
-                <p><a href="{% url 'member_loyalty_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'member_loyalty_card_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Dodaj
                 </a></p>
                 <br />
                 <br />
                 {% for card in member.cardStatus.all %}
                     <div class="notepad">
-                      <p><a href="#"><b>{{ card.card }}</b></a></p>
+                      <p><a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=card.pk %}"><b>{{ card.card }}</b></a></p>
                       <p><b>Nr:</b> {{ card.card_identity }}</p>
-                        {% if card.card_status == 'demandReceived' %}<p><b>Status:</b> Zapotrzebowanie odebrane</p>
-                        {% elif card.card_status == 'requestSent' %}<p><b>Status:</b> Zapotrzebowanie wysłane</p>
-                        {% elif card.card_status == 'sent' %}<p><b>Status:</b> Przysłana</p>
-                        {% elif card.card_status == 'received' %}<p><b>Status:</b> Odebrana</p>
+                        {% if card.card_status == 'toOrder' %}<p><b>Status:</b> Do zlecenia</p>
+                        {% elif card.card_status == 'ordered' %}<p><b>Status:</b> Zlecona</p>
+                        {% elif card.card_status == 'toBePickedUp' %}<p><b>Status:</b> Do odbioru</p>
+                        {% elif card.card_status == 'deactivated' %}<p><b>Status:</b> Dezaktywowana</p>
                         {% elif card.card_status == 'none' %}<p><b>Status:</b> Brak statusu</p>
                         {% else %}<p><b>Status:</b> None</p>{% endif %}
                       <p><b>Data:</b> {{ card.date_of_action }}</p>
-                      <a href="#" class="btn btn-danger btn-sm pull-right">usuń</a>
+                      <a href="{% url 'member_loyalty_card_delete' pk=member.pk pk1=card.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                     </div>
 
                 {% empty %}
@@ -240,11 +245,18 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showGroup">Grupy:</li>
               <li id="objGroup" style="display: none">
-                <p><a href="#" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'member_group_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Dodaj
                 </a></p>
+                <br />
+                <br />
                 {% for group in member.groupsMember.all %}
-                    <p>{{ group.group }}</p>
+                  <div class="notepad">
+                    <p>
+                      {{ group.group }}
+                      <a href="{% url 'member_group_delete' pk=member.pk pk1=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                    </p>
+                  </div>
                 {% empty %}
                   <p>Brak grupy</p>
                 {% endfor %}
@@ -256,22 +268,42 @@
             <li class="nav-header" id="showNotepad">Komunikacja:</li>
               <li id="objNotepad" style="display: none">
 
-                {% for note in member.notepad.all %}
+                {% for note in member.notepad.all|dictsortreversed:"id"|slice:"1" %}
+
+                  <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
+                    Modyfikuj
+                  </a></p>
+                  <br />
+                  <br />
                     <div class="notepad">
-                      <p><b>Sprawa: </b><a href="#">{{ note.title }}</a></p>
-                      <p><b>Opis: </b> {{ note.content }}</p>
-                        {% if note.importance == 'standard' %}<p><b>Ważnośc:</b> Standard</p>
+                      <p><b>Sprawa: </b><a href="{% url 'member_notepad_history' pk=member.pk %}">{{ note.title }}</a></p>
+
+                      {% for note_date in member.notepad.all|slice:"1" %}
+                        <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>
+                      {% endfor %}
+
+                      <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>
+                        {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>
+                        {% elif note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>
                         {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
+                        {% elif note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>
                         {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
                         {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
-                        {% else %}<p><b>Ważność:</b> None</p>{% endif %}
+                        {% else %}<p><b>Ważność:</b> None</p>
+                        {% endif %}
                       <p><b>Status:</b> {{ note.status }}</p>
-                      <p><b>Data dodanie:</b> {{ note.created_date }}</p>
-                      <p><b>Data publikacji:</b> {{ note.published_date }}</p>
-                      <p><b>Odpowiedzialny:</b> {{member.forename}} {{member.surname}}</p>
-                      <p><b>Plik:</b> {{ note.file }}</p>
+
+                      <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
+
+                      <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                     </div>
+                  <br />
                 {% empty %}
+                  <p><a href="{% url 'member_notepad_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                    Dodaj
+                  </a></p>
+                  <br />
+                  <br />
                   <p>Brak informacji</p>
                 {% endfor %}
 

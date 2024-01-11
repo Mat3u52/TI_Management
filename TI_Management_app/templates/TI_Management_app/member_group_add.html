@@ -1,10 +1,32 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'member_group_add' pk=member.pk %}"> / Dodaj grupę</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+
+<!--        {% if form.errors %}-->
+<!--            <p>{{form.errors}}</p>-->
+<!--        {% endif %}-->
+
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
+        <p>Grupy</p>
+        <form method="post" class="post-form">
+<!--            {{ form.as_p }}-->
+            {% csrf_token %}
+            <p>{{form.group}}</p>
+<!--            <p>{{form.card_identity}}</p>-->
+<!--            <p>{{form.card_status}}</p>-->
+<!--            <p>{{form.date_of_action}}</p>-->
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj grupę</button>
+            <br />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

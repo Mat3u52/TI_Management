@@ -79,8 +79,10 @@ class CardStatusAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('card', 'card_identity', 'card_status', 'date_of_action', 'created_date')
-    list_filter = ('card', 'card_identity', 'card_status', 'date_of_action', 'created_date')
+    list_display = ('card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+                    'created_date', 'file_name', 'file', 'file_name_a', 'file_a', 'responsible', 'confirmed')
+    list_filter = ('card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+                   'created_date', 'file_name', 'file', 'file_name_a', 'file_a', 'responsible', 'confirmed')
     search_fields = ('card_identity', 'card_status')
     # raw_id_fields = ('author',)
     date_hierarchy = 'created_date'
@@ -133,8 +135,10 @@ class NotepadAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('title', 'published_date', 'importance', 'status', 'member', 'file', 'created_date')
-    list_filter = ('title', 'published_date', 'importance', 'status', 'member', 'file', 'created_date')
+    list_display = ('title', 'published_date', 'importance', 'method', 'status', 'member',
+                    'responsible', 'file', 'created_date', 'confirmed')
+    list_filter = ('title', 'published_date', 'importance', 'method', 'status', 'member',
+                   'responsible', 'file', 'created_date', 'confirmed')
     search_fields = ('title',)
     date_hierarchy = 'created_date'
 

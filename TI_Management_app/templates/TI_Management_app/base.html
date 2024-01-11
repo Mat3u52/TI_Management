@@ -64,9 +64,9 @@
                     <div class="well sidebar-nav">
                         <ul class="nav nav-list">
                             <li class="nav-header">Panel</li>
-                            <li><a href="#">Dashboard</a></li>
+                            <li><a href="#"><b>Dashboard</b></a></li>
                             <li class="active">
-                                <a href="{% url 'members_list' %}">Baza Członków</a>
+                                <a href="{% url 'members_list' %}"><b>Baza Członków</b></a>
                                 <ul>
                                     <li>
                                         <a href="{% url 'member_new' %}">dodaj uczestnika</a>
@@ -75,8 +75,13 @@
                             </li>
 
 
-                            <li><a href="#">Link</a></li>
-                            <li><a href="#">Link</a></li>
+                            <li><a href="{% url 'groups_list' %}"><b>Grupy</b></a></li>
+                                <ul>
+                                    <li>
+                                        <a href="{% url 'groups_add' %}">dodaj grupe</a>
+                                    </li>
+                                </ul>
+                            <li><a href="#"><b>Karty Lojalnościowe</b></a></li>
                         </ul>
                     </div>
                 </div>

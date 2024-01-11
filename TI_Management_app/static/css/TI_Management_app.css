@@ -77,6 +77,38 @@ img {
     margin-top: 10px;
     border-radius: 10px;
 }
+.notepad-history-head {
+    width: 100%
+}
+
+.notepad-head {
+    width: 100%
+    text-align: center;
+    text-align: center;
+    color: #828282;
+    background:  #ECF0F1;
+    padding: 2px;
+    margin-top: 0px;
+    border-radius: 10px;
+}
+
+.notepad-status-left {
+    width:50%;
+    float:left;
+    font-size: 10pt;
+    color: #828282;
+    text-align: left;
+    padding-top: 1px;
+}
+
+.notepad-status-right {
+    width:50%;
+    float:left;
+    font-size: 10pt;
+    color: #828282;
+    text-align: right;
+    padding-top: 1px;
+}
 
 .errorlist {
     font-size: 10pt;

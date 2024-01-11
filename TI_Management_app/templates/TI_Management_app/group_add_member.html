@@ -1,21 +1,27 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'groups_add' %}"> / Dodaj Grupe</a>
+<a href="{% url 'groups_list' %}"> / Grupy </a>
+<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+<a href="{% url 'group_add_member' pk=group.pk %}"> / Dodaj uczestnika</a>
 {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
+        <a href="{% url 'group_detail' pk=group.pk %}"><h3>{{group.group_name}}</h3></a>
         <form method="post" class="post-form">
             {% csrf_token %}
             {% if form.errors %}
                 <p>{{form.errors}}</p>
             {% endif %}
-            <p>Grupa:</p>
-            {{form.group_name}}
+            <p>Nowy uczestnika:</p>
+            {{form.member}}
+<!--            {{form.group}}-->
+            {{form.group.as_hidden}}
 
-
+            <br />
+            <br />
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
             <br />
             <br />

@@ -3,11 +3,12 @@ import datetime
 from django.db import models
 from django.utils import timezone
 from phone_field import PhoneField
+from simple_history.models import HistoricalRecords
 
 
 class Groups(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
-    group_name = models.CharField(max_length=250, blank=False, default=None)
+    group_name = models.CharField(max_length=250, blank=False, default=None, unique=True)
 
     def __str__(self):
         return self.group_name
@@ -102,7 +103,7 @@ class MembersZZTI(models.Model):
     # card_rfid = models.ForeignKey(CardsRFID, on_delete=models.CASCADE, null=True, blank=True, default=None)
     card = models.CharField(max_length=350, blank=True, null=True, default=None)
     # card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    image = models.ImageField(null=True, blank=True, upload_to='images/', default='images/NoImage.png')
+    image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
 
     # vote = models.ManyToManyField(Vote)
 
@@ -137,7 +138,8 @@ class MembersFile(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='membersFile', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=350, null=False, blank=False)
-    file = models.FileField(null=False, blank=False, upload_to='uploadsMember/%Y/%m/%d/')
+    file = models.FileField(null=False, blank=False, upload_to='uploadsMember/%Y/%m/%d/%H%M%S/')
+    history = HistoricalRecords()
 
     def __str__(self):
         return self.title
@@ -149,33 +151,54 @@ class MembersFile(models.Model):
 class Notepad(models.Model):
     IMPORTANCE_CHOICES = (
         ('none', 'Nie dotyczy'),
-        ('standard', 'Standard'),
+        ('low', 'Niski'),
+        ('standard', 'Umiarkowany'),
         ('important', 'Ważny'),
+        ('veryImportant', 'Bardzo ważny'),
         ('critical', 'Krytyczny'),
     )
+
+    METHOD_CHOICES = (
+        ('personally', 'Osobiście'),
+        ('email', 'E-mail'),
+        ('telephone', 'Telefonicznie'),
+        ('zoom', 'ZOOM'),
+        ('whatsapp', 'WhatsApp'),
+        ('facebook', 'Facebook'),
+        ('other', 'Inny'),
+    )
+
     STATUS_CHOICES = (
         ('ongoing', 'W trakcie'),
         ('closed', 'Zamknięty'),
     )
+
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='notepad', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=350, null=False, blank=False)
     content = models.TextField(null=True, blank=True, default=None)
-    published_date = models.DateTimeField(default=timezone.now)
+    # published_date = models.DateTimeField(default=timezone.now)
+    published_date = models.DateTimeField(blank=True, null=True)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
+    method = models.CharField(max_length=250, choices=METHOD_CHOICES, default=None)
     status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
-    file = models.FileField(null=True, blank=True, upload_to='uploads/%Y/%m/%d/')
+    responsible = models.CharField(max_length=350, null=True, blank=True)
+    file = models.FileField(null=True, blank=True, upload_to='uploadsNotepad/%Y/%m/%d/%H%M%S/')
+    confirmed = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
-        return self.title
+        return f"{self.title} {self.content} {self.importance} {self.status} {self.method} {self.file}"
 
     class Meta:
-        verbose_name_plural = 'Notatki'
+        verbose_name_plural = 'Komunikacja'
 
 
 class GroupsMember(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='groupsMember', null=True, blank=True)
-    group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # group = models.OneToOneField(Groups, on_delete=models.CASCADE, related_name='groupsGroup', null=False, blank=False, default=None)
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsGroup', null=False, blank=False, default=None)
+
     created_date = models.DateTimeField(default=timezone.now)
 
     # def __str__(self):
@@ -201,23 +224,38 @@ class Application(models.Model):
 
 
 class CardStatus(models.Model):
+    # STATUS_CHOICES = (
+    #     ('none', 'Brak statusu'),
+    #     ('demandReceived', 'Zapotrzebowanie odebrane'),
+    #     ('requestSent', 'Zapotrzebowanie wysłane'),
+    #     ('sent', 'Przysłana'),
+    #     ('received', 'Odebrana'),
+    #     ('deactivated', 'Dezaktywowana'),
+    # )
     STATUS_CHOICES = (
         ('none', 'Brak statusu'),
-        ('demandReceived', 'Zapotrzebowanie odebrane'),
-        ('requestSent', 'Zapotrzebowanie wysłane'),
-        ('sent', 'Przysłana'),
-        ('received', 'Odebrana'),
+        ('toOrder', 'Do zlecenia'),
+        ('ordered', 'Zlecona'),
+        ('toBePickedUp', 'Do odbioru'),
         ('deactivated', 'Dezaktywowana'),
     )
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='cardStatus', null=True, blank=True)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE)
     created_date = models.DateTimeField(default=timezone.now)
     card_identity = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    card_start_pin = models.CharField(max_length=250, blank=False, default=None, unique=True)
     card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default='none')
     date_of_action = models.DateTimeField(default=None, blank=True, null=True)
+    file_name = models.CharField(max_length=350, null=True, blank=True)
+    file = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards/%Y/%m/%d/%H%M%S/')
+    file_name_a = models.CharField(max_length=350, null=True, blank=True)
+    file_a = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards_a/%Y/%m/%d/%H%M%S/')
+    responsible = models.CharField(max_length=350, null=True, blank=True)
+    confirmed = models.BooleanField(default=False)
+    history = HistoricalRecords()
 
     def __str__(self):
-        return self.card_identity
+        return f"{self.card_status} {self.card_identity} {self.card} {self.file_name} {self.file_name_a}"
 
     class Meta:
         verbose_name_plural = 'Status Kart'
@@ -289,7 +327,7 @@ class Task(models.Model):
     description = models.TextField()
     deadline = models.DateTimeField(default=None, blank=True, null=True)
     frequency = models.CharField(max_length=250, choices=FREQUENCY_CHOICES, default=None)
-    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, null=True, blank=True)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='task', null=True, blank=True)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
     status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
 

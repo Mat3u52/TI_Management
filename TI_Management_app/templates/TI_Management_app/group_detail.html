@@ -1,0 +1,35 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'groups_list' %}"> / Grupy </a>
+<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+{% endblock %}
+
+{% block content %}
+
+    <div class="hero-unit">
+        <h3><a href="{% url 'groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
+
+                <p><a href="{% url 'group_add_member' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+                    Dodaj
+                </a></p>
+                <br />
+                <br />
+
+                {% for participant in group.groupsGroup.all %}
+                    <div class="notepad">
+                        <p>{{participant.member}}</p>
+<!--                        <p>{{participant.member.pk}}</p>-->
+<!--                        <p>{{participant.pk}}</p>-->
+                            <a href="{% url 'group_delete_member' pk=group.pk pk1=participant.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <br />
+                    </div>
+                {% endfor %}
+
+
+                <br />
+                <a href="{% url 'group_delete_all' pk=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                <br />
+    </div>
+
+{% endblock %}

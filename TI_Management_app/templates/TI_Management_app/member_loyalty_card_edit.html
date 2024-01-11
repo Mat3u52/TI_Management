@@ -1,22 +1,24 @@
 {% extends 'TI_Management_app/base.html' %}
 
+
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}}</a>
-<a href="{% url 'member_loyalty_card_edit' pk=member.pk %}"> / Karty Lojalnościowe</a>
+
+<a href="{% url 'members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj Kartę Lojalnościową</a>
 {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
 
-<!--        {% if form.errors %}-->
-<!--            <p>{{form.errors}}</p>-->
-<!--        {% endif %}-->
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
 
-        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h3>
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
         <p>Karty Lojalnościowe</p>
-        <form method="post" class="post-form">
+        <form method="post" class="post-form" enctype="multipart/form-data">
 <!--            {{ form.as_p }}-->
             {% csrf_token %}
 <!--            <p>{{form.card}}</p>-->
@@ -44,6 +46,10 @@
 
                 </tr>
                 <tr>
+                    <td>Startowy PIN: </td>
+                    <td>{{form.card_start_pin}}</td>
+                </tr>
+                <tr>
                     <td>Status karty: </td>
                     <td>{{form.card_status}}</td>
                 </tr>
@@ -51,9 +57,202 @@
                     <td>Data modyfikacji: </td>
                     <td>{{form.date_of_action}}</td>
                 </tr>
+                <tr>
+                    <td>Potwierdzenie odbioru: </td>
+                    <td>{{form.confirmed}}</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>{{form.responsible}}</td>
+                </tr>
             </table>
-            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj karte</button>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
             <br />
+            <br />
+<!--        </form>-->
+
+        <div class="notepad">
+        <p>Historia:</p>
+            <table width="100%">
+            {% for h in member_loyalty_card.history.all %}
+                <tr>
+                    <td>{{ h.history_id }}</td>
+                    <td>{{ h.history_type }}</td>
+                    <td>
+                        {% if 'toorder' in h.history_object|lower %}Do zlecenia
+                        {% elif 'ordered' in h.history_object|lower %}Zlecona
+                        {% elif 'tobepickedup' in h.history_object|lower %}Do odbioru
+                        {% elif 'deactivated' in h.history_object|lower %}Dezaktywowana
+                        {% elif 'none' in h.history_object|lower %}Brak statusu
+                        {% else %}None{% endif %}
+                    </td>
+                    <td>{{ h.history_user }}</td>
+                    <td>{{ h.history_date }}</td>
+                    <td>
+                        <small>{{ h.history_object }}</small>
+                    </td>
+                </tr>
+<!--                {{ h.instance }}-->
+<!--                {{ h.next_record }}-->
+            {% endfor %}
+            </table>
+        </div>
+
+
+        {% if member_loyalty_card.file %}
+        {% else %}
+        <div class="notepad">
+            <p>Przypisanie dokumentu zlecenia:</p>
+            <table width="100%">
+                <tr>
+                    <td>Numer dokumentu: </td>
+                    <td>{{form.file_name}}</td>
+                </tr>
+                <tr>
+                    <td>Dodaj dokument: </td>
+                    <td>
+                        <label class="custom-file-upload">
+                            Dodaj plik:
+                            {{ form.file }}
+                        </label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if member_loyalty_card.file %}
+        <div class="notepad">
+            <p>Przypisany dokument zlecenia:</p>
+            <table width="100%">
+                <tr>
+                    <td>Numer dokumentu: </td>
+                    <td>
+                        {% if member_loyalty_card.file %}
+                            <a href="{{ member_loyalty_card.file.url }}">{{ member_loyalty_card.file_name }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Nazwa pliku: </td>
+                    {% if member_loyalty_card.file %}
+                        <td>{{ member_loyalty_card.file }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Data: </td>
+                    {% if member_loyalty_card.file %}
+                        <td>{{ member_loyalty_card.created_date }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Dodany przez: </td>
+                    {% if member_loyalty_card.file %}
+                        <td>{{ member_loyalty_card.responsible }}</td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if member_loyalty_card.file_a %}
+        {% else %}
+        <div class="notepad">
+            <p>Przypisanie dokumentu odbioru:</p>
+            <table width="100%">
+                <tr>
+                    <td>Numer dokumentu: </td>
+                    <td>{{form.file_name_a}}</td>
+                </tr>
+                <tr>
+                    <td>Dodaj dokument: </td>
+                    <td>
+                        <label class="custom-file-upload">
+                            Dodaj plik:
+                            {{ form.file_a }}
+                        </label>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+        {% if member_loyalty_card.file_a %}
+        <div class="notepad">
+            <p>Przypisany dokument odbioru:</p>
+            <table width="100%">
+                <tr>
+                    <td>Numer dokumentu: </td>
+                    <td>
+                        {% if member_loyalty_card.file_a %}
+                            <a href="{{ member_loyalty_card.file_a.url }}">{{ member_loyalty_card.file_name_a }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Nazwa pliku: </td>
+                    {% if member_loyalty_card.file_a %}
+                        <td>{{ member_loyalty_card.file_a }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Data: </td>
+                    {% if member_loyalty_card.file_a %}
+                        <td>{{ member_loyalty_card.created_date }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Dodany przez: </td>
+                    {% if member_loyalty_card.file_a %}
+                        <td>{{ member_loyalty_card.responsible }}</td>
+                    {% endif %}
+                </tr>
+            </table>
+        </div>
+        {% endif %}
+
+
+
+
+
+
+
+<!--        <div class="notepad">-->
+<!--        <p>Przypisane dokumenty zlecenia:</p>-->
+
+
+<!--            <p class="str-file">{{ member_loyalty_card.file }}</p>-->
+
+<!--        <table width="100%">-->
+<!--            {% for file in member.cardStatus.all %}-->
+
+<!--                  <tr>-->
+<!--                    <td><a href="#">{{ member_loyalty_card.file_name }}</a></td>-->
+<!--                    <td><p class="str-file">{{ member_loyalty_card.file }}</p></td>-->
+<!--                    <td><p>{{ member_loyalty_card.created_date }}</p></td>-->
+
+<!--                      {% for h in file.history.all|dictsortreversed:"id"|slice:"1" %}-->
+<!--                        {% if '1' in h.history_id|lower %}-->
+<!--                        <td><p>{{ h.history_user }}</p></td>-->
+<!--                        {% endif %}-->
+<!--                      {% endfor %}-->
+<!--                    <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a></td>-->
+
+<!--                  </tr>-->
+
+
+
+<!--            {% empty %}-->
+<!--                  <tr>-->
+<!--                    <td>-->
+<!--                      <p>Brak plików</p>-->
+<!--                    </td>-->
+<!--                  </tr>-->
+<!--            {% endfor %}-->
+
+<!--        </table>-->
+<!--        </div>-->
+
         </form>
     </div>
 {% endif %}
