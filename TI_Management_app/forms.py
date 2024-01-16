@@ -1,6 +1,6 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups
+from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards
 
 
 class MemberForm(forms.ModelForm):
@@ -53,7 +53,7 @@ class MemberForm(forms.ModelForm):
 class MemberFileForm(forms.ModelForm):
     class Meta:
         model = MembersFile
-        fields = ('title', 'file')
+        fields = ['title', 'file']
 
 
 class CardStatusForm(forms.ModelForm):
@@ -69,18 +69,20 @@ class CardStatusForm(forms.ModelForm):
 
     class Meta:
         model = CardStatus
-        fields = ('card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
-                  'file_name', 'file', 'file_name_a', 'file_a', 'responsible', 'confirmed')
+        fields = ['card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+                  'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
 
         widgets = {
-            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'})
+            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
         }
 
 
 class GroupsMemberForm(forms.ModelForm):
     class Meta:
         model = GroupsMember
-        fields = ('group',)
+        fields = ['group',]
 
 
 class NotepadMemberForm(forms.ModelForm):
@@ -99,13 +101,13 @@ class NotepadMemberForm(forms.ModelForm):
 class GroupsForm(forms.ModelForm):
     class Meta:
         model = Groups
-        fields = ('group_name',)
+        fields = ['group_name',]
 
 
 class GroupsEditForm(forms.ModelForm):
     class Meta:
         model = Groups
-        fields = ('group_name',)
+        fields = ['group_name',]
 
 
 class GroupAddMemberForm(forms.ModelForm):
@@ -113,4 +115,33 @@ class GroupAddMemberForm(forms.ModelForm):
 
     class Meta:
         model = GroupsMember
-        fields = ('member', 'group')
+        fields = ['member', 'group']
+
+
+class LoyaltyCardForm(forms.ModelForm):
+    class Meta:
+        # responsible = forms.CharField(widget=forms.HiddenInput())
+
+        model = Cards
+        fields = ['card_name',]
+
+
+class LoyaltyCardAddMemberForm(forms.ModelForm):
+
+    card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
+                                                               message="To pole musi być liczbą.")])
+    card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
+                                                                message="To pole musi być liczbą.")])
+
+    responsible = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = CardStatus
+        fields = ['member', 'card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+                  'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
+
+        widgets = {
+            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+        }

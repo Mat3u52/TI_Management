@@ -29,4 +29,22 @@ $(document).ready(function(){
     $("#showVoting").click(function(){
         $("#objVoting").show(1000);
     });
+    $("#showLoyaltyCardMembers").click(function(){
+        $("#objLoyaltyCardMembers").show(1000);
+    });
+    $("#showLoyaltyCardMembersReadyToGet").click(function(){
+        $("#objLoyaltyCardMembersReadyToGet").show(1000);
+    });
+    $("#showLoyaltyCardMembersOrdered").click(function(){
+        $("#objLoyaltyCardMembersOrdered").show(1000);
+    });
+    $("#showLoyaltyCardMembersToOrder").click(function(){
+        $("#objLoyaltyCardMembersToOrder").show(1000);
+    });
+    $("#showLoyaltyCardMembersDeactivated").click(function(){
+        $("#objLoyaltyCardMembersDeactivated").show(1000);
+    });
+    $("#showLoyaltyCardMembersDocuments").click(function(){
+        $("#objLoyaltyCardMembersDocuments").show(1000);
+    });
 });

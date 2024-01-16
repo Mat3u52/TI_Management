@@ -51,45 +51,82 @@ urlpatterns = [
     path('TI_Management_app/<int:pk>/editMemberNotepadDeleteAll/',
          views.member_notepad_delete_all,
          name='member_notepad_delete_all'),
+    path('TI_Management_app/member_search/',
+         views.member_search,
+         name='member_search'),
 
 
     path('TI_Management_app/groups/',
          views.groups_list,
          name='groups_list'),
-    path('TI_Management_app/groups_add/',
-         views.groups_add,
-         name='groups_add'),
-
-    path('TI_Management_app/group_edit/<int:pk>',
-         views.groups_edit,
-         name='groups_edit'),
-
-    path('TI_Management_app/group_add_member/<int:pk>',
-         views.group_add_member,
-         name='group_add_member'),
-
-
-
     path('TI_Management_app/group_detail/<int:pk>/',
          views.group_detail,
          name='group_detail'),
-
+    path('TI_Management_app/groups_add/',
+         views.groups_add,
+         name='groups_add'),
+    path('TI_Management_app/group_edit/<int:pk>',
+         views.groups_edit,
+         name='groups_edit'),
+    path('TI_Management_app/group_add_member/<int:pk>',
+         views.group_add_member,
+         name='group_add_member'),
     path('TI_Management_app/group_delete/<int:pk>/',
          views.group_delete_all,
          name='group_delete_all'),
-
-
     path('TI_Management_app/group_detail/<int:pk>/group_delete_member/<int:pk1>',
          views.group_delete_member,
          name='group_delete_member'),
-
-
     path('TI_Management_app/group_search/',
          views.group_search,
          name='group_search'),
 
+    path('TI_Management_app/loyaltyCardsList/',
+         views.loyalty_card_list,
+         name='loyalty_card_list'),
+    path('TI_Management_app/loyaltyCardsDetail/<int:pk>/',
+         views.loyalty_card_detail,
+         name='loyalty_card_detail'),
+    path('TI_Management_app/loyaltyCardsAdd/',
+         views.loyalty_card_add,
+         name='loyalty_card_add'),
+    path('TI_Management_app/loyaltyCardsEdit/<int:pk>',
+         views.loyalty_card_edit,
+         name='loyalty_card_edit'),
+    path('TI_Management_app/loyaltyCardsAddMember/<int:pk>',
+         views.loyalty_card_add_member,
+         name='loyalty_card_add_member'),
+    path('TI_Management_app/loyaltyCardsDetail/<int:pk>/loyaltyCardsDeleteMember/<int:pk1>',
+         views.loyalty_card_delete_member,
+         name='loyalty_card_delete_member'),
+    path('TI_Management_app/loyaltyCardsDeleteDelete/<int:pk>/',
+         views.loyalty_card_delete_all,
+         name='loyalty_card_delete_all'),
 
-    path('TI_Management_app/member_search/',
-         views.member_search,
-         name='member_search'),
+    path('TI_Management_app/loyaltyCardsExportAllUsers/<int:pk>/',
+         views.loyalty_cards_export_all_users,
+         name='loyalty_cards_export_all_users'),
+
+    path('TI_Management_app/loyaltyCardsExportToBePickedUp/<int:pk>/',
+         views.loyalty_cards_export_to_be_picked_up,
+         name='loyalty_cards_export_to_be_picked_up'),
+
+    path('TI_Management_app/loyaltyCardsExportOrdered/<int:pk>/',
+         views.loyalty_cards_export_ordered,
+         name='loyalty_cards_export_ordered'),
+
+    path('TI_Management_app/loyaltyCardsExportToOrder/<int:pk>/',
+         views.loyalty_cards_export_to_order,
+         name='loyalty_cards_export_to_order'),
+
+    path('TI_Management_app/loyaltyCardsExportDeactivated/<int:pk>/',
+         views.loyalty_cards_export_deactivated,
+         name='loyalty_cards_export_deactivated'),
+
+
+
+    path('TI_Management_app/loyaltyCardsSearch/',
+         views.loyalty_card_search,
+         name='loyalty_card_search'),
+
 ]

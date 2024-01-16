@@ -1,5 +1,3 @@
-import datetime
-
 from django.db import models
 from django.utils import timezone
 from phone_field import PhoneField
@@ -240,16 +238,18 @@ class CardStatus(models.Model):
         ('deactivated', 'Dezaktywowana'),
     )
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='cardStatus', null=True, blank=True)
-    card = models.ForeignKey(Cards, on_delete=models.CASCADE)
+    card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardStatus')
     created_date = models.DateTimeField(default=timezone.now)
     card_identity = models.CharField(max_length=250, blank=False, default=None, unique=True)
     card_start_pin = models.CharField(max_length=250, blank=False, default=None, unique=True)
     card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default='none')
-    date_of_action = models.DateTimeField(default=None, blank=True, null=True)
+    date_of_action = models.DateTimeField(default=timezone.now, blank=True, null=True)
     file_name = models.CharField(max_length=350, null=True, blank=True)
     file = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards/%Y/%m/%d/%H%M%S/')
+    file_date = models.DateTimeField(blank=True, null=True)
     file_name_a = models.CharField(max_length=350, null=True, blank=True)
     file_a = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards_a/%Y/%m/%d/%H%M%S/')
+    file_a_date = models.DateTimeField(blank=True, null=True)
     responsible = models.CharField(max_length=350, null=True, blank=True)
     confirmed = models.BooleanField(default=False)
     history = HistoricalRecords()

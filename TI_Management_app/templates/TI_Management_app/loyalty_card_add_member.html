@@ -1,10 +1,31 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk %}"> / Dodaj uczestnika</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+<div class="hero-unit">
+        <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+            <p>Nowy uczestnika:</p>
+            {{form.member}}
+<!--            {{form.group}}-->
+<!--            {{form.group.as_hidden}}-->
+
+            <br />
+            <br />
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
+            <br />
+        </form>
+</div>
+{% endif %}
+{% endblock %}

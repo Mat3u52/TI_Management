@@ -73,15 +73,20 @@
                                     </li>
                                 </ul>
                             </li>
-
-
-                            <li><a href="{% url 'groups_list' %}"><b>Grupy</b></a></li>
+                            <li><a href="{% url 'groups_list' %}"><b>Grupy</b></a>
                                 <ul>
                                     <li>
                                         <a href="{% url 'groups_add' %}">dodaj grupe</a>
                                     </li>
                                 </ul>
-                            <li><a href="#"><b>Karty Lojalnościowe</b></a></li>
+                            </li>
+                            <li><a href="{% url 'loyalty_card_list' %}"><b>Karty Lojalnościowe</b></a>
+                                <ul>
+                                    <li>
+                                        <a href="{% url 'loyalty_card_add' %}">dodaj karte lojalnościową</a>
+                                    </li>
+                                </ul>
+                            </li>
                         </ul>
                     </div>
                 </div>

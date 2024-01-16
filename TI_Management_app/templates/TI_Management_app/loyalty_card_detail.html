@@ -1,10 +1,206 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}}</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+        <h3><a href="{% url 'loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h3>
+            <p>
+                <a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk %}" class="btn btn-primary btn-large pull-right">
+                Dodaj
+                </a>
+            </p>
+            <br />
+            <br />
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembers">
+                Lista użytkowników:
+            </li>
+            <li>
+                <div class="notepad">
+                    <a href="{% url 'loyalty_cards_export_all_users' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembers" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                <div class="notepad">
+                    <p><b>{{loyalty_card_status.member}}</b></p>
+                    <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                    <p>E-mail: {{loyalty_card_status.member.email}}</p>
+
+                    <a href="{% url 'loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                    <br />
+                </div>
+                {% endfor %}
+                <br />
+                <a href="{% url 'loyalty_card_delete_all' pk=loyalty_card.pk %}" class="btn btn-danger btn-sm pull-right">usuń wszystkich</a>
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersReadyToGet">
+                Lista karty do odbioru {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <a href="{% url 'loyalty_cards_export_to_be_picked_up' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersReadyToGet" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'toBePickedUp' %}
+                        <div class="notepad">
+                            <p><b>{{loyalty_card_status.member}}</b></p>
+                            <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
+                            <p>Rodzaj: {{loyalty_card.card_name}}</p>
+                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
+                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
+                            <p>Status:
+                                {% if loyalty_card_status.card_status == 'toBePickedUp' %}
+                                    Do odbioru
+                                {% endif %}
+                            </p>
+                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersOrdered">
+                Lista wysłanych karty {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <a href="{% url 'loyalty_cards_export_ordered' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersOrdered" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'ordered' %}
+                        <div class="notepad">
+                            <p><b>{{loyalty_card_status.member}}</b></p>
+                            <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
+                            <p>Rodzaj: {{loyalty_card.card_name}}</p>
+                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
+                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
+                            <p>Status:
+                                {% if loyalty_card_status.card_status == 'ordered' %}
+                                    Zlecona
+                                {% endif %}
+                            </p>
+                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersToOrder">
+                Zlecenia na kartę {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <a href="{% url 'loyalty_cards_export_to_order' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersToOrder" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'toOrder' %}
+                        <div class="notepad">
+                            <p><b>{{loyalty_card_status.member}}</b></p>
+                            <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
+                            <p>Rodzaj: {{loyalty_card.card_name}}</p>
+                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
+                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
+                            <p>Status:
+                                {% if loyalty_card_status.card_status == 'toOrder' %}
+                                    Zlecona
+                                {% endif %}
+                            </p>
+                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+        <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersDocuments">
+                Dokumenty:
+            </li>
+            <li id="objLoyaltyCardMembersDocuments" style="display: none">
+                <div class="notepad">
+                    <h3>Dokumenty zlecenie:</h3>
+                {% for loyalty_card_status in status_card_file %}
+                    {% if loyalty_card_status.file%}
+                            <p>Nr dokumentu: {{loyalty_card_status.file_name}}</p>
+                            <p>Nazwa: {{loyalty_card_status.file}}</p>
+                            <p>Data: {{loyalty_card_status.file_date}}</p>
+                            <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>
+                            <br />
+                    {% endif %}
+                {% endfor %}
+                </div>
+
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersDeactivated">
+                Karty dezaktywowane {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <a href="{% url 'loyalty_cards_export_deactivated' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersDeactivated" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'deactivated' %}
+                        <div class="notepad">
+                            <p><b>{{loyalty_card_status.member}}</b></p>
+                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
+                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
+                            <p>Status:
+                                {% if loyalty_card_status.card_status == 'deactivated' %}
+                                    Zlecona
+                                {% endif %}
+                            </p>
+                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+</div>
+
+{% endblock %}

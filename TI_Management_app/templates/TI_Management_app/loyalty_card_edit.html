@@ -1,10 +1,26 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="#"> / Modyfikacja Karty Lojalnościowej</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+            <p>Modyfikuj kartę lojalnościową:</p>
+            {{form.card_name}}
+
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
+            <br />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}

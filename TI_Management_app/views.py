@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups
+from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .forms import (MemberForm, MemberFileForm, CardStatusForm, GroupsMemberForm,
-                    NotepadMemberForm, GroupsForm, GroupsEditForm, GroupAddMemberForm)
+from .forms import (MemberForm, MemberFileForm, CardStatusForm, GroupsMemberForm, NotepadMemberForm,
+                    GroupsForm, GroupsEditForm, GroupAddMemberForm,
+                    LoyaltyCardForm, LoyaltyCardAddMemberForm)
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -12,6 +13,8 @@ from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
+
+from django.http import HttpResponse
 
 
 class Image(TemplateView):
@@ -161,6 +164,192 @@ def member_file_delete(request, pk, pk1):
     member_file.file.delete()
     member_file.delete()
     return redirect('member_detail', pk=member.pk)
+
+
+def loyalty_card_list(request):
+    loyalty_card_obj = Cards.objects.all()
+
+    paginator = Paginator(loyalty_card_obj, 5)
+    page = request.GET.get('page')
+    try:
+        loyalty_card = paginator.page(page)
+    except PageNotAnInteger:
+        loyalty_card = paginator.page(1)
+    except EmptyPage:
+        loyalty_card = paginator.page(paginator.num_pages)
+
+    return render(request,
+                  'TI_Management_app/loyalty_card_list.html',
+                  {'page': page,
+                   'loyalty_card': loyalty_card})
+
+
+def loyalty_card_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        loyalty_card = Cards.objects.filter(Q(card_name__contains=searched))
+        return render(request,
+                      'TI_Management_app/loyalty_card_search.html',
+                      {'searched': searched,
+                       'loyalty_card': loyalty_card})
+    else:
+        return render(request,
+                      'TI_Management_app/loyalty_card_search.html',
+                      {})
+
+
+def loyalty_card_detail(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    status_card_file = CardStatus.objects.order_by('-file_date')
+    return render(request, 'TI_Management_app/loyalty_card_detail.html',
+                  {'loyalty_card': loyalty_card,
+                   'status_card_file': status_card_file})
+
+
+@login_required
+def loyalty_card_add(request):
+    if request.method == "POST":
+        form = LoyaltyCardForm(request.POST)
+        if form.is_valid():
+            loyalty_card = form.save(commit=False)
+            loyalty_card.author = request.user
+            loyalty_card.save()
+            return redirect('loyalty_card_list')
+    else:
+        form = LoyaltyCardForm()
+    return render(request, 'TI_Management_app/loyalty_card_add.html',
+                  {'form': form})
+
+
+@login_required
+def loyalty_card_edit(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    if request.method == "POST":
+        form = LoyaltyCardForm(request.POST, instance=loyalty_card)
+        if form.is_valid():
+            loyalty_card = form.save(commit=False)
+            loyalty_card.author = request.user
+            loyalty_card.save()
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+    else:
+        form = LoyaltyCardForm(instance=loyalty_card)
+    return render(request, 'TI_Management_app/loyalty_card_edit.html', {'form': form})
+
+
+@login_required
+def loyalty_card_add_member(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    if request.method == "POST":
+        form = LoyaltyCardAddMemberForm(request.POST)
+        if form.is_valid():
+            loyalty_card_member = form.save(commit=False)
+            loyalty_card_member.author = request.user
+            loyalty_card_member.loyalty_card = loyalty_card
+            loyalty_card_member.save()
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+    else:
+        form = LoyaltyCardAddMemberForm(initial={'group': loyalty_card})
+    return render(request, 'TI_Management_app/loyalty_card_add_member.html',
+                  {'form': form, 'loyalty_card': loyalty_card})
+
+
+@login_required
+def loyalty_card_delete_member(request, pk, pk1):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
+
+    loyalty_card.author = request.user
+    member_loyalty_card.delete()
+    return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+
+
+@login_required
+def loyalty_card_delete_all(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    loyalty_card.author = request.user
+
+    loyalty_card.delete()
+
+    return redirect('loyalty_card_detail')
+
+
+def loyalty_cards_export_all_users(request, pk):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{timezone.now()}.txt'
+
+    loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+
+    lines = []
+    for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+        lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
+                     f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
+
+    response.writelines(lines)
+    return response
+
+
+def loyalty_cards_export_to_be_picked_up(request, pk):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=karty_do_odbioru_{timezone.now()}.txt'
+
+    loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+
+    lines = []
+    for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+        if loyalty_card_all_user.card_status == 'toBePickedUp':
+            lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
+                         f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
+
+    response.writelines(lines)
+    return response
+
+
+def loyalty_cards_export_ordered(request, pk):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=karty_zamowione_{timezone.now()}.txt'
+
+    loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+
+    lines = []
+    for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+        if loyalty_card_all_user.card_status == 'ordered':
+            lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
+                         f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
+
+    response.writelines(lines)
+    return response
+
+
+def loyalty_cards_export_to_order(request, pk):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=zlecenia_na_karte_{timezone.now()}.txt'
+
+    loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+
+    lines = []
+    for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+        if loyalty_card_all_user.card_status == 'toOrder':
+            lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
+                         f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
+
+    response.writelines(lines)
+    return response
+
+
+def loyalty_cards_export_deactivated(request, pk):
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=karty_dezaktywowane_{timezone.now()}.txt'
+
+    loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+
+    lines = []
+    for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+        if loyalty_card_all_user.card_status == 'deactivated':
+            lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
+                         f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
+
+    response.writelines(lines)
+    return response
 
 
 @login_required
@@ -319,7 +508,6 @@ def group_add_member(request, pk):
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupAddMemberForm(initial={'group': group})
-        # form = NotepadMemberForm(initial={'responsible': username})
     return render(request, 'TI_Management_app/group_add_member.html',
                   {'form': form, 'group': group})
 

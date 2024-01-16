@@ -109,6 +109,10 @@
                     <td>{{form.file_name}}</td>
                 </tr>
                 <tr>
+                    <td>Data dodania: </td>
+                    <td>{{form.file_date}}</td>
+                </tr>
+                <tr>
                     <td>Dodaj dokument: </td>
                     <td>
                         <label class="custom-file-upload">
@@ -142,7 +146,7 @@
                 <tr>
                     <td>Data: </td>
                     {% if member_loyalty_card.file %}
-                        <td>{{ member_loyalty_card.created_date }}</td>
+                        <td>{{ member_loyalty_card.file_date }}</td>
                     {% endif %}
                 </tr>
                 <tr>
@@ -163,6 +167,10 @@
                 <tr>
                     <td>Numer dokumentu: </td>
                     <td>{{form.file_name_a}}</td>
+                </tr>
+                <tr>
+                    <td>Data dodania: </td>
+                    <td>{{form.file_a_date}}</td>
                 </tr>
                 <tr>
                     <td>Dodaj dokument: </td>
@@ -198,7 +206,7 @@
                 <tr>
                     <td>Data: </td>
                     {% if member_loyalty_card.file_a %}
-                        <td>{{ member_loyalty_card.created_date }}</td>
+                        <td>{{ member_loyalty_card.file_a_date }}</td>
                     {% endif %}
                 </tr>
                 <tr>

@@ -1,10 +1,24 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Wyszukiwarka</a>
+{% endblock %}
+
+{% block content %}
+    {% if searched %}
+        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <br />
+        {% for card in loyalty_card %}
+            <div class="hero-unit">
+                <h2><a href="{% url 'loyalty_card_detail' pk=card.pk %}">{{card.card_name}}</a></h2>
+
+                <p><a href="{% url 'loyalty_card_detail' pk=card.pk %}" class="btn btn-primary btn-large pull-right">
+                    Więcej informacji
+                </a></p>
+                <div class="date"><p>Data dodania: {{ card.created_date }}</p></div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h2>Please, insert the phrase into the search area.</h2>
+    {% endif %}
+{% endblock %}
