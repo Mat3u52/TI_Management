@@ -58,9 +58,9 @@ class MemberFileForm(forms.ModelForm):
 
 class CardStatusForm(forms.ModelForm):
     card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                               message="To pole musi być liczbą.")])
+                                                               message="To pole musi być liczbą.")], required=False)
     card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                                message="To pole musi być liczbą.")])
+                                                                message="To pole musi być liczbą.")], required=False)
 
     # responsible = forms.CharField(initial='admin')
     # responsible = forms.CharField(initial=user.username)
@@ -129,9 +129,9 @@ class LoyaltyCardForm(forms.ModelForm):
 class LoyaltyCardAddMemberForm(forms.ModelForm):
 
     card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                               message="To pole musi być liczbą.")])
+                                                               message="To pole musi być liczbą.")], required=False)
     card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                                message="To pole musi być liczbą.")])
+                                                                message="To pole musi być liczbą.")], required=False)
 
     responsible = forms.CharField(widget=forms.HiddenInput())
 

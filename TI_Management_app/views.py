@@ -201,9 +201,11 @@ def loyalty_card_search(request):
 def loyalty_card_detail(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     status_card_file = CardStatus.objects.order_by('-file_date')
+    status_card_file_a = CardStatus.objects.order_by('-file_a_date')
     return render(request, 'TI_Management_app/loyalty_card_detail.html',
                   {'loyalty_card': loyalty_card,
-                   'status_card_file': status_card_file})
+                   'status_card_file': status_card_file,
+                   'status_card_file_a': status_card_file_a})
 
 
 @login_required

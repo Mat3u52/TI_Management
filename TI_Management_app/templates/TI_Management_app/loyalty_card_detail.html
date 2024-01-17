@@ -146,23 +146,46 @@
           </ul>
     </div>
 
-        <div class="well sidebar-nav">
+    <div class="well sidebar-nav">
         <ul class="nav nav-list">
             <li class="nav-header" id="showLoyaltyCardMembersDocuments">
                 Dokumenty:
             </li>
             <li id="objLoyaltyCardMembersDocuments" style="display: none">
                 <div class="notepad">
-                    <h3>Dokumenty zlecenie:</h3>
-                {% for loyalty_card_status in status_card_file %}
-                    {% if loyalty_card_status.file%}
-                            <p>Nr dokumentu: {{loyalty_card_status.file_name}}</p>
-                            <p>Nazwa: {{loyalty_card_status.file}}</p>
-                            <p>Data: {{loyalty_card_status.file_date}}</p>
-                            <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>
-                            <br />
-                    {% endif %}
-                {% endfor %}
+                    <h4>Dokumenty zlecenie:</h4>
+                    <br/>
+                        {% for loyalty_card_status in status_card_file %}
+                            {% if loyalty_card_status.file%}
+                                <p>Nr dokumentu:
+                                    <a href="{{ loyalty_card_status.file.url }}">
+                                        {{loyalty_card_status.file_name}}
+                                    </a>
+                                </p>
+                                <p>Nazwa: {{loyalty_card_status.file}}</p>
+                                <p>Data: {{loyalty_card_status.file_date}}</p>
+                                <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>
+                                <br />
+                            {% endif %}
+                        {% endfor %}
+                </div>
+
+                <div class="notepad">
+                    <h4>Dokumenty odbioru:</h4>
+                    <br/>
+                        {% for loyalty_card_status in status_card_file_a %}
+                            {% if loyalty_card_status.file_a%}
+                                <p>Nr dokumentu:
+                                    <a href="{{ loyalty_card_status.file_a.url }}">
+                                        {{loyalty_card_status.file_name_a}}
+                                    </a>
+                                </p>
+                                <p>Nazwa: {{loyalty_card_status.file_a}}</p>
+                                <p>Data: {{loyalty_card_status.file_a_date}}</p>
+                                <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>
+                                <br />
+                            {% endif %}
+                        {% endfor %}
                 </div>
 
             </li>

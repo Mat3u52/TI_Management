@@ -17,8 +17,13 @@
             {% endif %}
             <p>Nowy uczestnika:</p>
             {{form.member}}
-<!--            {{form.group}}-->
-<!--            {{form.group.as_hidden}}-->
+            {{form.card.as_hidden}}
+            {{form.card_identity}}
+            {{form.card_start_pin}}
+            {{form.card_status}}
+            {{form.date_of_action}}
+            {{form.confirmed}}
+            {{form.responsible.as_hidden}}
 
             <br />
             <br />

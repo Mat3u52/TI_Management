@@ -3,6 +3,8 @@ from django.utils import timezone
 from phone_field import PhoneField
 from simple_history.models import HistoricalRecords
 
+from django.core.exceptions import ValidationError
+
 
 class Groups(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
@@ -221,6 +223,11 @@ class Application(models.Model):
         verbose_name_plural = 'Finanse'
 
 
+def validate_unique_or_null(value):
+    if CardStatus.objects.exclude(card_identity=value).exclude(card_identity__isnull=True).exists():
+        raise ValidationError('This field must be unique or null.')
+
+
 class CardStatus(models.Model):
     # STATUS_CHOICES = (
     #     ('none', 'Brak statusu'),
@@ -237,11 +244,13 @@ class CardStatus(models.Model):
         ('toBePickedUp', 'Do odbioru'),
         ('deactivated', 'Dezaktywowana'),
     )
+
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='cardStatus', null=True, blank=True)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardStatus')
     created_date = models.DateTimeField(default=timezone.now)
-    card_identity = models.CharField(max_length=250, blank=False, default=None, unique=True)
-    card_start_pin = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    # card_identity = models.CharField(max_length=250, blank=True, null=True, unique=True)
+    card_identity = models.CharField(max_length=250, blank=True, null=True, validators=[validate_unique_or_null])
+    card_start_pin = models.CharField(max_length=250, blank=True, null=True, default=None)
     card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default='none')
     date_of_action = models.DateTimeField(default=timezone.now, blank=True, null=True)
     file_name = models.CharField(max_length=350, null=True, blank=True)
@@ -253,6 +262,10 @@ class CardStatus(models.Model):
     responsible = models.CharField(max_length=350, null=True, blank=True)
     confirmed = models.BooleanField(default=False)
     history = HistoricalRecords()
+
+    def save(self, **kwargs):
+        self.card_identity = self.card_identity or None
+        super().save(**kwargs)
 
     def __str__(self):
         return f"{self.card_status} {self.card_identity} {self.card} {self.file_name} {self.file_name_a}"
