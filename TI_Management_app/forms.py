@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
 from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards
+from django.utils import timezone
 
 
 class MemberForm(forms.ModelForm):
@@ -134,6 +135,9 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
                                                                 message="To pole musi być liczbą.")], required=False)
 
     responsible = forms.CharField(widget=forms.HiddenInput())
+    card = forms.CharField(widget=forms.HiddenInput())
+
+    date_of_action = forms.DateField(initial=timezone.now())
 
     class Meta:
         model = CardStatus
