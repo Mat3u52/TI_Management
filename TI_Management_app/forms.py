@@ -135,7 +135,9 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
                                                                 message="To pole musi być liczbą.")], required=False)
 
     responsible = forms.CharField(widget=forms.HiddenInput())
-    card = forms.CharField(widget=forms.HiddenInput())
+    # card = forms.CharField(widget=forms.HiddenInput())
+    card = forms.CharField(disabled=True)
+    member = forms.CharField(disabled=True)
 
     date_of_action = forms.DateField(initial=timezone.now())
 
