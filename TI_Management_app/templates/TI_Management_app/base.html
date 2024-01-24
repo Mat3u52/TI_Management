@@ -62,32 +62,8 @@
 
                 <div class="span3">
                     <div class="well sidebar-nav">
-                        <ul class="nav nav-list">
-                            <li class="nav-header">Panel</li>
-                            <li><a href="#"><b>Dashboard</b></a></li>
-                            <li class="active">
-                                <a href="{% url 'members_list' %}"><b>Baza Członków</b></a>
-                                <ul>
-                                    <li>
-                                        <a href="{% url 'member_new' %}">dodaj uczestnika</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li><a href="{% url 'groups_list' %}"><b>Grupy</b></a>
-                                <ul>
-                                    <li>
-                                        <a href="{% url 'groups_add' %}">dodaj grupe</a>
-                                    </li>
-                                </ul>
-                            </li>
-                            <li><a href="{% url 'loyalty_card_list' %}"><b>Karty Lojalnościowe</b></a>
-                                <ul>
-                                    <li>
-                                        <a href="{% url 'loyalty_card_add' %}">dodaj karte lojalnościową</a>
-                                    </li>
-                                </ul>
-                            </li>
-                        </ul>
+                        {% block menu %}
+                        {% endblock %}
                     </div>
                 </div>
 

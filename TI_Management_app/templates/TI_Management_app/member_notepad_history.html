@@ -10,13 +10,14 @@
 {% if user.is_authenticated and user.username == 'admin' %}
    <div class="hero-unit">
        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
-       <p>Historia komunikacji</p>
+       <p>Historia komunikacji
+        <a href="{% url 'member_notepad_history_pdf' pk=member.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj PDF</a>
+       </p>
 
        {% for note in member_notepad_history_obj %}
             <div class="notepad">
                 <div class="notepad-head"><h3>{{ note.title }}</h3> </div>
                 <div class="notepad-history-head">
-
                     <div class="notepad-status-left">
                         <p># {{ forloop.revcounter }}</p>
                     </div>
@@ -83,4 +84,7 @@
    </div>
 
 {% endif %}
+{% endblock %}
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
 {% endblock %}

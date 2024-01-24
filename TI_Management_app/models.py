@@ -223,8 +223,27 @@ class Application(models.Model):
         verbose_name_plural = 'Finanse'
 
 
+# def validate_unique_or_null(value):
+#     # existing_records = CardStatus.objects.exclude(pk=value.pk)
+#     if CardStatus.objects.exclude(card_identity=value).exclude(card_identity__isnull=True).exists():
+#         raise ValidationError('This field must be unique or null.')
+# def validate_unique_or_null(value):
+#     existing_records = CardStatus.objects.exclude(pk=value.pk)  # Exclude the current instance if it exists
+#     if existing_records.filter(card_identity=value.card_identity).exists():
+#         raise ValidationError('This field must be unique or null.')
 def validate_unique_or_null(value):
-    if CardStatus.objects.exclude(card_identity=value).exclude(card_identity__isnull=True).exists():
+    if value is None or value.strip() == '':
+        # If the value is None or an empty string, consider it as null
+        return
+
+    if isinstance(value, str):
+        # If value is a string, check for uniqueness in the queryset
+        existing_records = CardStatus.objects.filter(card_identity=value)
+    else:
+        # If value is an instance of the model, exclude it and check for uniqueness
+        existing_records = CardStatus.objects.exclude(pk=value.pk).filter(card_identity=value.card_identity)
+
+    if existing_records.exists():
         raise ValidationError('This field must be unique or null.')
 
 
@@ -249,7 +268,9 @@ class CardStatus(models.Model):
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardStatus')
     created_date = models.DateTimeField(default=timezone.now)
     # card_identity = models.CharField(max_length=250, blank=True, null=True, unique=True)
+    # card_identity = models.CharField(max_length=250, blank=True, null=True)
     card_identity = models.CharField(max_length=250, blank=True, null=True, validators=[validate_unique_or_null])
+
     card_start_pin = models.CharField(max_length=250, blank=True, null=True, default=None)
     card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default='none')
     date_of_action = models.DateTimeField(default=timezone.now, blank=True, null=True)

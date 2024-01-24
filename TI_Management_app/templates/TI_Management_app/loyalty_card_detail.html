@@ -6,16 +6,20 @@
 {% endblock %}
 
 {% block content %}
+<div class="hero-unit">
+    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_search' pk=loyalty_card.pk %}">
+        {% csrf_token %}
+        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
+        type="search" placeholder="Dodaj nowego uczestnika" aria-label="Search" name="searched">
+        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź czy uczestnik istnieje</button>
+    </form>
+</div>
 
 <div class="hero-unit">
-        <h3><a href="{% url 'loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h3>
-            <p>
-                <a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk %}" class="btn btn-primary btn-large pull-right">
-                Dodaj
-                </a>
-            </p>
-            <br />
-            <br />
+
+
+    <h2><a href="{% url 'loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h2>
+
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
             <li class="nav-header" id="showLoyaltyCardMembers">
@@ -151,6 +155,16 @@
             <li class="nav-header" id="showLoyaltyCardMembersDocuments">
                 Dokumenty:
             </li>
+            <li>
+                <div class="notepad">
+                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_order_search' pk=loyalty_card.pk %}">
+                        {% csrf_token %}
+                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
+                        type="search" placeholder="Dodaj dokument zlecenie" aria-label="Search" name="searched">
+                        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź</button>
+                    </form>
+                </div>
+            </li>
             <li id="objLoyaltyCardMembersDocuments" style="display: none">
                 <div class="notepad">
                     <h4>Dokumenty zlecenie:</h4>
@@ -164,6 +178,7 @@
                                 </p>
                                 <p>Nazwa: {{loyalty_card_status.file}}</p>
                                 <p>Data: {{loyalty_card_status.file_date}}</p>
+                                <p>Przypisany: {{ loyalty_card_status.member }}</p>
                                 <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>
                                 <br />
                             {% endif %}
@@ -182,6 +197,7 @@
                                 </p>
                                 <p>Nazwa: {{loyalty_card_status.file_a}}</p>
                                 <p>Data: {{loyalty_card_status.file_a_date}}</p>
+                                <p>Przypisany: {{ loyalty_card_status.member }}</p>
                                 <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>
                                 <br />
                             {% endif %}
@@ -226,4 +242,8 @@
 
 </div>
 
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
 {% endblock %}

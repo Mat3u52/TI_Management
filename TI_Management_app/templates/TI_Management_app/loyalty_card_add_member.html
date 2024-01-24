@@ -3,34 +3,72 @@
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
 <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}}</a>
-<a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk %}"> / Dodaj uczestnika</a>
+<a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk pk1=loyalty_card_member_add.pk %}"> / Dodaj uczestnika</a>
 {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
 <div class="hero-unit">
-        <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
-                <p>{{form.errors}}</p>
+    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
+    {% for status in loyalty_card_validator %}
+        {% if loyalty_card.id == status.card.id %}
+            {% if loyalty_card_member_add.id == status.member.id %}
+                <span style="color: #FF0000">
+                    Użytkownik {{status.member}} posiada już kartę {{loyalty_card.card_name}}
+                </span>
             {% endif %}
-            <p>Nowy uczestnika:</p>
-            {{form.member}}
-            {{form.card.as_hidden}}
-            {{form.card_identity}}
-            {{form.card_start_pin}}
-            {{form.card_status}}
-            {{form.date_of_action}}
-            {{form.confirmed}}
-            {{form.responsible.as_hidden}}
+        {% endif %}
+    {% endfor %}
 
-            <br />
-            <br />
-            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
-            <br />
-            <br />
-        </form>
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+
+        {{form.responsible}}
+        <table width="100%">
+            <tr>
+                <td>Karta:</td>
+                <td>{{ loyalty_card.card_name }} {{form.card.as_hidden}}</td>
+            </tr>
+            <tr>
+                <td>Nowy uczestnik:</td>
+                <td>{{ loyalty_card_member_add.forename }} {{ loyalty_card_member_add.surname }}{{form.member.as_hidden}}</td>
+            </tr>
+            <tr>
+                <td>Numer karty: </td>
+                <td>{{form.card_identity}}</td>
+            </tr>
+            <tr>
+                <td>Startowy PIN: </td>
+                <td>{{form.card_start_pin}}</td>
+            </tr>
+            <tr>
+                <td>Status karty: </td>
+                <td>{{form.card_status}}</td>
+            </tr>
+            <tr>
+                <td>Data modyfikacji: </td>
+                <td>{{form.date_of_action}}</td>
+            </tr>
+            <tr>
+                <td>Potwierdzenie odbioru: </td>
+                <td>{{form.confirmed}}</td>
+            </tr>
+        </table>
+
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
 </div>
 {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
 {% endblock %}

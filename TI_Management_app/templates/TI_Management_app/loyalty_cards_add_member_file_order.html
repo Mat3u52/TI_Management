@@ -1,10 +1,66 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card}}</a>
+<a href="{% url 'loyalty_cards_add_member_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument zlecenie</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+<div class="hero-unit">
+    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
+
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+
+<!--        {{form.responsible}}-->
+
+
+        <table width="100%">
+            <tr>
+                <td>Karta:</td>
+<!--                <td>{{loyalty_card.card_name}}</td>-->
+                <td>{{loyalty_card.card}} {{form.card.as_hidden}}</td>
+            </tr>
+            <tr>
+                <td>Uczestnik:</td>
+<!--                <td>{{loyalty_card_member_add.forename}} {{loyalty_card_member_add.surname}}</td>-->
+                <td>{{loyalty_card.member}} {{form.member.as_hidden }}</td>
+            </tr>
+            <tr>
+                <td>Dokument zlecenie:</td>
+                <td>{{form.file_name}}</td>
+            </tr>
+            <tr>
+                <td>Nowy uczestnik:</td>
+                <td>
+                    <label class="custom-file-upload">
+                        Dodaj dokument zlecenie
+                        {{form.file}}
+                    </label>
+                </td>
+            </tr>
+<!--            <tr>-->
+<!--                <td>Data dodania:</td>-->
+<!--                <td>{{form.file_date}}</td>-->
+<!--            </tr>-->
+        </table>
+
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
+{% endblock %}

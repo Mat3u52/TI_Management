@@ -5,7 +5,7 @@ from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from .forms import (MemberForm, MemberFileForm, CardStatusForm, GroupsMemberForm, NotepadMemberForm,
                     GroupsForm, GroupsEditForm, GroupAddMemberForm,
-                    LoyaltyCardForm, LoyaltyCardAddMemberForm)
+                    LoyaltyCardForm, LoyaltyCardAddMemberForm, LoyaltyCardsAddMemberFileOrderForm)
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -14,7 +14,14 @@ from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
-from django.http import HttpResponse
+from django.http import HttpResponse  # txt file
+from django.http import FileResponse  # pdf file
+import io
+from reportlab.pdfgen import canvas
+from reportlab.lib.units import inch
+from reportlab.lib.pagesizes import letter
+from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
+# from reportlab.pdfbase import pdfmetrics, ttfonts
 
 
 class Image(TemplateView):
@@ -198,6 +205,27 @@ def loyalty_card_search(request):
                       {})
 
 
+@login_required
+def loyalty_card_member_search(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    loyalty_card_validator = CardStatus.objects.all()
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
+                                                         Q(surname__contains=searched) |
+                                                         Q(member_nr__contains=searched))
+        return render(request,
+                      'TI_Management_app/loyalty_card_member_search.html',
+                      {'searched': searched,
+                       'loyalty_card_member': loyalty_card_member,
+                       'loyalty_card': loyalty_card,
+                       'loyalty_card_validator': loyalty_card_validator})
+    else:
+        return render(request,
+                      'TI_Management_app/loyalty_card_member_search.html',
+                      {})
+
+
 def loyalty_card_detail(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     status_card_file = CardStatus.objects.order_by('-file_date')
@@ -239,20 +267,75 @@ def loyalty_card_edit(request, pk):
 
 
 @login_required
-def loyalty_card_add_member(request, pk):
+def loyalty_card_add_member(request, pk, pk1):
     loyalty_card = get_object_or_404(Cards, pk=pk)
+    loyalty_card_member_add = get_object_or_404(MembersZZTI, pk=pk1)
+    loyalty_card_validator = CardStatus.objects.all()
     if request.method == "POST":
         form = LoyaltyCardAddMemberForm(request.POST)
         if form.is_valid():
             loyalty_card_member = form.save(commit=False)
             loyalty_card_member.author = request.user
-            loyalty_card_member.loyalty_card = loyalty_card
+            loyalty_card_member.card = loyalty_card
+            loyalty_card_member.member = loyalty_card_member_add
             loyalty_card_member.save()
             return redirect('loyalty_card_detail', pk=loyalty_card.pk)
     else:
-        form = LoyaltyCardAddMemberForm(initial={'group': loyalty_card})
+        username = request.user.username
+        form = LoyaltyCardAddMemberForm(initial={'card': loyalty_card,
+                                                 'member': loyalty_card_member_add,
+                                                 'responsible': username})
     return render(request, 'TI_Management_app/loyalty_card_add_member.html',
-                  {'form': form, 'loyalty_card': loyalty_card})
+                  {'form': form,
+                   'loyalty_card': loyalty_card,
+                   'loyalty_card_member_add': loyalty_card_member_add,
+                   'loyalty_card_validator': loyalty_card_validator})
+
+
+@login_required
+def loyalty_cards_add_member_file_order(request, pk):
+    loyalty_card = get_object_or_404(CardStatus, pk=pk)
+    if request.method == "POST":
+        form = LoyaltyCardsAddMemberFileOrderForm(request.POST, request.FILES, instance=loyalty_card)
+        if form.is_valid():
+            loyalty_card_member = form.save(commit=False)
+            loyalty_card_member.author = request.user
+            # loyalty_card_member.card = loyalty_card
+            # loyalty_card_member.= loyalty_card_validator
+            # loyalty_card_member.save(update_fields=['file_name'])
+            # loyalty_card_member.save(update_fields=['file'])
+            # loyalty_card_member.save(update_fields=['file_date'] = timezone.now())
+            loyalty_card_member.file_date = timezone.now()
+
+            loyalty_card_member.save()
+            return redirect('loyalty_card_list')
+    else:
+        form = LoyaltyCardsAddMemberFileOrderForm(instance=loyalty_card)
+    return render(request, 'TI_Management_app/loyalty_cards_add_member_file_order.html',
+                  {'form': form,
+                   'loyalty_card': loyalty_card})
+
+
+@login_required
+def loyalty_card_member_file_order_search(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    loyalty_card_validator = CardStatus.objects.all()
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
+                                                         Q(surname__contains=searched) |
+                                                         Q(member_nr__contains=searched))
+        return render(request,
+                      'TI_Management_app/loyalty_card_member_file_order_search.html',
+                      {'searched': searched,
+                       'loyalty_card_member': loyalty_card_member,
+                       'loyalty_card': loyalty_card,
+                       'loyalty_card_validator': loyalty_card_validator})
+    else:
+        return render(request,
+                      'TI_Management_app/loyalty_card_member_file_order_search.html',
+                      {})
+
 
 
 @login_required
@@ -409,7 +492,7 @@ def member_loyalty_card_delete(request, pk, pk1):
     return redirect('member_detail', pk=member.pk)
 
 
-@login_required
+# @login_required
 def groups_list(request):
     groups_obj = Groups.objects.all()
 
@@ -597,6 +680,64 @@ def member_notepad_history(request, pk):
     return render(request, 'TI_Management_app/member_notepad_history.html',
                   {'member': member,
                    'member_notepad_history_obj': member_notepad_history_obj})
+
+
+
+@login_required
+def member_notepad_history_pdf(request, pk):
+    member = MembersZZTI.objects.get(id=pk)
+    member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+    textob = c.beginText()
+    textob.setTextOrigin(inch, inch)
+    # pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
+    # pdfmetrics.registerFont(ttfonts.TTFont('Arial', 'arial.ttf'))
+    # pdfmetrics.registerFont(TTFont("Arial", os.path.join(settings.PROJECT_ROOT, 'static', 'fonts', 'arial.ttf')))
+    textob.setFont("Helvetica", 14)
+
+    # lines = [
+    #     "this is line 1",
+    #     "this is line 2",
+    #     "this is line 3",
+    # ]
+    lines = []
+
+    for history in member_notepad_history_obj:
+        # lines.append(history.member)
+        lines.append(f"Tytuł: {history.title}")
+        lines.append(" ")
+        lines.append(history.content)
+        lines.append(" ")
+        lines.append(history.published_date.isoformat())
+        lines.append(" ")
+        lines.append(history.importance)
+        lines.append(" ")
+        lines.append(history.method)
+        lines.append(" ")
+        lines.append(history.status)
+        lines.append(" ")
+        lines.append(history.responsible)
+        lines.append(" ")
+        # lines.append(history.file)
+        # lines.append(" ")
+        # lines.append(history.confirmed)
+        lines.append("--------------------------------------------------------------------")
+        lines.append(" ")
+
+
+    for line in lines:
+        textob.textLine(line)
+
+
+    # c.drawText(textob.decode("iso-8859-2").encode("utf-8"))
+    c.drawText(textob)
+    c.showPage()
+    c.save()
+    buf.seek(0)
+
+    return FileResponse(buf, as_attachment=True, filename=f"HistoriaKomunikacji-{member}.pdf")
 
 
 @login_required

@@ -6,12 +6,12 @@
 
 {% block content %}
 <div class="hero-unit">
-<form class="d-flex" method=POST action="{% url 'member_search' %}">
+    <form class="d-flex" method=POST action="{% url 'member_search' %}">
         {% csrf_token %}
         <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
         type="search" placeholder="Szukaj Uczestnika" aria-label="Search" name="searched">
         <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
-</form>
+    </form>
 </div>
 {% for member in members %}
     <div class="hero-unit">
@@ -54,4 +54,8 @@
 
 {% include 'TI_Management_app/pagination.html' with page=members %}
 
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
 {% endblock %}

@@ -136,8 +136,8 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
 
     responsible = forms.CharField(widget=forms.HiddenInput())
     # card = forms.CharField(widget=forms.HiddenInput())
-    card = forms.CharField(disabled=True)
-    member = forms.CharField(disabled=True)
+    # card = forms.CharField(disabled=True)
+    # member = forms.CharField(disabled=True)
 
     date_of_action = forms.DateField(initial=timezone.now())
 
@@ -150,4 +150,26 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
             'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
             'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
             'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+        }
+
+
+class LoyaltyCardsAddMemberFileOrderForm(forms.ModelForm):
+
+    # responsible = forms.CharField(widget=forms.HiddenInput())
+    # card = forms.CharField(widget=forms.HiddenInput())
+    # card = forms.CharField(widget=forms.HiddenInput())
+    # member = forms.CharField(widget=forms.HiddenInput())
+    # card = forms.CharField(disabled=True)
+    # member = forms.CharField(disabled=True)
+
+    # file_date = forms.DateField(initial=timezone.now())
+
+    class Meta:
+
+        model = CardStatus
+
+        fields = ['member', 'card', 'file_name', 'file', 'file_date',]
+
+        widgets = {
+            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
         }

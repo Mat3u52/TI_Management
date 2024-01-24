@@ -26,3 +26,6 @@
         <h2>Please, insert the phrase into the search area.</h2>
     {% endif %}
 {% endblock %}
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

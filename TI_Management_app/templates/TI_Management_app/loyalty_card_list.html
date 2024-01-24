@@ -29,3 +29,7 @@
 {% include 'TI_Management_app/pagination.html' with page=loyalty_card %}
 
 {% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
+{% endblock %}
