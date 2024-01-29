@@ -1,6 +1,7 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards
+from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards,
+                     OrderedCardDocument, ToBePickedUpCardDocument)
 from django.utils import timezone
 
 
@@ -70,7 +71,7 @@ class CardStatusForm(forms.ModelForm):
 
     class Meta:
         model = CardStatus
-        fields = ['card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+        fields = ['ordered_doc', 'to_be_picked_up_doc', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
                   'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
 
         widgets = {
@@ -155,21 +156,35 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
 
 class LoyaltyCardsAddMemberFileOrderForm(forms.ModelForm):
 
-    # responsible = forms.CharField(widget=forms.HiddenInput())
-    # card = forms.CharField(widget=forms.HiddenInput())
-    # card = forms.CharField(widget=forms.HiddenInput())
-    # member = forms.CharField(widget=forms.HiddenInput())
-    # card = forms.CharField(disabled=True)
-    # member = forms.CharField(disabled=True)
-
-    # file_date = forms.DateField(initial=timezone.now())
-
     class Meta:
-
         model = CardStatus
 
-        fields = ['member', 'card', 'file_name', 'file', 'file_date',]
+        fields = ['ordered_doc', 'member', 'card', 'file_name', 'file', 'file_date']
 
         widgets = {
             'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
         }
+
+
+class LoyaltyCardsAddMemberFileToBePickedUpForm(forms.ModelForm):
+
+    class Meta:
+        model = CardStatus
+
+        fields = ['to_be_picked_up_doc', 'member', 'card', 'file_name_a', 'file_a', 'file_a_date']
+
+        widgets = {
+            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+        }
+
+
+class OrderedCardDocumentForm(forms.ModelForm):
+    class Meta:
+        model = OrderedCardDocument
+        fields = ['card', 'title', 'file', 'responsible']
+
+
+class ToBePickedUpCardDocumentForm(forms.ModelForm):
+    class Meta:
+        model = ToBePickedUpCardDocument
+        fields = ['card', 'title', 'file', 'responsible']

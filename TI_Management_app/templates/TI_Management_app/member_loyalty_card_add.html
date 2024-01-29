@@ -3,12 +3,13 @@
 {% block breadcrumbs %}
 <a href="{% url 'members_list' %}"> / Baza Członków </a>
 <a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_loyalty_card_add' pk=member.pk %}"> / Dodaj Kartę Lojalnościową</a>
+<a href="{% url 'member_loyalty_card_add' pk=member.pk pk1=card_add.pk %}"> / Dodaj Kartę Lojalnościową</a>
 {% endblock %}
 
 {% block content %}
 {% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
+
 
         {% if form.errors %}
             <p>{{form.errors}}</p>
@@ -26,7 +27,7 @@
             <table width="100%">
                 <tr>
                     <td>Rodzaj karty: </td>
-                    <td>{{form.card}}</td>
+                    <td>{{ card_add }}</td>
                 </tr>
 
                 <tr>
@@ -52,10 +53,10 @@
                     <td>Status karty: </td>
                     <td>{{form.card_status}}</td>
                 </tr>
-                <tr>
-                    <td>Data modyfikacji: </td>
-                    <td>{{form.date_of_action}}</td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td>Data modyfikacji: </td>-->
+<!--                    <td>{{form.date_of_action}}</td>-->
+<!--                </tr>-->
                 <tr>
                     <td>Potwierdzenie odbioru: </td>
                     <td>{{form.confirmed}}</td>

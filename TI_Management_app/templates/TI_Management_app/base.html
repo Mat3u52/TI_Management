@@ -7,13 +7,15 @@
         <meta name="viewport" content="width=device-with, initial-scale=1.0">
         <meta name="description" content="zzti LUMS">
         <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
 <!--        <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap.css" rel="stylesheet">-->
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
 <!--        <link href="https://getbootstrap.com/2.3.1/assets/css/bootstrap-responsive.css" rel="stylesheet">-->
 
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+<!--        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>-->
+        <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
 
     </head>
@@ -26,7 +28,9 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                     </button>
+                    <img src="{% static 'img/zzti_png-3.png' %}" alt="logo" width="20">
                     <a class="brand" href="{% url 'members_list' %}">zzti LUMS</a>
+<!--                    <a class="brand" href="{% url 'members_list' %}"><img src="{% static 'img/zzti_png-3.png' %}" alt="logo" width="10%"></a>-->
                     <div class="nav-collapse collapse">
                         <p class="navbar-text pull-left">
                             Labour Union<br>

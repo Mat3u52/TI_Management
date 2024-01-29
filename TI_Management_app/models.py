@@ -223,6 +223,35 @@ class Application(models.Model):
         verbose_name_plural = 'Finanse'
 
 
+class OrderedCardDocument(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardOrder', null=True, blank=True)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='OrderedCardDocument/%Y/%m/%d/%H%M%S/')
+    responsible = models.CharField(max_length=350, null=True, blank=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Dokumenty Zlecona'
+
+
+class ToBePickedUpCardDocument(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardToBePickedUp', null=True, blank=True)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='ToBePickedUpCardDocument/%Y/%m/%d/%H%M%S/')
+    responsible = models.CharField(max_length=350, null=True, blank=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Dokumenty Odbioru'
+
 # def validate_unique_or_null(value):
 #     # existing_records = CardStatus.objects.exclude(pk=value.pk)
 #     if CardStatus.objects.exclude(card_identity=value).exclude(card_identity__isnull=True).exists():
@@ -231,6 +260,8 @@ class Application(models.Model):
 #     existing_records = CardStatus.objects.exclude(pk=value.pk)  # Exclude the current instance if it exists
 #     if existing_records.filter(card_identity=value.card_identity).exists():
 #         raise ValidationError('This field must be unique or null.')
+
+
 def validate_unique_or_null(value):
     if value is None or value.strip() == '':
         # If the value is None or an empty string, consider it as null
@@ -266,6 +297,8 @@ class CardStatus(models.Model):
 
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='cardStatus', null=True, blank=True)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardStatus')
+    ordered_doc = models.ForeignKey(OrderedCardDocument, on_delete=models.SET_NULL, related_name='orderedDoc', null=True, blank=True)
+    to_be_picked_up_doc = models.ForeignKey(ToBePickedUpCardDocument, on_delete=models.SET_NULL, related_name='toBePickedUpCardDoc', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     # card_identity = models.CharField(max_length=250, blank=True, null=True, unique=True)
     # card_identity = models.CharField(max_length=250, blank=True, null=True)
@@ -293,6 +326,7 @@ class CardStatus(models.Model):
 
     class Meta:
         verbose_name_plural = 'Status Kart'
+        # unique_together = ('card', 'member',)
 
 
 class Activities(models.Model):

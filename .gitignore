@@ -15,4 +15,8 @@ db.sqlite3
 /media/uploadsNotepad/*
 /media/uploadsLoyaltyCards/*
 /media/uploadsLoyaltyCards_a/*
+/media/OrderedCardDocument/*
+/media/ToBePickedUpCardDocument/*
+/TI_Management_app/static/img/*
+/TI_Management_app/static/font/*
 

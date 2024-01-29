@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card}}</a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.card.pk %}"> / {{loyalty_card.card}}</a>
 <a href="{% url 'loyalty_cards_add_member_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument zlecenie</a>
 {% endblock %}
 
@@ -18,37 +18,32 @@
             <p>{{form.errors}}</p>
         {% endif %}
 
-<!--        {{form.responsible}}-->
-
-
         <table width="100%">
             <tr>
                 <td>Karta:</td>
-<!--                <td>{{loyalty_card.card_name}}</td>-->
                 <td>{{loyalty_card.card}} {{form.card.as_hidden}}</td>
             </tr>
             <tr>
                 <td>Uczestnik:</td>
-<!--                <td>{{loyalty_card_member_add.forename}} {{loyalty_card_member_add.surname}}</td>-->
                 <td>{{loyalty_card.member}} {{form.member.as_hidden }}</td>
             </tr>
-            <tr>
-                <td>Dokument zlecenie:</td>
-                <td>{{form.file_name}}</td>
-            </tr>
-            <tr>
-                <td>Nowy uczestnik:</td>
-                <td>
-                    <label class="custom-file-upload">
-                        Dodaj dokument zlecenie
-                        {{form.file}}
-                    </label>
-                </td>
-            </tr>
 <!--            <tr>-->
-<!--                <td>Data dodania:</td>-->
-<!--                <td>{{form.file_date}}</td>-->
+<!--                <td>Dokument zlecenie:</td>-->
+<!--                <td>{{form.file_name}}</td>-->
 <!--            </tr>-->
+<!--            <tr>-->
+<!--                <td>Nowy uczestnik:</td>-->
+<!--                <td>-->
+<!--                    <label class="custom-file-upload">-->
+<!--                        Dodaj dokument zlecenie-->
+<!--                        {{form.file}}-->
+<!--                    </label>-->
+<!--                </td>-->
+<!--            </tr>-->
+            <tr>
+                <td>Dokument:</td>
+                <td>{{form.ordered_doc}}</td>
+            </tr>
         </table>
 
         <br />

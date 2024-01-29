@@ -1,10 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.card.pk %}"> / {{loyalty_card.card}}</a>
+<a href="{% url 'loyalty_cards_add_member_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument odbioru</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+<div class="hero-unit">
+    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
+
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <table width="100%">
+            <tr>
+                <td>Karta:</td>
+
+                <td>{{loyalty_card.card}} {{form.card.as_hidden}}</td>
+            </tr>
+            <tr>
+                <td>Uczestnik:</td>
+                <td>{{loyalty_card.member}} {{form.member.as_hidden}}</td>
+            </tr>
+<!--            <tr>-->
+<!--                <td>Dokument odbioru:</td>-->
+<!--                <td>{{form.file_name_a}}</td>-->
+<!--            </tr>-->
+<!--            <tr>-->
+<!--                <td>Nowy uczestnik:</td>-->
+<!--                <td>-->
+<!--                    <label class="custom-file-upload">-->
+<!--                        Dodaj dokument odbioru-->
+<!--                        {{form.file_a}}-->
+<!--                    </label>-->
+<!--                </td>-->
+<!--            </tr>-->
+            <tr>
+                <td>Dokument:</td>
+                <td>{{form.to_be_picked_up_doc}}</td>
+            </tr>
+        </table>
+
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
+{% endif %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
+{% endblock %}

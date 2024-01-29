@@ -37,7 +37,13 @@
                     {% if member.id == member_validator.member.id %}
                         {% if loyalty_card.pk == member_validator.card.id %}
                             {% if member_validator.file %}
-                                <span style="color: #FF0000">Dokument zlecenie: {{member_validator.file_name}} </span>|
+                                <span style="color: #FF0000">Dokument zlecenie:
+                                    {{member_validator.file_name}}
+                                </span>|
+                            {% elif member_validator.ordered_doc %}
+                                <span style="color: #FF0000">Dokument zlecenie:
+                                    {{member_validator.ordered_doc}}
+                                </span>|
                             {% endif %}
                         {% endif %}
                     {% endif %}
@@ -46,17 +52,17 @@
                 {% for member_validator in loyalty_card_validator%}
                     {% if member.id == member_validator.member.id %}
                         {% if loyalty_card.pk == member_validator.card.id %}
-                            {% if member_validator.file %}
+                            {% if member_validator.file or member_validator.ordered_doc %}
                                 <p>
                                     <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
-                                        Dodaj dokument zlecenie dla krary {{loyalty_card.card_name}}
+                                        Dodaj dokument zlecenie dla karty {{loyalty_card.card_name}}
                                     </button>
                                 </p>
                             {% else %}
                                 <p>
                                     <a href="{% url 'loyalty_cards_add_member_file_order' pk=member_validator.pk %}"
                                        class="btn btn-primary btn-large pull-right">
-                                        Dodaj dokument zlecenie dla krary {{loyalty_card.card_name}}
+                                        Dodaj dokument zlecenie dla karty {{loyalty_card.card_name}}
                                     </a>
                                 </p>
                             {% endif %}

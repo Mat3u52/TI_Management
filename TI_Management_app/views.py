@@ -1,11 +1,15 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards
+from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards, OrderedCardDocument, ToBePickedUpCardDocument
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from .forms import (MemberForm, MemberFileForm, CardStatusForm, GroupsMemberForm, NotepadMemberForm,
                     GroupsForm, GroupsEditForm, GroupAddMemberForm,
-                    LoyaltyCardForm, LoyaltyCardAddMemberForm, LoyaltyCardsAddMemberFileOrderForm)
+                    LoyaltyCardForm, LoyaltyCardAddMemberForm,
+                    LoyaltyCardsAddMemberFileOrderForm,
+                    LoyaltyCardsAddMemberFileToBePickedUpForm,
+                    OrderedCardDocumentForm,
+                    ToBePickedUpCardDocumentForm)
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -17,11 +21,12 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from django.http import HttpResponse  # txt file
 from django.http import FileResponse  # pdf file
 import io
+import os
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
-# from reportlab.pdfbase import pdfmetrics, ttfonts
+from textwrap import wrap
 
 
 class Image(TemplateView):
@@ -68,7 +73,19 @@ def members_list(request):
 
 def member_detail(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
-    return render(request, 'TI_Management_app/member_detail.html', {'member': member})
+    accessible = Cards.objects.all()
+    accessible_ids = accessible.values_list('id', flat=True)
+    user_cards = CardStatus.objects.filter(member_id=pk, card__isnull=False)
+    card_names = user_cards.values_list('card', flat=True).distinct()
+    different_elements = set(accessible_ids).difference(set(card_names))
+    # accessed = get_object_or_404(Cards, pk__in=different_elements)
+
+    return render(request, 'TI_Management_app/member_detail.html',
+                  {'member': member,
+                   'accessible_ids': accessible_ids,
+                   'card_names': card_names,
+                   'different_elements': different_elements,
+                   'accessible': accessible})
 
 
 def error_404_view(request, exception):
@@ -230,10 +247,14 @@ def loyalty_card_detail(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     status_card_file = CardStatus.objects.order_by('-file_date')
     status_card_file_a = CardStatus.objects.order_by('-file_a_date')
+    ordered_card_file = OrderedCardDocument.objects.all()
+    to_be_picked_up_doc_card_file = ToBePickedUpCardDocument.objects.all()
     return render(request, 'TI_Management_app/loyalty_card_detail.html',
                   {'loyalty_card': loyalty_card,
                    'status_card_file': status_card_file,
-                   'status_card_file_a': status_card_file_a})
+                   'status_card_file_a': status_card_file_a,
+                   'ordered_card_file': ordered_card_file,
+                   'to_be_picked_up_doc_card_file': to_be_picked_up_doc_card_file})
 
 
 @login_required
@@ -263,7 +284,8 @@ def loyalty_card_edit(request, pk):
             return redirect('loyalty_card_detail', pk=loyalty_card.pk)
     else:
         form = LoyaltyCardForm(instance=loyalty_card)
-    return render(request, 'TI_Management_app/loyalty_card_edit.html', {'form': form})
+    return render(request, 'TI_Management_app/loyalty_card_edit.html',
+                  {'form': form})
 
 
 @login_required
@@ -293,6 +315,50 @@ def loyalty_card_add_member(request, pk, pk1):
 
 
 @login_required
+def loyalty_cards_add_file_order(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    if request.method == "POST":
+        form = OrderedCardDocumentForm(request.POST, request.FILES)  # , instance = member
+        if form.is_valid():
+            order_file = form.save(commit=False)
+            order_file.author = request.user
+            order_file.card = loyalty_card
+            order_file.save()
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+    else:
+        username = request.user.username
+        form = OrderedCardDocumentForm(initial={'card': loyalty_card,
+                                                'responsible': username})
+    return render(request, 'TI_Management_app/loyalty_cards_add_file_order.html',
+                  {
+                      'form': form,
+                      'loyalty_card': loyalty_card}
+                  )
+
+
+@login_required
+def loyalty_cards_add_file_to_be_picked_up(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    if request.method == "POST":
+        form = ToBePickedUpCardDocumentForm(request.POST, request.FILES)  # , instance = member
+        if form.is_valid():
+            order_file = form.save(commit=False)
+            order_file.author = request.user
+            order_file.card = loyalty_card
+            order_file.save()
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+    else:
+        username = request.user.username
+        form = ToBePickedUpCardDocumentForm(initial={'card': loyalty_card,
+                                                     'responsible': username})
+    return render(request, 'TI_Management_app/loyalty_cards_add_file_to_be_picked_up.html',
+                  {
+                      'form': form,
+                      'loyalty_card': loyalty_card}
+                  )
+
+
+@login_required
 def loyalty_cards_add_member_file_order(request, pk):
     loyalty_card = get_object_or_404(CardStatus, pk=pk)
     if request.method == "POST":
@@ -300,13 +366,7 @@ def loyalty_cards_add_member_file_order(request, pk):
         if form.is_valid():
             loyalty_card_member = form.save(commit=False)
             loyalty_card_member.author = request.user
-            # loyalty_card_member.card = loyalty_card
-            # loyalty_card_member.= loyalty_card_validator
-            # loyalty_card_member.save(update_fields=['file_name'])
-            # loyalty_card_member.save(update_fields=['file'])
-            # loyalty_card_member.save(update_fields=['file_date'] = timezone.now())
             loyalty_card_member.file_date = timezone.now()
-
             loyalty_card_member.save()
             return redirect('loyalty_card_list')
     else:
@@ -336,6 +396,44 @@ def loyalty_card_member_file_order_search(request, pk):
                       'TI_Management_app/loyalty_card_member_file_order_search.html',
                       {})
 
+
+@login_required
+def loyalty_cards_add_member_file_to_be_picked_up(request, pk):
+    loyalty_card = get_object_or_404(CardStatus, pk=pk)
+    if request.method == "POST":
+        form = LoyaltyCardsAddMemberFileToBePickedUpForm(request.POST, request.FILES, instance=loyalty_card)
+        if form.is_valid():
+            loyalty_card_member = form.save(commit=False)
+            loyalty_card_member.author = request.user
+            loyalty_card_member.file_a_date = timezone.now()
+            loyalty_card_member.save()
+            return redirect('loyalty_card_list')
+    else:
+        form = LoyaltyCardsAddMemberFileToBePickedUpForm(instance=loyalty_card)
+    return render(request, 'TI_Management_app/loyalty_cards_add_member_file_to_be_picked_up.html',
+                  {'form': form,
+                   'loyalty_card': loyalty_card})
+
+
+@login_required
+def loyalty_card_member_file_to_be_picked_up_search(request, pk):
+    loyalty_card = get_object_or_404(Cards, pk=pk)
+    loyalty_card_validator = CardStatus.objects.all()
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
+                                                         Q(surname__contains=searched) |
+                                                         Q(member_nr__contains=searched))
+        return render(request,
+                      'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
+                      {'searched': searched,
+                       'loyalty_card_member': loyalty_card_member,
+                       'loyalty_card': loyalty_card,
+                       'loyalty_card_validator': loyalty_card_validator})
+    else:
+        return render(request,
+                      'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
+                      {})
 
 
 @login_required
@@ -441,12 +539,14 @@ def loyalty_cards_export_deactivated(request, pk):
 def member_loyalty_card_edit(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
+    ordered_card_file = OrderedCardDocument.objects.all()
     if request.method == "POST":
         form = CardStatusForm(request.POST, request.FILES, instance=member_loyalty_card)
         if form.is_valid():
             member_loyalty_card = form.save(commit=False)
             member_loyalty_card.member = member
             member_loyalty_card.author = request.user
+            member_loyalty_card.date_of_action = timezone.now()
             member_loyalty_card.save()
             return redirect('member_detail', pk=member.pk)
     else:
@@ -455,19 +555,27 @@ def member_loyalty_card_edit(request, pk, pk1):
                   {
                       'form': form,
                       'member': member,
-                      'member_loyalty_card': member_loyalty_card}
+                      'member_loyalty_card': member_loyalty_card,
+                      'ordered_card_file': ordered_card_file}
                   )
 
 
 @login_required
-def member_loyalty_card_add(request, pk):
+def member_loyalty_card_add(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
+
+    card_add = get_object_or_404(Cards, pk=pk1)
+
     if request.method == "POST":
         form = CardStatusForm(request.POST, request.FILES)
         if form.is_valid():
             loyalty_card = form.save(commit=False)
             loyalty_card.member = member
+
+            loyalty_card.card = card_add
+
             loyalty_card.author = request.user
+            loyalty_card.date_of_action = timezone.now()
             loyalty_card.save()
             return redirect('member_detail', pk=member.pk)
     else:
@@ -476,7 +584,8 @@ def member_loyalty_card_add(request, pk):
     return render(request, 'TI_Management_app/member_loyalty_card_add.html',
                   {
                       'form': form,
-                      'member': member}
+                      'member': member,
+                      'card_add': card_add}
                   )
 
 
@@ -487,6 +596,7 @@ def member_loyalty_card_delete(request, pk, pk1):
 
     member.author = request.user
     member_loyalty_card.file.delete()
+    member_loyalty_card.card.delete()
     member_loyalty_card.file_a.delete()
     member_loyalty_card.delete()
     return redirect('member_detail', pk=member.pk)
@@ -682,7 +792,6 @@ def member_notepad_history(request, pk):
                    'member_notepad_history_obj': member_notepad_history_obj})
 
 
-
 @login_required
 def member_notepad_history_pdf(request, pk):
     member = MembersZZTI.objects.get(id=pk)
@@ -690,12 +799,14 @@ def member_notepad_history_pdf(request, pk):
 
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
-    textob = c.beginText()
-    textob.setTextOrigin(inch, inch)
-    # pdfmetrics.registerFont(TTFont('Verdana', 'Verdana.ttf'))
-    # pdfmetrics.registerFont(ttfonts.TTFont('Arial', 'arial.ttf'))
-    # pdfmetrics.registerFont(TTFont("Arial", os.path.join(settings.PROJECT_ROOT, 'static', 'fonts', 'arial.ttf')))
-    textob.setFont("Helvetica", 14)
+
+    # c.beginText()
+    # c.setFont("Verdana", 14)
+    # textob = c.beginText()
+    # textob.setTextOrigin(inch, inch)
+    pdfmetrics.registerFont(TTFont('Verdana', 'TI_Management_app/static/font/verdana.ttf'))
+    # textob.setFont("Verdana", 14)
+
 
     # lines = [
     #     "this is line 1",
@@ -708,36 +819,68 @@ def member_notepad_history_pdf(request, pk):
         # lines.append(history.member)
         lines.append(f"Tytuł: {history.title}")
         lines.append(" ")
-        lines.append(history.content)
+        lines.append(f"Opis: {history.content}")
         lines.append(" ")
-        lines.append(history.published_date.isoformat())
+        lines.append(f"Data: {history.published_date.isoformat()}")
         lines.append(" ")
-        lines.append(history.importance)
+        lines.append(f"Ważność: {history.importance}")
         lines.append(" ")
-        lines.append(history.method)
+        lines.append(f"Sposób zgłoszenia: {history.method}")
         lines.append(" ")
-        lines.append(history.status)
+        lines.append(f"Nadano status: {history.status}")
         lines.append(" ")
-        lines.append(history.responsible)
+        lines.append(f"Prowadzący: {history.responsible}")
         lines.append(" ")
+        if history.file:
+            lines.append("Plik")
+        lines.append(" ")
+
         # lines.append(history.file)
         # lines.append(" ")
-        # lines.append(history.confirmed)
+        if history.confirmed:
+            confirm = "Podpisano: Tak"
+        else:
+            confirm = "Podpisano: Nie"
+        lines.append(confirm)
         lines.append("--------------------------------------------------------------------")
         lines.append(" ")
 
+    # for line in lines:
+    #     textob.textLine(line)
+    #     c.getPageNumber()
+    #
+    # c.drawText(textob)
+    # c.showPage()
+    # c.save()
+    # buf.seek(0)
 
+
+
+
+    y = 10
     for line in lines:
-        textob.textLine(line)
+        c.beginText()
+        c.setFont("Verdana", 14)
 
+        # textob = c.beginText()
+        # textob.setTextOrigin(inch, inch)
+        # textob.setFont("Verdana", 14)
+        # textob.textLine(line)
 
-    # c.drawText(textob.decode("iso-8859-2").encode("utf-8"))
-    c.drawText(textob)
-    c.showPage()
+        # wraped_text = "\n".join(wrap(line, 80))
+        # t.textLines(wraped_text)
+        y += 10
+        c.drawString(10, y, line)
+        c.getPageNumber()
+        if "-------" in line:
+            c.showPage()
+            y = 0
+
     c.save()
     buf.seek(0)
 
     return FileResponse(buf, as_attachment=True, filename=f"HistoriaKomunikacji-{member}.pdf")
+
 
 
 @login_required

@@ -16,7 +16,7 @@
             <p>{{form.errors}}</p>
         {% endif %}
 
-        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
         <p>Karty Lojalnościowe</p>
         <form method="post" class="post-form" enctype="multipart/form-data">
 <!--            {{ form.as_p }}-->
@@ -28,7 +28,7 @@
             <table width="100%">
                 <tr>
                     <td>Rodzaj karty: </td>
-                    <td>{{form.card}}</td>
+                    <td>{{member_loyalty_card.card}}{{form.card.as_hidden}}</td>
                 </tr>
                 <tr>
                     <td>Numer karty: </td>
@@ -53,10 +53,10 @@
                     <td>Status karty: </td>
                     <td>{{form.card_status}}</td>
                 </tr>
-                <tr>
-                    <td>Data modyfikacji: </td>
-                    <td>{{form.date_of_action}}</td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td>Data modyfikacji: </td>-->
+<!--                    <td>{{form.date_of_action}}</td>-->
+<!--                </tr>-->
                 <tr>
                     <td>Potwierdzenie odbioru: </td>
                     <td>{{form.confirmed}}</td>
@@ -99,27 +99,31 @@
         </div>
 
 
-        {% if member_loyalty_card.file %}
+        {% if member_loyalty_card.file or member_loyalty_card.ordered_doc %}
         {% else %}
         <div class="notepad">
             <p>Przypisanie dokumentu zlecenia:</p>
             <table width="100%">
-                <tr>
-                    <td>Numer dokumentu: </td>
-                    <td>{{form.file_name}}</td>
-                </tr>
-                <tr>
-                    <td>Data dodania: </td>
-                    <td>{{form.file_date}}</td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td>Numer dokumentu: </td>-->
+<!--                    <td>{{form.file_name}}</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>Data dodania: </td>-->
+<!--                    <td>{{form.file_date}}</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>Dodaj dokument: </td>-->
+<!--                    <td>-->
+<!--                        <label class="custom-file-upload">-->
+<!--                            Dodaj plik:-->
+<!--                            {{ form.file }}-->
+<!--                        </label>-->
+<!--                    </td>-->
+<!--                </tr>-->
                 <tr>
                     <td>Dodaj dokument: </td>
-                    <td>
-                        <label class="custom-file-upload">
-                            Dodaj plik:
-                            {{ form.file }}
-                        </label>
-                    </td>
+                    <td>{{ form.ordered_doc }}</td>
                 </tr>
             </table>
         </div>
@@ -158,28 +162,65 @@
             </table>
         </div>
         {% endif %}
+        {% if member_loyalty_card.ordered_doc %}
+            <div class="notepad">
+            <p>Przypisany dokument zlecenia:</p>
+            <table width="100%">
+                <tr>
+                    <td>Numer dokumentu: </td>
+                    <td>
+                        {% if member_loyalty_card.ordered_doc.file %}
+                            <a href="{{ member_loyalty_card.ordered_doc.file.url }}">{{ member_loyalty_card.ordered_doc.title }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Nazwa pliku: </td>
+                    {% if member_loyalty_card.ordered_doc.file %}
+                        <td>{{ member_loyalty_card.ordered_doc.file }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Data: </td>
+                    {% if member_loyalty_card.ordered_doc.file %}
+                        <td>{{ member_loyalty_card.ordered_doc.created_date }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Dodany przez: </td>
+                    {% if member_loyalty_card.ordered_doc.file %}
+                        <td>{{ member_loyalty_card.ordered_doc.responsible }}</td>
+                    {% endif %}
+                </tr>
+            </table>
+            </div>
+        {% endif %}
 
-        {% if member_loyalty_card.file_a %}
+        {% if member_loyalty_card.file_a or member_loyalty_card.to_be_picked_up_doc %}
         {% else %}
         <div class="notepad">
             <p>Przypisanie dokumentu odbioru:</p>
             <table width="100%">
-                <tr>
-                    <td>Numer dokumentu: </td>
-                    <td>{{form.file_name_a}}</td>
-                </tr>
-                <tr>
-                    <td>Data dodania: </td>
-                    <td>{{form.file_a_date}}</td>
-                </tr>
+<!--                <tr>-->
+<!--                    <td>Numer dokumentu: </td>-->
+<!--                    <td>{{form.file_name_a}}</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>Data dodania: </td>-->
+<!--                    <td>{{form.file_a_date}}</td>-->
+<!--                </tr>-->
+<!--                <tr>-->
+<!--                    <td>Dodaj dokument: </td>-->
+<!--                    <td>-->
+<!--                        <label class="custom-file-upload">-->
+<!--                            Dodaj plik:-->
+<!--                            {{ form.file_a }}-->
+<!--                        </label>-->
+<!--                    </td>-->
+<!--                </tr>-->
                 <tr>
                     <td>Dodaj dokument: </td>
-                    <td>
-                        <label class="custom-file-upload">
-                            Dodaj plik:
-                            {{ form.file_a }}
-                        </label>
-                    </td>
+                    <td>{{ form.to_be_picked_up_doc }}</td>
                 </tr>
             </table>
         </div>
@@ -217,6 +258,40 @@
                 </tr>
             </table>
         </div>
+        {% endif %}
+
+        {% if member_loyalty_card.to_be_picked_up_doc %}
+            <div class="notepad">
+            <p>Przypisany dokument zlecenia:</p>
+            <table width="100%">
+                <tr>
+                    <td>Numer dokumentu: </td>
+                    <td>
+                        {% if member_loyalty_card.to_be_picked_up_doc.file %}
+                            <a href="{{ member_loyalty_card.to_be_picked_up_doc.file.url }}">{{ member_loyalty_card.to_be_picked_up_doc.title }}</a>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Nazwa pliku: </td>
+                    {% if member_loyalty_card.to_be_picked_up_doc.file %}
+                        <td>{{ member_loyalty_card.to_be_picked_up_doc.file }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Data: </td>
+                    {% if member_loyalty_card.to_be_picked_up_doc.file %}
+                        <td>{{ member_loyalty_card.to_be_picked_up_doc.created_date }}</td>
+                    {% endif %}
+                </tr>
+                <tr>
+                    <td>Dodany przez: </td>
+                    {% if member_loyalty_card.to_be_picked_up_doc.file %}
+                        <td>{{ member_loyalty_card.to_be_picked_up_doc.responsible }}</td>
+                    {% endif %}
+                </tr>
+            </table>
+            </div>
         {% endif %}
 
 

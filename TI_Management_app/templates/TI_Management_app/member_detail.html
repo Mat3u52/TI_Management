@@ -164,12 +164,38 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>
               <li id="objCardsLoyality" style="display: none">
-                <p><a href="{% url 'member_loyalty_card_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
-                  Dodaj
-                </a></p>
+
+
+
+
+<!--                {{ card_names }}-->
+<!--                <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->
+<!--                {{ accessible_ids }}-->
+<!--                <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->
+<!--                {{ different_elements }}-->
+
+                {% for en in different_elements %}
+<!--                  {{ en }}-->
+                  {% for accessed in accessible %}
+                    {%if en == accessed.id%}
+                      <p><a href="{% url 'member_loyalty_card_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
+                        Dodaj - {{ accessed }} {{ en }}
+                      </a></p>
+                    {%endif%}
+                  {% endfor %}
+
+
+                {% endfor %}
+
+
+
+
+
+
                 <br />
                 <br />
                 {% for card in member.cardStatus.all %}
+
                     <div class="notepad">
                       <p><a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=card.pk %}"><b>{{ card.card }}</b></a></p>
                       <p><b>Nr:</b> {{ card.card_identity }}</p>
@@ -291,7 +317,12 @@
                         {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
                         {% else %}<p><b>Ważność:</b> None</p>
                         {% endif %}
-                      <p><b>Status:</b> {{ note.status }}</p>
+                      <p>
+                        {% if note.status == 'ongoing' %}
+                          <b>Status:</b> W trakcie</p>
+                        {% elif note.status == '' %}
+                          <b>Status:</b> Zamknięty</p>
+                        {% endif %}
 
                       <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
 

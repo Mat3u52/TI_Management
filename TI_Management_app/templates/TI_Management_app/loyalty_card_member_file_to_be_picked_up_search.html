@@ -1,10 +1,79 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}} </a>
+<a href="#"> / Wyszukiwarka</a>
+{% endblock %}
+
+{% block content %}
+    {% if searched %}
+        <h2>Szukasz uczestnika dla karty {{loyalty_card.card_name}}: <span class="search-style">{{ searched }}</span></h2>
+        <br />
+        {% for member in loyalty_card_member %}
+
+            <div class="hero-unit">
+                <img src="{{ member.image.url }}" alt="image" width="100px">
+                <h2><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
+                <p><b>Nr:</b> {{member.member_nr}} 	&#124;
+                    <b>tel:</b> {{member.phone_number}} &#124;
+                    <b>email:</b> {{member.email}}</p>
+
+                {% for member_validator in loyalty_card_validator%}
+                    {% if member.id == member_validator.member.id %}
+                        {% if loyalty_card.pk == member_validator.card.id %}
+                            <span style="color: #37EC00">{{member_validator.card}} </span>|
+                        {% else %}
+                            {{member_validator.card}} |
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {% for member_validator in loyalty_card_validator%}
+                    {% if member.id == member_validator.member.id %}
+                        {% if loyalty_card.pk == member_validator.card.id %}
+                            {% if member_validator.file_a %}
+                                <span style="color: #FF0000">Dokument odbioru: {{member_validator.file_name_a}} </span>|
+                            {% elif member_validator.to_be_picked_up_doc %}
+                                <span style="color: #FF0000">Dokument odbioru:
+                                    {{member_validator.to_be_picked_up_doc}}
+                                </span>|
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                {% for member_validator in loyalty_card_validator%}
+                    {% if member.id == member_validator.member.id %}
+                        {% if loyalty_card.pk == member_validator.card.id %}
+                            {% if member_validator.file_a or member_validator.to_be_picked_up_doc %}
+                                <p>
+                                    <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
+                                        Dodaj dokument odbioru dla karty {{loyalty_card.card_name}}
+                                    </button>
+                                </p>
+                            {% else %}
+                                <p>
+                                    <a href="{% url 'loyalty_cards_add_member_file_to_be_picked_up' pk=member_validator.pk %}"
+                                       class="btn btn-primary btn-large pull-right">
+                                        Dodaj dokument odbioru dla karty {{loyalty_card.card_name}}
+                                    </a>
+                                </p>
+                            {% endif %}
+                        {% endif %}
+                    {% endif %}
+                {% endfor %}
+
+                <div class="date"><p>Data dodania Uczestnika: {{ member.created_date }}</p></div>
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+        <h2>Please, insert the phrase into the search area.</h2>
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
+{% endblock %}

@@ -3,7 +3,7 @@ from django.utils.html import format_html
 from .models import (Groups, Cards, CardsRFID, CardStatus,
                      MembersZZTI, Notepad, Application, Task,
                      GroupsMember, MembersFile, Activities, ActivityStatus,
-                     Vote, Questions, Answers)
+                     Vote, Questions, Answers, OrderedCardDocument, ToBePickedUpCardDocument)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -79,9 +79,9 @@ class CardStatusAdmin(admin.ModelAdmin):
             return ['created_date']
         return self.readonly_fields
 
-    list_display = ('card', 'member', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+    list_display = ('card', 'member', 'ordered_doc', 'to_be_picked_up_doc', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
                     'created_date', 'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed')
-    list_filter = ('card', 'member', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+    list_filter = ('card', 'member', 'ordered_doc', 'to_be_picked_up_doc', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
                    'created_date', 'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed')
     search_fields = ('card_identity', 'card_status')
     # raw_id_fields = ('author',)
@@ -244,4 +244,31 @@ class AnswersAdmin(admin.ModelAdmin):
     list_filter = ('answer', 'status', 'status_description',)
     search_fields = ('answer',)
     date_hierarchy = 'created_date'
+
+
+@admin.register(OrderedCardDocument)
+class OrderedCardDocument(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('card', 'title', 'file', 'created_date')
+    list_filter = ('card', 'title', 'file', 'created_date')
+    search_fields = ('title',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(ToBePickedUpCardDocument)
+class ToBePickedUpCardDocument(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('card', 'title', 'file', 'created_date')
+    list_filter = ('card', 'title', 'file', 'created_date')
+    search_fields = ('title',)
+    date_hierarchy = 'created_date'
+
 

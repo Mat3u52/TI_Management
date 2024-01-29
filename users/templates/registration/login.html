@@ -1,5 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
 {% block content %}
+<div class="hero-unit">
     {% if form.errors %}
         <p>Nazwa użytkownika i hasło są nieprawidłowe. Proszę spróbować ponownie.</p>
     {% endif %}
@@ -11,6 +12,7 @@
         <br />
         <br />
     </form>
+</div>
 
 {% endblock content %}
 {% block menu %}
