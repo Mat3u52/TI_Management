@@ -7,30 +7,31 @@
 
 {% block content %}
 
-    <div class="hero-unit">
-        <h3><a href="{% url 'groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
+<div class="hero-unit">
+    <form class="d-flex" method=POST action="{% url 'group_member_search' pk=group.pk %}">
+        {% csrf_token %}
+        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
+        type="search" placeholder="Szukaj uczestnika do grupy" aria-label="Search" name="searched">
+        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj uczestnika do grupy</button>
+    </form>
+</div>
 
-                <p><a href="{% url 'group_add_member' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
-                    Dodaj
-                </a></p>
-                <br />
-                <br />
+<div class="hero-unit">
+    <h3><a href="{% url 'groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
 
-                {% for participant in group.groupsGroup.all %}
-                    <div class="notepad">
-                        <p>{{participant.member}}</p>
-<!--                        <p>{{participant.member.pk}}</p>-->
-<!--                        <p>{{participant.pk}}</p>-->
-                            <a href="{% url 'group_delete_member' pk=group.pk pk1=participant.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-                        <br />
-                    </div>
-                {% endfor %}
+    {% for participant in group.groupsGroup.all %}
+        <div class="notepad">
+            <p>{{participant.member}}</p>
+            <a href="{% url 'group_delete_member' pk=group.pk pk1=participant.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+            <br />
+        </div>
+    {% endfor %}
 
 
-                <br />
-                <a href="{% url 'group_delete_all' pk=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-                <br />
-    </div>
+    <br />
+    <a href="{% url 'group_delete_all' pk=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+    <br />
+</div>
 
 {% endblock %}
 

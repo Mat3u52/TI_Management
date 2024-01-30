@@ -1,0 +1,46 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'groups_list' %}"> / Grupy </a>
+<a href="{% url 'group_detail' pk=group_available.pk %}"> / {{group_available.group_name}}</a>
+<a href="#"> / Wyszukiwarka</a>
+{% endblock %}
+
+{% block content %}
+    {% if searched %}
+        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <br />
+<!--        {{members_without_group}}-->
+        {% for member in group_members %}
+            <div class="hero-unit">
+                <img src="{{ member.image.url }}" alt="image" width="100px">
+                <h2><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
+                <p><b>Nr:</b> {{member.member_nr}} 	&#124;
+                    <b>tel:</b> {{member.phone_number}} &#124;
+                    <b>email:</b> {{member.email}}</p>
+
+                {% for without in members_without_group %}
+                    {% if member.id == without.id  %}
+                        <p><a href="{% url 'group_add_member' pk=group_available.pk pk1=member.id %}" class="btn btn-primary btn-large pull-right">
+                            Dodaj uczestnika
+                        </a></p>
+
+                    {% else %}
+
+                    {% endif %}
+
+                {% endfor %}
+
+
+
+                <div class="date"><p>Data dodania: {{ member.created_date }}</p></div>
+            </div>
+
+        {% endfor %}
+    {% else %}
+        <h2>Please, insert the phrase into the search area.</h2>
+    {% endif %}
+{% endblock %}
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='groups' %}
+{% endblock %}

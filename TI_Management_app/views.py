@@ -563,17 +563,13 @@ def member_loyalty_card_edit(request, pk, pk1):
 @login_required
 def member_loyalty_card_add(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
-
     card_add = get_object_or_404(Cards, pk=pk1)
-
     if request.method == "POST":
         form = CardStatusForm(request.POST, request.FILES)
         if form.is_valid():
             loyalty_card = form.save(commit=False)
             loyalty_card.member = member
-
             loyalty_card.card = card_add
-
             loyalty_card.author = request.user
             loyalty_card.date_of_action = timezone.now()
             loyalty_card.save()
@@ -619,6 +615,35 @@ def groups_list(request):
                   'TI_Management_app/groups_list.html',
                   {'page': page,
                    'groups': groups})
+
+
+@login_required
+def group_member_search(request, pk):
+    group_available = get_object_or_404(Groups, pk=pk)
+    group_validator = GroupsMember.objects.all()
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        group_members = MembersZZTI.objects.filter(Q(forename__contains=searched) |
+                                                   Q(surname__contains=searched) |
+                                                   Q(member_nr__contains=searched))
+
+        # members_without_group = MembersZZTI.objects.filter(groupsMember__isnull=True)
+        members_without_group = group_members.exclude(groupsMember__group__pk=pk)
+
+
+
+
+        return render(request,
+                      'TI_Management_app/group_member_search.html',
+                      {'searched': searched,
+                       'group_members': group_members,
+                       'group_available': group_available,
+                       'group_validator': group_validator,
+                       'members_without_group': members_without_group})
+    else:
+        return render(request,
+                      'TI_Management_app/group_member_search.html',
+                      {})
 
 
 @login_required
@@ -691,20 +716,22 @@ def member_group_add(request, pk):
 
 
 @login_required
-def group_add_member(request, pk):
+def group_add_member(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
+    member = get_object_or_404(MembersZZTI, pk=pk1)
     if request.method == "POST":
         form = GroupAddMemberForm(request.POST)
         if form.is_valid():
             group_member = form.save(commit=False)
             group_member.author = request.user
             group_member.group = group
+            group_member.member = member
             group_member.save()
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupAddMemberForm(initial={'group': group})
     return render(request, 'TI_Management_app/group_add_member.html',
-                  {'form': form, 'group': group})
+                  {'form': form, 'group': group, 'member': member})
 
 
 @login_required

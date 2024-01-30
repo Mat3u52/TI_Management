@@ -70,13 +70,18 @@ urlpatterns = [
     path('TI_Management_app/groupDetail/<int:pk>/',
          views.group_detail,
          name='group_detail'),
+
+    path('TI_Management_app/groupMemberSearch/<int:pk>/',
+         views.group_member_search,
+         name='group_member_search'),
+
     path('TI_Management_app/groupsAdd/',
          views.groups_add,
          name='groups_add'),
     path('TI_Management_app/groupEdit/<int:pk>',
          views.groups_edit,
          name='groups_edit'),
-    path('TI_Management_app/groupAddMember/<int:pk>',
+    path('TI_Management_app/groupAddMember/<int:pk>/<int:pk1>/',
          views.group_add_member,
          name='group_add_member'),
     path('TI_Management_app/groupDelete/<int:pk>/',
@@ -88,9 +93,6 @@ urlpatterns = [
     path('TI_Management_app/groupSearch/',
          views.group_search,
          name='group_search'),
-
-
-
 
     path('TI_Management_app/loyaltyCardsList/',
          views.loyalty_card_list,
@@ -104,11 +106,6 @@ urlpatterns = [
     path('TI_Management_app/loyaltyCardsEdit/<int:pk>',
          views.loyalty_card_edit,
          name='loyalty_card_edit'),
-
-
-
-
-
 
     path('TI_Management_app/loyaltyCardsAddMember/<int:pk>/<int:pk1>/',
          views.loyalty_card_add_member,
@@ -134,35 +131,24 @@ urlpatterns = [
     path('TI_Management_app/loyaltyCardsExportDeactivated/<int:pk>/',
          views.loyalty_cards_export_deactivated,
          name='loyalty_cards_export_deactivated'),
-
     path('TI_Management_app/loyaltyCardsAddFileOrder/<int:pk>/',
          views.loyalty_cards_add_file_order,
          name='loyalty_cards_add_file_order'),
-
     path('TI_Management_app/loyaltyCardsAddFileToBePickedUp/<int:pk>/',
          views.loyalty_cards_add_file_to_be_picked_up,
          name='loyalty_cards_add_file_to_be_picked_up'),
-
     path('TI_Management_app/loyaltyCardsAddMemberFileOrder/<int:pk>/',
          views.loyalty_cards_add_member_file_order,
          name='loyalty_cards_add_member_file_order'),
-
-
     path('TI_Management_app/loyaltyCardsAddMemberFileOrderSearch/<int:pk>/',
          views.loyalty_card_member_file_order_search,
          name='loyalty_card_member_file_order_search'),
-
     path('TI_Management_app/loyaltyCardsAddMemberFileToBePickedUp/<int:pk>/',
          views.loyalty_cards_add_member_file_to_be_picked_up,
          name='loyalty_cards_add_member_file_to_be_picked_up'),
-
     path('TI_Management_app/loyaltyCardsAddMemberFileToBePickedUpSearch/<int:pk>/',
          views.loyalty_card_member_file_to_be_picked_up_search,
          name='loyalty_card_member_file_to_be_picked_up_search'),
-
-    # path('TI_Management_app/loyaltyCardsAddMemberFileOrderAdd/<int:pk>/',
-    #      views.loyalty_card_member_file_order_add,
-    #      name='loyalty_card_member_file_order_add'),
 
     path('TI_Management_app/loyaltyCardsMemberSearch/<int:pk>/',
          views.loyalty_card_member_search,
