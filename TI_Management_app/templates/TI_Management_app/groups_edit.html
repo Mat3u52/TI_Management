@@ -2,6 +2,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'groups_list' %}"> / Grupy </a>
+<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
 <a href="#"> / Modyfikuj Grupe</a>
 {% endblock %}
 

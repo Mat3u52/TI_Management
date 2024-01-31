@@ -52,17 +52,12 @@ urlpatterns = [
          views.member_notepad_history_pdf,
          name='member_notepad_history_pdf'),
 
-
-
-
-
     path('TI_Management_app/<int:pk>/editMemberNotepadDeleteAll/',
          views.member_notepad_delete_all,
          name='member_notepad_delete_all'),
     path('TI_Management_app/member_search/',
          views.member_search,
          name='member_search'),
-
 
     path('TI_Management_app/groups/',
          views.groups_list,

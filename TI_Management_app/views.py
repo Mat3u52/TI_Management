@@ -630,9 +630,6 @@ def group_member_search(request, pk):
         # members_without_group = MembersZZTI.objects.filter(groupsMember__isnull=True)
         members_without_group = group_members.exclude(groupsMember__group__pk=pk)
 
-
-
-
         return render(request,
                       'TI_Management_app/group_member_search.html',
                       {'searched': searched,
@@ -672,7 +669,9 @@ def groups_edit(request, pk):
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupsEditForm(instance=group)
-    return render(request, 'TI_Management_app/groups_edit.html', {'form': form})
+    return render(request, 'TI_Management_app/groups_edit.html',
+                  {'form': form,
+                   'group': group})
 
 
 def group_detail(request, pk):
