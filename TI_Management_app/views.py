@@ -80,12 +80,20 @@ def member_detail(request, pk):
     different_elements = set(accessible_ids).difference(set(card_names))
     # accessed = get_object_or_404(Cards, pk__in=different_elements)
 
+    accessible_group = Groups.objects.all()
+    accessible_group_ids = accessible_group.values_list('id', flat=True)
+    user_group = GroupsMember.objects.filter(member_id=pk, group__isnull=False)
+    group_names = user_group.values_list('group', flat=True).distinct()
+    different_elements_group = set(accessible_group_ids).difference(set(group_names))
+
     return render(request, 'TI_Management_app/member_detail.html',
                   {'member': member,
                    'accessible_ids': accessible_ids,
                    'card_names': card_names,
                    'different_elements': different_elements,
-                   'accessible': accessible})
+                   'accessible': accessible,
+                   'accessible_group': accessible_group,
+                   'different_elements_group': different_elements_group})
 
 
 def error_404_view(request, exception):
@@ -457,10 +465,11 @@ def loyalty_card_delete_all(request, pk):
 
 
 def loyalty_cards_export_all_users(request, pk):
-    response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{timezone.now()}.txt'
-
     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{loyalty_card_all_users}_{timezone.now()}.txt'
+
+
 
     lines = []
     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
@@ -695,22 +704,25 @@ def group_search(request):
 
 
 @login_required
-def member_group_add(request, pk):
+def member_group_add(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
+    group = get_object_or_404(Groups, pk=pk1)
     if request.method == "POST":
         form = GroupsMemberForm(request.POST)
         if form.is_valid():
-            loyalty_card = form.save(commit=False)
-            loyalty_card.member = member
-            loyalty_card.author = request.user
-            loyalty_card.save()
+            group_member = form.save(commit=False)
+            group_member.member = member
+            group_member.group = group
+            # group_member.author = request.user
+            group_member.save()
             return redirect('member_detail', pk=member.pk)
     else:
         form = GroupsMemberForm()
     return render(request, 'TI_Management_app/member_group_add.html',
                   {
                       'form': form,
-                      'member': member}
+                      'member': member,
+                      'group': group}
                   )
 
 
@@ -884,16 +896,23 @@ def member_notepad_history_pdf(request, pk):
 
 
     y = 10
+
     for line in lines:
         c.beginText()
         c.setFont("Verdana", 14)
 
-        # textob = c.beginText()
-        # textob.setTextOrigin(inch, inch)
-        # textob.setFont("Verdana", 14)
-        # textob.textLine(line)
+        # if len(line) > 25:
+        #     textob = c.beginText()
+        #     textob.setTextOrigin(inch, inch)
+        #     textob.setFont("Verdana", 14)
+        #     textob.textLine(line)
+        #
+        #     # wraped_text = "\n".join(wrap(line, 80))
+        #     wraped_text = wrap(line, width=25)
+        #     c.drawString(10, y, wraped_text[0])
+        #     c.getPageNumber()
+        #     y += 10
 
-        # wraped_text = "\n".join(wrap(line, 80))
         # t.textLines(wraped_text)
         y += 10
         c.drawString(10, y, line)
@@ -906,7 +925,6 @@ def member_notepad_history_pdf(request, pk):
     buf.seek(0)
 
     return FileResponse(buf, as_attachment=True, filename=f"HistoriaKomunikacji-{member}.pdf")
-
 
 
 @login_required

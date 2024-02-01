@@ -84,7 +84,8 @@ class CardStatusForm(forms.ModelForm):
 class GroupsMemberForm(forms.ModelForm):
     class Meta:
         model = GroupsMember
-        fields = ['group',]
+        fields = ['member',]
+        # fields = ['group',]
 
 
 class NotepadMemberForm(forms.ModelForm):

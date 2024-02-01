@@ -33,7 +33,7 @@ urlpatterns = [
     path('TI_Management_app/<int:pk>/editLoyaltyCardDelete/<int:pk1>/',
          views.member_loyalty_card_delete,
          name='member_loyalty_card_delete'),
-    path('TI_Management_app/<int:pk>/editMemberGroupAdd/',
+    path('TI_Management_app/<int:pk>/editMemberGroupAdd/<int:pk1>/',
          views.member_group_add,
          name='member_group_add'),
     path('TI_Management_app/<int:pk>/editGroupDelete/<int:pk1>/',

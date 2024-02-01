@@ -179,7 +179,7 @@
                   {% for accessed in accessible %}
                     {%if en == accessed.id%}
                       <p><a href="{% url 'member_loyalty_card_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
-                        Dodaj - {{ accessed }} {{ en }}
+                        Dodaj - {{ accessed }}
                       </a></p>
                     {%endif%}
                   {% endfor %}
@@ -271,11 +271,19 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showGroup">Grupy:</li>
               <li id="objGroup" style="display: none">
-                <p><a href="{% url 'member_group_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
-                  Dodaj
-                </a></p>
+
+                {% for en in different_elements_group %}
+                  {% for accessed in accessible_group %}
+                    {%if en == accessed.id%}
+                      <p><a href="{% url 'member_group_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
+                        Dodaj - {{ accessed }}
+                      </a></p>
+                    {% endif %}
+                  {% endfor %}
+                {% endfor %}
                 <br />
                 <br />
+
                 {% for group in member.groupsMember.all %}
                   <div class="notepad">
                     <p>
