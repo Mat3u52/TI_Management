@@ -305,7 +305,7 @@
                 {% for note in member.notepad.all|dictsortreversed:"id"|slice:"1" %}
 
                   <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
-                    Modyfikuj
+                    Aktualizuj
                   </a></p>
                   <br />
                   <br />

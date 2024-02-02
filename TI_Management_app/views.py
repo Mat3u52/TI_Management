@@ -29,6 +29,7 @@ from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
 from textwrap import wrap
 
 
+
 class Image(TemplateView):
     form = MemberForm
     template_name = 'TI_Management_app/image.html'
@@ -53,7 +54,7 @@ class ImageDisplay(DetailView):
 
 
 def members_list(request):
-    members_obj = MembersZZTI.objects.all()
+    members_obj = MembersZZTI.objects.all().order_by('-created_date')
 
     paginator = Paginator(members_obj, 3)
     page = request.GET.get('page')
@@ -857,8 +858,13 @@ def member_notepad_history_pdf(request, pk):
         # lines.append(history.member)
         lines.append(f"Tytuł: {history.title}")
         lines.append(" ")
-        lines.append(f"Opis: {history.content}")
+        # lines.append(f"Opis: {wrap(history.content, 25)}")
+        lines.append("Opis:")
         lines.append(" ")
+        description = wrap(history.content, 65)
+        for i in description:
+            lines.append(f"{i}")
+            lines.append(" ")
         lines.append(f"Data: {history.published_date.isoformat()}")
         lines.append(" ")
         lines.append(f"Ważność: {history.importance}")
@@ -880,26 +886,16 @@ def member_notepad_history_pdf(request, pk):
         else:
             confirm = "Podpisano: Nie"
         lines.append(confirm)
-        lines.append("--------------------------------------------------------------------")
+        # lines.append("--------------------------------------------------------------------")
         lines.append(" ")
-
-    # for line in lines:
-    #     textob.textLine(line)
-    #     c.getPageNumber()
-    #
-    # c.drawText(textob)
-    # c.showPage()
-    # c.save()
-    # buf.seek(0)
-
-
-
 
     y = 10
 
     for line in lines:
         c.beginText()
         c.setFont("Verdana", 14)
+
+        # line = wrap(line, 25)
 
         # if len(line) > 25:
         #     textob = c.beginText()

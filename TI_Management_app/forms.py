@@ -21,11 +21,17 @@ class MemberForm(forms.ModelForm):
                   'date_of_contract', 'expiration_date_contract', 'group', 'card', 'image']
 
         widgets = {
-            'date_of_accession': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'date_of_abandonment': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'birthday': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'birthday': forms.DateInput(attrs={'type': 'date'}),
+            # 'birthday': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_accession': forms.TextInput(attrs={'type': 'date'}),
+            # 'date_of_accession': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_abandonment': forms.TextInput(attrs={'type': 'date'}),
+            # 'date_of_abandonment': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_contract': forms.TextInput(attrs={'type': 'date'}),
+            # 'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'expiration_date_contract': forms.TextInput(attrs={'type': 'date'}),
+            # 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
+
         }
 
     # def clean_pin(self, *args, **kwargs):
