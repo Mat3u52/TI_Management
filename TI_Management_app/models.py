@@ -104,11 +104,14 @@ class MembersZZTI(models.Model):
     card = models.CharField(max_length=350, blank=True, null=True, default=None)
     # card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
-
+    history = HistoricalRecords()
     # vote = models.ManyToManyField(Vote)
 
     def __str__(self):
-        return f"{self.forename} {self.surname}"
+        return (f"{self.forename} {self.surname} {self.role} {self.occupation} {self.member_nr} {self.sex} "
+                f"{self.birthday} {self.birthplace} {self.pin} {self.phone_number} {self.email} "
+                f"{self.date_of_accession} {self.date_of_abandonment} {self.type_of_contract} {self.date_of_contract} "
+                f"{self.expiration_date_contract} {self.group} {self.card} {self.image}")
 
     class Meta:
         verbose_name_plural = 'Członkowie'
@@ -289,6 +292,7 @@ class CardStatus(models.Model):
     # )
     STATUS_CHOICES = (
         ('none', 'Brak statusu'),
+        ('active', 'Aktywna'),
         ('toOrder', 'Do zlecenia'),
         ('ordered', 'Zlecona'),
         ('toBePickedUp', 'Do odbioru'),

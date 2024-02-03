@@ -3,7 +3,7 @@ from django.utils import timezone
 from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards, OrderedCardDocument, ToBePickedUpCardDocument
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .forms import (MemberForm, MemberFileForm, CardStatusForm, GroupsMemberForm, NotepadMemberForm,
+from .forms import (MemberForm, MemberEditForm, MemberFileForm, CardStatusForm, GroupsMemberForm, NotepadMemberForm,
                     GroupsForm, GroupsEditForm, GroupAddMemberForm,
                     LoyaltyCardForm, LoyaltyCardAddMemberForm,
                     LoyaltyCardsAddMemberFileOrderForm,
@@ -27,7 +27,6 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
 from textwrap import wrap
-
 
 
 class Image(TemplateView):
@@ -120,7 +119,7 @@ def member_new(request):
 def member_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
-        form = MemberForm(request.POST, request.FILES, instance=member)
+        form = MemberEditForm(request.POST, request.FILES, instance=member)
         if form.is_valid():
             member = form.save(commit=False)
             member.author = request.user
@@ -128,7 +127,9 @@ def member_edit(request, pk):
             member.save()
             return redirect('member_detail', pk=member.pk)
     else:
-        form = MemberForm(instance=member)
+        form = MemberEditForm(instance=member)
+        # birthday = member.birthday
+        # form = MemberForm(instance=member, initial={'birthday': birthday})
     return render(request, 'TI_Management_app/member_edit.html', {'form': form,
                                                                   'member': member})
 
@@ -469,8 +470,6 @@ def loyalty_cards_export_all_users(request, pk):
     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
     response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{loyalty_card_all_users}_{timezone.now()}.txt'
-
-
 
     lines = []
     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():

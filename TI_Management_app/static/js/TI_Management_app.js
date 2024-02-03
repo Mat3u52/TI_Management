@@ -47,4 +47,7 @@ $(document).ready(function(){
     $("#showLoyaltyCardMembersDocuments").click(function(){
         $("#objLoyaltyCardMembersDocuments").show(1000);
     });
+    $("#showHistory").click(function(){
+        $("#objHistory").show(1000);
+    });
 });

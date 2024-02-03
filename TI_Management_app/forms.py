@@ -34,6 +34,8 @@ class MemberForm(forms.ModelForm):
 
         }
 
+
+
     # def clean_pin(self, *args, **kwargs):
     #     pin = self.cleaned_data.get("pin")
 
@@ -58,6 +60,34 @@ class MemberForm(forms.ModelForm):
     #     return member_nr
 
 
+class MemberEditForm(forms.ModelForm):
+    phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
+                                                                                  message="Wprowadź włąściwy numer telefonu.")])
+    member_nr = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
+                                                               message="To pole musi być liczbą.")])
+    pin = forms.IntegerField(required=True, validators=[RegexValidator(r'^\d{0,8}$',
+                                                                           message="To pole musi być liczbą.")])
+
+    class Meta:
+        model = MembersZZTI
+        fields = ['forename', 'surname', 'role', 'occupation',
+                      'member_nr', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number',
+                      'email', 'date_of_accession', 'date_of_abandonment', 'type_of_contract',
+                      'date_of_contract', 'expiration_date_contract', 'group', 'card', 'image']
+
+        widgets = {
+                # 'birthday': forms.DateInput(attrs={'type': 'date'}),
+                'birthday': forms.TextInput(attrs={'type': 'datetime-local'}),
+                # 'date_of_accession': forms.TextInput(attrs={'type': 'date'}),
+                'date_of_accession': forms.TextInput(attrs={'type': 'datetime-local'}),
+                # 'date_of_abandonment': forms.TextInput(attrs={'type': 'date'}),
+                'date_of_abandonment': forms.TextInput(attrs={'type': 'datetime-local'}),
+                # 'date_of_contract': forms.TextInput(attrs={'type': 'date'}),
+                'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
+                # 'expiration_date_contract': forms.TextInput(attrs={'type': 'date'}),
+                'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
+
+        }
 class MemberFileForm(forms.ModelForm):
     class Meta:
         model = MembersFile
@@ -65,8 +95,13 @@ class MemberFileForm(forms.ModelForm):
 
 
 class CardStatusForm(forms.ModelForm):
-    card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                               message="To pole musi być liczbą.")], required=False)
+    # r'^\d{0,50}$',
+    card_identity = forms.CharField(max_length=50,
+                                    validators=[
+                                        RegexValidator(
+                                            regex=r'^[a-z0-9]+$',
+                                            message="To pole może składać się tylko z liczb i małych liter.")],
+                                    required=False)
     card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
                                                                 message="To pole musi być liczbą.")], required=False)
 
@@ -137,8 +172,14 @@ class LoyaltyCardForm(forms.ModelForm):
 
 class LoyaltyCardAddMemberForm(forms.ModelForm):
 
-    card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                               message="To pole musi być liczbą.")], required=False)
+    # card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,50}$',
+    #                                                            message="To pole musi być liczbą.")], required=False)
+    card_identity = forms.CharField(max_length=50,
+                                    validators=[
+                                        RegexValidator(
+                                            regex=r'^[a-z0-9]+$',
+                                            message="To pole może składać się tylko z liczb i małych liter.")],
+                                    required=False)
     card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
                                                                 message="To pole musi być liczbą.")], required=False)
 

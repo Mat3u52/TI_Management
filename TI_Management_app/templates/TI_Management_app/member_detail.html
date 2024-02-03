@@ -164,42 +164,23 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>
               <li id="objCardsLoyality" style="display: none">
-
-
-
-
-<!--                {{ card_names }}-->
-<!--                <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->
-<!--                {{ accessible_ids }}-->
-<!--                <p>-&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;</p>-->
-<!--                {{ different_elements }}-->
-
                 {% for en in different_elements %}
-<!--                  {{ en }}-->
                   {% for accessed in accessible %}
                     {%if en == accessed.id%}
                       <p><a href="{% url 'member_loyalty_card_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
-                        Dodaj - {{ accessed }}
+                        {{ accessed }}
                       </a></p>
                     {%endif%}
                   {% endfor %}
-
-
                 {% endfor %}
-
-
-
-
-
-
                 <br />
                 <br />
                 {% for card in member.cardStatus.all %}
-
                     <div class="notepad">
                       <p><a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=card.pk %}"><b>{{ card.card }}</b></a></p>
                       <p><b>Nr:</b> {{ card.card_identity }}</p>
                         {% if card.card_status == 'toOrder' %}<p><b>Status:</b> Do zlecenia</p>
+                        {% elif card.card_status == 'active' %}<p><b>Status:</b> Aktywna</p>
                         {% elif card.card_status == 'ordered' %}<p><b>Status:</b> Zlecona</p>
                         {% elif card.card_status == 'toBePickedUp' %}<p><b>Status:</b> Do odbioru</p>
                         {% elif card.card_status == 'deactivated' %}<p><b>Status:</b> Dezaktywowana</p>
@@ -346,6 +327,107 @@
                   <p>Brak informacji</p>
                 {% endfor %}
 
+              </li>
+          </ul>
+        </div>
+
+
+        <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showHistory">Historia:</li>
+              <li id="objHistory" style="display: none">
+                {% for h in member.history.all %}
+                <div class="notepad">
+                    <table width="100%">
+
+                      <tr>
+                        <td>{{ h.history_id }}</td>
+                        <td>{{ h.history_type }}</td>
+<!--                      <td>-->
+<!--                        {% if 'toorder' in h.history_object|lower %}Do zlecenia-->
+<!--                        {% elif 'ordered' in h.history_object|lower %}Zlecona-->
+<!--                        {% elif 'tobepickedup' in h.history_object|lower %}Do odbioru-->
+<!--                        {% elif 'deactivated' in h.history_object|lower %}Dezaktywowana-->
+<!--                        {% elif 'none' in h.history_object|lower %}Brak statusu-->
+<!--                        {% else %}None{% endif %}-->
+<!--                      </td>-->
+                        <td>{{ h.history_user }}</td>
+                        <td>{{ h.history_date }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="4">
+                          <small>
+                            {{ h.history_object.forename }} {{ h.history_object.surname }}
+                          </small>
+                          <br />
+                          <small>
+                            Funkcja: {{ h.history_object.role }}
+                          </small>
+                          <br />
+                          <small>
+                            Zawód: {{ h.history_object.occupation }}
+                          </small>
+                          <br />
+                          <small>
+                            Numer uczestnika: {{ h.history_object.member_nr }}
+                          </small>
+                          <br />
+                          <small>
+                            Płeć: {{ h.history_object.sex }}
+                          </small><br />
+                          <small>
+                            Data urodzenia: {{ h.history_object.birthday }}
+                          </small><br />
+                          <small>
+                            Miejsce urodzenia: {{ h.history_object.birthplace }}
+                          </small><br />
+                          <small>
+                            PIN: {{ h.history_object.pin }}
+                          </small><br />
+                          <small>
+                            Numer kontaktowy: {{ h.history_object.phone_number }}
+                          </small><br />
+                          <small>
+                            E-mail: {{ h.history_object.email }}
+                          </small><br />
+                          <small>
+                            Data przystąpienia: {{ h.history_object.date_of_accession }}
+                          </small>
+                          <br />
+                          <small>
+                            Data wystąpienia: {{ h.history_object.date_of_contract }}
+                          </small>
+                          <br />
+                          <small>
+                            Rodzaj umowy: {{ h.history_object.type_of_contract }}
+                          </small>
+                          <br />
+                          <small>
+                            Data zatrudnienia: {{ h.history_object.date_of_contract }}
+                          </small>
+                          <br />
+                          <small>
+                            Data rozwiązania umowy: {{ h.history_object.expiration_date_contract }}
+                          </small>
+                          <br />
+                          <small>
+                            Karta HID: {{ h.history_object.card }}
+                          </small>
+                          <br />
+                          <small>
+                            Grupa: {{ h.history_object.group }}
+                          </small>
+                          <br />
+                          <small>
+                            Zdjęcie: {{ h.history_object.image }}
+                          </small>
+
+                        </td>
+                      </tr>
+
+                    </table>
+                </div>
+                {% endfor %}
               </li>
           </ul>
         </div>
