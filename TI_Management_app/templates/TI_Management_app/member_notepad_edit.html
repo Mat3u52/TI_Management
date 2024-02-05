@@ -3,7 +3,7 @@
 {% block breadcrumbs %}
 <a href="{% url 'members_list' %}"> / Baza Członków </a>
 <a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_notepad_edit' pk=member.pk pk1=notepad.pk %}"> / Modyfikuj komunikację</a>
+<a href="{% url 'member_notepad_edit' pk=member.pk pk1=notepad.pk %}"> / Aktualizuj komunikację</a>
 {% endblock %}
 
 {% block content %}

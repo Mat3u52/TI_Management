@@ -86,6 +86,24 @@ def member_detail(request, pk):
     group_names = user_group.values_list('group', flat=True).distinct()
     different_elements_group = set(accessible_group_ids).difference(set(group_names))
 
+    all_card_history_entries = member.history.filter(card__isnull=False)
+    card_history_entries = []
+    seen_cards = set()
+
+    for entry in all_card_history_entries:
+        if entry.card not in seen_cards:
+            card_history_entries.append(entry)
+            seen_cards.add(entry.card)
+
+    all_note_entries = member.notepad.filter(title__isnull=False).order_by('-published_date')
+    note_entries = []
+    seen_note = set()
+
+    for entry in all_note_entries:
+        if entry.title not in seen_note:
+            note_entries.append(entry)
+            seen_note.add(entry.title)
+
     return render(request, 'TI_Management_app/member_detail.html',
                   {'member': member,
                    'accessible_ids': accessible_ids,
@@ -93,7 +111,11 @@ def member_detail(request, pk):
                    'different_elements': different_elements,
                    'accessible': accessible,
                    'accessible_group': accessible_group,
-                   'different_elements_group': different_elements_group})
+                   'different_elements_group': different_elements_group,
+                   'card_history_entries': card_history_entries,
+                   'seen_cards': seen_cards,
+                   'note_entries': note_entries,
+                   'seen_note': seen_note})
 
 
 def error_404_view(request, exception):
@@ -158,7 +180,8 @@ def member_search(request):
         searched = request.POST.get('searched', False)
         members = MembersZZTI.objects.filter(Q(forename__contains=searched) |
                                              Q(surname__contains=searched) |
-                                             Q(member_nr__contains=searched))
+                                             Q(member_nr__contains=searched) |
+                                             Q(phone_number__contains=searched))
         return render(request,
                       'TI_Management_app/member_search.html',
                       {'searched': searched,
@@ -240,7 +263,8 @@ def loyalty_card_member_search(request, pk):
         searched = request.POST.get('searched', False)
         loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
                                                          Q(surname__contains=searched) |
-                                                         Q(member_nr__contains=searched))
+                                                         Q(member_nr__contains=searched) |
+                                                         Q(phone_number__contains=searched))
         return render(request,
                       'TI_Management_app/loyalty_card_member_search.html',
                       {'searched': searched,
@@ -394,7 +418,8 @@ def loyalty_card_member_file_order_search(request, pk):
         searched = request.POST.get('searched', False)
         loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
                                                          Q(surname__contains=searched) |
-                                                         Q(member_nr__contains=searched))
+                                                         Q(member_nr__contains=searched) |
+                                                         Q(phone_number__contains=searched))
         return render(request,
                       'TI_Management_app/loyalty_card_member_file_order_search.html',
                       {'searched': searched,
@@ -433,7 +458,8 @@ def loyalty_card_member_file_to_be_picked_up_search(request, pk):
         searched = request.POST.get('searched', False)
         loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
                                                          Q(surname__contains=searched) |
-                                                         Q(member_nr__contains=searched))
+                                                         Q(member_nr__contains=searched) |
+                                                         Q(phone_number__contains=searched))
         return render(request,
                       'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
                       {'searched': searched,
@@ -634,7 +660,8 @@ def group_member_search(request, pk):
         searched = request.POST.get('searched', False)
         group_members = MembersZZTI.objects.filter(Q(forename__contains=searched) |
                                                    Q(surname__contains=searched) |
-                                                   Q(member_nr__contains=searched))
+                                                   Q(member_nr__contains=searched) |
+                                                   Q(phone_number__contains=searched))
 
         # members_without_group = MembersZZTI.objects.filter(groupsMember__isnull=True)
         members_without_group = group_members.exclude(groupsMember__group__pk=pk)
@@ -821,19 +848,22 @@ def member_notepad_edit(request, pk, pk1):
 
 
 @login_required
-def member_notepad_history(request, pk):
+def member_notepad_history(request, pk, title):
     member = MembersZZTI.objects.get(id=pk)
-    member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    # member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    member_notepad_history_obj = member.notepad.filter(Q(published_date__lte=timezone.now()) & Q(title__contains=title)).order_by('-published_date')
 
     return render(request, 'TI_Management_app/member_notepad_history.html',
                   {'member': member,
-                   'member_notepad_history_obj': member_notepad_history_obj})
+                   'member_notepad_history_obj': member_notepad_history_obj,
+                   'title': title})
 
 
 @login_required
-def member_notepad_history_pdf(request, pk):
+def member_notepad_history_pdf(request, pk, title):
     member = MembersZZTI.objects.get(id=pk)
-    member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    # member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
+    member_notepad_history_obj = member.notepad.filter(Q(published_date__lte=timezone.now()) & Q(title__contains=title)).order_by('-published_date')
 
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
@@ -854,10 +884,8 @@ def member_notepad_history_pdf(request, pk):
     lines = []
 
     for history in member_notepad_history_obj:
-        # lines.append(history.member)
         lines.append(f"Tytuł: {history.title}")
         lines.append(" ")
-        # lines.append(f"Opis: {wrap(history.content, 25)}")
         lines.append("Opis:")
         lines.append(" ")
         description = wrap(history.content, 65)
@@ -885,7 +913,7 @@ def member_notepad_history_pdf(request, pk):
         else:
             confirm = "Podpisano: Nie"
         lines.append(confirm)
-        # lines.append("--------------------------------------------------------------------")
+        lines.append("--------------------------------------------------------------------")
         lines.append(" ")
 
     y = 10
@@ -894,24 +922,10 @@ def member_notepad_history_pdf(request, pk):
         c.beginText()
         c.setFont("Verdana", 14)
 
-        # line = wrap(line, 25)
-
-        # if len(line) > 25:
-        #     textob = c.beginText()
-        #     textob.setTextOrigin(inch, inch)
-        #     textob.setFont("Verdana", 14)
-        #     textob.textLine(line)
-        #
-        #     # wraped_text = "\n".join(wrap(line, 80))
-        #     wraped_text = wrap(line, width=25)
-        #     c.drawString(10, y, wraped_text[0])
-        #     c.getPageNumber()
-        #     y += 10
-
-        # t.textLines(wraped_text)
         y += 10
         c.drawString(10, y, line)
         c.getPageNumber()
+        # c.showPage()
         if "-------" in line:
             c.showPage()
             y = 0
@@ -919,7 +933,7 @@ def member_notepad_history_pdf(request, pk):
     c.save()
     buf.seek(0)
 
-    return FileResponse(buf, as_attachment=True, filename=f"HistoriaKomunikacji-{member}.pdf")
+    return FileResponse(buf, as_attachment=True, filename=f"HistoriaKomunikacji-{member.forename} {member.surname}.pdf")
 
 
 @login_required

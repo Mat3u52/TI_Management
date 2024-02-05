@@ -45,10 +45,10 @@ urlpatterns = [
     path('TI_Management_app/<int:pk>/editMemberNotepadEdit/<int:pk1>/',
          views.member_notepad_edit,
          name='member_notepad_edit'),
-    path('TI_Management_app/<int:pk>/editMemberNotepadHistory/',
+    path('TI_Management_app/<int:pk>/editMemberNotepadHistory/<str:title>/',
          views.member_notepad_history,
          name='member_notepad_history'),
-    path('TI_Management_app/<int:pk>/editMemberNotepadHistoryPDF/',
+    path('TI_Management_app/<int:pk>/editMemberNotepadHistoryPDF/<str:title>/',
          views.member_notepad_history_pdf,
          name='member_notepad_history_pdf'),
 

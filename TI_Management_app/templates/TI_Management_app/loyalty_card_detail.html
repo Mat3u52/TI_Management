@@ -35,7 +35,7 @@
                 <div class="notepad">
                     <p>
                         <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                            <b>{{loyalty_card_status.member}}</b>
+                            <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                         </a>
                     </p>
                     <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
@@ -68,7 +68,7 @@
                         <div class="notepad">
                             <p>
                                 <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member}}</b>
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
                             <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
@@ -106,7 +106,7 @@
                         <div class="notepad">
                             <p>
                                 <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member}}</b>
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
                             <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
@@ -144,7 +144,7 @@
                         <div class="notepad">
                             <p>
                                 <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member}}</b>
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
                             <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
@@ -367,7 +367,7 @@
                         <div class="notepad">
                             <p>
                                 <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member}}</b>
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
                             <p>Nr karty: {{loyalty_card_status.card_identity}}</p>

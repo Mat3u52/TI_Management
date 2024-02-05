@@ -101,6 +101,31 @@
                 <div class="notepad">
                   <p>{{member.card}}</p>
                 </div>
+                <div class="notepad"> Historia: </div>
+                {% for h in card_history_entries %}
+                <div class="notepad">
+                  {% if h.history_object.card not in seen_cards %}
+                      {{h.history_object.card}}
+                  {% endif %}
+                    <table width="100%">
+                      <tr>
+                        <td>{{ h.history_id }}</td>
+                        <td>{{ h.history_type }}</td>
+                        <td>{{ h.history_user }}</td>
+                        <td>{{ h.history_date }}</td>
+                      </tr>
+                      <tr>
+                        <td colspan="4">
+                          <small>
+                            Karta HID: {{ h.history_object.card }}
+                          </small>
+                          <br />
+                        </td>
+                      </tr>
+                    </table>
+
+                </div>
+                {% endfor %}
               </li>
           </ul>
         </div>
@@ -282,50 +307,95 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showNotepad">Komunikacja:</li>
               <li id="objNotepad" style="display: none">
-
-                {% for note in member.notepad.all|dictsortreversed:"id"|slice:"1" %}
-
-                  <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
-                    Aktualizuj
-                  </a></p>
-                  <br />
-                  <br />
-                    <div class="notepad">
-                      <p><b>Sprawa: </b><a href="{% url 'member_notepad_history' pk=member.pk %}">{{ note.title }}</a></p>
-
-                      {% for note_date in member.notepad.all|slice:"1" %}
-                        <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>
-                      {% endfor %}
-
-                      <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>
-                        {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>
-                        {% elif note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>
-                        {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
-                        {% elif note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>
-                        {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
-                        {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
-                        {% else %}<p><b>Ważność:</b> None</p>
-                        {% endif %}
-                      <p>
-                        {% if note.status == 'ongoing' %}
-                          <b>Status:</b> W trakcie</p>
-                        {% elif note.status == '' %}
-                          <b>Status:</b> Zamknięty</p>
-                        {% endif %}
-
-                      <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
-
-                      <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-                    </div>
-                  <br />
-                {% empty %}
-                  <p><a href="{% url 'member_notepad_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'member_notepad_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                     Dodaj
-                  </a></p>
-                  <br />
-                  <br />
-                  <p>Brak informacji</p>
+                </a></p>
+                <br />
+                <br />
+
+
+<!--                {{ seen_note }}-->
+<!--                {{ note_entries }}-->
+
+
+                {% for note in note_entries %}
+                    {% if note.title in seen_note %}
+                      <div class="notepad">
+<!--                        {{ note.title }}-->
+                        <div class="notepad">
+                          <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
+                            Aktualizuj
+                          </a></p>
+                          <br />
+                          <br />
+                          <p><b>Sprawa: </b><a href="{% url 'member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>
+
+                        {% for note_date in member.notepad.all|slice:"1" %}
+                          <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>
+                        {% endfor %}
+
+                        <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>
+                          {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>
+                          {% elif note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>
+                          {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
+                          {% elif note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>
+                          {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
+                          {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
+                          {% else %}<p><b>Ważność:</b> None</p>
+                          {% endif %}
+                        <p>
+                          {% if note.status == 'ongoing' %}
+                            <b>Status:</b> W trakcie</p>
+                          {% elif note.status == '' %}
+                             <b>Status:</b> Zamknięty</p>
+                          {% endif %}
+
+                        <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
+
+                        <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        </div>
+                      </div>
+                    {% endif %}
                 {% endfor %}
+
+
+<!--                {% for note in member.notepad.all|dictsortreversed:"id"|slice:"1" %}-->
+<!--                    <div class="notepad">-->
+<!--                      <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">-->
+<!--                        Aktualizuj-->
+<!--                      </a></p>-->
+<!--                      <br />-->
+<!--                      <br />-->
+<!--                      <p><b>Sprawa: </b><a href="{% url 'member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>-->
+
+<!--                      {% for note_date in member.notepad.all|slice:"1" %}-->
+<!--                        <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>-->
+<!--                      {% endfor %}-->
+
+<!--                      <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>-->
+<!--                        {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>-->
+<!--                        {% elif note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>-->
+<!--                        {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>-->
+<!--                        {% elif note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>-->
+<!--                        {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>-->
+<!--                        {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>-->
+<!--                        {% else %}<p><b>Ważność:</b> None</p>-->
+<!--                        {% endif %}-->
+<!--                      <p>-->
+<!--                        {% if note.status == 'ongoing' %}-->
+<!--                          <b>Status:</b> W trakcie</p>-->
+<!--                        {% elif note.status == '' %}-->
+<!--                          <b>Status:</b> Zamknięty</p>-->
+<!--                        {% endif %}-->
+
+<!--                      <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>-->
+
+<!--                      <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>-->
+<!--                    </div>-->
+<!--                  <br />-->
+<!--                {% empty %}-->
+<!--                  <p>Brak informacji</p>-->
+<!--                {% endfor %}-->
 
               </li>
           </ul>

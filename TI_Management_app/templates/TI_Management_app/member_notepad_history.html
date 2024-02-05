@@ -3,7 +3,7 @@
 {% block breadcrumbs %}
 <a href="{% url 'members_list' %}"> / Baza Członków </a>
 <a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_notepad_history' pk=member.pk %}"> / Historia</a>
+<a href="{% url 'member_notepad_history' pk=member.pk title=title %}"> / Historia Komunikacji</a>
 {% endblock %}
 
 {% block content %}
@@ -11,9 +11,8 @@
    <div class="hero-unit">
        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
        <p>Historia komunikacji
-        <a href="{% url 'member_notepad_history_pdf' pk=member.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj PDF</a>
+        <a href="{% url 'member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">Wygeneruj PDF</a>
        </p>
-
        {% for note in member_notepad_history_obj %}
             <div class="notepad">
                 <div class="notepad-head"><h3>{{ note.title }}</h3> </div>
