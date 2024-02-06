@@ -5,6 +5,7 @@ from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad
 from django.utils import timezone
 
 
+
 class MemberForm(forms.ModelForm):
     phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
                                                                               message="Wprowadź włąściwy numer telefonu.")])
@@ -139,6 +140,7 @@ class NotepadMemberForm(forms.ModelForm):
 
         widgets = {
             'published_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'content': forms.Textarea(attrs={'rows': 12, 'cols': 50}),
         }
 
 
@@ -236,3 +238,32 @@ class ToBePickedUpCardDocumentForm(forms.ModelForm):
     class Meta:
         model = ToBePickedUpCardDocument
         fields = ['card', 'title', 'file', 'responsible']
+
+
+class ExportDataSeparatorForm(forms.Form):
+    SEPARATOR_CHOICES = [
+        (';', ';'),
+        (',', ','),
+        ('-', '-'),
+    ]
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('tel', 'tel'),
+        ('nr', 'nr'),
+    ]
+
+    # separator = forms.CharField()
+    separator = forms.ChoiceField(
+        choices=SEPARATOR_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+    data = forms.ChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+
+

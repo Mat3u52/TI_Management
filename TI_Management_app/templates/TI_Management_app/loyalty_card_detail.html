@@ -27,7 +27,36 @@
             </li>
             <li>
                 <div class="notepad">
-                    <a href="{% url 'loyalty_cards_export_all_users' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+
+<!--                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">-->
+<!--                        {% csrf_token %}-->
+
+<!--                        {{ form_sep.as_p }}-->
+
+<!--                        <input type="submit" value="Submit">-->
+<!--                    </form>-->
+
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                        {% csrf_token %}
+
+                        {% for radio in form_sep.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        {% for radio in form_sep.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+
+<!--                        <input type="submit" value="Submit">-->
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę email</button>
+                    </form>
+
+
+
                 </div>
             </li>
             <li id="objLoyaltyCardMembers" style="display: none">

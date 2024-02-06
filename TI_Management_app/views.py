@@ -9,7 +9,8 @@ from .forms import (MemberForm, MemberEditForm, MemberFileForm, CardStatusForm, 
                     LoyaltyCardsAddMemberFileOrderForm,
                     LoyaltyCardsAddMemberFileToBePickedUpForm,
                     OrderedCardDocumentForm,
-                    ToBePickedUpCardDocumentForm)
+                    ToBePickedUpCardDocumentForm,
+                    ExportDataSeparatorForm)
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -55,7 +56,7 @@ class ImageDisplay(DetailView):
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
 
-    paginator = Paginator(members_obj, 3)
+    paginator = Paginator(members_obj, 50)
     page = request.GET.get('page')
     try:
         members = paginator.page(page)
@@ -283,12 +284,31 @@ def loyalty_card_detail(request, pk):
     status_card_file_a = CardStatus.objects.order_by('-file_a_date')
     ordered_card_file = OrderedCardDocument.objects.all()
     to_be_picked_up_doc_card_file = ToBePickedUpCardDocument.objects.all()
+
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{loyalty_card}_{timezone.now()}.txt'
+
+    if request.method == 'POST':
+        form_sep = ExportDataSeparatorForm(request.POST)
+        if form_sep.is_valid():
+            separator = form_sep.cleaned_data['separator']
+            data = form_sep.cleaned_data['data']
+            lines = []
+            if data == 'email':
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+                    lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                response.writelines(lines)
+
+            return response
+    else:
+        form_sep = ExportDataSeparatorForm()
+
     return render(request, 'TI_Management_app/loyalty_card_detail.html',
                   {'loyalty_card': loyalty_card,
                    'status_card_file': status_card_file,
                    'status_card_file_a': status_card_file_a,
                    'ordered_card_file': ordered_card_file,
-                   'to_be_picked_up_doc_card_file': to_be_picked_up_doc_card_file})
+                   'to_be_picked_up_doc_card_file': to_be_picked_up_doc_card_file, 'form_sep': form_sep})
 
 
 @login_required
@@ -492,18 +512,30 @@ def loyalty_card_delete_all(request, pk):
     return redirect('loyalty_card_detail')
 
 
-def loyalty_cards_export_all_users(request, pk):
-    loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
-    response = HttpResponse(content_type='text/plain')
-    response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{loyalty_card_all_users}_{timezone.now()}.txt'
-
-    lines = []
-    for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-        lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
-                     f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
-
-    response.writelines(lines)
-    return response
+# def loyalty_cards_export_all_users(request, pk, separator):
+# def loyalty_cards_export_all_users(request, pk):
+#     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
+#     response = HttpResponse(content_type='text/plain')
+#     response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{loyalty_card_all_users}_{timezone.now()}.txt'
+#
+#
+#
+#             # return render(request, 'my_template.html', {'my_variable_value': my_variable_value})
+#
+#
+#
+#     # if separator:
+#     #     lines = []
+#     #     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+#     #         lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+#     #     response.writelines(lines)
+#     # else:
+#     #     lines = []
+#     #     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
+#     #         lines.append(f"{loyalty_card_all_user.member.email};")
+#     #     response.writelines(lines)
+#
+#     # return response
 
 
 def loyalty_cards_export_to_be_picked_up(request, pk):
