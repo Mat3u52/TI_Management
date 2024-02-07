@@ -27,15 +27,6 @@
             </li>
             <li>
                 <div class="notepad">
-
-<!--                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">-->
-<!--                        {% csrf_token %}-->
-
-<!--                        {{ form_sep.as_p }}-->
-
-<!--                        <input type="submit" value="Submit">-->
-<!--                    </form>-->
-
                     <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
                         {% csrf_token %}
 
@@ -50,13 +41,8 @@
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
-
-<!--                        <input type="submit" value="Submit">-->
-                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę email</button>
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
-
-
-
                 </div>
             </li>
             <li id="objLoyaltyCardMembers" style="display: none">
@@ -88,7 +74,22 @@
             </li>
             <li>
                 <div class="notepad">
-                    <a href="{% url 'loyalty_cards_export_to_be_picked_up' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                        {% csrf_token %}
+
+                        {% for radio in form_sep_picked_up.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        {% for radio in form_sep.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
                 </div>
             </li>
             <li id="objLoyaltyCardMembersReadyToGet" style="display: none">
@@ -126,7 +127,21 @@
             </li>
             <li>
                 <div class="notepad">
-                    <a href="{% url 'loyalty_cards_export_ordered' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                        {% csrf_token %}
+                        {% for radio in form_sep_ordered.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        {% for radio in form_sep_ordered.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
                 </div>
             </li>
             <li id="objLoyaltyCardMembersOrdered" style="display: none">
@@ -164,7 +179,21 @@
             </li>
             <li>
                 <div class="notepad">
-                    <a href="{% url 'loyalty_cards_export_to_order' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                        {% csrf_token %}
+                        {% for radio in form_sep_to_ordered.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        {% for radio in form_sep_to_ordered.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
                 </div>
             </li>
             <li id="objLoyaltyCardMembersToOrder" style="display: none">
@@ -208,26 +237,26 @@
                 </div>
 
             </li>
-            <li>
-                <div class="notepad">
-                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_order_search' pk=loyalty_card.pk %}">
-                        {% csrf_token %}
-                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-                        type="search" placeholder="Dodaj dokument zlecenie" aria-label="Search" name="searched">
-                        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź</button>
-                    </form>
-                </div>
-            </li>
-            <li>
-                <div class="notepad">
-                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_to_be_picked_up_search' pk=loyalty_card.pk %}">
-                        {% csrf_token %}
-                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-                        type="search" placeholder="Dodaj dokument odbioru" aria-label="Search" name="searched">
-                        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź</button>
-                    </form>
-                </div>
-            </li>
+<!--            <li>-->
+<!--                <div class="notepad">-->
+<!--                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_order_search' pk=loyalty_card.pk %}">-->
+<!--                        {% csrf_token %}-->
+<!--                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"-->
+<!--                        type="search" placeholder="Dodaj dokument zlecenie" aria-label="Search" name="searched">-->
+<!--                        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź</button>-->
+<!--                    </form>-->
+<!--                </div>-->
+<!--            </li>-->
+<!--            <li>-->
+<!--                <div class="notepad">-->
+<!--                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_to_be_picked_up_search' pk=loyalty_card.pk %}">-->
+<!--                        {% csrf_token %}-->
+<!--                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"-->
+<!--                        type="search" placeholder="Dodaj dokument odbioru" aria-label="Search" name="searched">-->
+<!--                        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź</button>-->
+<!--                    </form>-->
+<!--                </div>-->
+<!--            </li>-->
             <li id="objLoyaltyCardMembersDocuments" style="display: none">
 
                 <div class="notepad">
@@ -249,62 +278,45 @@
 
                 </div>
 
-                <div class="notepad">
-                    <h4>Dokumenty zlecenie przypisane do uczestnika:</h4>
-                    <br/>
-                        {% for loyalty_card_status in status_card_file %}
-                            {% if loyalty_card_status.file%}
-                                <p>Nr dokumentu:
-                                    <a href="{{ loyalty_card_status.file.url }}">
-                                        {{loyalty_card_status.file_name}}
-                                    </a>
-                                </p>
-<!--                                <p>Nazwa: {{loyalty_card_status.file}}</p>-->
-<!--                                <p>Data: {{loyalty_card_status.file_date}}</p>-->
-                                <p>Przypisany:
-                                    <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">
-                                        {{ loyalty_card_status.member }}
-                                    </a>
-                                </p>
-<!--                                <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>-->
-                                <br />
-                            {% endif %}
-                        {% endfor %}
+<!--                <div class="notepad">-->
+<!--                    <h4>Dokumenty zlecenie przypisane do uczestnika:</h4>-->
+<!--                    <br />-->
+<!--                        {% for loyalty_card_status in status_card_file %}-->
+<!--                            {% if loyalty_card_status.file%}-->
+<!--                                <p>Nr dokumentu:-->
+<!--                                    <a href="{{ loyalty_card_status.file.url }}">-->
+<!--                                        {{loyalty_card_status.file_name}}-->
+<!--                                    </a>-->
+<!--                                </p>-->
+<!--                                <p>Przypisany:-->
+<!--                                    <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                        {{ loyalty_card_status.member }}-->
+<!--                                    </a>-->
+<!--                                </p>-->
+<!--                                <br />-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
 
-                        {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                                {% if loyalty_card_status.ordered_doc %}
-
-<!--                                    {{ loyalty_card_status.ordered_doc.id }}-->
-
-
-                                    {% for ordered_file in ordered_card_file %}
-                                        {% if ordered_file.id == loyalty_card_status.ordered_doc.id %}
-<!--                                            {{loyalty_card_status.member}}-->
-<!--                                            {{ ordered_file.id }}-->
-<!--                                            {{ ordered_file.title }}-->
-
-
-                                            <p>Nr dokumentu:
-                                                <a href="{{ ordered_file.file.url }}">
-                                                    {{ordered_file.title}}
-                                                </a>
-                                            </p>
-<!--                                            <p>Nazwa: {{ordered_file.file}}</p>-->
-<!--                                            <p>Data: {{ordered_file.created_date}}</p>-->
-                                            <p>Przypisany:
-                                                <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">
-                                                    {{ loyalty_card_status.member }}
-                                                </a>
-                                            </p>
-<!--                                            <p>Dodany przez: {{ ordered_file.responsible }}</p>-->
-                                            <br />
-
-                                        {% endif %}
-                                    {% endfor %}
-                                {% endif %}
-                        {% endfor%}
-
-                </div>
+<!--                        {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}-->
+<!--                                {% if loyalty_card_status.ordered_doc %}-->
+<!--                                    {% for ordered_file in ordered_card_file %}-->
+<!--                                        {% if ordered_file.id == loyalty_card_status.ordered_doc.id %}-->
+<!--                                            <p>Nr dokumentu:-->
+<!--                                                <a href="{{ ordered_file.file.url }}">-->
+<!--                                                    {{ordered_file.title}}-->
+<!--                                                </a>-->
+<!--                                            </p>-->
+<!--                                            <p>Przypisany:-->
+<!--                                                <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                                    {{ loyalty_card_status.member }}-->
+<!--                                                </a>-->
+<!--                                            </p>-->
+<!--                                            <br />-->
+<!--                                        {% endif %}-->
+<!--                                    {% endfor %}-->
+<!--                                {% endif %}-->
+<!--                        {% endfor%}-->
+<!--                </div>-->
 
                 <div class="notepad">
                     <h4>Dokumenty odbioru:</h4>
@@ -326,55 +338,46 @@
                 </div>
 
 
-                <div class="notepad">
-                    <h4>Dokumenty odbioru przypisane do uczestnika:</h4>
-                    <br/>
-                        {% for loyalty_card_status in status_card_file_a %}
-                            {% if loyalty_card_status.file_a%}
-                                <p>Nr dokumentu:
-                                    <a href="{{ loyalty_card_status.file_a.url }}">
-                                        {{loyalty_card_status.file_name_a}}
-                                    </a>
-                                </p>
-<!--                                <p>Nazwa: {{loyalty_card_status.file_a}}</p>-->
-<!--                                <p>Data: {{loyalty_card_status.file_a_date}}</p>-->
-                                <p>Przypisany:
-                                    <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">
-                                        {{ loyalty_card_status.member }}
-                                    </a>
-                                </p>
-<!--                                <p>Dodany przez: {{ loyalty_card_status.responsible }}</p>-->
-                                <br />
-                            {% endif %}
-                        {% endfor %}
+<!--                <div class="notepad">-->
+<!--                    <h4>Dokumenty odbioru przypisane do uczestnika:</h4>-->
+<!--                    <br/>-->
+<!--                        {% for loyalty_card_status in status_card_file_a %}-->
+<!--                            {% if loyalty_card_status.file_a%}-->
+<!--                                <p>Nr dokumentu:-->
+<!--                                    <a href="{{ loyalty_card_status.file_a.url }}">-->
+<!--                                        {{loyalty_card_status.file_name_a}}-->
+<!--                                    </a>-->
+<!--                                </p>-->
+<!--                                <p>Przypisany:-->
+<!--                                    <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                        {{ loyalty_card_status.member }}-->
+<!--                                    </a>-->
+<!--                                </p>-->
+<!--                                <br />-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
 
-                        {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                                {% if loyalty_card_status.to_be_picked_up_doc %}
+<!--                        {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}-->
+<!--                                {% if loyalty_card_status.to_be_picked_up_doc %}-->
 
-                                    {% for to_be_picked_up_file in to_be_picked_up_doc_card_file %}
-                                        {% if to_be_picked_up_file.id == loyalty_card_status.to_be_picked_up_doc.id %}
-                                            <p>Nr dokumentu:
-                                                <a href="{{ to_be_picked_up_file.file.url }}">
-                                                    {{to_be_picked_up_file.title}}
-                                                </a>
-                                            </p>
-<!--                                            <p>Nazwa: {{to_be_picked_up_file.file}}</p>-->
-<!--                                            <p>Data: {{to_be_picked_up_file.created_date}}</p>-->
-                                            <p>Przypisany:
-                                                <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">
-                                                    {{ loyalty_card_status.member }}
-                                                </a>
-                                            </p>
-<!--                                            <p>Dodany przez: {{ to_be_picked_up_file.responsible }}</p>-->
-                                            <br />
-
-                                        {% endif %}
-                                    {% endfor %}
-
-
-                                {% endif %}
-                        {% endfor%}
-                </div>
+<!--                                    {% for to_be_picked_up_file in to_be_picked_up_doc_card_file %}-->
+<!--                                        {% if to_be_picked_up_file.id == loyalty_card_status.to_be_picked_up_doc.id %}-->
+<!--                                            <p>Nr dokumentu:-->
+<!--                                                <a href="{{ to_be_picked_up_file.file.url }}">-->
+<!--                                                    {{to_be_picked_up_file.title}}-->
+<!--                                                </a>-->
+<!--                                            </p>-->
+<!--                                            <p>Przypisany:-->
+<!--                                                <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                                    {{ loyalty_card_status.member }}-->
+<!--                                                </a>-->
+<!--                                            </p>-->
+<!--                                            <br />-->
+<!--                                        {% endif %}-->
+<!--                                    {% endfor %}-->
+<!--                                {% endif %}-->
+<!--                        {% endfor%}-->
+<!--                </div>-->
 
             </li>
           </ul>
@@ -387,7 +390,21 @@
             </li>
             <li>
                 <div class="notepad">
-                    <a href="{% url 'loyalty_cards_export_deactivated' pk=loyalty_card.pk %}" class="btn btn-info btn-sm pull-right">Wygeneruj listę</a>
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                        {% csrf_token %}
+                        {% for radio in form_sep_to_deactivated.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        {% for radio in form_sep_to_deactivated.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
                 </div>
             </li>
             <li id="objLoyaltyCardMembersDeactivated" style="display: none">

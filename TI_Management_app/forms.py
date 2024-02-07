@@ -5,7 +5,6 @@ from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad
 from django.utils import timezone
 
 
-
 class MemberForm(forms.ModelForm):
     phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
                                                                               message="Wprowadź włąściwy numer telefonu.")])
@@ -61,6 +60,7 @@ class MemberForm(forms.ModelForm):
     #     return member_nr
 
 
+
 class MemberEditForm(forms.ModelForm):
     phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
                                                                                   message="Wprowadź włąściwy numer telefonu.")])
@@ -89,6 +89,8 @@ class MemberEditForm(forms.ModelForm):
                 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
 
         }
+
+
 class MemberFileForm(forms.ModelForm):
     class Meta:
         model = MembersFile
@@ -249,7 +251,6 @@ class ExportDataSeparatorForm(forms.Form):
     DATA_CHOICES = [
         ('email', 'email'),
         ('tel', 'tel'),
-        ('nr', 'nr'),
     ]
 
     # separator = forms.CharField()
@@ -267,3 +268,113 @@ class ExportDataSeparatorForm(forms.Form):
     )
 
 
+class ExportDataSeparatorToBePickedUpForm(forms.Form):
+    SEPARATOR_CHOICES = [
+        (';', ';'),
+        (',', ','),
+        ('-', '-'),
+    ]
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('tel', 'tel'),
+    ]
+
+    # separator = forms.CharField()
+    separator = forms.ChoiceField(
+        choices=SEPARATOR_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+    data = forms.ChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+
+
+class ExportDataSeparatorOrderedForm(forms.Form):
+    SEPARATOR_CHOICES = [
+        (';', ';'),
+        (',', ','),
+        ('-', '-'),
+    ]
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('tel', 'tel'),
+    ]
+
+    # separator = forms.CharField()
+    separator = forms.ChoiceField(
+        choices=SEPARATOR_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+    data = forms.ChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+
+
+class ExportDataSeparatorToOrderedForm(forms.Form):
+    SEPARATOR_CHOICES = [
+        (';', ';'),
+        (',', ','),
+        ('-', '-'),
+    ]
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('tel', 'tel'),
+    ]
+
+    # separator = forms.CharField()
+    separator = forms.ChoiceField(
+        choices=SEPARATOR_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+    data = forms.ChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+
+
+class ExportDataSeparatorDeactivatedForm(forms.Form):
+    SEPARATOR_CHOICES = [
+        (';', ';'),
+        (',', ','),
+        ('-', '-'),
+    ]
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('tel', 'tel'),
+    ]
+
+    # separator = forms.CharField()
+    separator = forms.ChoiceField(
+        choices=SEPARATOR_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+    data = forms.ChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+
+
+class GroupAddGenderForm(forms.Form):
+    SEX_CHOICES = (
+        ('female', 'Kobieta'),
+        ('male', 'Mężczyzna'),
+    )
+    gender = forms.ChoiceField(choices=SEX_CHOICES)

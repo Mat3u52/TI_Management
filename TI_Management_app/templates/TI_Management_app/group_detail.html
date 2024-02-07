@@ -17,13 +17,23 @@
 </div>
 
 <div class="hero-unit">
+    <form method="post" action="{% url 'group_detail' pk=group.pk %}">
+        {% csrf_token %}
+        {{form_gender.gender}}
+        <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
+        <br />
+    </form>
+    {{all_members}}
+</div>
+
+<div class="hero-unit">
     <h3><a href="{% url 'groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
 
     {% for participant in group.groupsGroup.all %}
         <div class="notepad">
             <p>
                 <a href="{% url 'member_detail' pk=participant.member.pk %}">
-                    {{participant.member}} - {{participant.member.member_nr}}
+                    {{participant.member.forename}} {{participant.member.surname}} - {{participant.member.member_nr}}
                 </a>
             </p>
             <a href="{% url 'group_delete_member' pk=group.pk pk1=participant.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
