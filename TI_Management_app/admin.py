@@ -3,7 +3,8 @@ from django.utils.html import format_html
 from .models import (Groups, Cards, CardsRFID, CardStatus,
                      MembersZZTI, Notepad, Application, Task,
                      GroupsMember, MembersFile, Activities, ActivityStatus,
-                     Vote, Questions, Answers, OrderedCardDocument, ToBePickedUpCardDocument)
+                     Vote, Questions, Answers, OrderedCardDocument, ToBePickedUpCardDocument,
+                     MemberFunction, MemberOccupation, GroupsFile)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -30,6 +31,32 @@ class GroupsAdmin(admin.ModelAdmin):
     list_display = ('group_name', 'created_date')
     list_filter = ('group_name', 'created_date')
     search_fields = ('group_name',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(MemberFunction)
+class MemberFunctionAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('member_function', 'created_date')
+    list_filter = ('member_function', 'created_date')
+    search_fields = ('member_function',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(MemberOccupation)
+class MemberOccupationAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('member_occupation', 'created_date')
+    list_filter = ('member_occupation', 'created_date')
+    search_fields = ('member_occupation',)
     date_hierarchy = 'created_date'
 
 
@@ -106,11 +133,11 @@ class MembersZZTIAdmin(admin.ModelAdmin):
     list_display = ('id', 'forename', 'surname', 'role', 'occupation', 'member_nr', 'sex', 'birthday', 'birthplace',
                     'pin', 'phone_number', 'email', 'date_of_accession',
                     'date_of_abandonment', 'type_of_contract', 'date_of_contract', 'expiration_date_contract',
-                    'group', 'card', 'image_tag', 'created_date')
+                    'group', 'card', 'image_tag', 'deactivate', 'created_date')
     list_filter = ('id', 'forename', 'surname', 'role', 'occupation', 'member_nr', 'sex', 'birthday', 'birthplace',
                    'pin', 'phone_number', 'email', 'date_of_accession', 'expiration_date_contract',
                    'date_of_abandonment', 'type_of_contract', 'date_of_contract',
-                   'group', 'card', 'created_date')
+                   'group', 'card', 'deactivate', 'created_date')
     search_fields = ('surname',)
     date_hierarchy = 'created_date'
 
@@ -124,6 +151,19 @@ class MembersFile(admin.ModelAdmin):
 
     list_display = ('member', 'title', 'file', 'created_date')
     list_filter = ('member', 'title', 'file', 'created_date')
+    search_fields = ('title',)
+    date_hierarchy = 'created_date'
+
+
+@admin.register(GroupsFile)
+class GroupsFile(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:  # when editing an object
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = ('group', 'title', 'file', 'created_date')
+    list_filter = ('group', 'title', 'file', 'created_date')
     search_fields = ('title',)
     date_hierarchy = 'created_date'
 
