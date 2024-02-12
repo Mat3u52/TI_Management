@@ -1,10 +1,30 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'groups_list' %}"> / Grupy </a>
+<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+<a href="{% url 'group_file_edit' pk=group.pk %}"> / Pliki</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin' %}
+   <div class="hero-unit">
+        <h3><a href="{% url 'group_detail' pk=group.pk %}">{{group.group_name}}</a></h3>
+        <p>Dokument</p>
+        <form method="post" class="post-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <p>{{form.title}}</p>
+            <label class="custom-file-upload">
+                Wybierz dokument
+                {{form.file}}
+            </label>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+            <br />
+        </form>
+    </div>
+{% endif %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='groups' %}
+{% endblock %}

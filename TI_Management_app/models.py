@@ -17,6 +17,28 @@ class Groups(models.Model):
         verbose_name_plural = 'Grupy'
 
 
+class MemberFunction(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    member_function = models.CharField(max_length=250, blank=False, default=None, unique=True)
+
+    def __str__(self):
+        return self.member_function
+
+    class Meta:
+        verbose_name_plural = 'Funkcja Członka'
+
+
+class MemberOccupation(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    member_occupation = models.CharField(max_length=250, blank=False, default=None, unique=True)
+
+    def __str__(self):
+        return self.member_occupation
+
+    class Meta:
+        verbose_name_plural = 'Stanowisko Członka'
+
+
 class CardsRFID(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     serial_number = models.IntegerField(unique=True)
@@ -83,8 +105,10 @@ class MembersZZTI(models.Model):
     forename = models.CharField(max_length=250, blank=False, null=False)
     # surname = models.CharField(max_length=250, blank=True, null=True, default=None)
     surname = models.CharField(max_length=250, blank=False, null=False)
-    role = models.CharField(max_length=250, blank=True, null=True, default=None)
-    occupation = models.CharField(max_length=250, blank=True, null=True, default=None)
+    # role = models.CharField(max_length=250, blank=True, null=True, default=None)
+    role = models.ForeignKey(MemberFunction, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    # occupation = models.CharField(max_length=250, blank=True, null=True, default=None)
+    occupation = models.ForeignKey(MemberOccupation, on_delete=models.CASCADE, null=True, blank=True, default=None)
     # member_nr = models.CharField(max_length=250, blank=True, null=True, default=None)
     member_nr = models.CharField(max_length=250, blank=False, null=False, unique=True)
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, blank=True, null=True, default=None)
@@ -104,6 +128,7 @@ class MembersZZTI(models.Model):
     card = models.CharField(max_length=350, blank=True, null=True, default=None)
     # card_status = models.ForeignKey(CardStatus, on_delete=models.CASCADE, null=True, blank=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
+    deactivate = models.BooleanField(default=False)
     history = HistoricalRecords()
     # vote = models.ManyToManyField(Vote)
 
@@ -111,7 +136,7 @@ class MembersZZTI(models.Model):
         return (f"{self.forename} {self.surname} {self.role} {self.occupation} {self.member_nr} {self.sex} "
                 f"{self.birthday} {self.birthplace} {self.pin} {self.phone_number} {self.email} "
                 f"{self.date_of_accession} {self.date_of_abandonment} {self.type_of_contract} {self.date_of_contract} "
-                f"{self.expiration_date_contract} {self.group} {self.card} {self.image}")
+                f"{self.expiration_date_contract} {self.group} {self.card} {self.image} {self.deactivate}")
 
     class Meta:
         verbose_name_plural = 'Członkowie'
@@ -149,6 +174,20 @@ class MembersFile(models.Model):
 
     class Meta:
         verbose_name_plural = 'Członkowie Pliki'
+
+
+class GroupsFile(models.Model):
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsFile', null=True, blank=True)
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=350, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='uploadsGroup/%Y/%m/%d/%H%M%S/')
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Grupy Pliki'
 
 
 class Notepad(models.Model):
@@ -282,14 +321,6 @@ def validate_unique_or_null(value):
 
 
 class CardStatus(models.Model):
-    # STATUS_CHOICES = (
-    #     ('none', 'Brak statusu'),
-    #     ('demandReceived', 'Zapotrzebowanie odebrane'),
-    #     ('requestSent', 'Zapotrzebowanie wysłane'),
-    #     ('sent', 'Przysłana'),
-    #     ('received', 'Odebrana'),
-    #     ('deactivated', 'Dezaktywowana'),
-    # )
     STATUS_CHOICES = (
         ('none', 'Brak statusu'),
         ('active', 'Aktywna'),

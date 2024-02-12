@@ -1,9 +1,11 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards, OrderedCardDocument, ToBePickedUpCardDocument
+from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards, OrderedCardDocument,
+                     ToBePickedUpCardDocument, MemberFunction, MemberOccupation, GroupsFile)
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .forms import (MemberForm, MemberEditForm, MemberFileForm, CardStatusForm, GroupsMemberForm, NotepadMemberForm,
+from .forms import (MemberForm, MemberEditForm, MemberDeactivateForm, MemberFileForm, CardStatusForm, GroupsMemberForm,
+                    NotepadMemberForm,
                     GroupsForm, GroupsEditForm, GroupAddMemberForm,
                     LoyaltyCardForm, LoyaltyCardAddMemberForm,
                     LoyaltyCardsAddMemberFileOrderForm,
@@ -12,7 +14,8 @@ from .forms import (MemberForm, MemberEditForm, MemberFileForm, CardStatusForm, 
                     ToBePickedUpCardDocumentForm,
                     ExportDataSeparatorForm, ExportDataSeparatorToBePickedUpForm, ExportDataSeparatorOrderedForm,
                     ExportDataSeparatorToOrderedForm, ExportDataSeparatorDeactivatedForm,
-                    GroupAddGenderForm)
+                    GroupAddGenderForm, ExportDataSeparatorGroupForm, MemberFunctionForm, MemberOccupationForm,
+                    GroupAddRoleForm, GroupFileForm)
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -121,6 +124,30 @@ def member_detail(request, pk):
                    'seen_note': seen_note})
 
 
+@login_required
+def member_deactivate(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    member_loyalty_cards = CardStatus.objects.filter(member=member)
+    member_groups = GroupsMember.objects.filter(member=member)
+
+
+    if request.method == "POST":
+        form = MemberDeactivateForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            member = form.save(commit=False)
+            member.author = request.user
+            member.date_of_abandonment = timezone.now()
+            member.save()
+            return redirect('member_detail', pk=member.pk)
+    else:
+        form = MemberDeactivateForm(instance=member)
+    return render(request, 'TI_Management_app/member_deactivate.html',
+                  {'form': form,
+                   'member': member,
+                   'member_loyalty_cards': member_loyalty_cards,
+                   'member_groups': member_groups})
+
+
 def error_404_view(request, exception):
     data = {"name": "TI_Management"}
     return render(request, 'TI_Management_app/404.html', data)
@@ -157,6 +184,38 @@ def member_edit(request, pk):
         # form = MemberForm(instance=member, initial={'birthday': birthday})
     return render(request, 'TI_Management_app/member_edit.html', {'form': form,
                                                                   'member': member})
+
+
+@login_required
+def member_function_add(request):
+    all_functions = MemberFunction.objects.all()
+    if request.method == "POST":
+        form = MemberFunctionForm(request.POST)
+        if form.is_valid():
+            function = form.save(commit=False)
+            function.author = request.user
+            function.save()
+            return redirect('member_function_add')
+    else:
+        form = MemberFunctionForm()
+    return render(request, 'TI_Management_app/member_function_add.html',
+                  {'form': form, 'all_functions': all_functions})
+
+
+@login_required
+def member_occupation_add(request):
+    all_occupation = MemberOccupation.objects.all()
+    if request.method == "POST":
+        form = MemberOccupationForm(request.POST)
+        if form.is_valid():
+            occupation = form.save(commit=False)
+            occupation.author = request.user
+            occupation.save()
+            return redirect('member_occupation_add')
+    else:
+        form = MemberOccupationForm()
+    return render(request, 'TI_Management_app/member_occupation_add.html',
+                  {'form': form, 'all_occupation': all_occupation})
 
 
 @login_required
@@ -833,15 +892,15 @@ def groups_edit(request, pk):
 def group_detail(request, pk):
     group = get_object_or_404(Groups, pk=pk)
 
+    response = HttpResponse(content_type='text/plain')
+    response['Content-Disposition'] = f'attachment; filename={group}.txt'
+
     if request.method == "POST":
         form_gender = GroupAddGenderForm(request.POST)
 
         if form_gender.is_valid():
-            # group = form_gender.save(commit=False)
-            # group.author = request.user
-            # group.save()
             gender = form_gender.cleaned_data['gender']
-            all_members_ids = MembersZZTI.objects.filter(sex__contains=gender).values_list('id', flat=True)
+            all_members_ids = MembersZZTI.objects.filter(sex=gender).values_list('id', flat=True)
 
             group_instance = get_object_or_404(Groups, pk=pk)
 
@@ -849,16 +908,101 @@ def group_detail(request, pk):
             for member_id in all_members_ids:
                 if not GroupsMember.objects.filter(group=group_instance, member_id=member_id).exists():
                     group_members_instance = GroupsMember.objects.create(group=group_instance, member_id=member_id)
-                    # GroupsMember.objects.create(group=group_instance, member_id=member_id)
                     group_members_instances.append(group_members_instance)
 
             return redirect('group_detail', pk=group.pk)
     else:
         form_gender = GroupAddGenderForm()
 
+    if request.method == "POST":
+        form_role = GroupAddRoleForm(request.POST)
+
+        if form_role.is_valid():
+            role = form_role.cleaned_data['role']
+            occupation = form_role.cleaned_data['occupation']
+            if role:
+                all_members_ids = MembersZZTI.objects.filter(role=role).values_list('id', flat=True)
+
+                group_instance = get_object_or_404(Groups, pk=pk)
+
+                group_members_instances = []
+                for member_id in all_members_ids:
+                    if not GroupsMember.objects.filter(group=group_instance, member_id=member_id).exists():
+                        group_members_instance = GroupsMember.objects.create(group=group_instance, member_id=member_id)
+                        group_members_instances.append(group_members_instance)
+
+                return redirect('group_detail', pk=group.pk)
+            elif occupation:
+                all_members_ids = MembersZZTI.objects.filter(occupation=occupation).values_list('id', flat=True)
+
+                group_instance = get_object_or_404(Groups, pk=pk)
+
+                group_members_instances = []
+                for member_id in all_members_ids:
+                    if not GroupsMember.objects.filter(group=group_instance, member_id=member_id).exists():
+                        group_members_instance = GroupsMember.objects.create(group=group_instance, member_id=member_id)
+                        group_members_instances.append(group_members_instance)
+
+                return redirect('group_detail', pk=group.pk)
+
+    else:
+        form_role = GroupAddRoleForm()
+
+    if request.method == 'POST':
+        form_export = ExportDataSeparatorGroupForm(request.POST)
+        if form_export.is_valid():
+            separator = form_export.cleaned_data['separator']
+            data = form_export.cleaned_data['data']
+            lines = []
+            if data == 'email':
+                for details in group.groupsGroup.all():
+                    lines.append(f"{details.member.email}{separator}")
+                response.writelines(lines)
+            else:
+                for details in group.groupsGroup.all():
+                    lines.append(f"{details.member.phone_number}{separator}")
+                response.writelines(lines)
+
+            return response
+    else:
+        form_export = ExportDataSeparatorGroupForm()
+
     return render(request, 'TI_Management_app/group_detail.html',
                   {'group': group,
-                   'form_gender': form_gender})
+                   'form_gender': form_gender,
+                   'form_role': form_role,
+                   # 'form_occupation': form_occupation,
+                   'form_export': form_export})
+
+
+@login_required
+def group_file_edit(request, pk):
+    group = get_object_or_404(Groups, pk=pk)
+    if request.method == "POST":
+        form = GroupFileForm(request.POST, request.FILES)  # , instance = member
+        if form.is_valid():
+            group_file = form.save(commit=False)
+            group_file.group = group
+            group_file.author = request.user
+            group_file.save()
+            return redirect('group_detail', pk=group.pk)
+    else:
+        form = GroupFileForm()
+    return render(request, 'TI_Management_app/group_file_edit.html',
+                  {
+                      'form': form,
+                      'group': group})
+
+
+@login_required
+def group_file_delete(request, pk, pk1):
+    group = get_object_or_404(Groups, pk=pk)
+    group_file = get_object_or_404(GroupsFile, pk=pk1)
+
+    group.author = request.user
+    group_file.file.delete()
+    group_file.delete()
+    return redirect('group_detail', pk=group.pk)
 
 
 def group_search(request):

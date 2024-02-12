@@ -1,10 +1,39 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'member_occupation_add' %}"> / Dodaj stanowisko</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+            <p>Stanowisko:</p>
+            {{form.member_occupation}}
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+            <br />
+            <br />
+        </form>
+    </div>
+
+<div class="hero-unit">
+    {% for occupation in all_occupation %}
+        <div class="notepad">
+            <h3>{{occupation}}</h3>
+            <div class="date"><p>Data dodania: {{occupation.created_date}}</p></div>
+        </div>
+    {% endfor %}
+</div>
+
+
+{% endif %}
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

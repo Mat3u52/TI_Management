@@ -84,7 +84,14 @@
         </table>
 
         <a href="{% url 'member_edit' pk=member.pk %}">
-          <button type="submit" class="btn btn-primary btn-large pull-left">Modyfikuj</button>
+          <button type="submit" class="btn btn-primary btn-large pull-left">Aktualizuj</button>
+        </a>
+        <a href="{% url 'member_deactivate' pk=member.pk %}">
+          {% if member.deactivate %}
+            <button type="submit" class="btn btn-danger btn-large pull-right">Przywróć</button>
+          {% else %}
+            <button type="submit" class="btn btn-danger btn-large pull-right">Dezaktywacja</button>
+          {% endif %}
         </a>
       <br/>
       <br/>
@@ -435,7 +442,7 @@
                           </small>
                           <br />
                           <small>
-                            Zawód: {{ h.history_object.occupation }}
+                            Zawód: {{ h.history_object.occupation}}
                           </small>
                           <br />
                           <small>
@@ -465,7 +472,7 @@
                           </small>
                           <br />
                           <small>
-                            Data wystąpienia: {{ h.history_object.date_of_contract }}
+                            Data wystąpienia: {{ h.history_object.date_of_abandonment }}
                           </small>
                           <br />
                           <small>
@@ -490,6 +497,10 @@
                           <br />
                           <small>
                             Zdjęcie: {{ h.history_object.image }}
+                          </small>
+                          <br />
+                          <small>
+                            Dezaktywacja: {{ h.history_object.deactivate }}
                           </small>
 
                         </td>

@@ -7,6 +7,12 @@
             <li>
                 <a href="{% url 'member_new' %}">dodaj członka</a>
             </li>
+            <li>
+                <a href="{% url 'member_function_add' %}">dodaj funkcje członka</a>
+            </li>
+            <li>
+                <a href="{% url 'member_occupation_add' %}">dodaj stanowsko</a>
+            </li>
         </ul>
     </li>
     <li class="{% if active_tab == 'groups' %} active {% endif %}">

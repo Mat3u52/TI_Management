@@ -23,11 +23,40 @@
         <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
         <br />
     </form>
-    {{all_members}}
+    <form method="post" action="{% url 'group_detail' pk=group.pk %}">
+        {% csrf_token %}
+        {{form_role.role}}
+        <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
+        <br />
+    </form>
+    <form method="post" action="{% url 'group_detail' pk=group.pk %}">
+        {% csrf_token %}
+        {{form_role.occupation}}
+        <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
+        <br />
+    </form>
 </div>
 
 <div class="hero-unit">
     <h3><a href="{% url 'groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
+    <div class="notepad">
+    <form method="post" action="{% url 'group_detail' pk=group.pk %}">
+        {% csrf_token %}
+        {% for radio in form_export.separator %}
+            <label class="horizontal-radio">
+                {{ radio.tag }} {{ radio.choice_label }}
+            </label>
+        {% endfor %}
+        <br />
+        {% for radio in form_export.data %}
+            <label class="horizontal-radio">
+                {{ radio.tag }} {{ radio.choice_label }}
+            </label>
+        {% endfor %}
+        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+        <br />
+    </form>
+    </div>
 
     {% for participant in group.groupsGroup.all %}
         <div class="notepad">
@@ -45,6 +74,40 @@
     <br />
     <a href="{% url 'group_delete_all' pk=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
     <br />
+</div>
+
+<div class="hero-unit">
+    <p>Komunikacja</p>
+    <p>
+        <a href="{% url 'group_file_edit' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+            Dodaj Plik
+        </a>
+    </p>
+    <br />
+    <br />
+    <div class="notepad">
+    <table width="100%">
+        {% for file in group.groupsFile.all %}
+        <tr>
+            <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
+            <td><p class="str-file">{{ file.file }}</p></td>
+            <td><p class="str-file">{{ file.created_date }}</p></td>
+            <td>
+                <a href="{% url 'group_file_delete' pk=group.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">
+                    usuń
+                </a>
+            </td>
+        </tr>
+
+        {% empty %}
+        <tr>
+            <td>
+                <p>Brak plików</p>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+    </div>
 </div>
 
 {% endblock %}

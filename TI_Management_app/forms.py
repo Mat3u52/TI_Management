@@ -1,17 +1,25 @@
 from django import forms
 from django.core.validators import RegexValidator
 from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards,
-                     OrderedCardDocument, ToBePickedUpCardDocument)
+                     OrderedCardDocument, ToBePickedUpCardDocument, MemberFunction, MemberOccupation, GroupsFile)
 from django.utils import timezone
 
 
 class MemberForm(forms.ModelForm):
-    phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
-                                                                              message="Wprowadź włąściwy numer telefonu.")])
-    member_nr = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                           message="To pole musi być liczbą.")])
-    pin = forms.IntegerField(required=True, validators=[RegexValidator(r'^\d{0,8}$',
-                                                                       message="To pole musi być liczbą.")])
+    phone_number = forms.CharField(
+        required=False,
+        validators=[RegexValidator(r'^\+?1?\d{9,15}$',
+                                   message="Wprowadź włąściwy numer telefonu.")]
+    )
+    member_nr = forms.CharField(
+        validators=[RegexValidator(r'^\d{0,10}$',
+                                   message="To pole musi być liczbą.")]
+    )
+    pin = forms.IntegerField(
+        required=True,
+        validators=[RegexValidator(r'^\d{0,8}$',
+                                   message="To pole musi być liczbą.")]
+    )
 
     class Meta:
         model = MembersZZTI
@@ -60,7 +68,6 @@ class MemberForm(forms.ModelForm):
     #     return member_nr
 
 
-
 class MemberEditForm(forms.ModelForm):
     phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
                                                                                   message="Wprowadź włąściwy numer telefonu.")])
@@ -89,6 +96,25 @@ class MemberEditForm(forms.ModelForm):
                 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
 
         }
+
+
+class MemberDeactivateForm(forms.ModelForm):
+
+    class Meta:
+        model = MembersZZTI
+        fields = ['deactivate']
+
+
+class MemberFunctionForm(forms.ModelForm):
+    class Meta:
+        model = MemberFunction
+        fields = ['member_function',]
+
+
+class MemberOccupationForm(forms.ModelForm):
+    class Meta:
+        model = MemberOccupation
+        fields = ['member_occupation',]
 
 
 class MemberFileForm(forms.ModelForm):
@@ -374,7 +400,46 @@ class ExportDataSeparatorDeactivatedForm(forms.Form):
 
 class GroupAddGenderForm(forms.Form):
     SEX_CHOICES = (
+        ('---------', '---------'),
         ('female', 'Kobieta'),
         ('male', 'Mężczyzna'),
     )
     gender = forms.ChoiceField(choices=SEX_CHOICES)
+
+
+class GroupAddRoleForm(forms.ModelForm):
+    class Meta:
+        model = MembersZZTI
+        fields = ['role', 'occupation',]
+
+
+class ExportDataSeparatorGroupForm(forms.Form):
+    SEPARATOR_CHOICES = [
+        (';', ';'),
+        (',', ','),
+        ('-', '-'),
+    ]
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('tel', 'tel'),
+    ]
+
+    # separator = forms.CharField()
+    separator = forms.ChoiceField(
+        choices=SEPARATOR_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+    data = forms.ChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.RadioSelect(attrs={
+            'class': 'form-check-inline'
+        })
+    )
+
+
+class GroupFileForm(forms.ModelForm):
+    class Meta:
+        model = GroupsFile
+        fields = ['title', 'file']

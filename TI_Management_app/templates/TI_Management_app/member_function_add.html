@@ -1,10 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'member_function_add' %}"> / Dodaj funkcję dla członka</a>
+{% endblock %}
+
+{% block content %}
+{% if user.is_authenticated and user.username == 'admin'%}
+    <div class="hero-unit">
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+            <p>Funkcja Członka:</p>
+            {{form.member_function}}
+
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+            <br />
+            <br />
+        </form>
+    </div>
+
+<div class="hero-unit">
+    {% for function in all_functions %}
+        <div class="notepad">
+            <h3>{{function}}</h3>
+            <div class="date"><p>Data dodania: {{function.created_date}}</p></div>
+        </div>
+    {% endfor %}
+</div>
+
+
+{% endif %}
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

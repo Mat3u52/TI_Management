@@ -1,10 +1,40 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'member_deactivate' pk=member.pk %}"> / Dezaktywacja</a>
+{% endblock %}
+
+
+{% block content %}
+<div class="hero-unit">
+    <p>Czy na pewno chcesz {%if member.deactivate%} przywrócić {%else%} dezaktywować {%endif%}:
+        {{member.forename}} {{member.surname}} - {{member.member_nr}}?
+    </p>
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        <table>
+            <tr>
+                <td><p class="tableCredential"><b>Dezaktywacja: </b></p></td>
+                <td><p>{{form.deactivate}}</p></td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+    </form>
+    <h3>Kary:</h3>
+    {% for member_loyalty_card in member_loyalty_cards %}
+        <p>- {{member_loyalty_card.card}}</p>
+    {% endfor %}
+    <h3>Grupy:</h3>
+    {% for member_group in member_groups %}
+        <p>- {{member_group.group}}</p>
+    {% endfor %}
+
+</div>
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

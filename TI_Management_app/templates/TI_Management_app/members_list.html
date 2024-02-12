@@ -19,7 +19,6 @@
             {{member.forename}} {{member.surname}}
         </a></h2>
             <img src="{{ member.image.url }}" alt="image" width="150px">
-
         <table>
           <tr>
             <td><p class="tableCredential"><b>Funkcja:</b></p></td>
@@ -44,6 +43,9 @@
             <td><p>{{member.email}}</p></td>
           </tr>
         </table>
+        {% if member.deactivate %}
+            <span style="color: #FF0000">Dezaktywacja!</span>
+        {% endif %}
 
         <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
             Więcej informacji
