@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="hero-unit">
-    <p>Czy na pewno chcesz {%if member.deactivate%} przywrócić {%else%} dezaktywować {%endif%}:
+    <p>Czy na pewno chcesz {% if member.deactivate %} przywrócić {% else %} dezaktywować {% endif %}:
         {{member.forename}} {{member.surname}} - {{member.member_nr}}?
     </p>
     <form method="post" class="post-form">
@@ -23,14 +23,21 @@
         <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
         <br />
     </form>
-    <h3>Kary:</h3>
-    {% for member_loyalty_card in member_loyalty_cards %}
-        <p>- {{member_loyalty_card.card}}</p>
-    {% endfor %}
-    <h3>Grupy:</h3>
-    {% for member_group in member_groups %}
-        <p>- {{member_group.group}}</p>
-    {% endfor %}
+    {% if member.deactivate %}
+        <h3>Nieaktywne karty:</h3>
+            {% for member_loyalty_card in member_loyalty_cards %}
+                <p>- {{member_loyalty_card.card}}</p>
+            {% endfor %}
+    {% else %}
+        <h3>Karty:</h3>
+            {% for member_loyalty_card in member_loyalty_cards %}
+                <p>- {{member_loyalty_card.card}}</p>
+            {% endfor %}
+        <h3>Grupy:</h3>
+            {% for member_group in member_groups %}
+                <p>- {{member_group.group}}</p>
+            {% endfor %}
+    {% endif %}
 
 </div>
 {% endblock %}

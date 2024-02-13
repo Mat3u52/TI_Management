@@ -67,14 +67,22 @@ class MemberForm(forms.ModelForm):
     #
     #     return member_nr
 
-
 class MemberEditForm(forms.ModelForm):
-    phone_number = forms.CharField(required=False, validators=[RegexValidator(r'^\+?1?\d{9,15}$',
-                                                                                  message="Wprowadź włąściwy numer telefonu.")])
-    member_nr = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                               message="To pole musi być liczbą.")])
-    pin = forms.IntegerField(required=True, validators=[RegexValidator(r'^\d{0,8}$',
-                                                                           message="To pole musi być liczbą.")])
+    phone_number = forms.CharField(
+        required=False,
+        validators=[RegexValidator(r'^\+?1?\d{9,15}$',
+                                   message="Wprowadź włąściwy numer telefonu.")]
+    )
+
+    member_nr = forms.CharField(
+        validators=[RegexValidator(r'^\d{0,10}$',
+                                   message="To pole musi być liczbą.")]
+    )
+    pin = forms.IntegerField(
+        required=True,
+        validators=[RegexValidator(r'^\d{0,8}$',
+                                   message="To pole musi być liczbą.")]
+    )
 
     class Meta:
         model = MembersZZTI
@@ -380,8 +388,10 @@ class ExportDataSeparatorDeactivatedForm(forms.Form):
     ]
     DATA_CHOICES = [
         ('email', 'email'),
-        ('tel', 'tel'),
+        ('phone_number', 'phone_number'),
     ]
+    start_date = forms.DateField(label='Start Date')
+    end_date = forms.DateField(label='End Date')
 
     # separator = forms.CharField()
     separator = forms.ChoiceField(
@@ -392,10 +402,15 @@ class ExportDataSeparatorDeactivatedForm(forms.Form):
     )
     data = forms.ChoiceField(
         choices=DATA_CHOICES,
-        widget=forms.RadioSelect(attrs={
+        widget=forms.CheckboxSelectMultiple(attrs={
             'class': 'form-check-inline'
         })
     )
+
+    widgets = {
+        'start_date': forms.DateInput(attrs={'type': 'date'}),
+        'end_date': forms.DateInput(attrs={'type': 'date'}),
+    }
 
 
 class GroupAddGenderForm(forms.Form):

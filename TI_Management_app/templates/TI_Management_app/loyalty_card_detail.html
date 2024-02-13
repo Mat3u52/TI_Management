@@ -398,13 +398,15 @@
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep_to_deactivated.data %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
+<!--                        {% for radio in form_sep_to_deactivated.data %}-->
+<!--                            <label class="horizontal-radio">-->
+<!--                                {{ radio.tag }} {{ radio.choice_label }}-->
+<!--                            </label>-->
+<!--                        {% endfor %}-->
+                        {{ form_sep_to_deactivated.data }}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
+                    {{data}}
                 </div>
             </li>
             <li id="objLoyaltyCardMembersDeactivated" style="display: none">

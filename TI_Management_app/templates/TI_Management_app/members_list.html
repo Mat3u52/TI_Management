@@ -44,7 +44,7 @@
           </tr>
         </table>
         {% if member.deactivate %}
-            <span style="color: #FF0000">Dezaktywacja!</span>
+            <span class="label label-danger">Dezaktywacja!</span>
         {% endif %}
 
         <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">

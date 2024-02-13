@@ -130,14 +130,22 @@ def member_deactivate(request, pk):
     member_loyalty_cards = CardStatus.objects.filter(member=member)
     member_groups = GroupsMember.objects.filter(member=member)
 
-
     if request.method == "POST":
         form = MemberDeactivateForm(request.POST, request.FILES, instance=member)
         if form.is_valid():
+            if form.cleaned_data['deactivate'] is True:
+                for card_status in member_loyalty_cards:
+                    card_status.author = request.user
+                    card_status.card_status = 'deactivated'
+                    card_status.date_of_action = timezone.now()
+                    card_status.save()
+                member_groups.delete()
+
             member = form.save(commit=False)
             member.author = request.user
             member.date_of_abandonment = timezone.now()
             member.save()
+
             return redirect('member_detail', pk=member.pk)
     else:
         form = MemberDeactivateForm(instance=member)
@@ -431,16 +439,20 @@ def loyalty_card_detail(request, pk):
             separator = form_sep_to_deactivated.cleaned_data['separator']
             data = form_sep_to_deactivated.cleaned_data['data']
             lines = []
-            if data == 'email':
-                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-                    lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-                response.writelines(lines)
-            else:
-                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-                    lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-                response.writelines(lines)
+            return render(request, 'TI_Management_app/loyalty_card_detail.html',
+                          {'data': data})
 
-            return response
+            # if data == 'email':
+            # for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+            #     lines.append(f"{loyalty_card_all_user.member.data}{separator}")
+
+            # response.writelines(lines)
+            # else:
+            #     for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+            #         lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+            #     response.writelines(lines)
+
+            # return response
     else:
         form_sep_to_deactivated = ExportDataSeparatorDeactivatedForm()
 

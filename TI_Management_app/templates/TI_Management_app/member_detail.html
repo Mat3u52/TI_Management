@@ -289,7 +289,7 @@
                   {% for accessed in accessible_group %}
                     {%if en == accessed.id%}
                       <p><a href="{% url 'member_group_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
-                        Dodaj - {{ accessed }}
+                        {{ accessed }}
                       </a></p>
                     {% endif %}
                   {% endfor %}
