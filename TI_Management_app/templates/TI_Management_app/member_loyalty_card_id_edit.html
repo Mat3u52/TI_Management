@@ -1,10 +1,50 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+
+{% block breadcrumbs %}
+
+<a href="{% url 'members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>
+<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj Kartę Lojalnościową</a>
+{% endblock %}
+
+{% block content %}
+    <div class="hero-unit">
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+        <p>Karty Lojalnościowe</p>
+        <form method="post" class="post-form" enctype="multipart/form-data">
+            {% csrf_token %}
+            <table width="100%">
+                <tr>
+                    <td>Rodzaj karty: </td>
+                    <td>{{member_loyalty_card.card}}{{form.card.as_hidden}}</td>
+                </tr>
+                <tr>
+                    <td>Numer karty: </td>
+                    <td>
+                        {% if form.card_identity.errors %}
+                            <p class="hint">{{form.card_identity}}</p>
+                            <p>{{form.card_identity.errors}}</p>
+                        {% else %}
+                            <p>{{form.card_identity}}</p>
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>{{form.responsible}}</td>
+                </tr>
+            </table>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
+            <br />
+        </form>
+    </div>
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

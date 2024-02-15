@@ -1,10 +1,152 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'members_list' %}"> / Baza Członków </a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <form class="d-flex" method=POST action="{% url 'member_search' %}">
+        {% csrf_token %}
+        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
+        type="search" placeholder="Szukaj Uczestnika" aria-label="Search" name="searched">
+        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
+        <p><a href="{% url 'members_list' %}" class="btn btn-primary btn-sm pull-left">
+            kafelki
+        </a></p>
+    </form>
+</div>
+
+    <table id="dtBasicExample" class="table table-striped table-hover table-bordered">
+        <thead class="table-dark">
+            <tr>
+                <th scope="col">
+                    Imie<br />
+                    <a href="?order_by=forename">&#8743;</a>&nbsp;<a href="?order_by=-forename">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Nazwisko<br />
+                    <a href="?order_by=surname">&#8743;</a>&nbsp;<a href="?order_by=-surname">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Numer uczestnika<br />
+                    <a href="?order_by=member_nr">&#8743;</a>&nbsp;<a href="?order_by=-member_nr">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Funkcja<br />
+                    <a href="?order_by=role">&#8743;</a>&nbsp;<a href="?order_by=-role">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Zawód<br />
+                    <a href="?order_by=occupation">&#8743;</a>&nbsp;<a href="?order_by=-occupation">&#8744;</a>
+                </th>
+                <th scope="col">
+                    E-mail<br />
+                    <a href="?order_by=email">&#8743;</a>&nbsp;<a href="?order_by=-email">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Numer Telefonu<br />
+                    <a href="?order_by=phone_number">&#8743;</a>&nbsp;<a href="?order_by=-phone_number">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Płeć<br />
+                    <a href="?order_by=sex">&#8743;</a>&nbsp;<a href="?order_by=-sex">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Data urodzenia<br />
+                    <a href="?order_by=birthday">&#8743;</a>&nbsp;<a href="?order_by=-birthday">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Miejsce urodzenia<br />
+                    <a href="?order_by=birthplace">&#8743;</a>&nbsp;<a href="?order_by=-birthplace">&#8744;</a>
+                </th>
+                <th scope="col">
+                    PP ID<br />
+                    <a href="?order_by=pin">&#8743;</a>&nbsp;<a href="?order_by=-pin">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Data przystąpienia<br />
+                    <a href="?order_by=date_of_accession">&#8743;</a>&nbsp;<a href="?order_by=-date_of_accession">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Data wystąpienia<br />
+                    <a href="?order_by=date_of_abandonment">&#8743;</a>&nbsp;<a href="?order_by=-date_of_abandonment">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Rodzaj umowy<br />
+                    <a href="?order_by=type_of_contract">&#8743;</a>&nbsp;<a href="?order_by=-type_of_contract">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Data zatrudnienia<br />
+                    <a href="?order_by=date_of_contract">&#8743;</a>&nbsp;<a href="?order_by=-date_of_contract">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Data rozwiązania umowy<br />
+                    <a href="?order_by=expiration_date_contract">&#8743;</a>&nbsp;<a href="?order_by=-expiration_date_contract">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Dezaktywacja<br />
+                    <a href="?order_by=deactivate">&#8743;</a>&nbsp;<a href="?order_by=-deactivate">&#8744;</a>
+                </th>
+                <th scope="col">
+                    Data dodania<br />
+                    <a href="?order_by=created_date">&#8743;</a>&nbsp;<a href="?order_by=-created_date">&#8744;</a>
+                </th>
+            </tr>
+        </thead>
+
+        {% for member in members %}
+        <tr>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.surname}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.member_nr}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.role}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.occupation}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.email}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.phone_number}}</a></td>
+            <td>
+                <a href="{% url 'member_detail' pk=member.pk %}">
+                    {% if member.sex == 'female' %}
+                        K
+                    {% elif member.sex == 'male' %}
+                        M
+                    {% endif %}
+                </a>
+            </td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.birthday}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.birthplace}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.pin}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.date_of_accession}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.date_of_abandonment}}</a></td>
+            <td>
+                <a href="{% url 'member_detail' pk=member.pk %}">
+                    {% if member.type_of_contract == 'indefinite_period_of_time' %}
+                        Na czas nieokreślony
+                    {% elif member.type_of_contract == 'limited_duration' %}
+                        Na czas określony
+                    {% endif %}
+                </a>
+            </td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.date_of_contract}}</a></td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.expiration_date_contract}}</a></td>
+            <td>
+                <a href="{% url 'member_detail' pk=member.pk %}">
+                    {% if member.deactivate %}
+                        Dezaktywowany
+                    {% else %}
+                        Aktywny
+                    {% endif %}
+                </a>
+            </td>
+            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.created_date}}</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+
+{% include 'TI_Management_app/pagination.html' with page=members %}
+
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

@@ -35,12 +35,14 @@
 <!--                    <td>{{form.card_identity}}</td>-->
 
                     <td>
-                        {% if form.card_identity.errors %}
-                            <p class="hint">{{form.card_identity}}</p>
-                            <p>{{form.card_identity.errors}}</p>
-                        {% else %}
-                            <p>{{form.card_identity}}</p>
-                        {% endif %}
+                        {{member_loyalty_card.card_identity}}
+                        <a href="{% url 'member_loyalty_card_id_edit' pk=member_loyalty_card.member.pk pk1=member_loyalty_card.pk %}">aktualizuj</a>
+<!--                        {% if form.card_identity.errors %}-->
+<!--                            <p class="hint">{{form.card_identity}}</p>-->
+<!--                            <p>{{form.card_identity.errors}}</p>-->
+<!--                        {% else %}-->
+<!--                            <p>{{form.card_identity}}</p>-->
+<!--                        {% endif %}-->
                     </td>
 
 

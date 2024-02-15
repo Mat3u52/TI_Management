@@ -140,6 +140,8 @@
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        {{form_sep_ordered.start_date}}
+                        {{form_sep_ordered.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -192,6 +194,8 @@
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        {{form_sep_to_ordered.start_date}}
+                        {{form_sep_to_ordered.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -398,15 +402,15 @@
                             </label>
                         {% endfor %}
                         <br />
-<!--                        {% for radio in form_sep_to_deactivated.data %}-->
-<!--                            <label class="horizontal-radio">-->
-<!--                                {{ radio.tag }} {{ radio.choice_label }}-->
-<!--                            </label>-->
-<!--                        {% endfor %}-->
-                        {{ form_sep_to_deactivated.data }}
+                        {% for radio in form_sep_to_deactivated.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        {{form_sep_to_deactivated.start_date}}
+                        {{form_sep_to_deactivated.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
-                    {{data}}
                 </div>
             </li>
             <li id="objLoyaltyCardMembersDeactivated" style="display: none">

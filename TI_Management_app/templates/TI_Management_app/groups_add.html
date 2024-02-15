@@ -12,9 +12,8 @@
             {% if form.errors %}
                 <p>{{form.errors}}</p>
             {% endif %}
-            <p>Grupa:</p>
+            <p>Dodaj grupę:</p>
             {{form.group_name}}
-
 
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
             <br />
@@ -25,5 +24,5 @@
 {% endblock %}
 
 {% block menu %}
-{% include 'TI_Management_app/menu.html' with active_tab='groups' %}
+{% include 'TI_Management_app/menu.html' with active_tab='groups_add' %}
 {% endblock %}

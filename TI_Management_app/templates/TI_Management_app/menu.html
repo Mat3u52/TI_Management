@@ -3,32 +3,26 @@
     <li><a href="#"><b>Dashboard</b></a></li>
     <li class="{% if active_tab == 'members_list' %} active {% endif %}">
         <a href="{% url 'members_list' %}"><b>Baza Członków</b></a>
-        <ul>
-            <li>
-                <a href="{% url 'member_new' %}">dodaj członka</a>
-            </li>
-            <li>
-                <a href="{% url 'member_function_add' %}">dodaj funkcje członka</a>
-            </li>
-            <li>
-                <a href="{% url 'member_occupation_add' %}">dodaj stanowsko</a>
-            </li>
-        </ul>
+    </li>
+    <li class="{% if active_tab == 'member_new' %} active {% endif %}">
+        <a href="{% url 'member_new' %}">&#160;&#160;&#8226; dodaj członka</a>
+    </li>
+    <li class="{% if active_tab == 'member_function_add' %} active {% endif %}">
+        <a href="{% url 'member_function_add' %}">&#160;&#160;&#8226; dodaj funkcje członka</a>
+    </li>
+    <li class="{% if active_tab == 'member_occupation_add' %} active {% endif %}">
+        <a href="{% url 'member_occupation_add' %}">&#160;&#160;&#8226; dodaj stanowsko</a>
     </li>
     <li class="{% if active_tab == 'groups' %} active {% endif %}">
         <a href="{% url 'groups_list' %}"><b>Grupy</b></a>
-        <ul>
-            <li>
-                <a href="{% url 'groups_add' %}">dodaj grupe</a>
-            </li>
-        </ul>
+    </li>
+    <li class="{% if active_tab == 'groups_add' %} active {% endif %}">
+        <a href="{% url 'groups_add' %}">&#160;&#160;&#8226; dodaj grupe</a>
     </li>
     <li class="{% if active_tab == 'loyalty_card' %} active {% endif %}">
         <a href="{% url 'loyalty_card_list' %}"><b>Karty Lojalnościowe</b></a>
-        <ul>
-            <li>
-                <a href="{% url 'loyalty_card_add' %}">dodaj karte lojalnościową</a>
-            </li>
-        </ul>
+    </li>
+    <li class="{% if active_tab == 'loyalty_card_add' %} active {% endif %}">
+        <a href="{% url 'loyalty_card_add' %}">&#160;&#160;&#8226; dodaj karte lojalnościową</a>
     </li>
 </ul>

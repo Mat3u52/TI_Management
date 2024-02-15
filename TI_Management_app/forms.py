@@ -3,7 +3,7 @@ from django.core.validators import RegexValidator
 from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards,
                      OrderedCardDocument, ToBePickedUpCardDocument, MemberFunction, MemberOccupation, GroupsFile)
 from django.utils import timezone
-
+from django.forms.widgets import DateInput
 
 class MemberForm(forms.ModelForm):
     phone_number = forms.CharField(
@@ -132,24 +132,22 @@ class MemberFileForm(forms.ModelForm):
 
 
 class CardStatusForm(forms.ModelForm):
-    # r'^\d{0,50}$',
-    card_identity = forms.CharField(max_length=50,
-                                    validators=[
-                                        RegexValidator(
-                                            regex=r'^[a-z0-9]+$',
-                                            message="To pole może składać się tylko z liczb i małych liter.")],
-                                    required=False)
-    card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                                message="To pole musi być liczbą.")], required=False)
 
-    # responsible = forms.CharField(initial='admin')
-    # responsible = forms.CharField(initial=user.username)
-    # widget = forms.HiddenInput(),
+    card_start_pin = forms.CharField(
+        validators=[
+            RegexValidator(r'^\d{0,10}$',
+                           message="To pole musi być liczbą.")],
+        required=False)
+
     responsible = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = CardStatus
-        fields = ['ordered_doc', 'to_be_picked_up_doc', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
+        fields = ['ordered_doc',
+                  'to_be_picked_up_doc',
+                  'card_start_pin',
+                  'card_status',
+                  'date_of_action',
                   'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
 
         widgets = {
@@ -159,11 +157,26 @@ class CardStatusForm(forms.ModelForm):
         }
 
 
+class CardStatusCardIDForm(forms.ModelForm):
+    card_identity = forms.CharField(
+        max_length=50,
+        validators=[
+            RegexValidator(
+                regex=r'^[a-z0-9]+$',
+                message="To pole może składać się tylko z liczb i małych liter.")],
+        required=False)
+
+    responsible = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = CardStatus
+        fields = ['card_identity', 'responsible']
+
+
 class GroupsMemberForm(forms.ModelForm):
     class Meta:
         model = GroupsMember
         fields = ['member',]
-        # fields = ['group',]
 
 
 class NotepadMemberForm(forms.ModelForm):
@@ -193,8 +206,6 @@ class GroupsEditForm(forms.ModelForm):
 
 
 class GroupAddMemberForm(forms.ModelForm):
-    # group = forms.CharField(widget=forms.HiddenInput())
-
     class Meta:
         model = GroupsMember
         fields = ['member', 'group']
@@ -202,7 +213,6 @@ class GroupAddMemberForm(forms.ModelForm):
 
 class LoyaltyCardForm(forms.ModelForm):
     class Meta:
-        # responsible = forms.CharField(widget=forms.HiddenInput())
 
         model = Cards
         fields = ['card_name',]
@@ -210,21 +220,22 @@ class LoyaltyCardForm(forms.ModelForm):
 
 class LoyaltyCardAddMemberForm(forms.ModelForm):
 
-    # card_identity = forms.CharField(validators=[RegexValidator(r'^\d{0,50}$',
-    #                                                            message="To pole musi być liczbą.")], required=False)
-    card_identity = forms.CharField(max_length=50,
-                                    validators=[
-                                        RegexValidator(
-                                            regex=r'^[a-z0-9]+$',
-                                            message="To pole może składać się tylko z liczb i małych liter.")],
-                                    required=False)
-    card_start_pin = forms.CharField(validators=[RegexValidator(r'^\d{0,10}$',
-                                                                message="To pole musi być liczbą.")], required=False)
+    card_identity = forms.CharField(
+        max_length=50,
+        validators=[
+            RegexValidator(
+                regex=r'^[a-z0-9]+$',
+                message="To pole może składać się tylko z liczb i małych liter.")],
+        required=False
+    )
+    card_start_pin = forms.CharField(
+        validators=[
+            RegexValidator(r'^\d{0,10}$',
+                           message="To pole musi być liczbą.")],
+        required=False
+    )
 
     responsible = forms.CharField(widget=forms.HiddenInput())
-    # card = forms.CharField(widget=forms.HiddenInput())
-    # card = forms.CharField(disabled=True)
-    # member = forms.CharField(disabled=True)
 
     date_of_action = forms.DateField(initial=timezone.now())
 
@@ -333,24 +344,52 @@ class ExportDataSeparatorOrderedForm(forms.Form):
         (';', ';'),
         (',', ','),
         ('-', '-'),
-    ]
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('tel', 'tel'),
+        (':', ':'),
+        ('/', '/'),
+        ('#', '#'),
     ]
 
-    # separator = forms.CharField()
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('phone_number', 'tel'),
+        ('forename', 'imie'),
+        ('surname', 'nazwisko'),
+        ('member_nr', 'id członka'),
+        ('card_identity', 'nr karty'),
+    ]
+
     separator = forms.ChoiceField(
         choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.RadioSelect(
+            attrs={
+                'class': 'form-check-inline'
+            }
+        )
     )
-    data = forms.ChoiceField(
+
+    data = forms.MultipleChoiceField(
         choices=DATA_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    start_date = forms.DateField(
+        label='Start Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )
+
+    end_date = forms.DateField(
+        label='End Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
     )
 
 
@@ -359,24 +398,52 @@ class ExportDataSeparatorToOrderedForm(forms.Form):
         (';', ';'),
         (',', ','),
         ('-', '-'),
-    ]
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('tel', 'tel'),
+        (':', ':'),
+        ('/', '/'),
+        ('#', '#'),
     ]
 
-    # separator = forms.CharField()
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('phone_number', 'tel'),
+        ('forename', 'imie'),
+        ('surname', 'nazwisko'),
+        ('member_nr', 'id członka'),
+        ('card_identity', 'nr karty'),
+    ]
+
     separator = forms.ChoiceField(
         choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.RadioSelect(
+            attrs={
+                'class': 'form-check-inline'
+            }
+        )
     )
-    data = forms.ChoiceField(
+
+    data = forms.MultipleChoiceField(
         choices=DATA_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    start_date = forms.DateField(
+        label='Start Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )
+
+    end_date = forms.DateField(
+        label='End Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
     )
 
 
@@ -385,32 +452,53 @@ class ExportDataSeparatorDeactivatedForm(forms.Form):
         (';', ';'),
         (',', ','),
         ('-', '-'),
+        (':', ':'),
+        ('/', '/'),
+        ('#', '#'),
     ]
+
     DATA_CHOICES = [
         ('email', 'email'),
-        ('phone_number', 'phone_number'),
+        ('phone_number', 'tel'),
+        ('forename', 'imie'),
+        ('surname', 'nazwisko'),
+        ('member_nr', 'id członka'),
+        ('card_identity', 'nr karty'),
     ]
-    start_date = forms.DateField(label='Start Date')
-    end_date = forms.DateField(label='End Date')
 
-    # separator = forms.CharField()
     separator = forms.ChoiceField(
         choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
-    )
-    data = forms.ChoiceField(
-        choices=DATA_CHOICES,
-        widget=forms.CheckboxSelectMultiple(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.RadioSelect(
+            attrs={
+                'class': 'form-check-inline'
+            }
+        )
     )
 
-    widgets = {
-        'start_date': forms.DateInput(attrs={'type': 'date'}),
-        'end_date': forms.DateInput(attrs={'type': 'date'}),
-    }
+    data = forms.MultipleChoiceField(
+        choices=DATA_CHOICES,
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    start_date = forms.DateField(
+        label='Start Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )
+
+    end_date = forms.DateField(
+        label='End Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )
 
 
 class GroupAddGenderForm(forms.Form):
@@ -419,13 +507,18 @@ class GroupAddGenderForm(forms.Form):
         ('female', 'Kobieta'),
         ('male', 'Mężczyzna'),
     )
-    gender = forms.ChoiceField(choices=SEX_CHOICES)
+    gender = forms.ChoiceField(
+        choices=SEX_CHOICES
+    )
 
 
 class GroupAddRoleForm(forms.ModelForm):
     class Meta:
         model = MembersZZTI
-        fields = ['role', 'occupation',]
+        fields = [
+            'role',
+            'occupation',
+        ]
 
 
 class ExportDataSeparatorGroupForm(forms.Form):

@@ -3,8 +3,12 @@ from . import views
 # from .views import MemberFileView
 
 urlpatterns = [
-    path('', views.members_list,
+    path('',
+         views.members_list,
          name='members_list'),
+    path('TI_Management_app/members_table_list',
+         views.members_table_list,
+         name='members_table_list'),
     path('TI_Management_app/<int:pk>/',
          views.member_detail,
          name='member_detail'),
@@ -38,6 +42,9 @@ urlpatterns = [
     path('TI_Management_app/<int:pk>/editLoyaltyCardEdit/<int:pk1>/',
          views.member_loyalty_card_edit,
          name='member_loyalty_card_edit'),
+    path('TI_Management_app/<int:pk>/editLoyaltyCardIDEdit/<int:pk1>/',
+         views.member_loyalty_card_id_edit,
+         name='member_loyalty_card_id_edit'),
     path('TI_Management_app/<int:pk>/editLoyaltyCardDelete/<int:pk1>/',
          views.member_loyalty_card_delete,
          name='member_loyalty_card_delete'),
