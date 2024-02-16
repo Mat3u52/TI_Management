@@ -331,7 +331,7 @@ class CardStatus(models.Model):
     card_identity = models.CharField(max_length=250, blank=True, null=True, validators=[validate_unique_or_null])
 
     card_start_pin = models.CharField(max_length=250, blank=True, null=True, default=None)
-    card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default='none')
+    card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
     date_of_action = models.DateTimeField(default=timezone.now, blank=True, null=True)
     file_name = models.CharField(max_length=350, null=True, blank=True)
     file = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards/%Y/%m/%d/%H%M%S/')

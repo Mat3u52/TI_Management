@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
 {% endblock %}
 
 {% block content %}
@@ -16,6 +16,13 @@
 </div>
 
 <div class="hero-unit">
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+        {% endfor %}
+    </ul>
+{% endif %}
 
 
     <h2><a href="{% url 'loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h2>
@@ -27,7 +34,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='all' %}">
                         {% csrf_token %}
 
                         {% for radio in form_sep.separator %}
@@ -74,7 +81,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='pickedUp' %}">
                         {% csrf_token %}
 
                         {% for radio in form_sep_picked_up.separator %}
@@ -83,11 +90,13 @@
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep.data %}
+                        {% for radio in form_sep_picked_up.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        {{form_sep_picked_up.start_date}}
+                        {{form_sep_picked_up.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -127,7 +136,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
                         {% csrf_token %}
                         {% for radio in form_sep_ordered.separator %}
                             <label class="horizontal-radio">
@@ -181,7 +190,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='toOrdered'%}">
                         {% csrf_token %}
                         {% for radio in form_sep_to_ordered.separator %}
                             <label class="horizontal-radio">
@@ -394,7 +403,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='deactivated' %}">
                         {% csrf_token %}
                         {% for radio in form_sep_to_deactivated.separator %}
                             <label class="horizontal-radio">

@@ -318,24 +318,52 @@ class ExportDataSeparatorToBePickedUpForm(forms.Form):
         (';', ';'),
         (',', ','),
         ('-', '-'),
-    ]
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('tel', 'tel'),
+        (':', ':'),
+        ('/', '/'),
+        ('#', '#'),
     ]
 
-    # separator = forms.CharField()
+    DATA_CHOICES = [
+        ('email', 'email'),
+        ('phone_number', 'tel'),
+        ('forename', 'imie'),
+        ('surname', 'nazwisko'),
+        ('member_nr', 'id członka'),
+        ('card_identity', 'nr karty'),
+    ]
+
     separator = forms.ChoiceField(
         choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.RadioSelect(
+            attrs={
+                'class': 'form-check-inline'
+            }
+        )
     )
-    data = forms.ChoiceField(
+
+    data = forms.MultipleChoiceField(
         choices=DATA_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
+        widget=forms.CheckboxSelectMultiple
+    )
+
+    start_date = forms.DateField(
+        label='Start Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )
+
+    end_date = forms.DateField(
+        label='End Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
     )
 
 
