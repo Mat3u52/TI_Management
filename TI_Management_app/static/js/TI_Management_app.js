@@ -32,6 +32,9 @@ $(document).ready(function(){
     $("#showLoyaltyCardMembers").click(function(){
         $("#objLoyaltyCardMembers").show(1000);
     });
+    $("#showLoyaltyCardMembersActive").click(function(){
+        $("#objLoyaltyCardMembersActive").show(1000);
+    });
     $("#showLoyaltyCardMembersReadyToGet").click(function(){
         $("#objLoyaltyCardMembersReadyToGet").show(1000);
     });
@@ -50,4 +53,5 @@ $(document).ready(function(){
     $("#showHistory").click(function(){
         $("#objHistory").show(1000);
     });
+
 });

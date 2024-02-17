@@ -146,6 +146,33 @@ class CardStatusForm(forms.ModelForm):
         fields = ['ordered_doc',
                   'to_be_picked_up_doc',
                   'card_start_pin',
+                  'card_identity',
+                  'card_status',
+                  'date_of_action',
+                  'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
+
+        widgets = {
+            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+        }
+
+
+class CardStatusEditForm(forms.ModelForm):
+
+    card_start_pin = forms.CharField(
+        validators=[
+            RegexValidator(r'^\d{0,10}$',
+                           message="To pole musi być liczbą.")],
+        required=False)
+
+    responsible = forms.CharField(widget=forms.HiddenInput())
+
+    class Meta:
+        model = CardStatus
+        fields = ['ordered_doc',
+                  'to_be_picked_up_doc',
+                  'card_start_pin',
                   'card_status',
                   'date_of_action',
                   'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
@@ -287,195 +314,7 @@ class ToBePickedUpCardDocumentForm(forms.ModelForm):
         fields = ['card', 'title', 'file', 'responsible']
 
 
-class ExportDataSeparatorForm(forms.Form):
-    SEPARATOR_CHOICES = [
-        (';', ';'),
-        (',', ','),
-        ('-', '-'),
-    ]
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('tel', 'tel'),
-    ]
-
-    # separator = forms.CharField()
-    separator = forms.ChoiceField(
-        choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
-    )
-    data = forms.ChoiceField(
-        choices=DATA_CHOICES,
-        widget=forms.RadioSelect(attrs={
-            'class': 'form-check-inline'
-        })
-    )
-
-
-class ExportDataSeparatorToBePickedUpForm(forms.Form):
-    SEPARATOR_CHOICES = [
-        (';', ';'),
-        (',', ','),
-        ('-', '-'),
-        (':', ':'),
-        ('/', '/'),
-        ('#', '#'),
-    ]
-
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('phone_number', 'tel'),
-        ('forename', 'imie'),
-        ('surname', 'nazwisko'),
-        ('member_nr', 'id członka'),
-        ('card_identity', 'nr karty'),
-    ]
-
-    separator = forms.ChoiceField(
-        choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'form-check-inline'
-            }
-        )
-    )
-
-    data = forms.MultipleChoiceField(
-        choices=DATA_CHOICES,
-        widget=forms.CheckboxSelectMultiple
-    )
-
-    start_date = forms.DateField(
-        label='Start Date',
-        required=False,
-        widget=DateInput(
-            attrs={
-                'type': 'date'
-            }
-        )
-    )
-
-    end_date = forms.DateField(
-        label='End Date',
-        required=False,
-        widget=DateInput(
-            attrs={
-                'type': 'date'
-            }
-        )
-    )
-
-
-class ExportDataSeparatorOrderedForm(forms.Form):
-    SEPARATOR_CHOICES = [
-        (';', ';'),
-        (',', ','),
-        ('-', '-'),
-        (':', ':'),
-        ('/', '/'),
-        ('#', '#'),
-    ]
-
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('phone_number', 'tel'),
-        ('forename', 'imie'),
-        ('surname', 'nazwisko'),
-        ('member_nr', 'id członka'),
-        ('card_identity', 'nr karty'),
-    ]
-
-    separator = forms.ChoiceField(
-        choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'form-check-inline'
-            }
-        )
-    )
-
-    data = forms.MultipleChoiceField(
-        choices=DATA_CHOICES,
-        widget=forms.CheckboxSelectMultiple
-    )
-
-    start_date = forms.DateField(
-        label='Start Date',
-        required=False,
-        widget=DateInput(
-            attrs={
-                'type': 'date'
-            }
-        )
-    )
-
-    end_date = forms.DateField(
-        label='End Date',
-        required=False,
-        widget=DateInput(
-            attrs={
-                'type': 'date'
-            }
-        )
-    )
-
-
-class ExportDataSeparatorToOrderedForm(forms.Form):
-    SEPARATOR_CHOICES = [
-        (';', ';'),
-        (',', ','),
-        ('-', '-'),
-        (':', ':'),
-        ('/', '/'),
-        ('#', '#'),
-    ]
-
-    DATA_CHOICES = [
-        ('email', 'email'),
-        ('phone_number', 'tel'),
-        ('forename', 'imie'),
-        ('surname', 'nazwisko'),
-        ('member_nr', 'id członka'),
-        ('card_identity', 'nr karty'),
-    ]
-
-    separator = forms.ChoiceField(
-        choices=SEPARATOR_CHOICES,
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'form-check-inline'
-            }
-        )
-    )
-
-    data = forms.MultipleChoiceField(
-        choices=DATA_CHOICES,
-        widget=forms.CheckboxSelectMultiple
-    )
-
-    start_date = forms.DateField(
-        label='Start Date',
-        required=False,
-        widget=DateInput(
-            attrs={
-                'type': 'date'
-            }
-        )
-    )
-
-    end_date = forms.DateField(
-        label='End Date',
-        required=False,
-        widget=DateInput(
-            attrs={
-                'type': 'date'
-            }
-        )
-    )
-
-
-class ExportDataSeparatorDeactivatedForm(forms.Form):
+class ExportDataToTXTForm(forms.Form):
     SEPARATOR_CHOICES = [
         (';', ';'),
         (',', ','),

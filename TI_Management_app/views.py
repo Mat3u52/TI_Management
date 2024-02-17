@@ -5,7 +5,7 @@ from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
 from .forms import (MemberForm, MemberEditForm, MemberDeactivateForm, MemberFileForm,
-                    CardStatusForm, CardStatusCardIDForm, GroupsMemberForm,
+                    CardStatusForm, CardStatusEditForm, CardStatusCardIDForm, GroupsMemberForm,
                     NotepadMemberForm,
                     GroupsForm, GroupsEditForm, GroupAddMemberForm,
                     LoyaltyCardForm, LoyaltyCardAddMemberForm,
@@ -13,8 +13,7 @@ from .forms import (MemberForm, MemberEditForm, MemberDeactivateForm, MemberFile
                     LoyaltyCardsAddMemberFileToBePickedUpForm,
                     OrderedCardDocumentForm,
                     ToBePickedUpCardDocumentForm,
-                    ExportDataSeparatorForm, ExportDataSeparatorToBePickedUpForm, ExportDataSeparatorOrderedForm,
-                    ExportDataSeparatorToOrderedForm, ExportDataSeparatorDeactivatedForm,
+                    ExportDataToTXTForm,
                     GroupAddGenderForm, ExportDataSeparatorGroupForm, MemberFunctionForm, MemberOccupationForm,
                     GroupAddRoleForm, GroupFileForm)
 from django.views.generic import DetailView
@@ -36,7 +35,7 @@ from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
 from textwrap import wrap
 
 from django.contrib import messages
-from django.contrib.messages.middleware import MessageMiddleware
+
 
 class Image(TemplateView):
     form = MemberForm
@@ -168,6 +167,7 @@ def member_deactivate(request, pk):
             member.author = request.user
             member.date_of_abandonment = timezone.now()
             member.save()
+            messages.success(request, "Zaktualizowano!")
 
             return redirect('member_detail', pk=member.pk)
     else:
@@ -192,6 +192,7 @@ def member_new(request):
             member = form.save(commit=False)
             member.author = request.user
             member.save()
+            messages.success(request, "Dodano nowego członka!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = MemberForm()
@@ -208,6 +209,7 @@ def member_edit(request, pk):
             member.author = request.user
             # member.save(update_fields=['forename'])
             member.save()
+            messages.success(request, "Zaktualizowano!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = MemberEditForm(instance=member)
@@ -226,6 +228,7 @@ def member_function_add(request):
             function = form.save(commit=False)
             function.author = request.user
             function.save()
+            messages.success(request, "Dodano nową funkcję!")
             return redirect('member_function_add')
     else:
         form = MemberFunctionForm()
@@ -242,6 +245,7 @@ def member_occupation_add(request):
             occupation = form.save(commit=False)
             occupation.author = request.user
             occupation.save()
+            messages.success(request, "Dodano nowy zawód!")
             return redirect('member_occupation_add')
     else:
         form = MemberOccupationForm()
@@ -258,6 +262,7 @@ def member_card_edit(request, pk):
             member = form.save(commit=False)
             member.author = request.user
             member.save()
+            messages.success(request, "Zaktualizowano!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = MemberForm(instance=member)
@@ -295,6 +300,7 @@ def member_file_edit(request, pk):
             member_file.member = member
             member_file.author = request.user
             member_file.save()
+            messages.success(request, "Dodano dokument!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = MemberFileForm()
@@ -382,155 +388,157 @@ def loyalty_card_detail(request, pk, category):
     response = HttpResponse(content_type='text/plain')
     response['Content-Disposition'] = f'attachment; filename=Kary_Lojalnosciowe_{loyalty_card}_{timezone.now()}.txt'
 
-    # if request.method == 'POST':
-    #     form_sep = ExportDataSeparatorForm(request.POST)
-    #     if form_sep.is_valid():
-    #         separator = form_sep.cleaned_data['separator']
-    #         data = form_sep.cleaned_data['data']
-    #         lines = []
-    #         if data == 'email':
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-    #                 lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-    #             response.writelines(lines)
-    #         else:
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-    #                 lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-    #             response.writelines(lines)
-    #
-    #         return response
-    # else:
-    #     form_sep = ExportDataSeparatorForm()
-    #
-    # if request.method == 'POST':
-    #     form_sep_picked_up = ExportDataSeparatorToBePickedUpForm(request.POST)
-    #     if form_sep_picked_up.is_valid():
-    #         separator = form_sep_picked_up.cleaned_data['separator']
-    #         data = form_sep_picked_up.cleaned_data['data']
-    #         lines = []
-    #         if data == 'email':
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-    #                 lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-    #             response.writelines(lines)
-    #         else:
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-    #                 lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-    #             response.writelines(lines)
-    #
-    #         return response
-    # else:
-    #     form_sep_picked_up = ExportDataSeparatorToBePickedUpForm()
-    #
+    if request.method == 'POST' and category == 'active':
+        form = ExportDataToTXTForm(request.POST)
+        if form.is_valid():
+            separator = form.cleaned_data['separator']
+            data = form.cleaned_data['data']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            lines = []
 
+            if start_date and end_date:
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.filter(
+                        date_of_action__range=(start_date, end_date)
+                ):
+                    if loyalty_card_all_user.card_status == 'active':
+                        if 'email' in data:
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                        if 'phone_number' in data:
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+                        if 'forename' in data:
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
+                        if 'surname' in data:
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
+                        if 'member_nr' in data:
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
+                        if 'card_identity' in data:
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
+                        lines.append(f"\n")
+            else:
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+                    if loyalty_card_all_user.card_status == 'active':
+                        if 'email' in data:
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                        if 'phone_number' in data:
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+                        if 'forename' in data:
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
+                        if 'surname' in data:
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
+                        if 'member_nr' in data:
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
+                        if 'card_identity' in data:
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
+                        lines.append(f"\n")
 
+            response.writelines(lines)
 
+            return response
 
+    if request.method == 'POST' and category == 'toBePickedUp':
+        form = ExportDataToTXTForm(request.POST)
+        if form.is_valid():
+            separator = form.cleaned_data['separator']
+            data = form.cleaned_data['data']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            lines = []
 
+            if start_date and end_date:
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.filter(
+                        date_of_action__range=(start_date, end_date)
+                ):
+                    if loyalty_card_all_user.card_status == 'toBePickedUp':
+                        if 'email' in data:
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                        if 'phone_number' in data:
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+                        if 'forename' in data:
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
+                        if 'surname' in data:
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
+                        if 'member_nr' in data:
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
+                        if 'card_identity' in data:
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
+                        lines.append(f"\n")
+            else:
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+                    if loyalty_card_all_user.card_status == 'toBePickedUp':
+                        if 'email' in data:
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                        if 'phone_number' in data:
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+                        if 'forename' in data:
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
+                        if 'surname' in data:
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
+                        if 'member_nr' in data:
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
+                        if 'card_identity' in data:
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
+                        lines.append(f"\n")
 
+            response.writelines(lines)
 
+            return response
 
+    if request.method == 'POST' and category == 'ordered':
+        form = ExportDataToTXTForm(request.POST)
+        if form.is_valid():
+            separator = form.cleaned_data['separator']
+            data = form.cleaned_data['data']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            lines = []
 
+            if start_date and end_date:
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.filter(
+                        date_of_action__range=(start_date, end_date)
+                ):
+                    if loyalty_card_all_user.card_status == 'ordered':
+                        if 'email' in data:
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                        if 'phone_number' in data:
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+                        if 'forename' in data:
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
+                        if 'surname' in data:
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
+                        if 'member_nr' in data:
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
+                        if 'card_identity' in data:
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
+                        lines.append(f"\n")
+            else:
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+                    if loyalty_card_all_user.card_status == 'ordered':
+                        if 'email' in data:
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
+                        if 'phone_number' in data:
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
+                        if 'forename' in data:
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
+                        if 'surname' in data:
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
+                        if 'member_nr' in data:
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
+                        if 'card_identity' in data:
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
+                        lines.append(f"\n")
 
-    # if request.method == 'POST':
-    #     form_sep_picked_up = ExportDataSeparatorToBePickedUpForm(request.POST)
-    #     if form_sep_picked_up.is_valid():
-    #         separator = form_sep_picked_up.cleaned_data['separator']
-    #         data = form_sep_picked_up.cleaned_data['data']
-    #         start_date = form_sep_picked_up.cleaned_data['start_date']
-    #         end_date = form_sep_picked_up.cleaned_data['end_date']
-    #         lines = []
-    #
-    #         if start_date and end_date:
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.filter(
-    #                     Q(date_of_action__range=(start_date, end_date)) &
-    #                     Q(card_status='toBePickedUp')):
-    #                 if 'email' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-    #                 if 'phone_number' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-    #                 if 'forename' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
-    #                 if 'surname' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
-    #                 if 'member_nr' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
-    #                 if 'card_identity' in data:
-    #                     lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
-    #                 lines.append(f"\n")
-    #         else:
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-    #                 if 'email' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-    #                 if 'phone_number' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-    #                 if 'forename' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
-    #                 if 'surname' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
-    #                 if 'member_nr' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
-    #                 if 'card_identity' in data:
-    #                     lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
-    #                 lines.append(f"\n")
-    #         response.writelines(lines)
-    #
-    #         return response
-    # else:
-    #     form_sep_picked_up = ExportDataSeparatorToBePickedUpForm()
-    #
-    # if request.method == 'POST':
-    #     form_sep_ordered = ExportDataSeparatorOrderedForm(request.POST)
-    #     if form_sep_ordered.is_valid():
-    #         separator = form_sep_ordered.cleaned_data['separator']
-    #         data = form_sep_ordered.cleaned_data['data']
-    #         start_date = form_sep_ordered.cleaned_data['start_date']
-    #         end_date = form_sep_ordered.cleaned_data['end_date']
-    #         lines = []
-    #
-    #         if start_date and end_date:
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.filter(
-    #                     Q(date_of_action__range=(start_date, end_date)) &
-    #                     Q(card_status='ordered')):
-    #                 if 'email' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-    #                 if 'phone_number' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-    #                 if 'forename' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
-    #                 if 'surname' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
-    #                 if 'member_nr' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
-    #                 if 'card_identity' in data:
-    #                     lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
-    #                 lines.append(f"\n")
-    #         else:
-    #             for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
-    #                 if 'email' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-    #                 if 'phone_number' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
-    #                 if 'forename' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
-    #                 if 'surname' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
-    #                 if 'member_nr' in data:
-    #                     lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
-    #                 if 'card_identity' in data:
-    #                     lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
-    #                 lines.append(f"\n")
-    #         response.writelines(lines)
-    #
-    #         return response
-    # else:
-    #     form_sep_ordered = ExportDataSeparatorOrderedForm()
-    #
-    if request.method == 'POST' and category == 'toOrdered':
-        form_sep_to_ordered = ExportDataSeparatorToOrderedForm(request.POST)
-        if form_sep_to_ordered.is_valid():
-            separator = form_sep_to_ordered.cleaned_data['separator']
-            data = form_sep_to_ordered.cleaned_data['data']
-            start_date = form_sep_to_ordered.cleaned_data['start_date']
-            end_date = form_sep_to_ordered.cleaned_data['end_date']
+            response.writelines(lines)
+
+            return response
+
+    if request.method == 'POST' and category == 'toOrder':
+        form = ExportDataToTXTForm(request.POST)
+        if form.is_valid():
+            separator = form.cleaned_data['separator']
+            data = form.cleaned_data['data']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
             lines = []
 
             if start_date and end_date:
@@ -567,62 +575,62 @@ def loyalty_card_detail(request, pk, category):
                         if 'card_identity' in data:
                             lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
                         lines.append(f"\n")
+
             response.writelines(lines)
 
             return response
-    else:
-        form_sep_to_ordered = ExportDataSeparatorToOrderedForm()
+    # else:
+    #     form = ExportDataToTXTForm()
 
     if request.method == 'POST' and category == 'deactivated':
-        form_sep_to_deactivated = ExportDataSeparatorDeactivatedForm(request.POST)
-        if form_sep_to_deactivated.is_valid():
-            separator = form_sep_to_deactivated.cleaned_data['separator']
-            data = form_sep_to_deactivated.cleaned_data['data']
-            start_date = form_sep_to_deactivated.cleaned_data['start_date']
-            end_date = form_sep_to_deactivated.cleaned_data['end_date']
+        form = ExportDataToTXTForm(request.POST)
+        if form.is_valid():
+            separator = form.cleaned_data['separator']
+            data = form.cleaned_data['data']
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
             lines = []
 
             if start_date and end_date:
-                for loyalty_card_all_user_deactivated in loyalty_card.loyaltyCardStatus.filter(
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.filter(
                         date_of_action__range=(start_date, end_date)
                 ):
-                    if loyalty_card_all_user_deactivated.card_status == 'deactivated':
+                    if loyalty_card_all_user.card_status == 'deactivated':
                         if 'email' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.email}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
                         if 'phone_number' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.phone_number}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
                         if 'forename' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.forename}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
                         if 'surname' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.surname}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
                         if 'member_nr' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.member_nr}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
                         if 'card_identity' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.card_identity}{separator}")
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
                         lines.append(f"\n")
             else:
-                for loyalty_card_all_user_deactivated in loyalty_card.loyaltyCardStatus.all():
-                    if loyalty_card_all_user_deactivated.card_status == 'deactivated':
+                for loyalty_card_all_user in loyalty_card.loyaltyCardStatus.all():
+                    if loyalty_card_all_user.card_status == 'deactivated':
                         if 'email' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.email}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.email}{separator}")
                         if 'phone_number' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.phone_number}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.phone_number}{separator}")
                         if 'forename' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.forename}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.forename}{separator}")
                         if 'surname' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.surname}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.surname}{separator}")
                         if 'member_nr' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.member.member_nr}{separator}")
+                            lines.append(f"{loyalty_card_all_user.member.member_nr}{separator}")
                         if 'card_identity' in data:
-                            lines.append(f"{loyalty_card_all_user_deactivated.card_identity}{separator}")
+                            lines.append(f"{loyalty_card_all_user.card_identity}{separator}")
                         lines.append(f"\n")
 
             response.writelines(lines)
 
-            messages.success(request, 'Text file generated successfully!')
             return response
     else:
-        form_sep_to_deactivated = ExportDataSeparatorDeactivatedForm()
+        form = ExportDataToTXTForm()
 
     return render(request, 'TI_Management_app/loyalty_card_detail.html',
                   {'loyalty_card': loyalty_card,
@@ -630,11 +638,8 @@ def loyalty_card_detail(request, pk, category):
                    'status_card_file_a': status_card_file_a,
                    'ordered_card_file': ordered_card_file,
                    'to_be_picked_up_doc_card_file': to_be_picked_up_doc_card_file,
-                   # 'form_sep': form_sep,
-                   # 'form_sep_picked_up': form_sep_picked_up,
-                   # 'form_sep_ordered': form_sep_ordered,
-                   'form_sep_to_ordered': form_sep_to_ordered,
-                   'form_sep_to_deactivated': form_sep_to_deactivated})
+                   'form': form})
+
 
 @login_required
 def loyalty_card_add(request):
@@ -644,6 +649,7 @@ def loyalty_card_add(request):
             loyalty_card = form.save(commit=False)
             loyalty_card.author = request.user
             loyalty_card.save()
+            messages.success(request, "Dodano nową kartę lojalnościową!")
             return redirect('loyalty_card_list')
     else:
         form = LoyaltyCardForm()
@@ -660,6 +666,7 @@ def loyalty_card_edit(request, pk):
             loyalty_card = form.save(commit=False)
             loyalty_card.author = request.user
             loyalty_card.save()
+            messages.success(request, "Zaktualizowano!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk)
     else:
         form = LoyaltyCardForm(instance=loyalty_card)
@@ -680,6 +687,7 @@ def loyalty_card_add_member(request, pk, pk1):
             loyalty_card_member.card = loyalty_card
             loyalty_card_member.member = loyalty_card_member_add
             loyalty_card_member.save()
+            messages.success(request, "Dodano nowego uczestnika!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk)
     else:
         username = request.user.username
@@ -703,6 +711,7 @@ def loyalty_cards_add_file_order(request, pk):
             order_file.author = request.user
             order_file.card = loyalty_card
             order_file.save()
+            messages.success(request, "Dodano dokument!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk)
     else:
         username = request.user.username
@@ -725,6 +734,7 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
             order_file.author = request.user
             order_file.card = loyalty_card
             order_file.save()
+            messages.success(request, "Dodano dokument!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk)
     else:
         username = request.user.username
@@ -747,6 +757,7 @@ def loyalty_cards_add_member_file_order(request, pk):
             loyalty_card_member.author = request.user
             loyalty_card_member.file_date = timezone.now()
             loyalty_card_member.save()
+            messages.success(request, "Dodano dokument!")
             return redirect('loyalty_card_list')
     else:
         form = LoyaltyCardsAddMemberFileOrderForm(instance=loyalty_card)
@@ -837,112 +848,23 @@ def loyalty_card_delete_all(request, pk):
     return redirect('loyalty_card_detail')
 
 
-# def loyalty_cards_export_all_users(request, pk, separator):
-# def loyalty_cards_export_all_users(request, pk):
-#     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
-#     response = HttpResponse(content_type='text/plain')
-#     response['Content-Disposition'] = f'attachment; filename=wszyscy_uczestnicy_kary_lojalnosciowej_{loyalty_card_all_users}_{timezone.now()}.txt'
-#
-#
-#
-#             # return render(request, 'my_template.html', {'my_variable_value': my_variable_value})
-#
-#
-#
-#     # if separator:
-#     #     lines = []
-#     #     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-#     #         lines.append(f"{loyalty_card_all_user.member.email}{separator}")
-#     #     response.writelines(lines)
-#     # else:
-#     #     lines = []
-#     #     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-#     #         lines.append(f"{loyalty_card_all_user.member.email};")
-#     #     response.writelines(lines)
-#
-#     # return response
-
-
-# def loyalty_cards_export_to_be_picked_up(request, pk):
-#     response = HttpResponse(content_type='text/plain')
-#     response['Content-Disposition'] = f'attachment; filename=karty_do_odbioru_{timezone.now()}.txt'
-#
-#     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
-#
-#     lines = []
-#     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-#         if loyalty_card_all_user.card_status == 'toBePickedUp':
-#             lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
-#                          f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
-#
-#     response.writelines(lines)
-#     return response
-
-
-# def loyalty_cards_export_ordered(request, pk):
-#     response = HttpResponse(content_type='text/plain')
-#     response['Content-Disposition'] = f'attachment; filename=karty_zamowione_{timezone.now()}.txt'
-#
-#     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
-#
-#     lines = []
-#     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-#         if loyalty_card_all_user.card_status == 'ordered':
-#             lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
-#                          f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
-#
-#     response.writelines(lines)
-#     return response
-
-
-# def loyalty_cards_export_to_order(request, pk):
-#     response = HttpResponse(content_type='text/plain')
-#     response['Content-Disposition'] = f'attachment; filename=zlecenia_na_karte_{timezone.now()}.txt'
-#
-#     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
-#
-#     lines = []
-#     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-#         if loyalty_card_all_user.card_status == 'toOrder':
-#             lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
-#                          f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
-#
-#     response.writelines(lines)
-#     return response
-
-
-# def loyalty_cards_export_deactivated(request, pk):
-#     response = HttpResponse(content_type='text/plain')
-#     response['Content-Disposition'] = f'attachment; filename=karty_dezaktywowane_{timezone.now()}.txt'
-#
-#     loyalty_card_all_users = get_object_or_404(Cards, pk=pk)
-#
-#     lines = []
-#     for loyalty_card_all_user in loyalty_card_all_users.loyaltyCardStatus.all():
-#         if loyalty_card_all_user.card_status == 'deactivated':
-#             lines.append(f"{loyalty_card_all_user.card};{loyalty_card_all_user.member};"
-#                          f"{loyalty_card_all_user.member.phone_number};{loyalty_card_all_user.member.email}\n")
-#
-#     response.writelines(lines)
-#     return response
-
-
 @login_required
 def member_loyalty_card_edit(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
     ordered_card_file = OrderedCardDocument.objects.all()
     if request.method == "POST":
-        form = CardStatusForm(request.POST, request.FILES, instance=member_loyalty_card)
+        form = CardStatusEditForm(request.POST, request.FILES, instance=member_loyalty_card)
         if form.is_valid():
             member_loyalty_card = form.save(commit=False)
             member_loyalty_card.member = member
             member_loyalty_card.author = request.user
             member_loyalty_card.date_of_action = timezone.now()
             member_loyalty_card.save()
+            messages.success(request, "Zaktualizowano!")
             return redirect('member_detail', pk=member.pk)
     else:
-        form = CardStatusForm(instance=member_loyalty_card)
+        form = CardStatusEditForm(instance=member_loyalty_card)
     return render(request, 'TI_Management_app/member_loyalty_card_edit.html',
                   {
                       'form': form,
@@ -965,6 +887,7 @@ def member_loyalty_card_id_edit(request, pk, pk1):
             member_loyalty_card.author = request.user
             # member_loyalty_card.date_of_action = timezone.now()
             member_loyalty_card.save()
+            messages.success(request, "Zaktualizowano!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = CardStatusCardIDForm(instance=member_loyalty_card)
@@ -989,6 +912,7 @@ def member_loyalty_card_add(request, pk, pk1):
             loyalty_card.author = request.user
             loyalty_card.date_of_action = timezone.now()
             loyalty_card.save()
+            messages.success(request, "Dodano członka!")
             return redirect('member_detail', pk=member.pk)
     else:
         username = request.user.username
@@ -1068,6 +992,7 @@ def groups_add(request):
             group = form.save(commit=False)
             group.author = request.user
             group.save()
+            messages.success(request, "Dodano nową grupe!")
             return redirect('groups_list')
     else:
         form = GroupsForm()
@@ -1083,6 +1008,7 @@ def groups_edit(request, pk):
             group = form.save(commit=False)
             group.author = request.user
             group.save()
+            messages.success(request, "Zaktualizowano grupe!")
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupsEditForm(instance=group)
@@ -1234,6 +1160,7 @@ def member_group_add(request, pk, pk1):
             group_member.group = group
             # group_member.author = request.user
             group_member.save()
+            messages.success(request, "Dodano nowego uczestnika do grupy!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = GroupsMemberForm()
@@ -1257,6 +1184,7 @@ def group_add_member(request, pk, pk1):
             group_member.group = group
             group_member.member = member
             group_member.save()
+            messages.success(request, "Dodano nowego uczestnika do grupy!")
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupAddMemberForm(initial={'group': group})
@@ -1305,6 +1233,7 @@ def member_notepad_add(request, pk):
             notepad.author = request.user
             notepad.published_date = timezone.now()
             notepad.save()
+            messages.success(request, "Dodano notatkę!")
             return redirect('member_detail', pk=member.pk)
     else:
         username = request.user.username

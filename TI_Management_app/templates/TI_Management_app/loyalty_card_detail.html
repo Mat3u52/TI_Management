@@ -16,15 +16,6 @@
 </div>
 
 <div class="hero-unit">
-{% if messages %}
-    <ul class="messages">
-        {% for message in messages %}
-            <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-        {% endfor %}
-    </ul>
-{% endif %}
-
-
     <h2><a href="{% url 'loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h2>
 
     <div class="well sidebar-nav">
@@ -33,42 +24,88 @@
                 Lista użytkowników:
             </li>
             <li>
+            </li>
+            <li id="objLoyaltyCardMembers" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    <div class="notepad">
+                        <p>
+                            <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
+                            </a>
+                        </p>
+                        <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                        <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                        <p>
+                            Status:
+                            {% if  loyalty_card_status.card_status == 'active' %}
+                                Aktywny
+                            {% elif loyalty_card_status.card_status == 'toOrder' %}
+                                Do zlecenia
+                            {% elif loyalty_card_status.card_status == 'ordered' %}
+                                Zlecona
+                            {% elif loyalty_card_status.card_status == 'toBePickedUp' %}
+                                Do odbioru
+                            {% elif loyalty_card_status.card_status == 'deactivated' %}
+                                Dezaktywowana
+                            {% endif %}
+                        </p>
+
+                        <a href="{% url 'loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <br />
+                    </div>
+                {% endfor %}
+                <br />
+                <a href="{% url 'loyalty_card_delete_all' pk=loyalty_card.pk %}" class="btn btn-danger btn-sm pull-right">usuń wszystkich</a>
+                <br />
+            </li>
+          </ul>
+    </div>
+
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersActive">
+                Lista aktywnych użytkowników {{ loyalty_card.card_name }}:
+            </li>
+            <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='all' %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='active' %}">
                         {% csrf_token %}
 
-                        {% for radio in form_sep.separator %}
+                        {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep.data %}
+                        {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        {{form.start_date}}
+                        {{form.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
             </li>
-            <li id="objLoyaltyCardMembers" style="display: none">
+            <li id="objLoyaltyCardMembersActive" style="display: none">
                 {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                <div class="notepad">
-                    <p>
-                        <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                            <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
-                        </a>
-                    </p>
-                    <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                    <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                    {% if loyalty_card_status.card_status == 'active' %}
+                    <div class="notepad">
+                        <p>
+                            <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
+                            </a>
+                        </p>
+                        <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
+                        <p>E-mail: {{loyalty_card_status.member.email}}</p>
 
-                    <a href="{% url 'loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-                    <br />
-                </div>
+                        <a href="{% url 'loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <br />
+                    </div>
+                    {% endif %}
                 {% endfor %}
-                <br />
-                <a href="{% url 'loyalty_card_delete_all' pk=loyalty_card.pk %}" class="btn btn-danger btn-sm pull-right">usuń wszystkich</a>
                 <br />
             </li>
           </ul>
@@ -81,22 +118,22 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='pickedUp' %}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='toBePickedUp' %}">
                         {% csrf_token %}
 
-                        {% for radio in form_sep_picked_up.separator %}
+                        {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep_picked_up.data %}
+                        {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
-                        {{form_sep_picked_up.start_date}}
-                        {{form_sep_picked_up.end_date}}
+                        {{form.start_date}}
+                        {{form.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -138,19 +175,19 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
                         {% csrf_token %}
-                        {% for radio in form_sep_ordered.separator %}
+                        {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep_ordered.data %}
+                        {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
-                        {{form_sep_ordered.start_date}}
-                        {{form_sep_ordered.end_date}}
+                        {{form.start_date}}
+                        {{form.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -190,21 +227,21 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='toOrdered'%}">
+                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='toOrder'%}">
                         {% csrf_token %}
-                        {% for radio in form_sep_to_ordered.separator %}
+                        {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep_to_ordered.data %}
+                        {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
-                        {{form_sep_to_ordered.start_date}}
-                        {{form_sep_to_ordered.end_date}}
+                        {{form.start_date}}
+                        {{form.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -405,19 +442,19 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='deactivated' %}">
                         {% csrf_token %}
-                        {% for radio in form_sep_to_deactivated.separator %}
+                        {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
-                        {% for radio in form_sep_to_deactivated.data %}
+                        {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
-                        {{form_sep_to_deactivated.start_date}}
-                        {{form_sep_to_deactivated.end_date}}
+                        {{form.start_date}}
+                        {{form.end_date}}
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>

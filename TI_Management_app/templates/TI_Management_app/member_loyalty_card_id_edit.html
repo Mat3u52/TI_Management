@@ -5,7 +5,7 @@
 
 <a href="{% url 'members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>
 <a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj Kartę Lojalnościową</a>
+<a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj numer karty lojalnościowej</a>
 {% endblock %}
 
 {% block content %}
