@@ -7,13 +7,10 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
+
     <div class="hero-unit">
         <form method="post" class="post-form">
             {% csrf_token %}
-<!--            {% if form.errors %}-->
-<!--                <p>{{form.errors}}</p>-->
-<!--            {% endif %}-->
             <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
             <p>{{form.forename.as_hidden}}</p>
             <p>{{form.surname.as_hidden}}</p>
@@ -31,7 +28,7 @@
             <br />
         </form>
     </div>
-{% endif %}
+
 {% endblock %}
 
 {% block menu %}

@@ -53,5 +53,10 @@ $(document).ready(function(){
     $("#showHistory").click(function(){
         $("#objHistory").show(1000);
     });
-
+    $("#showGroupMembers").click(function(){
+        $("#objGroupMembers").show(1000);
+    });
+    $("#showGroupNotepad").click(function(){
+        $("#objGroupNotepad").show(1000);
+    });
 });

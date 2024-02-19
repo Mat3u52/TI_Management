@@ -7,29 +7,12 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin' %}
+
    <div class="hero-unit">
         <h3><a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">{{ loyalty_card.card_name }}</a></h3>
         <p>Dokument Zlecenie</p>
         <form method="post" class="post-form" enctype="multipart/form-data">
-<!--            {{ form.as_p }}-->
             {% csrf_token %}
-<!--            <table width="100%">-->
-<!--                <tr>-->
-<!--                    <td>Nazwa dokumentu: </td>-->
-<!--                    <td>{{form.title}}</td>-->
-<!--                </tr>-->
-<!--                <tr>-->
-<!--                    <td>Wybierz dokument: </td>-->
-<!--                    <td>-->
-<!--                        <label class="custom-file-upload">-->
-<!--                            Dodaj dokument-->
-<!--                            {{form.file}}-->
-<!--                        </label>-->
-<!--                    </td>-->
-<!--                </tr>-->
-<!--            </table>-->
-<!--            <p>{{loyalty_card.pk}} {{form.card.pk.as_hidden}}</p>-->
             <p>{{form.title}}</p>
             {{form.responsible.as_hidden}}
             <label class="custom-file-upload">
@@ -41,7 +24,6 @@
         </form>
     </div>
 
-{% endif %}
 {% endblock %}
 
 {% block menu %}

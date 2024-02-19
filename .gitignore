@@ -8,6 +8,7 @@ __pycache__/
 .idea
 *.sqlite3
 db.sqlite3
+mydb.py
 /TI_Management_app/migrations
 /media/images/*
 /media/uploads/*

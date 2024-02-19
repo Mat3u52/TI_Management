@@ -7,7 +7,6 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
     <div class="hero-unit">
         <a href="{% url 'group_detail' pk=group.pk %}"><h3>{{group.group_name}}</h3></a>
         <form method="post" class="post-form">
@@ -16,11 +15,8 @@
                 <p>{{form.errors}}</p>
             {% endif %}
             <p>Nowy uczestnik:</p>
-<!--            {{form.member}}-->
-<!--            {{form.group}}-->
             {{ member.forename }} {{ member.surname }}
             {{form.group.as_hidden}}
-
             <br />
             <br />
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
@@ -28,7 +24,6 @@
             <br />
         </form>
     </div>
-{% endif %}
 {% endblock %}
 
 {% block menu %}

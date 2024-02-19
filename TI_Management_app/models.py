@@ -64,7 +64,7 @@ class Cards(models.Model):
 
 class Answers(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
-    answer = models.CharField(max_length=450, blank=False, default=None, unique=True)
+    answer = models.CharField(max_length=250, blank=False, default=None, unique=True)
     status = models.BooleanField(default=False)
     status_description = models.BooleanField(default=False)
     # description = models.TextField(null=True, blank=True, default=None)
@@ -79,7 +79,7 @@ class Answers(models.Model):
 
 class Questions(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
-    question = models.CharField(max_length=450, blank=False, default=None, unique=True)
+    question = models.CharField(max_length=250, blank=False, default=None, unique=True)
     # answer = models.ForeignKey(Answers, on_delete=models.CASCADE, related_name='question', null=True, blank=True)
 
     answer = models.ManyToManyField(Answers)
@@ -118,7 +118,7 @@ class MembersZZTI(models.Model):
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
     expiration_date_contract = models.DateTimeField(default=None, blank=True, null=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    card = models.CharField(max_length=350, blank=True, null=True, default=None)
+    card = models.CharField(max_length=250, blank=True, null=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
     deactivate = models.BooleanField(default=False)
     history = HistoricalRecords()
@@ -135,7 +135,7 @@ class MembersZZTI(models.Model):
 
 class Vote(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     description = models.TextField(null=True, blank=True, default=None)
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)
@@ -156,7 +156,7 @@ class Vote(models.Model):
 class MembersFile(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='membersFile', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='uploadsMember/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
@@ -170,7 +170,7 @@ class MembersFile(models.Model):
 class GroupsFile(models.Model):
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsFile', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='uploadsGroup/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
@@ -179,6 +179,54 @@ class GroupsFile(models.Model):
 
     class Meta:
         verbose_name_plural = 'Grupy Pliki'
+
+
+class GroupsNotepad(models.Model):
+    IMPORTANCE_CHOICES = (
+        ('none', 'Nie dotyczy'),
+        ('low', 'Niski'),
+        ('standard', 'Umiarkowany'),
+        ('important', 'Ważny'),
+        ('veryImportant', 'Bardzo ważny'),
+        ('critical', 'Krytyczny'),
+    )
+
+    METHOD_CHOICES = (
+        ('personally', 'Osobiście'),
+        ('email', 'E-mail'),
+        ('telephone', 'Telefonicznie'),
+        ('zoom', 'ZOOM'),
+        ('whatsapp', 'WhatsApp'),
+        ('facebook', 'Facebook'),
+        ('other', 'Inny'),
+    )
+
+    STATUS_CHOICES = (
+        ('ongoing', 'W trakcie'),
+        ('closed', 'Zamknięty'),
+    )
+
+    group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsNotepad', null=True, blank=True)
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=250, null=False, blank=False)
+    content = models.TextField(null=True, blank=True, default=None)
+    published_date = models.DateTimeField(blank=True, null=True)
+    importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
+    method = models.CharField(max_length=250, choices=METHOD_CHOICES, default=None)
+    status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
+    responsible = models.CharField(max_length=250, null=True, blank=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return (f"{self.title} "
+                f"{self.content} "
+                f"{self.importance} "
+                f"{self.status} "
+                f"{self.method} "
+                f"{self.published_date}")
+
+    class Meta:
+        verbose_name_plural = 'Grupy Komunikacja'
 
 
 class Notepad(models.Model):
@@ -208,14 +256,13 @@ class Notepad(models.Model):
 
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='notepad', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     content = models.TextField(null=True, blank=True, default=None)
-    # published_date = models.DateTimeField(default=timezone.now)
     published_date = models.DateTimeField(blank=True, null=True)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
     method = models.CharField(max_length=250, choices=METHOD_CHOICES, default=None)
     status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
-    responsible = models.CharField(max_length=350, null=True, blank=True)
+    responsible = models.CharField(max_length=250, null=True, blank=True)
     file = models.FileField(null=True, blank=True, upload_to='uploadsNotepad/%Y/%m/%d/%H%M%S/')
     confirmed = models.BooleanField(default=False)
     history = HistoricalRecords()
@@ -229,7 +276,6 @@ class Notepad(models.Model):
 
 class GroupsMember(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='groupsMember', null=True, blank=True)
-    # group = models.OneToOneField(Groups, on_delete=models.CASCADE, related_name='groupsGroup', null=False, blank=False, default=None)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsGroup', null=False, blank=False, default=None)
 
     created_date = models.DateTimeField(default=timezone.now)
@@ -244,7 +290,7 @@ class GroupsMember(models.Model):
 class Application(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='application', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
-    kind_of_application = models.CharField(max_length=350, null=False, blank=False)
+    kind_of_application = models.CharField(max_length=250, null=False, blank=False)
     description = models.TextField(null=True, blank=True, default=None)
     date_of_application = models.DateTimeField(default=timezone.now)
     date_of_payout = models.DateTimeField(default=timezone.now)
@@ -259,9 +305,9 @@ class Application(models.Model):
 class OrderedCardDocument(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardOrder', null=True, blank=True)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='OrderedCardDocument/%Y/%m/%d/%H%M%S/')
-    responsible = models.CharField(max_length=350, null=True, blank=True)
+    responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
     def __str__(self):
@@ -274,9 +320,9 @@ class OrderedCardDocument(models.Model):
 class ToBePickedUpCardDocument(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardToBePickedUp', null=True, blank=True)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='ToBePickedUpCardDocument/%Y/%m/%d/%H%M%S/')
-    responsible = models.CharField(max_length=350, null=True, blank=True)
+    responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
     def __str__(self):
@@ -284,15 +330,6 @@ class ToBePickedUpCardDocument(models.Model):
 
     class Meta:
         verbose_name_plural = 'Dokumenty Odbioru'
-
-# def validate_unique_or_null(value):
-#     # existing_records = CardStatus.objects.exclude(pk=value.pk)
-#     if CardStatus.objects.exclude(card_identity=value).exclude(card_identity__isnull=True).exists():
-#         raise ValidationError('This field must be unique or null.')
-# def validate_unique_or_null(value):
-#     existing_records = CardStatus.objects.exclude(pk=value.pk)  # Exclude the current instance if it exists
-#     if existing_records.filter(card_identity=value.card_identity).exists():
-#         raise ValidationError('This field must be unique or null.')
 
 
 def validate_unique_or_null(value):
@@ -333,13 +370,13 @@ class CardStatus(models.Model):
     card_start_pin = models.CharField(max_length=250, blank=True, null=True, default=None)
     card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
     date_of_action = models.DateTimeField(default=timezone.now, blank=True, null=True)
-    file_name = models.CharField(max_length=350, null=True, blank=True)
+    file_name = models.CharField(max_length=250, null=True, blank=True)
     file = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards/%Y/%m/%d/%H%M%S/')
     file_date = models.DateTimeField(blank=True, null=True)
-    file_name_a = models.CharField(max_length=350, null=True, blank=True)
+    file_name_a = models.CharField(max_length=250, null=True, blank=True)
     file_a = models.FileField(null=True, blank=True, upload_to='uploadsLoyaltyCards_a/%Y/%m/%d/%H%M%S/')
     file_a_date = models.DateTimeField(blank=True, null=True)
-    responsible = models.CharField(max_length=350, null=True, blank=True)
+    responsible = models.CharField(max_length=250, null=True, blank=True)
     confirmed = models.BooleanField(default=False)
     history = HistoricalRecords()
 
@@ -357,7 +394,7 @@ class CardStatus(models.Model):
 
 class Activities(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
-    title = models.CharField(max_length=350, null=False, blank=False)
+    title = models.CharField(max_length=250, null=False, blank=False)
     capacity = models.IntegerField(blank=True, null=True)
     expiring_date = models.DateTimeField(default=None, blank=True, null=True)
 
@@ -416,7 +453,7 @@ class Task(models.Model):
         ('closed', 'Zamknięty'),
     )
     created_date = models.DateTimeField(default=timezone.now)
-    task_name = models.CharField(max_length=350, null=False, blank=False)
+    task_name = models.CharField(max_length=250, null=False, blank=False)
     category = models.CharField(max_length=250, choices=CATEGORY_CHOICES, default=None)
     description = models.TextField()
     deadline = models.DateTimeField(default=None, blank=True, null=True)

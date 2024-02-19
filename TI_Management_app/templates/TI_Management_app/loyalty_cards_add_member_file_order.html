@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
+
 <div class="hero-unit">
     <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
 
@@ -27,19 +27,6 @@
                 <td>Uczestnik:</td>
                 <td>{{loyalty_card.member}} {{form.member.as_hidden }}</td>
             </tr>
-<!--            <tr>-->
-<!--                <td>Dokument zlecenie:</td>-->
-<!--                <td>{{form.file_name}}</td>-->
-<!--            </tr>-->
-<!--            <tr>-->
-<!--                <td>Nowy uczestnik:</td>-->
-<!--                <td>-->
-<!--                    <label class="custom-file-upload">-->
-<!--                        Dodaj dokument zlecenie-->
-<!--                        {{form.file}}-->
-<!--                    </label>-->
-<!--                </td>-->
-<!--            </tr>-->
             <tr>
                 <td>Dokument:</td>
                 <td>{{form.ordered_doc}}</td>
@@ -53,7 +40,7 @@
         <br />
     </form>
 </div>
-{% endif %}
+
 {% endblock %}
 
 {% block menu %}

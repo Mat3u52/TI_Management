@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
+
     <div class="hero-unit">
 
         {% if form.errors %}
@@ -70,7 +70,7 @@
             <br />
         </form>
     </div>
-{% endif %}
+
 {% endblock %}
 {% block menu %}
     {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}

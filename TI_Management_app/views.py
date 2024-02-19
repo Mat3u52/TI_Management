@@ -1,21 +1,50 @@
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
-from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards, OrderedCardDocument,
-                     ToBePickedUpCardDocument, MemberFunction, MemberOccupation, GroupsFile)
+from .models import (
+    MembersZZTI,
+    MembersFile,
+    CardStatus,
+    GroupsMember,
+    Notepad,
+    Groups,
+    Cards,
+    OrderedCardDocument,
+    ToBePickedUpCardDocument,
+    MemberFunction,
+    MemberOccupation,
+    GroupsFile,
+    GroupsNotepad
+)
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
-from .forms import (MemberForm, MemberEditForm, MemberDeactivateForm, MemberFileForm,
-                    CardStatusForm, CardStatusEditForm, CardStatusCardIDForm, GroupsMemberForm,
-                    NotepadMemberForm,
-                    GroupsForm, GroupsEditForm, GroupAddMemberForm,
-                    LoyaltyCardForm, LoyaltyCardAddMemberForm,
-                    LoyaltyCardsAddMemberFileOrderForm,
-                    LoyaltyCardsAddMemberFileToBePickedUpForm,
-                    OrderedCardDocumentForm,
-                    ToBePickedUpCardDocumentForm,
-                    ExportDataToTXTForm,
-                    GroupAddGenderForm, ExportDataSeparatorGroupForm, MemberFunctionForm, MemberOccupationForm,
-                    GroupAddRoleForm, GroupFileForm)
+from .forms import (
+    MemberForm,
+    MemberEditForm,
+    MemberDeactivateForm,
+    MemberFileForm,
+    CardStatusForm,
+    CardStatusEditForm,
+    CardStatusCardIDForm,
+    GroupsMemberForm,
+    NotepadMemberForm,
+    GroupsForm,
+    GroupNotepadForm,
+    GroupsEditForm,
+    GroupAddMemberForm,
+    LoyaltyCardForm,
+    LoyaltyCardAddMemberForm,
+    LoyaltyCardsAddMemberFileOrderForm,
+    LoyaltyCardsAddMemberFileToBePickedUpForm,
+    OrderedCardDocumentForm,
+    ToBePickedUpCardDocumentForm,
+    ExportDataToTXTForm,
+    GroupAddGenderForm,
+    ExportDataSeparatorGroupForm,
+    MemberFunctionForm,
+    MemberOccupationForm,
+    GroupAddRoleForm,
+    GroupFileForm
+)
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -667,7 +696,7 @@ def loyalty_card_edit(request, pk):
             loyalty_card.author = request.user
             loyalty_card.save()
             messages.success(request, "Zaktualizowano!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         form = LoyaltyCardForm(instance=loyalty_card)
     return render(request, 'TI_Management_app/loyalty_card_edit.html',
@@ -1133,6 +1162,33 @@ def group_file_delete(request, pk, pk1):
     group_file.delete()
     return redirect('group_detail', pk=group.pk)
 
+
+@login_required
+def group_notepad_add(request, pk):
+    group = get_object_or_404(Groups, pk=pk)
+    # group = get_object_or_404(GroupsNotepad, pk=pk)
+
+    if request.method == "POST":
+        form = GroupNotepadForm(request.POST)
+        if form.is_valid():
+            group_notepad = form.save(commit=False)
+            group_notepad.group = group
+            group_notepad.author = request.user
+            group_notepad.published_date = timezone.now()
+            group_notepad.save()
+            messages.success(request, "Dodano notatkę do grupy!")
+            return redirect('group_detail', pk=group.pk)
+    else:
+        username = request.user.username
+        form = GroupNotepadForm(initial={'responsible': username})
+    return render(
+        request,
+        'TI_Management_app/group_notepad_add.html',
+        {
+            'form': form,
+            'group': group
+        }
+    )
 
 def group_search(request):
     if request.method == "POST":

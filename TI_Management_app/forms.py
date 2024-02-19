@@ -1,9 +1,23 @@
 from django import forms
 from django.core.validators import RegexValidator
-from .models import (MembersZZTI, MembersFile, CardStatus, GroupsMember, Notepad, Groups, Cards,
-                     OrderedCardDocument, ToBePickedUpCardDocument, MemberFunction, MemberOccupation, GroupsFile)
+from .models import (
+    MembersZZTI,
+    MembersFile,
+    CardStatus,
+    GroupsMember,
+    Notepad,
+    Groups,
+    GroupsNotepad,
+    Cards,
+    OrderedCardDocument,
+    ToBePickedUpCardDocument,
+    MemberFunction,
+    MemberOccupation,
+    GroupsFile
+)
 from django.utils import timezone
 from django.forms.widgets import DateInput
+
 
 class MemberForm(forms.ModelForm):
     phone_number = forms.CharField(
@@ -42,30 +56,6 @@ class MemberForm(forms.ModelForm):
 
         }
 
-
-
-    # def clean_pin(self, *args, **kwargs):
-    #     pin = self.cleaned_data.get("pin")
-
-        # if MembersZZTI.objects.filter(pin=pin).exists():
-        #     raise forms.ValidationError("To pole musi być unikalne.")
-
-        # if pin.is_integer() is False:
-        # if type(pin) == float:
-        #     raise forms.ValidationError('To pole musi być liczbą')
-
-        # if len(str(pin)) != 8:
-        #     raise forms.ValidationError('To pole musi sładać się z 8 znaków.')
-        #
-        # return pin
-
-    # def clean_member_nr(self, *args, **kwargs):
-    #     member_nr = self.cleaned_data.get("member_nr")
-    #
-    #     if MembersZZTI.objects.filter(member_nr=member_nr).exists():
-    #         raise forms.ValidationError("To pole musi być unikalne.")
-    #
-    #     return member_nr
 
 class MemberEditForm(forms.ModelForm):
     phone_number = forms.CharField(
@@ -204,6 +194,36 @@ class GroupsMemberForm(forms.ModelForm):
     class Meta:
         model = GroupsMember
         fields = ['member',]
+
+
+class GroupNotepadForm(forms.ModelForm):
+    class Meta:
+        responsible = forms.CharField(widget=forms.HiddenInput())
+
+        model = GroupsNotepad
+        fields = [
+            'title',
+            'content',
+            'published_date',
+            'importance',
+            'method',
+            'status',
+            'responsible'
+        ]
+
+        widgets = {
+            'published_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'content': forms.Textarea(
+                attrs={
+                    'rows': 12,
+                    'cols': 50
+                }
+            ),
+        }
 
 
 class NotepadMemberForm(forms.ModelForm):

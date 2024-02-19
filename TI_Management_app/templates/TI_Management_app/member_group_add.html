@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
+
     <div class="hero-unit">
 
         {% if form.errors %}
@@ -17,19 +17,14 @@
         <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
         <p>Grupa:</p>
         <form method="post" class="post-form">
-<!--            {{ form.as_p }}-->
             {% csrf_token %}
             <p>{{group.group_name}}{{form.member.as_hidden}}</p>
-<!--            {{form.group}}-->
-<!--            <p>{{form.card_identity}}</p>-->
-<!--            <p>{{form.card_status}}</p>-->
-<!--            <p>{{form.date_of_action}}</p>-->
 
             <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj grupę</button>
             <br />
         </form>
     </div>
-{% endif %}
+
 {% endblock %}
 
 {% block menu %}

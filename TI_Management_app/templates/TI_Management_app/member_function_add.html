@@ -5,15 +5,8 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
+
     <div class="hero-unit">
-
-<!--        {% for msg in messages %}-->
-<!--            <div class="alert alert-success" role="alert">-->
-<!--                {{msg}}-->
-<!--            </div>-->
-<!--        {% endfor %}-->
-
 
         <form method="post" class="post-form">
             {% csrf_token %}
@@ -22,7 +15,6 @@
             {% endif %}
             <p>Funkcja Członka:</p>
             {{form.member_function}}
-
 
             <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
             <br />
@@ -39,8 +31,6 @@
     {% endfor %}
 </div>
 
-
-{% endif %}
 {% endblock %}
 
 {% block menu %}

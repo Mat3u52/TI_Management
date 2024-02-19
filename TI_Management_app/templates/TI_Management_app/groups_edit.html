@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block content %}
-{% if user.is_authenticated and user.username == 'admin'%}
+
     <div class="hero-unit">
         <form method="post" class="post-form">
             {% csrf_token %}
@@ -23,7 +23,7 @@
             <br />
         </form>
     </div>
-{% endif %}
+
 {% endblock %}
 
 {% block menu %}

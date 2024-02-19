@@ -39,74 +39,143 @@
 
 <div class="hero-unit">
     <h3><a href="{% url 'groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
-    <div class="notepad">
-    <form method="post" action="{% url 'group_detail' pk=group.pk %}">
-        {% csrf_token %}
-        {% for radio in form_export.separator %}
-            <label class="horizontal-radio">
-                {{ radio.tag }} {{ radio.choice_label }}
-            </label>
-        {% endfor %}
-        <br />
-        {% for radio in form_export.data %}
-            <label class="horizontal-radio">
-                {{ radio.tag }} {{ radio.choice_label }}
-            </label>
-        {% endfor %}
-        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
-        <br />
-    </form>
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showGroupMembers">
+                Lista uczestników:
+            </li>
+            <li>
+                <div class="notepad">
+                    <form method="post" action="{% url 'group_detail' pk=group.pk %}">
+                    {% csrf_token %}
+                    {% for radio in form_export.separator %}
+                        <label class="horizontal-radio">
+                            {{ radio.tag }} {{ radio.choice_label }}
+                        </label>
+                    {% endfor %}
+                    <br />
+                    {% for radio in form_export.data %}
+                        <label class="horizontal-radio">
+                            {{ radio.tag }} {{ radio.choice_label }}
+                        </label>
+                    {% endfor %}
+                    <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    <br />
+                    </form>
+                </div>
+            </li>
+
+            <li id="objGroupMembers" style="display: none">
+                {% for participant in group.groupsGroup.all %}
+                    <div class="notepad">
+                        <p>
+                            <a href="{% url 'member_detail' pk=participant.member.pk %}">
+                                {{participant.member.forename}} {{participant.member.surname}} - {{participant.member.member_nr}}
+                            </a>
+                        </p>
+                        <a href="{% url 'group_delete_member' pk=group.pk pk1=participant.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <br />
+                    </div>
+                {% endfor %}
+                <br />
+                <a href="{% url 'group_delete_all' pk=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń wszystkich</a>
+                <br />
+            </li>
+        </ul>
+
     </div>
 
-    {% for participant in group.groupsGroup.all %}
-        <div class="notepad">
-            <p>
-                <a href="{% url 'member_detail' pk=participant.member.pk %}">
-                    {{participant.member.forename}} {{participant.member.surname}} - {{participant.member.member_nr}}
-                </a>
-            </p>
-            <a href="{% url 'group_delete_member' pk=group.pk pk1=participant.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-            <br />
-        </div>
-    {% endfor %}
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showGroupNotepad">
+                Komunikacja:
+            </li>
+            <li>
+                <div class="notepad">
+                    <p>
+                        <a href="{% url 'group_notepad_add' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+                            Dodaj Komunikacje do grupy {{ group.group_name }}
+                        </a>
+                    </p>
+                    <br />
+                    <br />
+
+                    <p>
+                        <a href="{% url 'group_file_edit' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+                            Dodaj Plik
+                        </a>
+                    </p>
+                    <br />
+                    <br />
+                </div>
+            </li>
+            <li id="objGroupNotepad" style="display: none">
+
+            {% for group_note in group.groupsNotepad.all %}
+                <div class="notepad">
+                    <p>
+                        <a href="#" class="btn btn-primary btn-large pull-right">
+                            Aktualizuj
+                        </a>
+                    </p>
+                    <br />
+                    <br />
+                    <p>
+                        <b>Sprawa: </b>
+                        <a href="#">{{ group_note.title }}</a>
+                    </p>
+                    <p>
+                        <b>Data dodanie:</b> {{ group_note.created_date }}
+                    </p>
+
+                    <p>
+                        <b>Data modyfikacji:</b> {{ group_note.published_date }}
+                    </p>
+                        {% if group_note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>
+                        {% elif group_note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>
+                        {% elif group_note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
+                        {% elif group_note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>
+                        {% elif group_note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
+                        {% elif group_note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
+                        {% else %}<p><b>Ważność:</b> None</p>
+                        {% endif %}
+                    <p>
+                        {% if group_note.status == 'ongoing' %}
+                            <b>Status:</b> W trakcie</p>
+                        {% elif group_note.status == '' %}
+                            <b>Status:</b> Zamknięty</p>
+                        {% endif %}
+
+                    <p><b>Odpowiedzialny:</b> {{ group_note.responsible }}</p>
+                </div>
+            {% endfor %}
 
 
-    <br />
-    <a href="{% url 'group_delete_all' pk=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-    <br />
-</div>
+            <div class="notepad">
+                <table width="100%">
+                    {% for file in group.groupsFile.all %}
+                        <tr>
+                            <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
+                            <td><p class="str-file">{{ file.file }}</p></td>
+                            <td><p class="str-file">{{ file.created_date }}</p></td>
+                            <td>
+                                <a href="{% url 'group_file_delete' pk=group.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">
+                                    usuń
+                                </a>
+                            </td>
+                        </tr>
 
-<div class="hero-unit">
-    <p>Komunikacja</p>
-    <p>
-        <a href="{% url 'group_file_edit' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
-            Dodaj Plik
-        </a>
-    </p>
-    <br />
-    <br />
-    <div class="notepad">
-    <table width="100%">
-        {% for file in group.groupsFile.all %}
-        <tr>
-            <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
-            <td><p class="str-file">{{ file.file }}</p></td>
-            <td><p class="str-file">{{ file.created_date }}</p></td>
-            <td>
-                <a href="{% url 'group_file_delete' pk=group.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">
-                    usuń
-                </a>
-            </td>
-        </tr>
-
-        {% empty %}
-        <tr>
-            <td>
-                <p>Brak plików</p>
-            </td>
-        </tr>
-        {% endfor %}
-    </table>
+                    {% empty %}
+                        <tr>
+                            <td>
+                                <p>Brak plików</p>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+            </div>
+            </li>
+        </ul>
     </div>
 </div>
 

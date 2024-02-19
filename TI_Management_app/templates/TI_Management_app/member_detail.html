@@ -319,17 +319,10 @@
                 </a></p>
                 <br />
                 <br />
-
-
-<!--                {{ seen_note }}-->
-<!--                {{ note_entries }}-->
-
-
                 {% for note in note_entries %}
                     {% if note.title in seen_note %}
                       <div class="notepad">
-<!--                        {{ note.title }}-->
-                        <div class="notepad">
+
                           <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
                             Aktualizuj
                           </a></p>
@@ -360,7 +353,7 @@
                         <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
 
                         <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-                        </div>
+
                       </div>
                     {% endif %}
                 {% endfor %}
