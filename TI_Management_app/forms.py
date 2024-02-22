@@ -13,7 +13,8 @@ from .models import (
     ToBePickedUpCardDocument,
     MemberFunction,
     MemberOccupation,
-    GroupsFile
+    GroupsFile,
+    DocumentsDatabase
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -438,3 +439,9 @@ class GroupFileForm(forms.ModelForm):
     class Meta:
         model = GroupsFile
         fields = ['title', 'file']
+
+
+class DocumentsDatabaseForm(forms.ModelForm):
+    class Meta:
+        model = DocumentsDatabase
+        fields = ['title', 'file', 'responsible']

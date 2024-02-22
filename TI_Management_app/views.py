@@ -13,7 +13,8 @@ from .models import (
     MemberFunction,
     MemberOccupation,
     GroupsFile,
-    GroupsNotepad
+    GroupsNotepad,
+    DocumentsDatabase
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -43,7 +44,8 @@ from .forms import (
     MemberFunctionForm,
     MemberOccupationForm,
     GroupAddRoleForm,
-    GroupFileForm
+    GroupFileForm,
+    DocumentsDatabaseForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -62,8 +64,8 @@ from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
 from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
 from textwrap import wrap
-
 from django.contrib import messages
+import csv
 
 
 class Image(TemplateView):
@@ -125,6 +127,59 @@ def members_table_list(request):
                   'TI_Management_app/members_table_list.html',
                   {'page': page,
                    'members': members})
+
+
+def member_export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="members.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(
+        [
+            'Imie',
+            'Nazwisko',
+            'Funkcja',
+            'Zawód',
+            'Numer',
+            'Płeć',
+            'Data urodzenia',
+            'Miejsce urodzenia',
+            'PPID',
+            'Numer telefonu',
+            'Email',
+            'Data przystąpienia',
+            'Data wystąpienia',
+            'Rodzaj umowy',
+            'Data zatrudnienia',
+            'Data rozwiązania umowy',
+            'Dezaktywacja'
+        ]
+    )
+
+    members = MembersZZTI.objects.all().values_list(
+        'forename',
+        'surname',
+        'role',
+        'occupation',
+        'member_nr',
+        'sex',
+        'birthday',
+        'birthplace',
+        'pin',
+        'phone_number',
+        'email',
+        'date_of_accession',
+        'date_of_abandonment',
+        'type_of_contract',
+        'date_of_contract',
+        'expiration_date_contract',
+        'deactivate'
+    )
+
+    for member in members:
+        writer.writerow(member)
+
+    return response
 
 
 @login_required
@@ -261,8 +316,39 @@ def member_function_add(request):
             return redirect('member_function_add')
     else:
         form = MemberFunctionForm()
-    return render(request, 'TI_Management_app/member_function_add.html',
-                  {'form': form, 'all_functions': all_functions})
+    return render(
+        request,
+        'TI_Management_app/member_function_add.html',
+        {
+            'form': form,
+            'all_functions': all_functions
+        }
+    )
+
+
+@login_required
+def member_function_edit(request, pk):
+    all_functions = MemberFunction.objects.all()
+    function = get_object_or_404(MemberFunction, pk=pk)
+    if request.method == "POST":
+        form = MemberFunctionForm(request.POST, instance=function)
+        if form.is_valid():
+            one_function = form.save(commit=False)
+            one_function.author = request.user
+            one_function.save()
+            messages.success(request, "Zaktualizowano funkcję!")
+            return redirect('member_function_add')
+    else:
+        form = MemberFunctionForm(instance=function)
+    return render(
+        request,
+        'TI_Management_app/member_function_edit.html',
+        {
+            'form': form,
+            'all_functions': all_functions,
+            'function': function
+        }
+    )
 
 
 @login_required
@@ -280,6 +366,31 @@ def member_occupation_add(request):
         form = MemberOccupationForm()
     return render(request, 'TI_Management_app/member_occupation_add.html',
                   {'form': form, 'all_occupation': all_occupation})
+
+
+@login_required
+def member_occupation_edit(request, pk):
+    all_occupation = MemberOccupation.objects.all()
+    occupation = get_object_or_404(MemberOccupation, pk=pk)
+    if request.method == "POST":
+        form = MemberOccupationForm(request.POST, instance=occupation)
+        if form.is_valid():
+            one_occupation = form.save(commit=False)
+            one_occupation.author = request.user
+            one_occupation.save()
+            messages.success(request, "Zaktualizowano zawód!")
+            return redirect('member_occupation_add')
+    else:
+        form = MemberOccupationForm(instance=occupation)
+    return render(
+        request,
+        'TI_Management_app/member_occupation_edit.html',
+        {
+            'form': form,
+            'all_occupation': all_occupation,
+            'occupation': occupation
+        }
+    )
 
 
 @login_required
@@ -1166,7 +1277,6 @@ def group_file_delete(request, pk, pk1):
 @login_required
 def group_notepad_add(request, pk):
     group = get_object_or_404(Groups, pk=pk)
-    # group = get_object_or_404(GroupsNotepad, pk=pk)
 
     if request.method == "POST":
         form = GroupNotepadForm(request.POST)
@@ -1189,6 +1299,124 @@ def group_notepad_add(request, pk):
             'group': group
         }
     )
+
+
+@login_required
+def group_notepad_edit(request, pk, pk1):
+    group = get_object_or_404(Groups, pk=pk)
+    notepad = get_object_or_404(GroupsNotepad, pk=pk1)
+    if request.method == "POST":
+        form = GroupNotepadForm(request.POST, instance=notepad)
+        if form.is_valid():
+            group_notepad = form.save(commit=False)
+            group_notepad.group = group
+            group_notepad.author = request.user
+            group_notepad.published_date = timezone.now()
+            group_notepad.save()
+            messages.success(request, "Zaktualizowano notatkę grupy!")
+            return redirect('group_detail', pk=group.pk)
+    else:
+        form = GroupNotepadForm(instance=notepad)
+    return render(
+        request,
+        'TI_Management_app/group_notepad_edit.html',
+        {
+            'form': form,
+            'group': group,
+            'notepad': notepad
+        }
+    )
+
+
+@login_required
+def group_notepad_history(request, pk, pk1):
+    group = get_object_or_404(Groups, pk=pk)
+    notepad = get_object_or_404(GroupsNotepad, pk=pk1)
+    group_notepad_history_obj = notepad.history.order_by('-published_date')
+
+    return render(
+        request,
+        'TI_Management_app/group_notepad_history.html',
+        {
+            'group': group,
+            'group_notepad_history_obj': group_notepad_history_obj,
+            'notepad': notepad
+        }
+    )
+
+
+@login_required
+def group_notepad_history_pdf(request, pk, pk1):
+    group = get_object_or_404(Groups, pk=pk)
+    notepad = get_object_or_404(GroupsNotepad, pk=pk1)
+    group_notepad_history_obj = notepad.history.order_by('-published_date')
+
+    buf = io.BytesIO()
+    c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+
+    pdfmetrics.registerFont(
+        TTFont(
+            'Verdana',
+            'TI_Management_app/static/font/verdana.ttf'
+        )
+    )
+
+    lines = []
+
+    for history in group_notepad_history_obj:
+        lines.append(f"Tytuł: {history.title}")
+        lines.append(" ")
+        lines.append("Opis:")
+        lines.append(" ")
+        description = wrap(history.content, 65)
+        for i in description:
+            lines.append(f"{i}")
+            lines.append(" ")
+        lines.append(f"Data: {history.published_date.isoformat()}")
+        lines.append(" ")
+        lines.append(f"Ważność: {history.importance}")
+        lines.append(" ")
+        lines.append(f"Sposób zgłoszenia: {history.method}")
+        lines.append(" ")
+        lines.append(f"Nadano status: {history.status}")
+        lines.append(" ")
+        lines.append(f"Prowadzący: {history.responsible}")
+        lines.append(" ")
+        # if history.file:
+        #     lines.append("Plik")
+        # lines.append(" ")
+
+        # if history.confirmed:
+        #     confirm = "Podpisano: Tak"
+        # else:
+        #     confirm = "Podpisano: Nie"
+        # lines.append(confirm)
+        lines.append("--------------------------------------------------------------------")
+        lines.append(" ")
+
+    y = 10
+
+    for line in lines:
+        c.beginText()
+        c.setFont("Verdana", 14)
+
+        y += 10
+        c.drawString(10, y, line)
+        c.getPageNumber()
+        # c.showPage()
+        if "-------" in line:
+            c.showPage()
+            y = 0
+
+    c.save()
+    buf.seek(0)
+
+    return FileResponse(
+        buf,
+        as_attachment=True,
+        filename=f"HistoriaKomunikacjiGrupy-{group.group_name}.pdf"
+    )
+
 
 def group_search(request):
     if request.method == "POST":
@@ -1426,3 +1654,62 @@ def member_notepad_delete_all(request, pk):
 
     return redirect('member_detail', pk=member.pk)
 
+
+@login_required
+def documents_database(request):
+    documents = DocumentsDatabase.objects.all()
+    if request.method == "POST":
+        form = DocumentsDatabaseForm(request.POST, request.FILES)
+        if form.is_valid():
+            doc = form.save(commit=False)
+            doc.author = request.user
+            doc.save()
+            messages.success(request, "Dodano nowy dokument!")
+            return redirect('documents_database')
+    else:
+        username = request.user.username
+        form = DocumentsDatabaseForm(
+            initial={
+                'responsible': username
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/documents_database.html',
+        {
+            'form': form,
+            'documents': documents
+        }
+    )
+
+
+@login_required
+def documents_database_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        documents = DocumentsDatabase.objects.filter(
+            Q(title__contains=searched) |
+            Q(file__contains=searched))
+        return render(
+            request,
+            'TI_Management_app/documents_database_search.html',
+            {
+                'searched': searched,
+                'documents': documents
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/documents_database_search.html',
+            {}
+        )
+
+
+@login_required
+def documents_database_delete(request, pk):
+    documents = get_object_or_404(DocumentsDatabase, pk=pk)
+    documents.author = request.user
+    documents.file.delete()
+    documents.delete()
+    return redirect('documents_database')

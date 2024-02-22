@@ -20,19 +20,19 @@
     <form method="post" action="{% url 'group_detail' pk=group.pk %}">
         {% csrf_token %}
         {{form_gender.gender}}
-        <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
+        <button class="btn btn-primary btn-sm pull-left" type="submit">Dodaj - płeć</button>
         <br />
     </form>
     <form method="post" action="{% url 'group_detail' pk=group.pk %}">
         {% csrf_token %}
         {{form_role.role}}
-        <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
+        <button class="btn btn-primary btn-sm pull-left" type="submit">Dodaj - funkcja</button>
         <br />
     </form>
     <form method="post" action="{% url 'group_detail' pk=group.pk %}">
         {% csrf_token %}
         {{form_role.occupation}}
-        <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj wszytkich</button>
+        <button class="btn btn-primary btn-sm pull-left" type="submit">Dodaj - zawód</button>
         <br />
     </form>
 </div>
@@ -114,15 +114,19 @@
             {% for group_note in group.groupsNotepad.all %}
                 <div class="notepad">
                     <p>
-                        <a href="#" class="btn btn-primary btn-large pull-right">
+                        <a href="{% url 'group_notepad_edit' pk=group.pk pk1=group_note.pk %}" class="btn btn-primary btn-large pull-right">
                             Aktualizuj
                         </a>
                     </p>
                     <br />
                     <br />
                     <p>
-                        <b>Sprawa: </b>
-                        <a href="#">{{ group_note.title }}</a>
+                        <b>
+                            Sprawa:
+                        </b>
+                        <a href="{% url 'group_notepad_history' pk=group.pk pk1=group_note.pk %}">
+                            {{ group_note.title }}
+                        </a>
                     </p>
                     <p>
                         <b>Data dodanie:</b> {{ group_note.created_date }}
@@ -156,7 +160,7 @@
                     {% for file in group.groupsFile.all %}
                         <tr>
                             <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
-                            <td><p class="str-file">{{ file.file }}</p></td>
+                            <td><p class="str-file">{{ file.file|cut:'uploadsGroup/' }}</p></td>
                             <td><p class="str-file">{{ file.created_date }}</p></td>
                             <td>
                                 <a href="{% url 'group_file_delete' pk=group.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">

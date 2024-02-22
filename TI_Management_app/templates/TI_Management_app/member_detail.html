@@ -151,7 +151,7 @@
 <!--                    <p><a href="{{ file.file.url }}">{{ file.title }}</a> - {{ file.created_date }}</p>-->
                   <tr>
                     <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
-                    <td><p class="str-file">{{ file.file }}</p></td>
+                    <td><p class="str-file">{{ file.file|cut:'uploadsMember/' }}</p></td>
                     <td><p class="str-file">{{ file.created_date }}</p></td>
 <!--                    <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="date-file-delete">usuń</a></td>-->
                     <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a></td>

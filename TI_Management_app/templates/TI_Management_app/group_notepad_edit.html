@@ -1,10 +1,61 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'groups_list' %}"> / Grupy </a>
+<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+<a href="{% url 'group_notepad_edit' pk=group.pk pk1=notepad.pk %}"> / Aktualizacja komunikacji grupy</a>
+{% endblock %}
+
+{% block content %}
+    <div class="hero-unit">
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <h3>
+            <a href="{% url 'group_detail' pk=group.pk %}">
+                {{ group.group_name }}
+            </a>
+        </h3>
+        <p>
+            Komunikacja grupy {{ group.group_name }}
+        </p>
+        <form method="post" class="post-form" enctype="multipart/form-data">
+            {% csrf_token %}
+
+            <table width="100%">
+                <tr>
+                    <td>Tytuł sprawy:
+                    {{ form.title }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>Opis:<br/>
+                    {{ form.content }}</td>
+                </tr>
+                <tr>
+                    <td>Ważność:<br/>
+                    {{ form.importance }}</td>
+                </tr>
+                <tr>
+                    <td>Sposób zgłoszenia:<br/>
+                    {{ form.method }}</td>
+                </tr>
+                <tr>
+                    <td>Status:<br/>
+                    {{ form.status }}</td>
+                </tr>
+                <tr>
+                    <td>Odpowiedzialny:<br/>
+                    {{ form.responsible }}</td>
+                </tr>
+            </table>
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+            <br />
+        </form>
+    </div>
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='groups' %}
+{% endblock %}

@@ -25,8 +25,16 @@
 <div class="hero-unit">
     {% for function in all_functions %}
         <div class="notepad">
-            <h3>{{function}}</h3>
-            <div class="date"><p>Data dodania: {{function.created_date}}</p></div>
+            <h3>
+                <a href="{% url 'member_function_edit' pk=function.pk %}">
+                    {{function}}
+                </a>
+            </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{function.created_date}}
+                </p>
+            </div>
         </div>
     {% endfor %}
 </div>

@@ -7,12 +7,23 @@
 {% endblock %}
 
 {% block content %}
-
-   <div class="hero-unit">
-       <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
-       <p>Historia komunikacji
-        <a href="{% url 'member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">Wygeneruj PDF</a>
-       </p>
+<div class="hero-unit">
+    <h3>
+        <a href="{% url 'member_detail' pk=member.pk %}">
+            {{member.forename}} {{member.surname}} {{member.member_nr}}
+        </a>
+    </h3>
+    <div class="no-print">
+        <p>
+            Historia komunikacji
+            <a href="{% url 'member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">
+                Wygeneruj PDF
+            </a>
+            <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
+                Drukuj
+            </button>
+        </p>
+    </div>
        {% for note in member_notepad_history_obj %}
             <div class="notepad">
                 <div class="notepad-head"><h3>{{ note.title }}</h3> </div>
@@ -60,7 +71,13 @@
                     </tr>
                     <tr>
                         <td><h5>Nadano status: </h5></td>
-                        <td>{{ note.status }}</td>
+                        <td>
+                            {% if note.status == 'ongoing' %}
+                                W trakcie
+                            {% elif note.status == 'closed' %}
+                                Zamknięty
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <td><h5>Podpisano: </h5></td>

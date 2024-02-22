@@ -24,8 +24,16 @@
 <div class="hero-unit">
     {% for occupation in all_occupation %}
         <div class="notepad">
-            <h3>{{occupation}}</h3>
-            <div class="date"><p>Data dodania: {{occupation.created_date}}</p></div>
+            <h3>
+                <a href="{% url 'member_occupation_edit' pk=occupation.pk %}">
+                    {{occupation}}
+                </a>
+            </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{occupation.created_date}}
+                </p>
+            </div>
         </div>
     {% endfor %}
 </div>

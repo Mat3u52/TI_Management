@@ -2,7 +2,6 @@ from django.db import models
 from django.utils import timezone
 from phone_field import PhoneField
 from simple_history.models import HistoricalRecords
-
 from django.core.exceptions import ValidationError
 
 
@@ -89,6 +88,20 @@ class Questions(models.Model):
 
     class Meta:
         verbose_name_plural = 'Pytania'
+
+
+class DocumentsDatabase(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=250, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='documentsDatabase/%Y/%m/%d/%H%M%S/')
+    responsible = models.CharField(max_length=250, null=True, blank=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Baza Dokumentów'
 
 
 class MembersZZTI(models.Model):

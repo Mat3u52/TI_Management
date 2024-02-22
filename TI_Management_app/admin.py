@@ -1,10 +1,29 @@
 from django.contrib import admin
 from django.utils.html import format_html
-from .models import (Groups, Cards, CardsRFID, CardStatus,
-                     MembersZZTI, Notepad, Application, Task,
-                     GroupsMember, MembersFile, Activities, ActivityStatus,
-                     Vote, Questions, Answers, OrderedCardDocument, ToBePickedUpCardDocument,
-                     MemberFunction, MemberOccupation, GroupsFile, GroupsNotepad)
+from .models import (
+    Groups,
+    Cards,
+    CardsRFID,
+    CardStatus,
+    MembersZZTI,
+    Notepad,
+    Application,
+    Task,
+    GroupsMember,
+    MembersFile,
+    Activities,
+    ActivityStatus,
+    Vote,
+    Questions,
+    Answers,
+    OrderedCardDocument,
+    ToBePickedUpCardDocument,
+    MemberFunction,
+    MemberOccupation,
+    GroupsFile,
+    GroupsNotepad,
+    DocumentsDatabase
+)
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -19,6 +38,29 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Vote)
 # admin.site.register(Question)
 # admin.site.register(Answers)
+
+
+@admin.register(DocumentsDatabase)
+class DocumentsDatabaseAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'title',
+        'file',
+        'created_date'
+    )
+    list_filter = (
+        'title',
+        'file',
+        'created_date'
+    )
+    search_fields = (
+        'title',
+    )
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Groups)
@@ -39,7 +81,7 @@ class GroupsAdmin(admin.ModelAdmin):
     search_fields = (
         'group_name',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(MemberFunction)
@@ -60,13 +102,13 @@ class MemberFunctionAdmin(admin.ModelAdmin):
     search_fields = (
         'member_function',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(MemberOccupation)
 class MemberOccupationAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
-        if obj:  # when editing an object
+        if obj:
             return ['created_date']
         return self.readonly_fields
 
@@ -81,7 +123,7 @@ class MemberOccupationAdmin(admin.ModelAdmin):
     search_fields = (
         'member_occupation',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(GroupsMember)
@@ -104,7 +146,7 @@ class GroupsMemberAdmin(admin.ModelAdmin):
     search_fields = (
         'group',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(CardsRFID)
@@ -127,7 +169,7 @@ class CardsRFIDAdmin(admin.ModelAdmin):
     search_fields = (
         'serial_number',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Cards)
@@ -148,7 +190,7 @@ class CardsAdmin(admin.ModelAdmin):
     search_fields = (
         'card_name',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(CardStatus)
@@ -200,7 +242,7 @@ class CardStatusAdmin(admin.ModelAdmin):
         'card_identity',
         'card_status'
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(MembersZZTI)
@@ -267,11 +309,11 @@ class MembersZZTIAdmin(admin.ModelAdmin):
     search_fields = (
         'surname',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(MembersFile)
-class MembersFile(admin.ModelAdmin):
+class MembersFileAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['created_date']
@@ -292,11 +334,11 @@ class MembersFile(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(GroupsFile)
-class GroupsFile(admin.ModelAdmin):
+class GroupsFileAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['created_date']
@@ -317,7 +359,7 @@ class GroupsFile(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(GroupsNotepad)
@@ -350,7 +392,7 @@ class GroupsNotepadAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Notepad)
@@ -387,7 +429,7 @@ class NotepadAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Application)
@@ -415,11 +457,11 @@ class ApplicationAdmin(admin.ModelAdmin):
     search_fields = (
         'kind_of_application',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Activities)
-class CardsActivities(admin.ModelAdmin):
+class CardsActivitiesAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['created_date']
@@ -440,11 +482,11 @@ class CardsActivities(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(ActivityStatus)
-class CardsActivityStatus(admin.ModelAdmin):
+class CardsActivityStatusAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:  # when editing an object
             return ['created_date']
@@ -471,7 +513,7 @@ class CardsActivityStatus(admin.ModelAdmin):
     search_fields = (
         'activities',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Task)
@@ -505,7 +547,7 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = (
         'task_name',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Vote)
@@ -533,7 +575,7 @@ class VoteAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Questions)
@@ -555,7 +597,7 @@ class QuestionsAdmin(admin.ModelAdmin):
     search_fields = (
         'question',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(Answers)
@@ -579,11 +621,11 @@ class AnswersAdmin(admin.ModelAdmin):
     search_fields = (
         'answer',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(OrderedCardDocument)
-class OrderedCardDocument(admin.ModelAdmin):
+class OrderedCardDocumentAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['created_date']
@@ -604,11 +646,11 @@ class OrderedCardDocument(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'
 
 
 @admin.register(ToBePickedUpCardDocument)
-class ToBePickedUpCardDocument(admin.ModelAdmin):
+class ToBePickedUpCardDocumentAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
         if obj:
             return ['created_date']
@@ -629,4 +671,4 @@ class ToBePickedUpCardDocument(admin.ModelAdmin):
     search_fields = (
         'title',
     )
-    date_hierarchy = 'created_date'
+    # date_hierarchy = 'created_date'

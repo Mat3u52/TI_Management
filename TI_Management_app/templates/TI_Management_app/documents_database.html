@@ -1,0 +1,71 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'documents_database' %}"> / Baza dokumentów</a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <form class="d-flex" method=POST action="{% url 'documents_database_search' %}">
+        {% csrf_token %}
+        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
+        type="search" placeholder="Szukaj Dokumentu" aria-label="Search" name="searched">
+        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
+    </form>
+</div>
+
+<div class="hero-unit">
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+            <p>Dokument:</p>
+        {{form.title}}
+        {{form.responsible.as_hidden}}
+        <label class="custom-file-upload">
+            Wybierz dokument
+            {{form.file}}
+        </label>
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    {% for document in documents %}
+        <div class="notepad">
+            <h3>
+                <a href="{{ document.file.url }}">
+                    {{document.title}}
+                </a>
+            </h3>
+            <p>
+                <b>
+                    Dodaj dokument:
+                </b>
+                    {{document.file|cut:'documentsDatabase/'}}
+            </p>
+            <div class="date">
+                <p>
+                    Data dodania: {{document.created_date}}
+                </p>
+                <p>
+                    Dodany przez: {{document.responsible}}
+                </p>
+            </div>
+            <a href="{% url 'documents_database_delete' pk=document.pk %}"
+               class="btn btn-danger btn-sm pull-right">
+                usuń
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='documents_database' %}
+{% endblock %}

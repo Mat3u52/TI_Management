@@ -1,3 +1,4 @@
+<div class="no-print">
 <ul class="nav nav-list">
     <li class="nav-header">Panel</li>
     <li><a href="#"><b>Dashboard</b></a></li>
@@ -25,4 +26,8 @@
     <li class="{% if active_tab == 'loyalty_card_add' %} active {% endif %}">
         <a href="{% url 'loyalty_card_add' %}">&#160;&#160;&#8226; dodaj karte lojalnościową</a>
     </li>
+        <li class="{% if active_tab == 'documents_database' %} active {% endif %}">
+        <a href="{% url 'documents_database' %}"><b>Baza Dokumentów</b></a>
+    </li>
 </ul>
+</div>

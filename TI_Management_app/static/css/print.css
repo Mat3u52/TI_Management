@@ -1,0 +1,17 @@
+/* Example print styles */
+body {
+    font-size: 12pt;
+
+}
+
+/* Hide certain elements */
+.no-print {
+    display: none;
+}
+
+/* Adjust margins */
+@page {
+    margin: 1cm;
+}
+
+/* Additional print-specific styles */

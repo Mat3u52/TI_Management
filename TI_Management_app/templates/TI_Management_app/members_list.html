@@ -6,15 +6,31 @@
 
 {% block content %}
 <div class="hero-unit">
-
     <form class="d-flex" method=POST action="{% url 'member_search' %}">
         {% csrf_token %}
-        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-        type="search" placeholder="Szukaj Uczestnika" aria-label="Search" name="searched">
-        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
-        <p><a href="{% url 'members_table_list' %}" class="btn btn-primary btn-sm pull-left">
-            tabela
-        </a></p>
+        <input class="form-control me-2"
+               style="min-width: 100%!important; min-height: 35px"
+               type="search"
+               placeholder="Szukaj Uczestnika"
+               aria-label="Search" name="searched">
+        <button class="btn btn-primary btn-large pull-right"
+                type="submit">
+            Szukaj
+        </button>
+        <table>
+            <tr>
+                <td>
+                    <a href="{% url 'members_table_list' %}" class="btn btn-primary btn-sm pull-left">
+                        tabela
+                    </a>
+                </td>
+                <td>
+                    <a href="{% url 'member_export_csv' %}" class="btn btn-primary btn-sm pull-left">
+                        csv
+                    </a>
+                </td>
+            </tr>
+        </table>
     </form>
 </div>
 {% for member in members %}
