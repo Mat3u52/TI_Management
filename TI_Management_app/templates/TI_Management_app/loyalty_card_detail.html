@@ -54,9 +54,9 @@
                         <br />
                     </div>
                 {% endfor %}
-                <br />
-                <a href="{% url 'loyalty_card_delete_all' pk=loyalty_card.pk %}" class="btn btn-danger btn-sm pull-right">usuń wszystkich</a>
-                <br />
+
+
+
             </li>
           </ul>
     </div>
@@ -318,7 +318,7 @@
                             <p>Nr dokumentu:
                                 <a href="{{ ordered_file.file.url }}">{{ ordered_file.title }}</a>
                             </p>
-                            <p>Nazwa: {{ ordered_file.file }}</p>
+                            <p>Nazwa: {{ ordered_file.file|cut:'OrderedCardDocument/' }}</p>
                             <p>Data: {{ ordered_file.created_date }}</p>
                             <p>Dodany przez: {{ ordered_file.responsible }}</p>
                             <br />
@@ -377,7 +377,7 @@
                             <p>Nr dokumentu:
                                 <a href="{{ ordered_file.file.url }}">{{ to_be_picked_up_file.title }}</a>
                             </p>
-                            <p>Nazwa: {{ to_be_picked_up_file.file }}</p>
+                            <p>Nazwa: {{ to_be_picked_up_file.file|cut:'ToBePickedUpCardDocument/' }}</p>
                             <p>Data: {{ to_be_picked_up_file.created_date }}</p>
                             <p>Dodany przez: {{ to_be_picked_up_file.responsible }}</p>
                             <br />

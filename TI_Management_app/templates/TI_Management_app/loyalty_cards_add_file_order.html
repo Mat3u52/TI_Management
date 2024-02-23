@@ -2,24 +2,34 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
 <a href="{% url 'loyalty_cards_add_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument zlecenie</a>
 {% endblock %}
 
 {% block content %}
 
    <div class="hero-unit">
-        <h3><a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}">{{ loyalty_card.card_name }}</a></h3>
-        <p>Dokument Zlecenie</p>
+        <h2>
+            <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}">
+                {{ loyalty_card.card_name }}
+            </a>
+        </h2>
+        <p>
+            Dokument Zlecenie
+        </p>
         <form method="post" class="post-form" enctype="multipart/form-data">
             {% csrf_token %}
-            <p>{{form.title}}</p>
+            <p>
+                {{form.title}}
+            </p>
             {{form.responsible.as_hidden}}
             <label class="custom-file-upload">
                 Wybierz dokument
                 {{form.file}}
             </label>
-            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+            <button type="submit" class="btn btn-primary btn-large pull-right">
+                Dodaj
+            </button>
             <br />
         </form>
     </div>

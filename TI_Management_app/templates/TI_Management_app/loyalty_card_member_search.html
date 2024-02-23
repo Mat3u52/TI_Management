@@ -2,7 +2,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}} </a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='active' %}"> / {{loyalty_card.card_name}} </a>
 <a href="#"> / Wyszukiwarka</a>
 {% endblock %}
 

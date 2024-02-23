@@ -59,4 +59,7 @@ $(document).ready(function(){
     $("#showGroupNotepad").click(function(){
         $("#objGroupNotepad").show(1000);
     });
+    $("#showGroupAddCollection").click(function(){
+        $("#objGroupAddCollection").show(1000);
+    });
 });

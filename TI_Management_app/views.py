@@ -852,7 +852,7 @@ def loyalty_cards_add_file_order(request, pk):
             order_file.card = loyalty_card
             order_file.save()
             messages.success(request, "Dodano dokument!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
         form = OrderedCardDocumentForm(initial={'card': loyalty_card,
@@ -875,7 +875,7 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
             order_file.card = loyalty_card
             order_file.save()
             messages.success(request, "Dodano dokument!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
         form = ToBePickedUpCardDocumentForm(initial={'card': loyalty_card,
@@ -978,14 +978,14 @@ def loyalty_card_delete_member(request, pk, pk1):
     return redirect('loyalty_card_detail', pk=loyalty_card.pk)
 
 
-@login_required
-def loyalty_card_delete_all(request, pk):
-    loyalty_card = get_object_or_404(Cards, pk=pk)
-    loyalty_card.author = request.user
-
-    loyalty_card.delete()
-
-    return redirect('loyalty_card_detail')
+# @login_required
+# def loyalty_card_delete_all(request, pk):
+#     loyalty_card = get_object_or_404(Cards, pk=pk)
+#     loyalty_card.author = request.user
+#
+#     loyalty_card.delete()
+#
+#     return redirect('loyalty_card_detail')
 
 
 @login_required
@@ -1071,9 +1071,9 @@ def member_loyalty_card_delete(request, pk, pk1):
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
 
     member.author = request.user
-    member_loyalty_card.file.delete()
-    member_loyalty_card.card.delete()
-    member_loyalty_card.file_a.delete()
+    # member_loyalty_card.file.delete()
+    # member_loyalty_card.card.delete()
+    # member_loyalty_card.file_a.delete()
     member_loyalty_card.delete()
     return redirect('member_detail', pk=member.pk)
 
@@ -1713,3 +1713,22 @@ def documents_database_delete(request, pk):
     documents.file.delete()
     documents.delete()
     return redirect('documents_database')
+
+
+@login_required
+def finance_list(request):
+    members_obj = MembersZZTI.objects.all().order_by('-created_date')
+
+    paginator = Paginator(members_obj, 50)
+    page = request.GET.get('page')
+    try:
+        members = paginator.page(page)
+    except PageNotAnInteger:
+        members = paginator.page(1)
+    except EmptyPage:
+        members = paginator.page(paginator.num_pages)
+
+    return render(request,
+                  'TI_Management_app/members_list.html',
+                  {'page': page,
+                   'members': members})

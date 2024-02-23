@@ -179,7 +179,7 @@
                 <tr>
                     <td>Nazwa pliku: </td>
                     {% if member_loyalty_card.ordered_doc.file %}
-                        <td>{{ member_loyalty_card.ordered_doc.file }}</td>
+                        <td>{{ member_loyalty_card.ordered_doc.file|cut:'OrderedCardDocument/' }}</td>
                     {% endif %}
                 </tr>
                 <tr>
@@ -277,7 +277,7 @@
                 <tr>
                     <td>Nazwa pliku: </td>
                     {% if member_loyalty_card.to_be_picked_up_doc.file %}
-                        <td>{{ member_loyalty_card.to_be_picked_up_doc.file }}</td>
+                        <td>{{ member_loyalty_card.to_be_picked_up_doc.file|cut:'ToBePickedUpCardDocument/' }}</td>
                     {% endif %}
                 </tr>
                 <tr>

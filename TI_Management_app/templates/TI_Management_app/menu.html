@@ -26,7 +26,21 @@
     <li class="{% if active_tab == 'loyalty_card_add' %} active {% endif %}">
         <a href="{% url 'loyalty_card_add' %}">&#160;&#160;&#8226; dodaj karte lojalnościową</a>
     </li>
-        <li class="{% if active_tab == 'documents_database' %} active {% endif %}">
+
+    <li class="{% if active_tab == 'finance_list' %} active {% endif %}">
+        <a href="#"><b>Finanse</b></a>
+    </li>
+    <li class="{% if active_tab == 'application_add' %} active {% endif %}">
+        <a href="#">&#160;&#160;&#8226; dodaj dokument księgowy</a>
+    </li>
+    <li class="{% if active_tab == 'stipend' %} active {% endif %}">
+        <a href="#">&#160;&#160;&#8226; Stypendia</a>
+    </li>
+    <li class="{% if active_tab == 'relief' %} active {% endif %}">
+        <a href="#">&#160;&#160;&#8226; Zapomogi</a>
+    </li>
+
+    <li class="{% if active_tab == 'documents_database' %} active {% endif %}">
         <a href="{% url 'documents_database' %}"><b>Baza Dokumentów</b></a>
     </li>
 </ul>

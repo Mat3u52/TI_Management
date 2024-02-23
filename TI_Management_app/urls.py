@@ -237,11 +237,11 @@ urlpatterns = [
         views.loyalty_card_delete_member,
         name='loyalty_card_delete_member'
     ),
-    path(
-        'TI_Management_app/loyaltyCardsDeleteDelete/<int:pk>',
-        views.loyalty_card_delete_all,
-        name='loyalty_card_delete_all'
-    ),
+    # path(
+    #     'TI_Management_app/loyaltyCardsDeleteDelete/<int:pk>',
+    #     views.loyalty_card_delete_all,
+    #     name='loyalty_card_delete_all'
+    # ),
     path(
         'TI_Management_app/loyaltyCardsAddFileOrder/<int:pk>',
         views.loyalty_cards_add_file_order,
@@ -296,5 +296,10 @@ urlpatterns = [
         'TI_Management_app/documentsDatabaseSearch',
         views.documents_database_search,
         name='documents_database_search'
+    ),
+    path(
+        'TI_Management_app/financeList',
+        views.finance_list,
+        name='finance_list'
     ),
 ]

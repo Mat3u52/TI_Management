@@ -300,7 +300,7 @@ class GroupsMember(models.Model):
         verbose_name_plural = 'Grupy Członek'
 
 
-class Application(models.Model):
+class Application(models.Model):  # Finances member explicitly
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='application', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     kind_of_application = models.CharField(max_length=250, null=False, blank=False)
@@ -398,7 +398,11 @@ class CardStatus(models.Model):
         super().save(**kwargs)
 
     def __str__(self):
-        return f"{self.card_status} {self.card_identity} {self.card} {self.file_name} {self.file_name_a}"
+        return (f"{self.card_status} "
+                f"{self.card_identity} "
+                f"{self.card} "
+                f"{self.ordered_doc} "
+                f"{self.to_be_picked_up_doc}")
 
     class Meta:
         verbose_name_plural = 'Status Kart'
