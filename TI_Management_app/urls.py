@@ -288,6 +288,11 @@ urlpatterns = [
         name='documents_database'
     ),
     path(
+        'TI_Management_app/documentsDatabaseEdit/<int:pk>',
+        views.documents_database_edit,
+        name='documents_database_edit'
+    ),
+    path(
         'TI_Management_app/documentsDatabaseDelete/<int:pk>',
         views.documents_database_delete,
         name='documents_database_delete'
@@ -298,8 +303,23 @@ urlpatterns = [
         name='documents_database_search'
     ),
     path(
+        'TI_Management_app/documentsDatabaseCategory',
+        views.documents_database_category,
+        name='documents_database_category'
+    ),
+    path(
+        'TI_Management_app/documentsDatabaseCategoryEdit/<int:pk>',
+        views.documents_database_category_edit,
+        name='documents_database_category_edit'
+    ),
+    path(
         'TI_Management_app/financeList',
         views.finance_list,
         name='finance_list'
+    ),
+    path(
+        'TI_Management_app/documentsDatabaseCategoryDelete/<int:pk>',
+        views.documents_database_category_delete,
+        name='documents_database_category_delete'
     ),
 ]

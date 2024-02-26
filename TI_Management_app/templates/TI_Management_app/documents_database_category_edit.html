@@ -1,10 +1,63 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'documents_database' %}"> / Baza dokumentów</a>
+<a href="{% url 'documents_database_category_edit' pk=category.pk %}"> / Aktualizuj kategorie</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+            <p>Kategoria:</p>
+        {{form.title}}
+        {{form.responsible.as_hidden}}
+
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Aktualizuj
+        </button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    <p>
+        Historia:
+    </p>
+    {% for h in category.history.all %}
+        <div class="notepad">
+            <table width="100%" border="0">
+                <tr>
+                    <td>
+                        {{ h.history_id }}
+                    </td>
+                    <td>
+                        {{ h.history_type }}
+                    </td>
+                    <td>
+                        {{ h.history_date }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Nazwa: {{ h.title }}
+                    <br />
+                        Odpowiedzialny: {{ h.responsible }}
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='documents_database_category' %}
+{% endblock %}

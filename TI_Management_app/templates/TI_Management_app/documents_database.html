@@ -21,6 +21,7 @@
             <p>{{form.errors}}</p>
         {% endif %}
             <p>Dokument:</p>
+        {{form.category}}
         {{form.title}}
         {{form.responsible.as_hidden}}
         <label class="custom-file-upload">
@@ -36,17 +37,20 @@
 
 <div class="hero-unit">
     {% for document in documents %}
+        {% if document.file %}
         <div class="notepad">
+            <h2>
+                {{ document.category }}:
+            </h2>
             <h3>
-                <a href="{{ document.file.url }}">
+                <a href="{% url 'documents_database_edit' pk=document.pk %}">
                     {{document.title}}
                 </a>
             </h3>
             <p>
-                <b>
-                    Dodaj dokument:
-                </b>
+                <a href="{{ document.file.url }}">
                     {{document.file|cut:'documentsDatabase/'}}
+                </a>
             </p>
             <div class="date">
                 <p>
@@ -61,6 +65,7 @@
                 usuń
             </a>
         </div>
+        {% endif %}
     {% endfor %}
 </div>
 

@@ -14,7 +14,8 @@ from .models import (
     MemberOccupation,
     GroupsFile,
     GroupsNotepad,
-    DocumentsDatabase
+    DocumentsDatabase,
+    DocumentsDatabaseCategory
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -45,7 +46,8 @@ from .forms import (
     MemberOccupationForm,
     GroupAddRoleForm,
     GroupFileForm,
-    DocumentsDatabaseForm
+    DocumentsDatabaseForm,
+    DocumentsDatabaseCategoryForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -67,6 +69,7 @@ from textwrap import wrap
 from django.contrib import messages
 import csv
 
+from django.conf import settings
 
 class Image(TemplateView):
     form = MemberForm
@@ -416,8 +419,8 @@ def member_card_edit(request, pk):
 def member_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        members = MembersZZTI.objects.filter(Q(forename__contains=searched) |
-                                             Q(surname__contains=searched) |
+        members = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
+                                             Q(surname__contains=searched.capitalize()) |
                                              Q(member_nr__contains=searched) |
                                              Q(phone_number__contains=searched))
         return render(request,
@@ -500,16 +503,32 @@ def loyalty_card_member_search(request, pk):
     loyalty_card_validator = CardStatus.objects.all()
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
-                                                         Q(surname__contains=searched) |
-                                                         Q(member_nr__contains=searched) |
-                                                         Q(phone_number__contains=searched))
-        return render(request,
-                      'TI_Management_app/loyalty_card_member_search.html',
-                      {'searched': searched,
-                       'loyalty_card_member': loyalty_card_member,
-                       'loyalty_card': loyalty_card,
-                       'loyalty_card_validator': loyalty_card_validator})
+        loyalty_card_member = MembersZZTI.objects.filter(
+            Q(forename__contains=searched.capitalize()) |
+            Q(surname__contains=searched.capitalize()) |
+            Q(member_nr__contains=searched) |
+            Q(phone_number__contains=searched)
+        )
+        members_in_validator = []
+        for member in loyalty_card_member:
+            exists_in_validator = loyalty_card_validator.filter(
+                Q(member_id=member.id) &
+                Q(card_id=loyalty_card.id)
+            ).exists()
+            if not exists_in_validator:
+                members_in_validator.append(member)
+
+        return render(
+            request,
+            'TI_Management_app/loyalty_card_member_search.html',
+            {
+                'searched': searched,
+                'loyalty_card_member': loyalty_card_member,
+                'loyalty_card': loyalty_card,
+                'loyalty_card_validator': loyalty_card_validator,
+                'members_in_validator': members_in_validator,
+            }
+        )
     else:
         return render(request,
                       'TI_Management_app/loyalty_card_member_search.html',
@@ -826,9 +845,10 @@ def loyalty_card_add_member(request, pk, pk1):
             loyalty_card_member.author = request.user
             loyalty_card_member.card = loyalty_card
             loyalty_card_member.member = loyalty_card_member_add
+            loyalty_card_member.date_of_action = timezone.now()
             loyalty_card_member.save()
             messages.success(request, "Dodano nowego uczestnika!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
         form = LoyaltyCardAddMemberForm(initial={'card': loyalty_card,
@@ -912,10 +932,12 @@ def loyalty_card_member_file_order_search(request, pk):
     loyalty_card_validator = CardStatus.objects.all()
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
-                                                         Q(surname__contains=searched) |
-                                                         Q(member_nr__contains=searched) |
-                                                         Q(phone_number__contains=searched))
+        loyalty_card_member = MembersZZTI.objects.filter(
+            Q(forename__contains=searched.capitalize()) |
+            Q(surname__contains=searched.capitalize()) |
+            Q(member_nr__contains=searched) |
+            Q(phone_number__contains=searched)
+        )
         return render(request,
                       'TI_Management_app/loyalty_card_member_file_order_search.html',
                       {'searched': searched,
@@ -952,8 +974,8 @@ def loyalty_card_member_file_to_be_picked_up_search(request, pk):
     loyalty_card_validator = CardStatus.objects.all()
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched) |
-                                                         Q(surname__contains=searched) |
+        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
+                                                         Q(surname__contains=searched.capitalize()) |
                                                          Q(member_nr__contains=searched) |
                                                          Q(phone_number__contains=searched))
         return render(request,
@@ -975,7 +997,7 @@ def loyalty_card_delete_member(request, pk, pk1):
 
     loyalty_card.author = request.user
     member_loyalty_card.delete()
-    return redirect('loyalty_card_detail', pk=loyalty_card.pk)
+    return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
 
 
 # @login_required
@@ -1103,8 +1125,8 @@ def group_member_search(request, pk):
     group_validator = GroupsMember.objects.all()
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        group_members = MembersZZTI.objects.filter(Q(forename__contains=searched) |
-                                                   Q(surname__contains=searched) |
+        group_members = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
+                                                   Q(surname__contains=searched.capitalize()) |
                                                    Q(member_nr__contains=searched) |
                                                    Q(phone_number__contains=searched))
 
@@ -1656,8 +1678,84 @@ def member_notepad_delete_all(request, pk):
 
 
 @login_required
+def documents_database_category(request):
+    categories = DocumentsDatabaseCategory.objects.all()
+    if request.method == "POST":
+        form = DocumentsDatabaseCategoryForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.author = request.user
+            category.save()
+            messages.success(request, "Dodano nową kategorie!")
+            return redirect('documents_database_category')
+    else:
+        username = request.user.username
+        form = DocumentsDatabaseCategoryForm(
+            initial={
+                'responsible': username
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/documents_database_category.html',
+        {
+            'form': form,
+            'categories': categories
+        }
+    )
+
+
+@login_required
+def documents_database_category_edit(request, pk):
+    category = get_object_or_404(DocumentsDatabaseCategory, pk=pk)
+
+    if request.method == "POST":
+        form = DocumentsDatabaseCategoryForm(request.POST, instance=category)
+        if form.is_valid():
+            category_form = form.save(commit=False)
+            category_form.author = request.user
+            category_form.save()
+            messages.success(request, f"Zaktualizowano kategorie {category.title}!")
+            return redirect('documents_database_category')
+    else:
+        username = request.user.username
+        form = DocumentsDatabaseCategoryForm(
+            instance=category,
+            initial={
+                'responsible': username
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/documents_database_category_edit.html',
+        {
+            'form': form,
+            'category': category
+        }
+    )
+
+@login_required
+def documents_database_category_delete(request, pk):
+    category = get_object_or_404(DocumentsDatabaseCategory, pk=pk)
+    category.author = request.user
+    # category.documentsDatabaseCategory.file.delete()
+    documents = DocumentsDatabase.objects.filter(category=category)
+
+    for document in documents:
+        for file_path in document.history.values_list('file', flat=True):
+            absolute_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+            if os.path.exists(absolute_file_path):
+                os.remove(absolute_file_path)
+        # document.file.delete()
+
+    category.delete()
+    return redirect('documents_database_category')
+
+
+@login_required
 def documents_database(request):
     documents = DocumentsDatabase.objects.all()
+
     if request.method == "POST":
         form = DocumentsDatabaseForm(request.POST, request.FILES)
         if form.is_valid():
@@ -1684,12 +1782,44 @@ def documents_database(request):
 
 
 @login_required
+def documents_database_edit(request, pk):
+    document = get_object_or_404(DocumentsDatabase, pk=pk)
+
+    if request.method == "POST":
+        form = DocumentsDatabaseForm(request.POST, request.FILES, instance=document)
+        if form.is_valid():
+            doc = form.save(commit=False)
+            doc.author = request.user
+            doc.save()
+            messages.success(request, f"Zaktualizowano dokument {document.title}!")
+            return redirect('documents_database')
+    else:
+        username = request.user.username
+        form = DocumentsDatabaseForm(
+            instance=document,
+            initial={
+                'responsible': username
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/documents_database_edit.html',
+        {
+            'form': form,
+            'document': document
+        }
+    )
+
+
+@login_required
 def documents_database_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
         documents = DocumentsDatabase.objects.filter(
             Q(title__contains=searched) |
-            Q(file__contains=searched))
+            Q(file__contains=searched) |
+            Q(category__title__contains=searched)
+        )
         return render(
             request,
             'TI_Management_app/documents_database_search.html',
@@ -1710,8 +1840,15 @@ def documents_database_search(request):
 def documents_database_delete(request, pk):
     documents = get_object_or_404(DocumentsDatabase, pk=pk)
     documents.author = request.user
-    documents.file.delete()
+
+    for file_path in documents.history.values_list('file', flat=True):
+        absolute_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+        if os.path.exists(absolute_file_path):
+            os.remove(absolute_file_path)
+
+    # documents.file.delete()
     documents.delete()
+
     return redirect('documents_database')
 
 

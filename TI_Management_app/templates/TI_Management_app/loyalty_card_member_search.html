@@ -2,26 +2,41 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='active' %}"> / {{loyalty_card.card_name}} </a>
-<a href="#"> / Wyszukiwarka</a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}} </a>
+<a href="#"> / Wyszukiwarka nowego uczestnika</a>
 {% endblock %}
 
 {% block content %}
     {% if searched %}
-        <h2>Szukasz uczestnika dla karty {{loyalty_card.card_name}}: <span class="search-style">{{ searched }}</span></h2>
-        <br />
-
-        {% for member in loyalty_card_member %}
-
-
-
-            <div class="hero-unit">
-                <img src="{{ member.image.url }}" alt="image" width="100px">
-                <h2><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
-                <p><b>Nr:</b> {{member.member_nr}} 	&#124;
-                    <b>tel:</b> {{member.phone_number}} &#124;
-                    <b>email:</b> {{member.email}}</p>
-
+    <h2>
+        Szukasz uczestnika dla karty {{loyalty_card.card_name}}:
+        <span class="search-style">
+            {{ searched }}
+        </span>
+    </h2>
+    <br />
+    {% for member in members_in_validator %}
+        <div class="hero-unit">
+            <img src="{{ member.image.url }}" alt="image" width="100px">
+            <h2>
+                <a href="{% url 'member_detail' pk=member.pk %}">
+                    {{member.forename}} {{member.surname}}
+                </a>
+            </h2>
+                <p>
+                    <b>
+                        Nr:
+                    </b>
+                    {{member.member_nr}} 	&#124;
+                    <b>
+                        tel:
+                    </b>
+                    {{member.phone_number}} &#124;
+                    <b>
+                        email:
+                    </b>
+                    {{member.email}}
+                </p>
 
                 {% for member_validator in loyalty_card_validator%}
                     {% if member.id == member_validator.member.id %}
@@ -33,24 +48,16 @@
                     {% endif %}
                 {% endfor %}
 
-                        <p>
-                            <a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk pk1=member.pk %}" class="btn btn-primary btn-large pull-right">
-                                Dodaj nowego uczestnika od krary {{loyalty_card.card_name}}
-
-                            </a>
-                        </p>
-
-
-
+                <p>
+                    <a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk pk1=member.pk %}" class="btn btn-primary btn-large pull-right">
+                        Dodaj nowego uczestnika od krary {{loyalty_card.card_name}}
+                    </a>
+                </p>
 
                 <div class="date"><p>Data dodania: {{ member.created_date }}</p></div>
             </div>
 
-
-
         {% endfor %}
-
-
 
     {% else %}
         <h2>Please, insert the phrase into the search area.</h2>

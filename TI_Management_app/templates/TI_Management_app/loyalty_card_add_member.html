@@ -2,14 +2,18 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
 <a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk pk1=loyalty_card_member_add.pk %}"> / Dodaj uczestnika</a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
-    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
+    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none'%}">
+        <h3>
+            {{loyalty_card.card_name}}
+        </h3>
+    </a>
     {% for status in loyalty_card_validator %}
         {% if loyalty_card.id == status.card.id %}
             {% if loyalty_card_member_add.id == status.member.id %}
@@ -24,7 +28,9 @@
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <p>
+                {{form.errors}}
+            </p>
         {% endif %}
 
         {{form.responsible}}
@@ -49,10 +55,10 @@
                 <td>Status karty: </td>
                 <td>{{form.card_status}}</td>
             </tr>
-            <tr>
-                <td>Data modyfikacji: </td>
-                <td>{{form.date_of_action}}</td>
-            </tr>
+<!--            <tr>-->
+<!--                <td>Data modyfikacji: </td>-->
+<!--                <td>{{form.date_of_action}}</td>-->
+<!--            </tr>-->
             <tr>
                 <td>Potwierdzenie odbioru: </td>
                 <td>{{form.confirmed}}</td>

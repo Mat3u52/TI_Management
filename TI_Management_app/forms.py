@@ -14,7 +14,8 @@ from .models import (
     MemberFunction,
     MemberOccupation,
     GroupsFile,
-    DocumentsDatabase
+    DocumentsDatabase,
+    DocumentsDatabaseCategory
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -285,15 +286,29 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
 
     responsible = forms.CharField(widget=forms.HiddenInput())
 
-    date_of_action = forms.DateField(initial=timezone.now())
+    # date_of_action = forms.DateField(initial=timezone.now())
 
     class Meta:
         model = CardStatus
-        fields = ['member', 'card', 'card_identity', 'card_start_pin', 'card_status', 'date_of_action',
-                  'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
+        fields = [
+            'member',
+            'card',
+            'card_identity',
+            'card_start_pin',
+            'card_status',
+            # 'date_of_action',
+            'file_name',
+            'file',
+            'file_date',
+            'file_name_a',
+            'file_a',
+            'file_a_date',
+            'responsible',
+            'confirmed'
+        ]
 
         widgets = {
-            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
+            # 'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
             'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
             'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
         }
@@ -444,4 +459,18 @@ class GroupFileForm(forms.ModelForm):
 class DocumentsDatabaseForm(forms.ModelForm):
     class Meta:
         model = DocumentsDatabase
-        fields = ['title', 'file', 'responsible']
+        fields = [
+            'title',
+            'category',
+            'file',
+            'responsible'
+        ]
+
+
+class DocumentsDatabaseCategoryForm(forms.ModelForm):
+    class Meta:
+        model = DocumentsDatabaseCategory
+        fields = [
+            'title',
+            'responsible'
+        ]

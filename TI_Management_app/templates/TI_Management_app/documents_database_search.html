@@ -11,19 +11,31 @@
         {% for document in documents %}
             <div class="hero-unit">
                 <h2>
-                    <a href="{{ document.file.url }}">
+                    {{ document.category }}:
+                </h2>
+                <h3>
+                    <a href="{% url 'documents_database_edit' pk=document.pk %}">
                         {{document.title}}
                     </a>
-                </h2>
+                </h3>
+                <p>
+                    <a href="{{ document.file.url }}">
+                        {{document.file|cut:'documentsDatabase/'}}
+                    </a>
+                </p>
 
                 <p>
-                    <a href="{{ document.file.url }}" class="btn btn-primary btn-large pull-right">
-                        Więcej informacji
+                    <a href="{% url 'documents_database_delete' pk=document.pk %}"
+                        class="btn btn-danger btn-sm pull-right">
+                        usuń
                     </a>
                 </p>
                 <div class="date">
                     <p>
                         Data dodania: {{ document.created_date }}
+                    </p>
+                    <p>
+                        Dodany przez: {{document.responsible}}
                     </p>
                 </div>
             </div>

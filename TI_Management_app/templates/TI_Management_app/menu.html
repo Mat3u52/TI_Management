@@ -43,5 +43,8 @@
     <li class="{% if active_tab == 'documents_database' %} active {% endif %}">
         <a href="{% url 'documents_database' %}"><b>Baza Dokumentów</b></a>
     </li>
+        <li class="{% if active_tab == 'documents_database_category' %} active {% endif %}">
+        <a href="{% url 'documents_database_category' %}">&#160;&#160;&#8226; dodaj kategorie</a>
+    </li>
 </ul>
 </div>

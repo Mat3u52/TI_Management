@@ -90,7 +90,21 @@ class Questions(models.Model):
         verbose_name_plural = 'Pytania'
 
 
+class DocumentsDatabaseCategory(models.Model):
+    created_date = models.DateTimeField(default=timezone.now)
+    title = models.CharField(max_length=250, null=False, blank=False)
+    responsible = models.CharField(max_length=250, null=True, blank=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return self.title
+
+    class Meta:
+        verbose_name_plural = 'Baza Dokumentów Kategorie'
+
+
 class DocumentsDatabase(models.Model):
+    category = models.ForeignKey(DocumentsDatabaseCategory, on_delete=models.CASCADE, related_name='documentsDatabaseCategpry', null=True, blank=True)
     created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='documentsDatabase/%Y/%m/%d/%H%M%S/')
@@ -98,7 +112,8 @@ class DocumentsDatabase(models.Model):
     history = HistoricalRecords()
 
     def __str__(self):
-        return self.title
+        return (f"{self.title} "
+                f"{self.category}")
 
     class Meta:
         verbose_name_plural = 'Baza Dokumentów'

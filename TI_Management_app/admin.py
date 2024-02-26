@@ -22,7 +22,8 @@ from .models import (
     MemberOccupation,
     GroupsFile,
     GroupsNotepad,
-    DocumentsDatabase
+    DocumentsDatabase,
+    DocumentsDatabaseCategory
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -40,6 +41,29 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Answers)
 
 
+@admin.register(DocumentsDatabaseCategory)
+class DocumentsDatabaseCategoryAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'title',
+        'created_date',
+        'responsible'
+    )
+    list_filter = (
+        'title',
+        'created_date',
+        'responsible'
+    )
+    search_fields = (
+        'title',
+    )
+    # date_hierarchy = 'created_date'
+
+
 @admin.register(DocumentsDatabase)
 class DocumentsDatabaseAdmin(admin.ModelAdmin):
     def get_readonly_fields(self, request, obj=None):
@@ -49,13 +73,17 @@ class DocumentsDatabaseAdmin(admin.ModelAdmin):
 
     list_display = (
         'title',
+        'category',
         'file',
-        'created_date'
+        'created_date',
+        'responsible'
     )
     list_filter = (
         'title',
+        'category',
         'file',
-        'created_date'
+        'created_date',
+        'responsible'
     )
     search_fields = (
         'title',
@@ -672,3 +700,4 @@ class ToBePickedUpCardDocumentAdmin(admin.ModelAdmin):
         'title',
     )
     # date_hierarchy = 'created_date'
+

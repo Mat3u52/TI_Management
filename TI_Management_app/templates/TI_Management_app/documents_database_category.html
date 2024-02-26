@@ -1,10 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'documents_database' %}"> / Baza dokumentów</a>
+<a href="{% url 'documents_database_category' %}"> / Kategorie</a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+            <p>Dodaj kategorie:</p>
+        {{form.title}}
+        {{form.responsible.as_hidden}}
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    {% for category in categories %}
+        <div class="notepad">
+            <h3>
+                <a href="{% url 'documents_database_category_edit' pk=category.pk %}">
+                    {{category.title}}
+                </a>
+            </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{category.created_date}}
+                </p>
+                <p>
+                    Dodany przez: {{category.responsible}}
+                </p>
+            </div>
+            <a href="{% url 'documents_database_category_delete' pk=category.pk %}"
+               class="btn btn-danger btn-sm pull-right">
+                usuń
+            </a>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='documents_database_category' %}
+{% endblock %}
