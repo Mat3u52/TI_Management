@@ -71,6 +71,7 @@ import csv
 
 from django.conf import settings
 
+
 class Image(TemplateView):
     form = MemberForm
     template_name = 'TI_Management_app/image.html'

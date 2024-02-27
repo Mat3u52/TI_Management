@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/3.2/ref/settings/
 """
 import os
 from pathlib import Path
+from decouple import config
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 # BASE_DIR = Path(__file__).resolve().parent.parent
@@ -21,10 +22,10 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-v4p1pcf*6qum))0m94nr)tb#d((g#)=inby$t!^eg3#%igp4e3'
+SECRET_KEY = config("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = config('DEBUG', default=False, cast=bool)
 # DEBUG = False
 # TEMPLATE_DEBUG = DEBUG
 
@@ -90,13 +91,13 @@ WSGI_APPLICATION = 'TI_Management.wsgi.application'
 # }
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.mysql',
-        # 'NAME': os.path.join(BASE_DIR, 'ti_management'),
-        'NAME': 'ti_management',
-        'USER': 'root',
-        'PASSWORD': 'toor',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'ENGINE': config("ENGINE"),
+        # 'NAME': os.path.join(BASE_DIR, config("NAME")),
+        'NAME': config("NAME"),
+        'USER': config("USER"),
+        'PASSWORD': config("PASSWORD"),
+        'HOST': config("HOST"),
+        'PORT': config("PORT", cast=int),
     }
 }
 

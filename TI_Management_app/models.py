@@ -3,17 +3,26 @@ from django.utils import timezone
 from phone_field import PhoneField
 from simple_history.models import HistoricalRecords
 from django.core.exceptions import ValidationError
+from django.contrib.auth.models import User
+from django.urls import reverse
 
 
 class Groups(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    # created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='author_groups')
     group_name = models.CharField(max_length=250, blank=False, default=None, unique=True)
 
-    def __str__(self):
-        return self.group_name
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Grupy'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.group_name
 
 
 class MemberFunction(models.Model):
@@ -128,7 +137,11 @@ class MembersZZTI(models.Model):
         ('indefinite_period_of_time', 'Na czas nieokreślony'),
         ('limited_duration', 'Na czas określony'),
     )
-    created_date = models.DateTimeField(default=timezone.now)
+    # created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='author_members')
     forename = models.CharField(max_length=250, blank=False, null=False)
     surname = models.CharField(max_length=250, blank=False, null=False)
     role = models.ForeignKey(MemberFunction, on_delete=models.CASCADE, null=True, blank=True, default=None)
@@ -151,14 +164,23 @@ class MembersZZTI(models.Model):
     deactivate = models.BooleanField(default=False)
     history = HistoricalRecords()
 
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Członkowie'
+        ordering = ('-created_date',)
+
     def __str__(self):
         return (f"{self.forename} {self.surname} {self.role} {self.occupation} {self.member_nr} {self.sex} "
                 f"{self.birthday} {self.birthplace} {self.pin} {self.phone_number} {self.email} "
                 f"{self.date_of_accession} {self.date_of_abandonment} {self.type_of_contract} {self.date_of_contract} "
                 f"{self.expiration_date_contract} {self.group} {self.card} {self.image} {self.deactivate}")
 
-    class Meta:
-        verbose_name_plural = 'Członkowie'
+    def get_absolute_url(self):
+        return reverse('TI_Management:member_detail',
+                       args=[self.created_date.year,
+                             self.created_date.month,
+                             self.created_date.day, self.slug])
 
 
 class Vote(models.Model):

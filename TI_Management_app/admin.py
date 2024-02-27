@@ -309,7 +309,7 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'card',
         'image_tag',
         'deactivate',
-        'created_date'
+        'created_date', 'update_date', 'slug', 'author'
     )
     list_filter = (
         'id',
