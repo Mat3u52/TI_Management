@@ -51,12 +51,18 @@ class DocumentsDatabaseCategoryAdmin(admin.ModelAdmin):
     list_display = (
         'title',
         'created_date',
-        'responsible'
+        'responsible',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'title',
         'created_date',
-        'responsible'
+        'responsible',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',
@@ -76,14 +82,20 @@ class DocumentsDatabaseAdmin(admin.ModelAdmin):
         'category',
         'file',
         'created_date',
-        'responsible'
+        'responsible',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'title',
         'category',
         'file',
         'created_date',
-        'responsible'
+        'responsible',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',
@@ -100,11 +112,17 @@ class GroupsAdmin(admin.ModelAdmin):
 
     list_display = (
         'group_name',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     list_filter = (
         'group_name',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     search_fields = (
         'group_name',
@@ -121,11 +139,17 @@ class MemberFunctionAdmin(admin.ModelAdmin):
 
     list_display = (
         'member_function',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     list_filter = (
         'member_function',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     search_fields = (
         'member_function',
@@ -142,11 +166,17 @@ class MemberOccupationAdmin(admin.ModelAdmin):
 
     list_display = (
         'member_occupation',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     list_filter = (
         'member_occupation',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     search_fields = (
         'member_occupation',
@@ -164,12 +194,18 @@ class GroupsMemberAdmin(admin.ModelAdmin):
     list_display = (
         'member',
         'group',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'member',
         'group',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'group',
@@ -209,11 +245,17 @@ class CardsAdmin(admin.ModelAdmin):
 
     list_display = (
         'card_name',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'card_name',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'card_name',
@@ -245,7 +287,10 @@ class CardStatusAdmin(admin.ModelAdmin):
         'file_a',
         'file_a_date',
         'responsible',
-        'confirmed'
+        'confirmed',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'card',
@@ -264,7 +309,10 @@ class CardStatusAdmin(admin.ModelAdmin):
         'file_a',
         'file_a_date',
         'responsible',
-        'confirmed'
+        'confirmed',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'card_identity',
@@ -309,7 +357,10 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'card',
         'image_tag',
         'deactivate',
-        'created_date', 'update_date', 'slug', 'author'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     list_filter = (
         'id',
@@ -332,7 +383,10 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'group',
         'card',
         'deactivate',
-        'created_date'
+        'created_date',
+        'updated_date',
+        'slug',
+        'author'
     )
     search_fields = (
         'surname',
@@ -351,13 +405,19 @@ class MembersFileAdmin(admin.ModelAdmin):
         'member',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'member',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',
@@ -376,13 +436,19 @@ class GroupsFileAdmin(admin.ModelAdmin):
         'group',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'group',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',
@@ -405,7 +471,10 @@ class GroupsNotepadAdmin(admin.ModelAdmin):
         'status',
         'group',
         'responsible',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'title',
@@ -415,7 +484,10 @@ class GroupsNotepadAdmin(admin.ModelAdmin):
         'status',
         'group',
         'responsible',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',
@@ -663,13 +735,19 @@ class OrderedCardDocumentAdmin(admin.ModelAdmin):
         'card',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'card',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',
@@ -688,13 +766,19 @@ class ToBePickedUpCardDocumentAdmin(admin.ModelAdmin):
         'card',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'card',
         'title',
         'file',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'title',

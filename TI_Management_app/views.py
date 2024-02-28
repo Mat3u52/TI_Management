@@ -316,7 +316,7 @@ def member_function_add(request):
             function = form.save(commit=False)
             function.author = request.user
             function.save()
-            messages.success(request, "Dodano nową funkcję!")
+            messages.success(request, f"Dodano nową funkcję {function.member_function}!")
             return redirect('member_function_add')
     else:
         form = MemberFunctionForm()
@@ -364,7 +364,7 @@ def member_occupation_add(request):
             occupation = form.save(commit=False)
             occupation.author = request.user
             occupation.save()
-            messages.success(request, "Dodano nowy zawód!")
+            messages.success(request, f"Dodano nowy zawód {occupation.member_occupation}!")
             return redirect('member_occupation_add')
     else:
         form = MemberOccupationForm()
@@ -441,10 +441,10 @@ def member_file_edit(request, pk):
         form = MemberFileForm(request.POST, request.FILES)  # , instance = member
         if form.is_valid():
             member_file = form.save(commit=False)
-            member_file.member = member
             member_file.author = request.user
+            member_file.member = member
             member_file.save()
-            messages.success(request, "Dodano dokument!")
+            messages.success(request, f"Dodano dokument {member_file.title}!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = MemberFileForm()
@@ -826,7 +826,7 @@ def loyalty_card_edit(request, pk):
             loyalty_card = form.save(commit=False)
             loyalty_card.author = request.user
             loyalty_card.save()
-            messages.success(request, "Zaktualizowano!")
+            messages.success(request, f"Zaktualizowano {loyalty_card.card_name}!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         form = LoyaltyCardForm(instance=loyalty_card)
@@ -872,7 +872,7 @@ def loyalty_cards_add_file_order(request, pk):
             order_file.author = request.user
             order_file.card = loyalty_card
             order_file.save()
-            messages.success(request, "Dodano dokument!")
+            messages.success(request, f"Dodano dokument {order_file.title}!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
@@ -895,7 +895,7 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
             order_file.author = request.user
             order_file.card = loyalty_card
             order_file.save()
-            messages.success(request, "Dodano dokument!")
+            messages.success(request, f"Dodano dokument {order_file.title}!")
             return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
@@ -918,7 +918,7 @@ def loyalty_cards_add_member_file_order(request, pk):
             loyalty_card_member.author = request.user
             loyalty_card_member.file_date = timezone.now()
             loyalty_card_member.save()
-            messages.success(request, "Dodano dokument!")
+            messages.success(request, f"Dodano dokument!")
             return redirect('loyalty_card_list')
     else:
         form = LoyaltyCardsAddMemberFileOrderForm(instance=loyalty_card)
@@ -961,6 +961,7 @@ def loyalty_cards_add_member_file_to_be_picked_up(request, pk):
             loyalty_card_member.author = request.user
             loyalty_card_member.file_a_date = timezone.now()
             loyalty_card_member.save()
+            messages.success(request, "Dodano dokument!")
             return redirect('loyalty_card_list')
     else:
         form = LoyaltyCardsAddMemberFileToBePickedUpForm(instance=loyalty_card)
@@ -995,7 +996,6 @@ def loyalty_card_member_file_to_be_picked_up_search(request, pk):
 def loyalty_card_delete_member(request, pk, pk1):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
-
     loyalty_card.author = request.user
     member_loyalty_card.delete()
     return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
@@ -1020,11 +1020,11 @@ def member_loyalty_card_edit(request, pk, pk1):
         form = CardStatusEditForm(request.POST, request.FILES, instance=member_loyalty_card)
         if form.is_valid():
             member_loyalty_card = form.save(commit=False)
-            member_loyalty_card.member = member
             member_loyalty_card.author = request.user
+            member_loyalty_card.member = member
             member_loyalty_card.date_of_action = timezone.now()
             member_loyalty_card.save()
-            messages.success(request, "Zaktualizowano!")
+            messages.success(request, f"Zaktualizowano!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = CardStatusEditForm(instance=member_loyalty_card)
@@ -1046,9 +1046,8 @@ def member_loyalty_card_id_edit(request, pk, pk1):
         form = CardStatusCardIDForm(request.POST, instance=member_loyalty_card)
         if form.is_valid():
             member_loyalty_card = form.save(commit=False)
-            member_loyalty_card.member = member
             member_loyalty_card.author = request.user
-            # member_loyalty_card.date_of_action = timezone.now()
+            member_loyalty_card.member = member
             member_loyalty_card.save()
             messages.success(request, "Zaktualizowano!")
             return redirect('member_detail', pk=member.pk)
@@ -1070,9 +1069,9 @@ def member_loyalty_card_add(request, pk, pk1):
         form = CardStatusForm(request.POST, request.FILES)
         if form.is_valid():
             loyalty_card = form.save(commit=False)
+            loyalty_card.author = request.user
             loyalty_card.member = member
             loyalty_card.card = card_add
-            loyalty_card.author = request.user
             loyalty_card.date_of_action = timezone.now()
             loyalty_card.save()
             messages.success(request, "Dodano członka!")
@@ -1092,7 +1091,6 @@ def member_loyalty_card_add(request, pk, pk1):
 def member_loyalty_card_delete(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
-
     member.author = request.user
     # member_loyalty_card.file.delete()
     # member_loyalty_card.card.delete()
@@ -1155,7 +1153,7 @@ def groups_add(request):
             group = form.save(commit=False)
             group.author = request.user
             group.save()
-            messages.success(request, "Dodano nową grupe!")
+            messages.success(request, f"Dodano nową grupe {group.group_name}!")
             return redirect('groups_list')
     else:
         form = GroupsForm()
@@ -1171,7 +1169,7 @@ def groups_edit(request, pk):
             group = form.save(commit=False)
             group.author = request.user
             group.save()
-            messages.success(request, "Zaktualizowano grupe!")
+            messages.success(request, f"Zaktualizowano grupe {group.group_name}!")
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupsEditForm(instance=group)
@@ -1271,12 +1269,13 @@ def group_detail(request, pk):
 def group_file_edit(request, pk):
     group = get_object_or_404(Groups, pk=pk)
     if request.method == "POST":
-        form = GroupFileForm(request.POST, request.FILES)  # , instance = member
+        form = GroupFileForm(request.POST, request.FILES)
         if form.is_valid():
             group_file = form.save(commit=False)
-            group_file.group = group
             group_file.author = request.user
+            group_file.group = group
             group_file.save()
+            messages.success(request, f"Dodano plik do grupy {group_file.group}!")
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupFileForm()
@@ -1305,11 +1304,11 @@ def group_notepad_add(request, pk):
         form = GroupNotepadForm(request.POST)
         if form.is_valid():
             group_notepad = form.save(commit=False)
-            group_notepad.group = group
             group_notepad.author = request.user
+            group_notepad.group = group
             group_notepad.published_date = timezone.now()
             group_notepad.save()
-            messages.success(request, "Dodano notatkę do grupy!")
+            messages.success(request, f"Dodano notatkę do grupy {group_notepad.group}!")
             return redirect('group_detail', pk=group.pk)
     else:
         username = request.user.username
@@ -1332,11 +1331,11 @@ def group_notepad_edit(request, pk, pk1):
         form = GroupNotepadForm(request.POST, instance=notepad)
         if form.is_valid():
             group_notepad = form.save(commit=False)
-            group_notepad.group = group
             group_notepad.author = request.user
+            group_notepad.group = group
             group_notepad.published_date = timezone.now()
             group_notepad.save()
-            messages.success(request, "Zaktualizowano notatkę grupy!")
+            messages.success(request, f"Zaktualizowano notatkę grupy {group_notepad.group}!")
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupNotepadForm(instance=notepad)
@@ -1463,11 +1462,11 @@ def member_group_add(request, pk, pk1):
         form = GroupsMemberForm(request.POST)
         if form.is_valid():
             group_member = form.save(commit=False)
+            group_member.author = request.user
             group_member.member = member
             group_member.group = group
-            # group_member.author = request.user
             group_member.save()
-            messages.success(request, "Dodano nowego uczestnika do grupy!")
+            messages.success(request, f"Dodano nowego uczestnika do grupy {group_member.member}!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = GroupsMemberForm()
@@ -1491,7 +1490,7 @@ def group_add_member(request, pk, pk1):
             group_member.group = group
             group_member.member = member
             group_member.save()
-            messages.success(request, "Dodano nowego uczestnika do grupy!")
+            messages.success(request, f"Dodano nowego uczestnika do grupy{group_member.member}!")
             return redirect('group_detail', pk=group.pk)
     else:
         form = GroupAddMemberForm(initial={'group': group})
@@ -1503,7 +1502,6 @@ def group_add_member(request, pk, pk1):
 def member_group_delete(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_group = get_object_or_404(GroupsMember, pk=pk1)
-
     member.author = request.user
     member_group.delete()
     return redirect('member_detail', pk=member.pk)
@@ -1513,7 +1511,6 @@ def member_group_delete(request, pk, pk1):
 def group_delete_member(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     member_group = get_object_or_404(GroupsMember, pk=pk1)
-
     group.author = request.user
     member_group.delete()
     return redirect('group_detail', pk=group.pk)
@@ -1523,9 +1520,7 @@ def group_delete_member(request, pk, pk1):
 def group_delete_all(request, pk):
     group = get_object_or_404(Groups, pk=pk)
     group.author = request.user
-
     group.delete()
-
     return redirect('groups_list')
 
 
@@ -1536,11 +1531,11 @@ def member_notepad_add(request, pk):
         form = NotepadMemberForm(request.POST, request.FILES)
         if form.is_valid():
             notepad = form.save(commit=False)
-            notepad.member = member
             notepad.author = request.user
+            notepad.member = member
             notepad.published_date = timezone.now()
             notepad.save()
-            messages.success(request, "Dodano notatkę!")
+            messages.success(request, f"Dodano notatkę {notepad.title}!")
             return redirect('member_detail', pk=member.pk)
     else:
         username = request.user.username
@@ -1560,10 +1555,11 @@ def member_notepad_edit(request, pk, pk1):
         form = NotepadMemberForm(request.POST, request.FILES)
         if form.is_valid():
             notepad = form.save(commit=False)
-            notepad.member = member
             notepad.author = request.user
+            notepad.member = member
             notepad.published_date = timezone.now()
             notepad.save()
+            messages.success(request, f"Zaktualizowano notatkę {notepad.title}!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = NotepadMemberForm(instance=notepad)
@@ -1578,8 +1574,10 @@ def member_notepad_edit(request, pk, pk1):
 @login_required
 def member_notepad_history(request, pk, title):
     member = MembersZZTI.objects.get(id=pk)
-    # member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
-    member_notepad_history_obj = member.notepad.filter(Q(published_date__lte=timezone.now()) & Q(title__contains=title)).order_by('-published_date')
+    member_notepad_history_obj = (member.notepad.filter(
+        Q(published_date__lte=timezone.now()) &
+        Q(title__contains=title)
+    ).order_by('-published_date'))
 
     return render(request, 'TI_Management_app/member_notepad_history.html',
                   {'member': member,
@@ -1590,8 +1588,10 @@ def member_notepad_history(request, pk, title):
 @login_required
 def member_notepad_history_pdf(request, pk, title):
     member = MembersZZTI.objects.get(id=pk)
-    # member_notepad_history_obj = member.notepad.filter(published_date__lte=timezone.now()).order_by('-published_date')
-    member_notepad_history_obj = member.notepad.filter(Q(published_date__lte=timezone.now()) & Q(title__contains=title)).order_by('-published_date')
+    member_notepad_history_obj = member.notepad.filter(
+        Q(published_date__lte=timezone.now()) &
+        Q(title__contains=title)
+    ).order_by('-published_date')
 
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
@@ -1667,7 +1667,6 @@ def member_notepad_history_pdf(request, pk, title):
 @login_required
 def member_notepad_delete_all(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
-    # member_group = get_object_or_404(GroupsMember, pk=pk1)
     member.author = request.user
 
     notepad_obj = MembersZZTI.objects.get(id=pk)
@@ -1687,7 +1686,7 @@ def documents_database_category(request):
             category = form.save(commit=False)
             category.author = request.user
             category.save()
-            messages.success(request, "Dodano nową kategorie!")
+            messages.success(request, f"Dodano nową kategorie {category.title}!")
             return redirect('documents_database_category')
     else:
         username = request.user.username
@@ -1735,6 +1734,7 @@ def documents_database_category_edit(request, pk):
         }
     )
 
+
 @login_required
 def documents_database_category_delete(request, pk):
     category = get_object_or_404(DocumentsDatabaseCategory, pk=pk)
@@ -1763,7 +1763,7 @@ def documents_database(request):
             doc = form.save(commit=False)
             doc.author = request.user
             doc.save()
-            messages.success(request, "Dodano nowy dokument!")
+            messages.success(request, f"Dodano nowy dokument {documents.title}!")
             return redirect('documents_database')
     else:
         username = request.user.username

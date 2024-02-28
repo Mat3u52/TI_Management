@@ -5,14 +5,14 @@ from simple_history.models import HistoricalRecords
 from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.utils.text import slugify
 
 
 class Groups(models.Model):
-    # created_date = models.DateTimeField(default=timezone.now)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='author_groups')
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroups')
     group_name = models.CharField(max_length=250, blank=False, default=None, unique=True)
 
     objects = models.Manager()  # default manager
@@ -24,27 +24,54 @@ class Groups(models.Model):
     def __str__(self):
         return self.group_name
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.group_name)
+        super().save(*args, **kwargs)
+
 
 class MemberFunction(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMemberFunction')
     member_function = models.CharField(max_length=250, blank=False, default=None, unique=True)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Funkcja Członka'
+        ordering = ('-created_date',)
 
     def __str__(self):
         return self.member_function
 
-    class Meta:
-        verbose_name_plural = 'Funkcja Członka'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.member_function)
+        super().save(*args, **kwargs)
 
 
 class MemberOccupation(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMemberOccupation')
     member_occupation = models.CharField(max_length=250, blank=False, default=None, unique=True)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Stanowisko Członka'
+        ordering = ('-created_date',)
 
     def __str__(self):
         return self.member_occupation
 
-    class Meta:
-        verbose_name_plural = 'Stanowisko Członka'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.member_occupation}")
+        super().save(*args, **kwargs)
 
 
 class CardsRFID(models.Model):
@@ -60,14 +87,25 @@ class CardsRFID(models.Model):
 
 
 class Cards(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorCards')
     card_name = models.CharField(max_length=250, blank=False, default=None, unique=True)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Karty Lojalnościowe'
+        ordering = ('-created_date',)
 
     def __str__(self):
         return self.card_name
 
-    class Meta:
-        verbose_name_plural = 'Karty Lojalnościowe'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.card_name)
+        super().save(*args, **kwargs)
 
 
 class Answers(models.Model):
@@ -100,32 +138,54 @@ class Questions(models.Model):
 
 
 class DocumentsDatabaseCategory(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorDocumentsDatabaseCategory')
     title = models.CharField(max_length=250, null=False, blank=False)
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
-    def __str__(self):
-        return self.title
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Baza Dokumentów Kategorie'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class DocumentsDatabase(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorDocumentsDatabase')
     category = models.ForeignKey(DocumentsDatabaseCategory, on_delete=models.CASCADE, related_name='documentsDatabaseCategpry', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='documentsDatabase/%Y/%m/%d/%H%M%S/')
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Baza Dokumentów'
+        ordering = ('-created_date',)
+
     def __str__(self):
         return (f"{self.title} "
                 f"{self.category}")
 
-    class Meta:
-        verbose_name_plural = 'Baza Dokumentów'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class MembersZZTI(models.Model):
@@ -140,8 +200,8 @@ class MembersZZTI(models.Model):
     # created_date = models.DateTimeField(default=timezone.now)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='author_members')
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMembers')
     forename = models.CharField(max_length=250, blank=False, null=False)
     surname = models.CharField(max_length=250, blank=False, null=False)
     role = models.ForeignKey(MemberFunction, on_delete=models.CASCADE, null=True, blank=True, default=None)
@@ -176,6 +236,11 @@ class MembersZZTI(models.Model):
                 f"{self.date_of_accession} {self.date_of_abandonment} {self.type_of_contract} {self.date_of_contract} "
                 f"{self.expiration_date_contract} {self.group} {self.card} {self.image} {self.deactivate}")
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.forename}-{self.surname}-{self.member_nr}")
+        super().save(*args, **kwargs)
+
     def get_absolute_url(self):
         return reverse('TI_Management:member_detail',
                        args=[self.created_date.year,
@@ -204,31 +269,53 @@ class Vote(models.Model):
 
 
 class MembersFile(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMembersFile')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='membersFile', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='uploadsMember/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
-    def __str__(self):
-        return self.title
+    ordering = ('-created_date',)
 
     class Meta:
         verbose_name_plural = 'Członkowie Pliki'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class GroupsFile(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroupsFile')
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsFile', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='uploadsGroup/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
-    def __str__(self):
-        return self.title
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Grupy Pliki'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}-{self.group}")
+        super().save(*args, **kwargs)
 
 
 class GroupsNotepad(models.Model):
@@ -256,8 +343,11 @@ class GroupsNotepad(models.Model):
         ('closed', 'Zamknięty'),
     )
 
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroupsNotepad')
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsNotepad', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250, null=False, blank=False)
     content = models.TextField(null=True, blank=True, default=None)
     published_date = models.DateTimeField(blank=True, null=True)
@@ -267,6 +357,12 @@ class GroupsNotepad(models.Model):
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Grupy Komunikacja'
+        ordering = ('-created_date',)
+
     def __str__(self):
         return (f"{self.title} "
                 f"{self.content} "
@@ -275,8 +371,10 @@ class GroupsNotepad(models.Model):
                 f"{self.method} "
                 f"{self.published_date}")
 
-    class Meta:
-        verbose_name_plural = 'Grupy Komunikacja'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class Notepad(models.Model):
@@ -304,8 +402,11 @@ class Notepad(models.Model):
         ('closed', 'Zamknięty'),
     )
 
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorNotepad')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='notepad', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
     title = models.CharField(max_length=250, null=False, blank=False)
     content = models.TextField(null=True, blank=True, default=None)
     published_date = models.DateTimeField(blank=True, null=True)
@@ -317,24 +418,42 @@ class Notepad(models.Model):
     confirmed = models.BooleanField(default=False)
     history = HistoricalRecords()
 
-    def __str__(self):
-        return f"{self.title} {self.content} {self.importance} {self.status} {self.method} {self.file}"
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Komunikacja'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f"{self.title} {self.content} {self.importance} {self.status} {self.method} {self.file}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class GroupsMember(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroupsMember')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='groupsMember', null=True, blank=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsGroup', null=False, blank=False, default=None)
 
-    created_date = models.DateTimeField(default=timezone.now)
-
-    # def __str__(self):
-    #     return self.group
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Grupy Członek'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.slug
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.group}-{self.member}")
+        super().save(*args, **kwargs)
 
 
 class Application(models.Model):  # Finances member explicitly
@@ -353,33 +472,55 @@ class Application(models.Model):  # Finances member explicitly
 
 
 class OrderedCardDocument(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorOrderedCardDocument')
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardOrder', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='OrderedCardDocument/%Y/%m/%d/%H%M%S/')
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
-    def __str__(self):
-        return self.title
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Dokumenty Zlecona'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class ToBePickedUpCardDocument(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorToBePickedUpCardDocument')
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardToBePickedUp', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='ToBePickedUpCardDocument/%Y/%m/%d/%H%M%S/')
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
-    def __str__(self):
-        return self.title
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Dokumenty Odbioru'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 def validate_unique_or_null(value):
@@ -408,15 +549,15 @@ class CardStatus(models.Model):
         ('deactivated', 'Dezaktywowana'),
     )
 
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorCardStatus')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='cardStatus', null=True, blank=True)
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardStatus')
     ordered_doc = models.ForeignKey(OrderedCardDocument, on_delete=models.SET_NULL, related_name='orderedDoc', null=True, blank=True)
     to_be_picked_up_doc = models.ForeignKey(ToBePickedUpCardDocument, on_delete=models.SET_NULL, related_name='toBePickedUpCardDoc', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
-    # card_identity = models.CharField(max_length=250, blank=True, null=True, unique=True)
-    # card_identity = models.CharField(max_length=250, blank=True, null=True)
     card_identity = models.CharField(max_length=250, blank=True, null=True, validators=[validate_unique_or_null])
-
     card_start_pin = models.CharField(max_length=250, blank=True, null=True, default=None)
     card_status = models.CharField(max_length=250, choices=STATUS_CHOICES, default=None)
     date_of_action = models.DateTimeField(default=timezone.now, blank=True, null=True)
@@ -430,9 +571,11 @@ class CardStatus(models.Model):
     confirmed = models.BooleanField(default=False)
     history = HistoricalRecords()
 
-    def save(self, **kwargs):
-        self.card_identity = self.card_identity or None
-        super().save(**kwargs)
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Status Kart'
+        ordering = ('-created_date',)
 
     def __str__(self):
         return (f"{self.card_status} "
@@ -441,9 +584,15 @@ class CardStatus(models.Model):
                 f"{self.ordered_doc} "
                 f"{self.to_be_picked_up_doc}")
 
-    class Meta:
-        verbose_name_plural = 'Status Kart'
-        # unique_together = ('card', 'member',)
+    # def save(self, **kwargs):
+    #     self.card_identity = self.card_identity or None
+    #     super().save(**kwargs)
+
+    def save(self, *args, **kwargs):
+        self.card_identity = self.card_identity or None
+        if not self.slug:
+            self.slug = slugify(f"{self.card}-{self.member}")
+        super().save(*args, **kwargs)
 
 
 class Activities(models.Model):
