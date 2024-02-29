@@ -13,6 +13,7 @@ mydb.py
 /TI_Management_app/migrations
 /media/images/*
 /media/uploads/*
+/media/uploadsGroup/*
 /media/uploadsMember/*
 /media/uploadsNotepad/*
 /media/uploadsLoyaltyCards/*

@@ -382,7 +382,7 @@ def member_occupation_edit(request, pk):
             one_occupation = form.save(commit=False)
             one_occupation.author = request.user
             one_occupation.save()
-            messages.success(request, "Zaktualizowano zawód!")
+            messages.success(request, f"Zaktualizowano zawód {occupation.member_occupation}!")
             return redirect('member_occupation_add')
     else:
         form = MemberOccupationForm(instance=occupation)
@@ -809,7 +809,7 @@ def loyalty_card_add(request):
             loyalty_card = form.save(commit=False)
             loyalty_card.author = request.user
             loyalty_card.save()
-            messages.success(request, "Dodano nową kartę lojalnościową!")
+            messages.success(request, f"Dodano nową kartę lojalnościową {loyalty_card.card_name}!")
             return redirect('loyalty_card_list')
     else:
         form = LoyaltyCardForm()
@@ -836,6 +836,7 @@ def loyalty_card_edit(request, pk):
 
 @login_required
 def loyalty_card_add_member(request, pk, pk1):
+    # TODO: confirmation by tapping the card to the reader
     loyalty_card = get_object_or_404(Cards, pk=pk)
     loyalty_card_member_add = get_object_or_404(MembersZZTI, pk=pk1)
     loyalty_card_validator = CardStatus.objects.all()
@@ -1466,7 +1467,7 @@ def member_group_add(request, pk, pk1):
             group_member.member = member
             group_member.group = group
             group_member.save()
-            messages.success(request, f"Dodano nowego uczestnika do grupy {group_member.member}!")
+            messages.success(request, f"Dodano nowego uczestnika do grupy {group.group_name}!")
             return redirect('member_detail', pk=member.pk)
     else:
         form = GroupsMemberForm()
@@ -1763,7 +1764,7 @@ def documents_database(request):
             doc = form.save(commit=False)
             doc.author = request.user
             doc.save()
-            messages.success(request, f"Dodano nowy dokument {documents.title}!")
+            messages.success(request, f"Dodano nowy dokument {doc.title}!")
             return redirect('documents_database')
     else:
         username = request.user.username
@@ -1856,7 +1857,6 @@ def documents_database_delete(request, pk):
 @login_required
 def finance_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
-
     paginator = Paginator(members_obj, 50)
     page = request.GET.get('page')
     try:
@@ -1865,7 +1865,6 @@ def finance_list(request):
         members = paginator.page(1)
     except EmptyPage:
         members = paginator.page(paginator.num_pages)
-
     return render(request,
                   'TI_Management_app/members_list.html',
                   {'page': page,

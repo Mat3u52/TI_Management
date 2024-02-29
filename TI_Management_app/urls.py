@@ -1,6 +1,8 @@
 from django.urls import path
 from . import views
 
+app_name = 'TI_Management_app'
+
 urlpatterns = [
     path(
         '',
@@ -313,13 +315,18 @@ urlpatterns = [
         name='documents_database_category_edit'
     ),
     path(
-        'TI_Management_app/financeList',
-        views.finance_list,
-        name='finance_list'
-    ),
-    path(
         'TI_Management_app/documentsDatabaseCategoryDelete/<int:pk>',
         views.documents_database_category_delete,
         name='documents_database_category_delete'
     ),
+    path(
+        'TI_Management_app/financeList',
+        views.finance_list,
+        name='finance_list'
+    ),
+    # path(
+    #     'TI_Management_app/relifeAdd',
+    #     views.relife_add,
+    #     name='relife_add'
+    # ),
 ]

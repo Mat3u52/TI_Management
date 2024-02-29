@@ -241,12 +241,6 @@ class MembersZZTI(models.Model):
             self.slug = slugify(f"{self.forename}-{self.surname}-{self.member_nr}")
         super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('TI_Management:member_detail',
-                       args=[self.created_date.year,
-                             self.created_date.month,
-                             self.created_date.day, self.slug])
-
 
 class Vote(models.Model):
     created_date = models.DateTimeField(default=timezone.now)
@@ -457,18 +451,61 @@ class GroupsMember(models.Model):
 
 
 class Application(models.Model):  # Finances member explicitly
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorApplication')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='application', null=True, blank=True)
-    created_date = models.DateTimeField(default=timezone.now)
     kind_of_application = models.CharField(max_length=250, null=False, blank=False)
     description = models.TextField(null=True, blank=True, default=None)
     date_of_application = models.DateTimeField(default=timezone.now)
     date_of_payout = models.DateTimeField(default=timezone.now)
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Finanse'
+        ordering = ('-created_date',)
 
     def __str__(self):
         return self.kind_of_application
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.kind_of_application}-{self.member}")
+        super().save(*args, **kwargs)
+
+
+class Relief(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorRelief')
+    title = models.CharField(max_length=250, null=False, blank=False, unique=True)
+    figure = models.FloatField(null=False, blank=False)
+    grace = models.IntegerField(null=False, blank=False)
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
     class Meta:
-        verbose_name_plural = 'Finanse'
+        verbose_name_plural = 'Zapomogi'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('TI_Management_app:relife_add',
+                       args=[self.created_date.year,
+                             self.created_date.month,
+                             self.created_date.day, self.slug])
 
 
 class OrderedCardDocument(models.Model):

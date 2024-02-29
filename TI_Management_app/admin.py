@@ -23,7 +23,8 @@ from .models import (
     GroupsFile,
     GroupsNotepad,
     DocumentsDatabase,
-    DocumentsDatabaseCategory
+    DocumentsDatabaseCategory,
+    Relief
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -545,14 +546,20 @@ class ApplicationAdmin(admin.ModelAdmin):
         'date_of_application',
         'date_of_payout',
         'member',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     list_filter = (
         'kind_of_application',
         'date_of_application',
         'date_of_payout',
         'member',
-        'created_date'
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
     )
     search_fields = (
         'kind_of_application',
@@ -775,6 +782,37 @@ class ToBePickedUpCardDocumentAdmin(admin.ModelAdmin):
         'card',
         'title',
         'file',
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
+    )
+    search_fields = (
+        'title',
+    )
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(Relief)
+class ReliefAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'title',
+        'figure',
+        'grace',
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
+    )
+    list_filter = (
+        'title',
+        'figure',
+        'grace',
         'created_date',
         'slug',
         'author',
