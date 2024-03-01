@@ -1,7 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'member_occupation_add' %}"> / Dodaj stanowisko</a>
+<a href="{% url 'TI_Management_app:member_occupation_add' %}"> / Dodaj stanowisko</a>
 {% endblock %}
 
 {% block content %}
@@ -25,7 +25,7 @@
     {% for occupation in all_occupation %}
         <div class="notepad">
             <h3>
-                <a href="{% url 'member_occupation_edit' pk=occupation.pk %}">
+                <a href="{% url 'TI_Management_app:member_occupation_edit' pk=occupation.pk %}">
                     {{occupation}}
                 </a>
             </h3>

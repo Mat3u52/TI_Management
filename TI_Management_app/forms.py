@@ -15,7 +15,8 @@ from .models import (
     MemberOccupation,
     GroupsFile,
     DocumentsDatabase,
-    DocumentsDatabaseCategory
+    DocumentsDatabaseCategory,
+    Relief
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -141,7 +142,14 @@ class CardStatusForm(forms.ModelForm):
                   'card_identity',
                   'card_status',
                   'date_of_action',
-                  'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
+                  'file_name',
+                  'file',
+                  'file_date',
+                  'file_name_a',
+                  'file_a',
+                  'file_a_date',
+                  'responsible',
+                  'confirmed']
 
         widgets = {
             'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
@@ -167,7 +175,14 @@ class CardStatusEditForm(forms.ModelForm):
                   'card_start_pin',
                   'card_status',
                   'date_of_action',
-                  'file_name', 'file', 'file_date', 'file_name_a', 'file_a', 'file_a_date', 'responsible', 'confirmed']
+                  'file_name',
+                  'file',
+                  'file_date',
+                  'file_name_a',
+                  'file_a',
+                  'file_a_date',
+                  'responsible',
+                  'confirmed']
 
         widgets = {
             'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
@@ -473,4 +488,14 @@ class DocumentsDatabaseCategoryForm(forms.ModelForm):
         fields = [
             'title',
             'responsible'
+        ]
+
+
+class ReliefFigureForm(forms.ModelForm):
+    class Meta:
+        model = Relief
+        fields = [
+            'title',
+            'figure',
+            'grace'
         ]

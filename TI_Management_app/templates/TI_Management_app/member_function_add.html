@@ -1,7 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'member_function_add' %}"> / Dodaj funkcję dla członka</a>
+<a href="{% url 'TI_Management_app:member_function_add' %}"> / Dodaj funkcję dla członka</a>
 {% endblock %}
 
 {% block content %}
@@ -26,7 +26,7 @@
     {% for function in all_functions %}
         <div class="notepad">
             <h3>
-                <a href="{% url 'member_function_edit' pk=function.pk %}">
+                <a href="{% url 'TI_Management_app:member_function_edit' pk=function.pk %}">
                     {{function}}
                 </a>
             </h3>

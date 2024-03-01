@@ -1,15 +1,15 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_file_edit' pk=member.pk %}"> / Dokumenty</a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:member_file_edit' pk=member.pk %}"> / Dokumenty</a>
 {% endblock %}
 
 {% block content %}
 
    <div class="hero-unit">
-        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
+        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
         <p>Dokument</p>
         <form method="post" class="post-form" enctype="multipart/form-data">
             {% csrf_token %}

@@ -11,12 +11,12 @@
         {% for member in members %}
             <div class="hero-unit">
                 <img src="{{ member.image.url }}" alt="image" width="100px">
-                <h2><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
+                <h2><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
                 <p><b>Nr:</b> {{member.member_nr}} 	&#124;
                     <b>tel:</b> {{member.phone_number}} &#124;
                     <b>email:</b> {{member.email}}</p>
 
-                <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                     Więcej informacji
                 </a></p>
                 <div class="date"><p>Data dodania: {{ member.created_date }}</p></div>

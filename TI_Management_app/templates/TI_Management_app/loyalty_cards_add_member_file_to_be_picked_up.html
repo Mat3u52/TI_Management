@@ -1,15 +1,15 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.card.pk %}"> / {{loyalty_card.card}}</a>
-<a href="{% url 'loyalty_cards_add_member_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument odbioru</a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.card.pk %}"> / {{loyalty_card.card}}</a>
+<a href="{% url 'TI_Management_app:loyalty_cards_add_member_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument odbioru</a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
-    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
+    <a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk %}"><h3>{{loyalty_card.card_name}}</h3></a>
 
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}

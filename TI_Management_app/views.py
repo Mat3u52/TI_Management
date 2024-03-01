@@ -15,7 +15,8 @@ from .models import (
     GroupsFile,
     GroupsNotepad,
     DocumentsDatabase,
-    DocumentsDatabaseCategory
+    DocumentsDatabaseCategory,
+    Relief
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -47,7 +48,8 @@ from .forms import (
     GroupAddRoleForm,
     GroupFileForm,
     DocumentsDatabaseForm,
-    DocumentsDatabaseCategoryForm
+    DocumentsDatabaseCategoryForm,
+    ReliefFigureForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -72,27 +74,27 @@ import csv
 from django.conf import settings
 
 
-class Image(TemplateView):
-    form = MemberForm
-    template_name = 'TI_Management_app/image.html'
-
-    def member(self, request, *args, **kwargs):
-        form = MemberForm(request.POST, request.FILES)
-        if form.is_valid():
-            obj = form.save()
-            return HttpResponseRedirect(reverse_lazy('image_display', kwargs={'pk': obj.id}))
-
-        context = self.get_context_data(form=form)
-        return self.render_to_response(context)
-
-    def get(self, request, *args, **kwargs):
-        return self.member(request, *args, **kwargs)
-
-
-class ImageDisplay(DetailView):
-    model = MembersZZTI
-    template_name = 'TI_Management_app/image_display.html'
-    context_object_name = 'image'
+# class Image(TemplateView):
+#     form = MemberForm
+#     template_name = 'TI_Management_app/image.html'
+#
+#     def member(self, request, *args, **kwargs):
+#         form = MemberForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             obj = form.save()
+#             return HttpResponseRedirect(reverse_lazy('image_display', kwargs={'pk': obj.id}))
+#
+#         context = self.get_context_data(form=form)
+#         return self.render_to_response(context)
+#
+#     def get(self, request, *args, **kwargs):
+#         return self.member(request, *args, **kwargs)
+#
+#
+# class ImageDisplay(DetailView):
+#     model = MembersZZTI
+#     template_name = 'TI_Management_app/image_display.html'
+#     context_object_name = 'image'
 
 
 def members_list(request):
@@ -257,7 +259,7 @@ def member_deactivate(request, pk):
             member.save()
             messages.success(request, "Zaktualizowano!")
 
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberDeactivateForm(instance=member)
     return render(request, 'TI_Management_app/member_deactivate.html',
@@ -281,7 +283,7 @@ def member_new(request):
             member.author = request.user
             member.save()
             messages.success(request, "Dodano nowego członka!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberForm()
     return render(request, 'TI_Management_app/member_new.html', {'form': form})
@@ -298,7 +300,7 @@ def member_edit(request, pk):
             # member.save(update_fields=['forename'])
             member.save()
             messages.success(request, "Zaktualizowano!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberEditForm(instance=member)
         # birthday = member.birthday
@@ -317,7 +319,7 @@ def member_function_add(request):
             function.author = request.user
             function.save()
             messages.success(request, f"Dodano nową funkcję {function.member_function}!")
-            return redirect('member_function_add')
+            return redirect('TI_Management_app:member_function_add')
     else:
         form = MemberFunctionForm()
     return render(
@@ -341,7 +343,7 @@ def member_function_edit(request, pk):
             one_function.author = request.user
             one_function.save()
             messages.success(request, "Zaktualizowano funkcję!")
-            return redirect('member_function_add')
+            return redirect('TI_Management_app:member_function_add')
     else:
         form = MemberFunctionForm(instance=function)
     return render(
@@ -365,7 +367,7 @@ def member_occupation_add(request):
             occupation.author = request.user
             occupation.save()
             messages.success(request, f"Dodano nowy zawód {occupation.member_occupation}!")
-            return redirect('member_occupation_add')
+            return redirect('TI_Management_app:member_occupation_add')
     else:
         form = MemberOccupationForm()
     return render(request, 'TI_Management_app/member_occupation_add.html',
@@ -383,7 +385,7 @@ def member_occupation_edit(request, pk):
             one_occupation.author = request.user
             one_occupation.save()
             messages.success(request, f"Zaktualizowano zawód {occupation.member_occupation}!")
-            return redirect('member_occupation_add')
+            return redirect('TI_Management_app:member_occupation_add')
     else:
         form = MemberOccupationForm(instance=occupation)
     return render(
@@ -407,7 +409,7 @@ def member_card_edit(request, pk):
             member.author = request.user
             member.save()
             messages.success(request, "Zaktualizowano!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberForm(instance=member)
     return render(request, 'TI_Management_app/member_card_edit.html',
@@ -445,7 +447,7 @@ def member_file_edit(request, pk):
             member_file.member = member
             member_file.save()
             messages.success(request, f"Dodano dokument {member_file.title}!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberFileForm()
     return render(request, 'TI_Management_app/member_file_edit.html',
@@ -463,7 +465,7 @@ def member_file_delete(request, pk, pk1):
     member.author = request.user
     member_file.file.delete()
     member_file.delete()
-    return redirect('member_detail', pk=member.pk)
+    return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
 def loyalty_card_list(request):
@@ -810,7 +812,7 @@ def loyalty_card_add(request):
             loyalty_card.author = request.user
             loyalty_card.save()
             messages.success(request, f"Dodano nową kartę lojalnościową {loyalty_card.card_name}!")
-            return redirect('loyalty_card_list')
+            return redirect('TI_Management_app:loyalty_card_list')
     else:
         form = LoyaltyCardForm()
     return render(request, 'TI_Management_app/loyalty_card_add.html',
@@ -827,7 +829,7 @@ def loyalty_card_edit(request, pk):
             loyalty_card.author = request.user
             loyalty_card.save()
             messages.success(request, f"Zaktualizowano {loyalty_card.card_name}!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
+            return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         form = LoyaltyCardForm(instance=loyalty_card)
     return render(request, 'TI_Management_app/loyalty_card_edit.html',
@@ -850,7 +852,7 @@ def loyalty_card_add_member(request, pk, pk1):
             loyalty_card_member.date_of_action = timezone.now()
             loyalty_card_member.save()
             messages.success(request, "Dodano nowego uczestnika!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
+            return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
         form = LoyaltyCardAddMemberForm(initial={'card': loyalty_card,
@@ -874,7 +876,7 @@ def loyalty_cards_add_file_order(request, pk):
             order_file.card = loyalty_card
             order_file.save()
             messages.success(request, f"Dodano dokument {order_file.title}!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
+            return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
         form = OrderedCardDocumentForm(initial={'card': loyalty_card,
@@ -897,7 +899,7 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
             order_file.card = loyalty_card
             order_file.save()
             messages.success(request, f"Dodano dokument {order_file.title}!")
-            return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
+            return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
         form = ToBePickedUpCardDocumentForm(initial={'card': loyalty_card,
@@ -920,7 +922,7 @@ def loyalty_cards_add_member_file_order(request, pk):
             loyalty_card_member.file_date = timezone.now()
             loyalty_card_member.save()
             messages.success(request, f"Dodano dokument!")
-            return redirect('loyalty_card_list')
+            return redirect('TI_Management_app:loyalty_card_list')
     else:
         form = LoyaltyCardsAddMemberFileOrderForm(instance=loyalty_card)
     return render(request, 'TI_Management_app/loyalty_cards_add_member_file_order.html',
@@ -963,7 +965,7 @@ def loyalty_cards_add_member_file_to_be_picked_up(request, pk):
             loyalty_card_member.file_a_date = timezone.now()
             loyalty_card_member.save()
             messages.success(request, "Dodano dokument!")
-            return redirect('loyalty_card_list')
+            return redirect('TI_Management_app:loyalty_card_list')
     else:
         form = LoyaltyCardsAddMemberFileToBePickedUpForm(instance=loyalty_card)
     return render(request, 'TI_Management_app/loyalty_cards_add_member_file_to_be_picked_up.html',
@@ -999,7 +1001,7 @@ def loyalty_card_delete_member(request, pk, pk1):
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
     loyalty_card.author = request.user
     member_loyalty_card.delete()
-    return redirect('loyalty_card_detail', pk=loyalty_card.pk, category='none')
+    return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
 
 
 # @login_required
@@ -1009,7 +1011,7 @@ def loyalty_card_delete_member(request, pk, pk1):
 #
 #     loyalty_card.delete()
 #
-#     return redirect('loyalty_card_detail')
+#     return redirect('TI_Management_app:loyalty_card_detail')
 
 
 @login_required
@@ -1026,7 +1028,7 @@ def member_loyalty_card_edit(request, pk, pk1):
             member_loyalty_card.date_of_action = timezone.now()
             member_loyalty_card.save()
             messages.success(request, f"Zaktualizowano!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = CardStatusEditForm(instance=member_loyalty_card)
     return render(request, 'TI_Management_app/member_loyalty_card_edit.html',
@@ -1051,7 +1053,7 @@ def member_loyalty_card_id_edit(request, pk, pk1):
             member_loyalty_card.member = member
             member_loyalty_card.save()
             messages.success(request, "Zaktualizowano!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = CardStatusCardIDForm(instance=member_loyalty_card)
     return render(request, 'TI_Management_app/member_loyalty_card_id_edit.html',
@@ -1076,7 +1078,7 @@ def member_loyalty_card_add(request, pk, pk1):
             loyalty_card.date_of_action = timezone.now()
             loyalty_card.save()
             messages.success(request, "Dodano członka!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         username = request.user.username
         form = CardStatusForm(initial={'responsible': username})
@@ -1097,7 +1099,7 @@ def member_loyalty_card_delete(request, pk, pk1):
     # member_loyalty_card.card.delete()
     # member_loyalty_card.file_a.delete()
     member_loyalty_card.delete()
-    return redirect('member_detail', pk=member.pk)
+    return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
 # @login_required
@@ -1155,7 +1157,7 @@ def groups_add(request):
             group.author = request.user
             group.save()
             messages.success(request, f"Dodano nową grupe {group.group_name}!")
-            return redirect('groups_list')
+            return redirect('TI_Management_app:groups_list')
     else:
         form = GroupsForm()
     return render(request, 'TI_Management_app/groups_add.html', {'form': form})
@@ -1171,7 +1173,7 @@ def groups_edit(request, pk):
             group.author = request.user
             group.save()
             messages.success(request, f"Zaktualizowano grupe {group.group_name}!")
-            return redirect('group_detail', pk=group.pk)
+            return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupsEditForm(instance=group)
     return render(request, 'TI_Management_app/groups_edit.html',
@@ -1201,7 +1203,7 @@ def group_detail(request, pk):
                     group_members_instance = GroupsMember.objects.create(group=group_instance, member_id=member_id)
                     group_members_instances.append(group_members_instance)
 
-            return redirect('group_detail', pk=group.pk)
+            return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form_gender = GroupAddGenderForm()
 
@@ -1222,7 +1224,7 @@ def group_detail(request, pk):
                         group_members_instance = GroupsMember.objects.create(group=group_instance, member_id=member_id)
                         group_members_instances.append(group_members_instance)
 
-                return redirect('group_detail', pk=group.pk)
+                return redirect('TI_Management_app:group_detail', pk=group.pk)
             elif occupation:
                 all_members_ids = MembersZZTI.objects.filter(occupation=occupation).values_list('id', flat=True)
 
@@ -1234,7 +1236,7 @@ def group_detail(request, pk):
                         group_members_instance = GroupsMember.objects.create(group=group_instance, member_id=member_id)
                         group_members_instances.append(group_members_instance)
 
-                return redirect('group_detail', pk=group.pk)
+                return redirect('TI_Management_app:group_detail', pk=group.pk)
 
     else:
         form_role = GroupAddRoleForm()
@@ -1277,7 +1279,7 @@ def group_file_edit(request, pk):
             group_file.group = group
             group_file.save()
             messages.success(request, f"Dodano plik do grupy {group_file.group}!")
-            return redirect('group_detail', pk=group.pk)
+            return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupFileForm()
     return render(request, 'TI_Management_app/group_file_edit.html',
@@ -1294,7 +1296,7 @@ def group_file_delete(request, pk, pk1):
     group.author = request.user
     group_file.file.delete()
     group_file.delete()
-    return redirect('group_detail', pk=group.pk)
+    return redirect('TI_Management_app:group_detail', pk=group.pk)
 
 
 @login_required
@@ -1310,7 +1312,7 @@ def group_notepad_add(request, pk):
             group_notepad.published_date = timezone.now()
             group_notepad.save()
             messages.success(request, f"Dodano notatkę do grupy {group_notepad.group}!")
-            return redirect('group_detail', pk=group.pk)
+            return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         username = request.user.username
         form = GroupNotepadForm(initial={'responsible': username})
@@ -1337,7 +1339,7 @@ def group_notepad_edit(request, pk, pk1):
             group_notepad.published_date = timezone.now()
             group_notepad.save()
             messages.success(request, f"Zaktualizowano notatkę grupy {group_notepad.group}!")
-            return redirect('group_detail', pk=group.pk)
+            return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupNotepadForm(instance=notepad)
     return render(
@@ -1468,7 +1470,7 @@ def member_group_add(request, pk, pk1):
             group_member.group = group
             group_member.save()
             messages.success(request, f"Dodano nowego uczestnika do grupy {group.group_name}!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = GroupsMemberForm()
     return render(request, 'TI_Management_app/member_group_add.html',
@@ -1492,7 +1494,7 @@ def group_add_member(request, pk, pk1):
             group_member.member = member
             group_member.save()
             messages.success(request, f"Dodano nowego uczestnika do grupy{group_member.member}!")
-            return redirect('group_detail', pk=group.pk)
+            return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupAddMemberForm(initial={'group': group})
     return render(request, 'TI_Management_app/group_add_member.html',
@@ -1505,7 +1507,7 @@ def member_group_delete(request, pk, pk1):
     member_group = get_object_or_404(GroupsMember, pk=pk1)
     member.author = request.user
     member_group.delete()
-    return redirect('member_detail', pk=member.pk)
+    return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
 @login_required
@@ -1514,7 +1516,7 @@ def group_delete_member(request, pk, pk1):
     member_group = get_object_or_404(GroupsMember, pk=pk1)
     group.author = request.user
     member_group.delete()
-    return redirect('group_detail', pk=group.pk)
+    return redirect('TI_Management_app:group_detail', pk=group.pk)
 
 
 @login_required
@@ -1522,7 +1524,7 @@ def group_delete_all(request, pk):
     group = get_object_or_404(Groups, pk=pk)
     group.author = request.user
     group.delete()
-    return redirect('groups_list')
+    return redirect('TI_Management_app:groups_list')
 
 
 @login_required
@@ -1537,7 +1539,7 @@ def member_notepad_add(request, pk):
             notepad.published_date = timezone.now()
             notepad.save()
             messages.success(request, f"Dodano notatkę {notepad.title}!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         username = request.user.username
         form = NotepadMemberForm(initial={'responsible': username})
@@ -1561,7 +1563,7 @@ def member_notepad_edit(request, pk, pk1):
             notepad.published_date = timezone.now()
             notepad.save()
             messages.success(request, f"Zaktualizowano notatkę {notepad.title}!")
-            return redirect('member_detail', pk=member.pk)
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = NotepadMemberForm(instance=notepad)
     return render(request, 'TI_Management_app/member_notepad_edit.html',
@@ -1675,7 +1677,7 @@ def member_notepad_delete_all(request, pk):
 
     notepad_obj.notepad.all().delete()
 
-    return redirect('member_detail', pk=member.pk)
+    return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
 @login_required
@@ -1688,7 +1690,7 @@ def documents_database_category(request):
             category.author = request.user
             category.save()
             messages.success(request, f"Dodano nową kategorie {category.title}!")
-            return redirect('documents_database_category')
+            return redirect('TI_Management_app:documents_database_category')
     else:
         username = request.user.username
         form = DocumentsDatabaseCategoryForm(
@@ -1717,7 +1719,7 @@ def documents_database_category_edit(request, pk):
             category_form.author = request.user
             category_form.save()
             messages.success(request, f"Zaktualizowano kategorie {category.title}!")
-            return redirect('documents_database_category')
+            return redirect('TI_Management_app:documents_database_category')
     else:
         username = request.user.username
         form = DocumentsDatabaseCategoryForm(
@@ -1751,7 +1753,7 @@ def documents_database_category_delete(request, pk):
         # document.file.delete()
 
     category.delete()
-    return redirect('documents_database_category')
+    return redirect('TI_Management_app:documents_database_category')
 
 
 @login_required
@@ -1765,7 +1767,7 @@ def documents_database(request):
             doc.author = request.user
             doc.save()
             messages.success(request, f"Dodano nowy dokument {doc.title}!")
-            return redirect('documents_database')
+            return redirect('TI_Management_app:documents_database')
     else:
         username = request.user.username
         form = DocumentsDatabaseForm(
@@ -1794,7 +1796,7 @@ def documents_database_edit(request, pk):
             doc.author = request.user
             doc.save()
             messages.success(request, f"Zaktualizowano dokument {document.title}!")
-            return redirect('documents_database')
+            return redirect('TI_Management_app:documents_database')
     else:
         username = request.user.username
         form = DocumentsDatabaseForm(
@@ -1851,7 +1853,7 @@ def documents_database_delete(request, pk):
     # documents.file.delete()
     documents.delete()
 
-    return redirect('documents_database')
+    return redirect('TI_Management_app:documents_database')
 
 
 @login_required
@@ -1869,3 +1871,26 @@ def finance_list(request):
                   'TI_Management_app/members_list.html',
                   {'page': page,
                    'members': members})
+
+
+@login_required
+def relief_figure_add(request):
+    all_relief = Relief.objects.all()
+    if request.method == "POST":
+        form = ReliefFigureForm(request.POST)
+        if form.is_valid():
+            relief = form.save(commit=False)
+            relief.author = request.user
+            relief.save()
+            messages.success(request, f"Dodano nową zapomogę {relief.title}!")
+            return redirect('TI_Management_app:relief_figure_add')
+    else:
+        form = ReliefFigureForm()
+    return render(
+        request,
+        'TI_Management_app/finance/relief_figure_add.html',
+        {
+            'form': form,
+            'all_relief': all_relief
+        }
+    )

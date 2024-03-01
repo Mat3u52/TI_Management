@@ -501,11 +501,11 @@ class Relief(models.Model):
             self.slug = slugify(f"{self.title}")
         super().save(*args, **kwargs)
 
-    def get_absolute_url(self):
-        return reverse('TI_Management_app:relife_add',
-                       args=[self.created_date.year,
-                             self.created_date.month,
-                             self.created_date.day, self.slug])
+    # def get_absolute_url(self):
+    #     return reverse('TI_Management_app:relife_add',
+    #                    args=[self.created_date.year,
+    #                          self.created_date.month,
+    #                          self.created_date.day, self.slug])
 
 
 class OrderedCardDocument(models.Model):

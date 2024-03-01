@@ -9,6 +9,11 @@ urlpatterns = [
         views.members_list,
         name='members_list'
     ),
+    # path(
+    #     'TI_Management_app/membersList',
+    #     views.members_list,
+    #     name='members_list'
+    # ),
     path(
         'TI_Management_app/membersTableList',
         views.members_table_list,
@@ -324,9 +329,9 @@ urlpatterns = [
         views.finance_list,
         name='finance_list'
     ),
-    # path(
-    #     'TI_Management_app/relifeAdd',
-    #     views.relife_add,
-    #     name='relife_add'
-    # ),
+    path(
+        'TI_Management_app/relifeFigureAdd',
+        views.relief_figure_add,
+        name='relief_figure_add'
+    ),
 ]

@@ -1,8 +1,8 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}} </a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk %}"> / {{loyalty_card.card_name}} </a>
 <a href="#"> / Wyszukiwarka</a>
 {% endblock %}
 
@@ -14,7 +14,7 @@
 
             <div class="hero-unit">
                 <img src="{{ member.image.url }}" alt="image" width="100px">
-                <h2><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
+                <h2><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
                 <p><b>Nr:</b> {{member.member_nr}} 	&#124;
                     <b>tel:</b> {{member.phone_number}} &#124;
                     <b>email:</b> {{member.email}}</p>
@@ -54,7 +54,7 @@
                                 </p>
                             {% else %}
                                 <p>
-                                    <a href="{% url 'loyalty_cards_add_member_file_to_be_picked_up' pk=member_validator.pk %}"
+                                    <a href="{% url 'TI_Management_app:loyalty_cards_add_member_file_to_be_picked_up' pk=member_validator.pk %}"
                                        class="btn btn-primary btn-large pull-right">
                                         Dodaj dokument odbioru dla karty {{loyalty_card.card_name}}
                                     </a>

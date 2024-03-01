@@ -1,12 +1,12 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <form class="d-flex" method=POST action="{% url 'member_search' %}">
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:member_search' %}">
         {% csrf_token %}
         <input class="form-control me-2"
                style="min-width: 100%!important; min-height: 35px"
@@ -20,12 +20,12 @@
         <table>
             <tr>
                 <td>
-                    <a href="{% url 'members_table_list' %}" class="btn btn-primary btn-sm pull-left">
+                    <a href="{% url 'TI_Management_app:members_table_list' %}" class="btn btn-primary btn-sm pull-left">
                         tabela
                     </a>
                 </td>
                 <td>
-                    <a href="{% url 'member_export_csv' %}" class="btn btn-primary btn-sm pull-left">
+                    <a href="{% url 'TI_Management_app:member_export_csv' %}" class="btn btn-primary btn-sm pull-left">
                         csv
                     </a>
                 </td>
@@ -35,7 +35,7 @@
 </div>
 {% for member in members %}
     <div class="hero-unit">
-        <h2><a href="{% url 'member_detail' pk=member.pk %}">
+        <h2><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
             {{member.forename}} {{member.surname}}
         </a></h2>
             <img src="{{ member.image.url }}" alt="image" width="150px">
@@ -67,7 +67,7 @@
             <span class="label label-danger">Dezaktywacja!</span>
         {% endif %}
 
-        <p><a href="{% url 'member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+        <p><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
             Więcej informacji
         </a></p>
         <div class="date"><p>Data dodania: {{member.created_date}}</p></div>

@@ -1,7 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'member_function_edit' pk=function.pk %}"> / Aktualizuj funkcję członka</a>
+<a href="{% url 'TI_Management_app:member_function_edit' pk=function.pk %}"> / Aktualizuj funkcję członka</a>
 {% endblock %}
 
 {% block content %}

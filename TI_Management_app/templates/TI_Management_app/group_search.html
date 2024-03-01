@@ -10,9 +10,9 @@
         <br />
         {% for group in groups %}
             <div class="hero-unit">
-                <h2><a href="{% url 'group_detail' pk=group.pk %}">{{group.group_name}}</a></h2>
+                <h2><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">{{group.group_name}}</a></h2>
 
-                <p><a href="{% url 'group_detail' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
                     Więcej informacji
                 </a></p>
                 <div class="date"><p>Data dodania: {{ group.created_date }}</p></div>

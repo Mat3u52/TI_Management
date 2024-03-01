@@ -1,8 +1,8 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
 {% endblock %}
 
 {% block content %}
@@ -83,10 +83,10 @@
           </tr>
         </table>
 
-        <a href="{% url 'member_edit' pk=member.pk %}">
+        <a href="{% url 'TI_Management_app:member_edit' pk=member.pk %}">
           <button type="submit" class="btn btn-primary btn-large pull-left">Aktualizuj</button>
         </a>
-        <a href="{% url 'member_deactivate' pk=member.pk %}">
+        <a href="{% url 'TI_Management_app:member_deactivate' pk=member.pk %}">
           {% if member.deactivate %}
             <button type="submit" class="btn btn-danger btn-large pull-right">Przywróć</button>
           {% else %}
@@ -100,7 +100,7 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="show">Karta:</li>
               <li id="obj1" style="display: none">
-                <p><a href="{% url 'member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'TI_Management_app:member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Zmień
                 </a></p>
                 <br />
@@ -140,7 +140,7 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showDocuments">Dokumenty:</li>
               <li id="objDocuments" style="display: none">
-                <p><a href="{% url 'member_file_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'TI_Management_app:member_file_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Dodaj Plik
                 </a></p>
                 <br />
@@ -153,8 +153,8 @@
                     <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
                     <td><p class="str-file">{{ file.file|cut:'uploadsMember/' }}</p></td>
                     <td><p class="str-file">{{ file.created_date }}</p></td>
-<!--                    <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="date-file-delete">usuń</a></td>-->
-                    <td><a href="{% url 'member_file_delete' pk=member.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a></td>
+<!--                    <td><a href="{% url 'TI_Management_app:member_file_delete' pk=member.pk pk1=file.pk %}" class="date-file-delete">usuń</a></td>-->
+                    <td><a href="{% url 'TI_Management_app:member_file_delete' pk=member.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a></td>
                   </tr>
 
 
@@ -199,7 +199,7 @@
                 {% for en in different_elements %}
                   {% for accessed in accessible %}
                     {%if en == accessed.id%}
-                      <p><a href="{% url 'member_loyalty_card_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
+                      <p><a href="{% url 'TI_Management_app:member_loyalty_card_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
                         {{ accessed }}
                       </a></p>
                     {%endif%}
@@ -209,7 +209,7 @@
                 <br />
                 {% for card in member.cardStatus.all %}
                     <div class="notepad">
-                      <p><a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=card.pk %}"><b>{{ card.card }}</b></a></p>
+                      <p><a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=card.pk %}"><b>{{ card.card }}</b></a></p>
                       <p><b>Nr:</b> {{ card.card_identity }}</p>
                         {% if card.card_status == 'toOrder' %}<p><b>Status:</b> Do zlecenia</p>
                         {% elif card.card_status == 'active' %}<p><b>Status:</b> Aktywna</p>
@@ -219,7 +219,7 @@
                         {% elif card.card_status == 'none' %}<p><b>Status:</b> Brak statusu</p>
                         {% else %}<p><b>Status:</b> None</p>{% endif %}
                       <p><b>Data:</b> {{ card.date_of_action }}</p>
-                      <a href="{% url 'member_loyalty_card_delete' pk=member.pk pk1=card.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                      <a href="{% url 'TI_Management_app:member_loyalty_card_delete' pk=member.pk pk1=card.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                     </div>
 
                 {% empty %}
@@ -288,7 +288,7 @@
                 {% for en in different_elements_group %}
                   {% for accessed in accessible_group %}
                     {%if en == accessed.id%}
-                      <p><a href="{% url 'member_group_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
+                      <p><a href="{% url 'TI_Management_app:member_group_add' pk=member.pk pk1=accessed.id %}" class="btn btn-primary btn-large pull-right">
                         {{ accessed }}
                       </a></p>
                     {% endif %}
@@ -301,7 +301,7 @@
                   <div class="notepad">
                     <p>
                       {{ group.group }}
-                      <a href="{% url 'member_group_delete' pk=member.pk pk1=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                      <a href="{% url 'TI_Management_app:member_group_delete' pk=member.pk pk1=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                     </p>
                   </div>
                 {% empty %}
@@ -314,7 +314,7 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="showNotepad">Komunikacja:</li>
               <li id="objNotepad" style="display: none">
-                <p><a href="{% url 'member_notepad_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                <p><a href="{% url 'TI_Management_app:member_notepad_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                     Dodaj
                 </a></p>
                 <br />
@@ -323,12 +323,12 @@
                     {% if note.title in seen_note %}
                       <div class="notepad">
 
-                          <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
+                          <p><a href="{% url 'TI_Management_app:member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
                             Aktualizuj
                           </a></p>
                           <br />
                           <br />
-                          <p><b>Sprawa: </b><a href="{% url 'member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>
+                          <p><b>Sprawa: </b><a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>
 
                         {% for note_date in member.notepad.all|slice:"1" %}
                           <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>
@@ -352,7 +352,7 @@
 
                         <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
 
-                        <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
 
                       </div>
                     {% endif %}
@@ -361,12 +361,12 @@
 
 <!--                {% for note in member.notepad.all|dictsortreversed:"id"|slice:"1" %}-->
 <!--                    <div class="notepad">-->
-<!--                      <p><a href="{% url 'member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">-->
+<!--                      <p><a href="{% url 'TI_Management_app:member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">-->
 <!--                        Aktualizuj-->
 <!--                      </a></p>-->
 <!--                      <br />-->
 <!--                      <br />-->
-<!--                      <p><b>Sprawa: </b><a href="{% url 'member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>-->
+<!--                      <p><b>Sprawa: </b><a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>-->
 
 <!--                      {% for note_date in member.notepad.all|slice:"1" %}-->
 <!--                        <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>-->
@@ -390,7 +390,7 @@
 
 <!--                      <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>-->
 
-<!--                      <a href="{% url 'member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>-->
+<!--                      <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>-->
 <!--                    </div>-->
 <!--                  <br />-->
 <!--                {% empty %}-->

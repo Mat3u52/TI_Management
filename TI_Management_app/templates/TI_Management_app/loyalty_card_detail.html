@@ -1,13 +1,13 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_search' pk=loyalty_card.pk %}">
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:loyalty_card_member_search' pk=loyalty_card.pk %}">
         {% csrf_token %}
         <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
         type="search" placeholder="Dodaj nowego uczestnika" aria-label="Search" name="searched">
@@ -16,7 +16,7 @@
 </div>
 
 <div class="hero-unit">
-    <h2><a href="{% url 'loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h2>
+    <h2><a href="{% url 'TI_Management_app:loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h2>
 
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
@@ -29,7 +29,7 @@
                 {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
                     <div class="notepad">
                         <p>
-                            <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                            <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
                                 <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                             </a>
                         </p>
@@ -50,7 +50,7 @@
                             {% endif %}
                         </p>
 
-                        <a href="{% url 'loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <a href="{% url 'TI_Management_app:loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                         <br />
                     </div>
                 {% endfor %}
@@ -69,7 +69,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='active' %}">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='active' %}">
                         {% csrf_token %}
 
                         {% for radio in form.separator %}
@@ -94,14 +94,14 @@
                     {% if loyalty_card_status.card_status == 'active' %}
                     <div class="notepad">
                         <p>
-                            <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                            <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
                                 <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                             </a>
                         </p>
                         <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
                         <p>E-mail: {{loyalty_card_status.member.email}}</p>
 
-                        <a href="{% url 'loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <a href="{% url 'TI_Management_app:loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                         <br />
                     </div>
                     {% endif %}
@@ -118,7 +118,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='toBePickedUp' %}">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toBePickedUp' %}">
                         {% csrf_token %}
 
                         {% for radio in form.separator %}
@@ -143,7 +143,7 @@
                     {% if loyalty_card_status.card_status == 'toBePickedUp' %}
                         <div class="notepad">
                             <p>
-                                <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
                                     <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
@@ -173,7 +173,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
                         {% csrf_token %}
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
@@ -197,7 +197,7 @@
                     {% if loyalty_card_status.card_status == 'ordered' %}
                         <div class="notepad">
                             <p>
-                                <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
                                     <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
@@ -227,7 +227,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='toOrder'%}">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toOrder'%}">
                         {% csrf_token %}
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
@@ -251,7 +251,7 @@
                     {% if loyalty_card_status.card_status == 'toOrder' %}
                         <div class="notepad">
                             <p>
-                                <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
                                     <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
@@ -281,15 +281,15 @@
             </li>
             <li>
                 <div class="notepad">
-                    <a href="{% url 'loyalty_cards_add_file_order' pk=loyalty_card.pk %}" class="btn btn-primary btn-large pull-left">Dodaj dokument zlecenie</a>
-                    <a href="{% url 'loyalty_cards_add_file_to_be_picked_up' pk=loyalty_card.pk %}" class="btn btn-primary btn-large pull-right">Dodaj dokument odbioru</a>
+                    <a href="{% url 'TI_Management_app:loyalty_cards_add_file_order' pk=loyalty_card.pk %}" class="btn btn-primary btn-large pull-left">Dodaj dokument zlecenie</a>
+                    <a href="{% url 'TI_Management_app:loyalty_cards_add_file_to_be_picked_up' pk=loyalty_card.pk %}" class="btn btn-primary btn-large pull-right">Dodaj dokument odbioru</a>
                     <br/>
                 </div>
 
             </li>
 <!--            <li>-->
 <!--                <div class="notepad">-->
-<!--                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_order_search' pk=loyalty_card.pk %}">-->
+<!--                    <form class="d-flex" method=POST action="{% url 'TI_Management_app:loyalty_card_member_file_order_search' pk=loyalty_card.pk %}">-->
 <!--                        {% csrf_token %}-->
 <!--                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"-->
 <!--                        type="search" placeholder="Dodaj dokument zlecenie" aria-label="Search" name="searched">-->
@@ -299,7 +299,7 @@
 <!--            </li>-->
 <!--            <li>-->
 <!--                <div class="notepad">-->
-<!--                    <form class="d-flex" method=POST action="{% url 'loyalty_card_member_file_to_be_picked_up_search' pk=loyalty_card.pk %}">-->
+<!--                    <form class="d-flex" method=POST action="{% url 'TI_Management_app:loyalty_card_member_file_to_be_picked_up_search' pk=loyalty_card.pk %}">-->
 <!--                        {% csrf_token %}-->
 <!--                        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"-->
 <!--                        type="search" placeholder="Dodaj dokument odbioru" aria-label="Search" name="searched">-->
@@ -339,7 +339,7 @@
 <!--                                    </a>-->
 <!--                                </p>-->
 <!--                                <p>Przypisany:-->
-<!--                                    <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                    <a href="{% url 'TI_Management_app:member_detail' pk=loyalty_card_status.member.id %}">-->
 <!--                                        {{ loyalty_card_status.member }}-->
 <!--                                    </a>-->
 <!--                                </p>-->
@@ -357,7 +357,7 @@
 <!--                                                </a>-->
 <!--                                            </p>-->
 <!--                                            <p>Przypisany:-->
-<!--                                                <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                                <a href="{% url 'TI_Management_app:member_detail' pk=loyalty_card_status.member.id %}">-->
 <!--                                                    {{ loyalty_card_status.member }}-->
 <!--                                                </a>-->
 <!--                                            </p>-->
@@ -399,7 +399,7 @@
 <!--                                    </a>-->
 <!--                                </p>-->
 <!--                                <p>Przypisany:-->
-<!--                                    <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                    <a href="{% url 'TI_Management_app:member_detail' pk=loyalty_card_status.member.id %}">-->
 <!--                                        {{ loyalty_card_status.member }}-->
 <!--                                    </a>-->
 <!--                                </p>-->
@@ -418,7 +418,7 @@
 <!--                                                </a>-->
 <!--                                            </p>-->
 <!--                                            <p>Przypisany:-->
-<!--                                                <a href="{% url 'member_detail' pk=loyalty_card_status.member.id %}">-->
+<!--                                                <a href="{% url 'TI_Management_app:member_detail' pk=loyalty_card_status.member.id %}">-->
 <!--                                                    {{ loyalty_card_status.member }}-->
 <!--                                                </a>-->
 <!--                                            </p>-->
@@ -440,7 +440,7 @@
             </li>
             <li>
                 <div class="notepad">
-                    <form method="post" action="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='deactivated' %}">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='deactivated' %}">
                         {% csrf_token %}
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
@@ -464,7 +464,7 @@
                     {% if loyalty_card_status.card_status == 'deactivated' %}
                         <div class="notepad">
                             <p>
-                                <a href="{% url 'member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
                                     <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>

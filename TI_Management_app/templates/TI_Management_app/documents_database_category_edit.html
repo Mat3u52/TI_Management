@@ -1,8 +1,8 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'documents_database' %}"> / Baza dokumentów</a>
-<a href="{% url 'documents_database_category_edit' pk=category.pk %}"> / Aktualizuj kategorie</a>
+<a href="{% url 'TI_Management_app:documents_database' %}"> / Baza dokumentów</a>
+<a href="{% url 'TI_Management_app:documents_database_category_edit' pk=category.pk %}"> / Aktualizuj kategorie</a>
 {% endblock %}
 
 {% block content %}

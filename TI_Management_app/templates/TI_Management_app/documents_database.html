@@ -1,12 +1,12 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'documents_database' %}"> / Baza dokumentów</a>
+<a href="{% url 'TI_Management_app:documents_database' %}"> / Baza dokumentów</a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <form class="d-flex" method=POST action="{% url 'documents_database_search' %}">
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:documents_database_search' %}">
         {% csrf_token %}
         <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
         type="search" placeholder="Szukaj Dokumentu" aria-label="Search" name="searched">
@@ -43,7 +43,7 @@
                 {{ document.category }}:
             </h2>
             <h3>
-                <a href="{% url 'documents_database_edit' pk=document.pk %}">
+                <a href="{% url 'TI_Management_app:documents_database_edit' pk=document.pk %}">
                     {{document.title}}
                 </a>
             </h3>
@@ -60,7 +60,7 @@
                     Dodany przez: {{document.responsible}}
                 </p>
             </div>
-            <a href="{% url 'documents_database_delete' pk=document.pk %}"
+            <a href="{% url 'TI_Management_app:documents_database_delete' pk=document.pk %}"
                class="btn btn-danger btn-sm pull-right">
                 usuń
             </a>

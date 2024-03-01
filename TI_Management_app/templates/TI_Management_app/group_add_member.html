@@ -1,14 +1,14 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'groups_list' %}"> / Grupy </a>
-<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="{% url 'group_add_member' pk=group.pk pk1=member.pk %}"> / Dodaj uczestnika</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+<a href="{% url 'TI_Management_app:group_add_member' pk=group.pk pk1=member.pk %}"> / Dodaj uczestnika</a>
 {% endblock %}
 
 {% block content %}
     <div class="hero-unit">
-        <a href="{% url 'group_detail' pk=group.pk %}"><h3>{{group.group_name}}</h3></a>
+        <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><h3>{{group.group_name}}</h3></a>
         <form method="post" class="post-form">
             {% csrf_token %}
             {% if form.errors %}

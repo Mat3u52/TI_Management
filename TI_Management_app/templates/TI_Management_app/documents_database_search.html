@@ -14,7 +14,7 @@
                     {{ document.category }}:
                 </h2>
                 <h3>
-                    <a href="{% url 'documents_database_edit' pk=document.pk %}">
+                    <a href="{% url 'TI_Management_app:documents_database_edit' pk=document.pk %}">
                         {{document.title}}
                     </a>
                 </h3>
@@ -25,7 +25,7 @@
                 </p>
 
                 <p>
-                    <a href="{% url 'documents_database_delete' pk=document.pk %}"
+                    <a href="{% url 'TI_Management_app:documents_database_delete' pk=document.pk %}"
                         class="btn btn-danger btn-sm pull-right">
                         usuń
                     </a>

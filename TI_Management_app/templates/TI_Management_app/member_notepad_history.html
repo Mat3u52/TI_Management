@@ -1,22 +1,22 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_notepad_history' pk=member.pk title=title %}"> / Historia Komunikacji</a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=title %}"> / Historia Komunikacji</a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
     <h3>
-        <a href="{% url 'member_detail' pk=member.pk %}">
+        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
             {{member.forename}} {{member.surname}} {{member.member_nr}}
         </a>
     </h3>
     <div class="no-print">
         <p>
             Historia komunikacji
-            <a href="{% url 'member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">
+            <a href="{% url 'TI_Management_app:member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">
                 Wygeneruj PDF
             </a>
             <button class="btn btn-info btn-sm pull-right" onclick="window.print()">

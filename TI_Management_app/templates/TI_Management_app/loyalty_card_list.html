@@ -1,12 +1,12 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-<form class="d-flex" method=POST action="{% url 'loyalty_card_search' %}">
+<form class="d-flex" method=POST action="{% url 'TI_Management_app:loyalty_card_search' %}">
         {% csrf_token %}
         <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
         type="search" placeholder="Szukaj katry lojalnościowej" aria-label="Search" name="searched">
@@ -15,11 +15,11 @@
 </div>
 {% for card in loyalty_card %}
     <div class="hero-unit">
-        <h2><a href="{% url 'loyalty_card_detail' pk=card.pk category='none' %}">
+        <h2><a href="{% url 'TI_Management_app:loyalty_card_detail' pk=card.pk category='none' %}">
             {{card.card_name}}
         </a></h2>
 
-        <p><a href="{% url 'loyalty_card_detail' pk=card.pk category='none' %}" class="btn btn-primary btn-large pull-right">
+        <p><a href="{% url 'TI_Management_app:loyalty_card_detail' pk=card.pk category='none' %}" class="btn btn-primary btn-large pull-right">
             Więcej informacji
         </a></p>
         <div class="date"><p>Data dodania: {{card.created_date}}</p></div>

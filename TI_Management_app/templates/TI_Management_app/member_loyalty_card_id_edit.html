@@ -3,9 +3,9 @@
 
 {% block breadcrumbs %}
 
-<a href="{% url 'members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj numer karty lojalnościowej</a>
+<a href="{% url 'TI_Management_app:members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj numer karty lojalnościowej</a>
 {% endblock %}
 
 {% block content %}
@@ -13,7 +13,7 @@
         {% if form.errors %}
             <p>{{form.errors}}</p>
         {% endif %}
-        <h3><a href="{% url 'member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+        <h3><a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
         <p>Karty Lojalnościowe</p>
         <form method="post" class="post-form" enctype="multipart/form-data">
             {% csrf_token %}

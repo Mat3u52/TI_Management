@@ -1,9 +1,9 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_loyalty_card_add' pk=member.pk pk1=card_add.pk %}"> / Dodaj Kartę Lojalnościową</a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:member_loyalty_card_add' pk=member.pk pk1=card_add.pk %}"> / Dodaj Kartę Lojalnościową</a>
 {% endblock %}
 
 {% block content %}
@@ -15,7 +15,7 @@
             <p>{{form.errors}}</p>
         {% endif %}
 
-        <h3><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
+        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
         <p>Karty Lojalnościowe</p>
         <form method="post" class="post-form" enctype="multipart/form-data">
 <!--            {{ form.as_p }}-->

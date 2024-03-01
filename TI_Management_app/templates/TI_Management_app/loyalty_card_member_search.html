@@ -1,8 +1,8 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}} </a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}} </a>
 <a href="#"> / Wyszukiwarka nowego uczestnika</a>
 {% endblock %}
 
@@ -19,7 +19,7 @@
         <div class="hero-unit">
             <img src="{{ member.image.url }}" alt="image" width="100px">
             <h2>
-                <a href="{% url 'member_detail' pk=member.pk %}">
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                     {{member.forename}} {{member.surname}}
                 </a>
             </h2>
@@ -49,7 +49,7 @@
                 {% endfor %}
 
                 <p>
-                    <a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk pk1=member.pk %}" class="btn btn-primary btn-large pull-right">
+                    <a href="{% url 'TI_Management_app:loyalty_card_add_member' pk=loyalty_card.pk pk1=member.pk %}" class="btn btn-primary btn-large pull-right">
                         Dodaj nowego uczestnika od krary {{loyalty_card.card_name}}
                     </a>
                 </p>

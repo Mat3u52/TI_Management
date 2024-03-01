@@ -1,0 +1,82 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:relief_figure_add' %}">
+    / Wprowadzanie kwót zapomóg
+</a>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="hero-unit">
+    {% for relief in all_relief %}
+        <div class="notepad">
+            <h3>
+                <a href="#">
+                    {{relief}}
+                </a>
+            </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{relief.created_date}}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+<div class="hero-unit">
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+        <table width="100%">
+            <tr>
+                <td>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; min-height: 15px"
+                            type="text"
+                            placeholder="Nazwa zapomogi"
+                            aria-label="Search"
+                            name="title"
+                            required>
+                </td>
+                <td>
+                    <input
+                            class="form-control me-2"
+                            style="max-width:75px; min-height: 15px"
+                            type="number"
+                            step="0.01"
+                            placeholder="Kwota"
+                            aria-label="Search"
+                            name="figure"
+                            required>
+                </td>
+                <td>
+                    <input
+                            class="form-control me-2"
+                            style="max-width:75px; min-height: 15px"
+                            type="number"
+                            step="1"
+                            placeholder="Karencja"
+                            aria-label="Search"
+                            name="grace"
+                            required>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+    </form>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='relief_figure_add' %}
+{% endblock %}

@@ -1,15 +1,15 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'groups_list' %}"> / Grupy </a>
-<a href="{% url 'group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="{% url 'group_notepad_history' pk=group.pk pk1=notepad.pk %}"> / Aktualizacja komunikacji grupy</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+<a href="{% url 'TI_Management_app:group_notepad_history' pk=group.pk pk1=notepad.pk %}"> / Aktualizacja komunikacji grupy</a>
 {% endblock %}
 
 {% block content %}
    <div class="hero-unit">
        <h3>
-               <a href="{% url 'group_detail' pk=group.pk %}">
+               <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
                    {{group.group_name}}
                </a>
 
@@ -17,7 +17,7 @@
        <div class="no-print">
            <p>
                Historia komunikacji
-               <a href="{% url 'group_notepad_history_pdf' pk=group.pk pk1=notepad.pk %}" class="btn btn-info btn-sm pull-right">
+               <a href="{% url 'TI_Management_app:group_notepad_history_pdf' pk=group.pk pk1=notepad.pk %}" class="btn btn-info btn-sm pull-right">
                    Wygeneruj PDF
                </a>
                <button class="btn btn-info btn-sm pull-right" onclick="window.print()">

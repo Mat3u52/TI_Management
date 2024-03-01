@@ -1,9 +1,9 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
-<a href="{% url 'member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'member_deactivate' pk=member.pk %}"> / Dezaktywacja</a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:member_deactivate' pk=member.pk %}"> / Dezaktywacja</a>
 {% endblock %}
 
 

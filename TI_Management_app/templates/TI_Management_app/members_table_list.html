@@ -1,12 +1,12 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'members_list' %}"> / Baza Członków </a>
+<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <form class="d-flex" method=POST action="{% url 'member_search' %}">
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:member_search' %}">
         {% csrf_token %}
         <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
         type="search" placeholder="Szukaj Uczestnika" aria-label="Search" name="searched">
@@ -14,12 +14,12 @@
         <table>
             <tr>
                 <td>
-                    <a href="{% url 'members_list' %}" class="btn btn-primary btn-sm pull-left">
+                    <a href="{% url 'TI_Management_app:members_list' %}" class="btn btn-primary btn-sm pull-left">
                         kafelki
                     </a>
                 </td>
                 <td>
-                    <a href="{% url 'member_export_csv' %}" class="btn btn-primary btn-sm pull-left">
+                    <a href="{% url 'TI_Management_app:member_export_csv' %}" class="btn btn-primary btn-sm pull-left">
                         csv
                     </a>
                 </td>
@@ -108,15 +108,15 @@
 
         {% for member in members %}
         <tr>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.forename}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.surname}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.member_nr}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.role}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.occupation}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.email}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.phone_number}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.surname}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.member_nr}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.role}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.occupation}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.email}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.phone_number}}</a></td>
             <td>
-                <a href="{% url 'member_detail' pk=member.pk %}">
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                     {% if member.sex == 'female' %}
                         K
                     {% elif member.sex == 'male' %}
@@ -124,13 +124,13 @@
                     {% endif %}
                 </a>
             </td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.birthday}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.birthplace}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.pin}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.date_of_accession}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.date_of_abandonment}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.birthday}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.birthplace}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.pin}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.date_of_accession}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.date_of_abandonment}}</a></td>
             <td>
-                <a href="{% url 'member_detail' pk=member.pk %}">
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                     {% if member.type_of_contract == 'indefinite_period_of_time' %}
                         Na czas nieokreślony
                     {% elif member.type_of_contract == 'limited_duration' %}
@@ -138,10 +138,10 @@
                     {% endif %}
                 </a>
             </td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.date_of_contract}}</a></td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.expiration_date_contract}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.date_of_contract}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.expiration_date_contract}}</a></td>
             <td>
-                <a href="{% url 'member_detail' pk=member.pk %}">
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                     {% if member.deactivate %}
                         Dezaktywowany
                     {% else %}
@@ -149,7 +149,7 @@
                     {% endif %}
                 </a>
             </td>
-            <td><a href="{% url 'member_detail' pk=member.pk %}">{{member.created_date}}</a></td>
+            <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.created_date}}</a></td>
         </tr>
         {% endfor %}
     </table>

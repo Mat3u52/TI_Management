@@ -1,15 +1,15 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
-<a href="{% url 'loyalty_card_add_member' pk=loyalty_card.pk pk1=loyalty_card_member_add.pk %}"> / Dodaj uczestnika</a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'TI_Management_app:loyalty_card_add_member' pk=loyalty_card.pk pk1=loyalty_card_member_add.pk %}"> / Dodaj uczestnika</a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
-    <a href="{% url 'loyalty_card_detail' pk=loyalty_card.pk category='none'%}">
+    <a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none'%}">
         <h3>
             {{loyalty_card.card_name}}
         </h3>
