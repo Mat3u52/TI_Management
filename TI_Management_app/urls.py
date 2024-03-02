@@ -334,4 +334,14 @@ urlpatterns = [
         views.relief_figure_add,
         name='relief_figure_add'
     ),
+    path(
+        'TI_Management_app/relifeFigureEdit/<int:pk>',
+        views.relief_figure_edit,
+        name='relief_figure_edit'
+    ),
+    path(
+        'TI_Management_app/relifeFigureDelete/<int:pk>',
+        views.relief_figure_delete,
+        name='relief_figure_delete'
+    ),
 ]

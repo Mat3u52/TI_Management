@@ -1,0 +1,103 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="#"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_figure_edit' pk=one_relief.pk %}"> / Aktualizacja kwót zapomóg</a>
+{% endblock %}
+
+{% block content %}
+
+
+<div class="hero-unit">
+    <H2>Aktualizacja kwót zapomóg</H2>
+    <br />
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+        <table width="100%">
+            <tr>
+                <td>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 80%!important; min-height: 15px"
+                            type="text"
+                            placeholder="{{ one_relief.title }}"
+                            value="{{ one_relief.title }}"
+                            aria-label="Nazwa"
+                            name="title"
+                            required>
+                </td>
+                <td>
+                    {{form.figure}}zł
+                </td>
+                <td>
+                    <input
+                            class="form-control me-2"
+                            style="max-width:95px; min-height: 15px"
+                            type="number"
+                            step="1"
+                            placeholder="{{ one_relife.grace }}"
+                            value="{{ one_relief.grace }}"
+                            aria-label="Karencja"
+                            name="grace"
+                            required>m
+                </td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Aktualizuj
+        </button>
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    <h4>
+        Historia:
+    </h4>
+    {% for h in one_relief.history.all %}
+        <div class="notepad">
+            <table width="100%" border="0">
+                <tr>
+                    <td>
+                        {{ h.history_id }}
+                    </td>
+                    <td>
+                        {{ h.history_type }}
+                    </td>
+                    <td>
+                        {{ h.history_user }}
+                    </td>
+                    <td>
+                        {{ h.history_date }}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="4">
+                        Ketegoria: {{ h.category }}
+                    <br />
+                        Tytuł:
+                        <b>
+                            {{ h.title }}
+                        </b>
+                    <br />
+                        Kwota: {{ h.figure }} zł
+                    <br />
+                        Karencja w miesiącach: {{ h.grace }}
+                    <br />
+                    </td>
+                </tr>
+            </table>
+        </div>
+    {% endfor %}
+</div>
+
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='relief_figure_add' %}
+{% endblock %}

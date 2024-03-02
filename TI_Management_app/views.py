@@ -1875,14 +1875,20 @@ def finance_list(request):
 
 @login_required
 def relief_figure_add(request):
-    all_relief = Relief.objects.all()
+    all_relief = Relief.objects.all().order_by('-created_date')
     if request.method == "POST":
         form = ReliefFigureForm(request.POST)
         if form.is_valid():
+            figure = form.cleaned_data['figure']
+            grace = form.cleaned_data['grace']
+            figure = round(float(figure), 2)
+            grace = int(grace)
             relief = form.save(commit=False)
             relief.author = request.user
+            relief.figure = figure
+            relief.grace = grace
             relief.save()
-            messages.success(request, f"Dodano nową zapomogę {relief.title}!")
+            messages.success(request, f"Dodano zapomogę {relief.title}!")
             return redirect('TI_Management_app:relief_figure_add')
     else:
         form = ReliefFigureForm()
@@ -1894,3 +1900,40 @@ def relief_figure_add(request):
             'all_relief': all_relief
         }
     )
+
+
+@login_required
+def relief_figure_edit(request, pk):
+    one_relief = get_object_or_404(Relief, pk=pk)
+    if request.method == "POST":
+        form = ReliefFigureForm(request.POST, instance=one_relief)
+        if form.is_valid():
+            figure = form.cleaned_data['figure']
+            grace = form.cleaned_data['grace']
+            figure = round(float(figure), 2)
+            grace = int(grace)
+            relief = form.save(commit=False)
+            relief.author = request.user
+            relief.figure = figure
+            relief.grace = grace
+            relief.save()
+            messages.success(request, f"Zaktualizowano zapomogę {relief.title}!")
+            return redirect('TI_Management_app:relief_figure_add')
+    else:
+        form = ReliefFigureForm(instance=one_relief)
+    return render(
+        request,
+        'TI_Management_app/finance/relief_figure_edit.html',
+        {
+            'form': form,
+            'one_relief': one_relief
+        }
+    )
+
+
+@login_required
+def relief_figure_delete(request, pk):
+    one_relief = get_object_or_404(Relief, pk=pk)
+    one_relief.author = request.user
+    one_relief.delete()
+    return redirect('TI_Management_app:relief_figure_add')

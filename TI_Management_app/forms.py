@@ -492,6 +492,22 @@ class DocumentsDatabaseCategoryForm(forms.ModelForm):
 
 
 class ReliefFigureForm(forms.ModelForm):
+    title = forms.CharField(
+        required=True
+    )
+    figure = forms.FloatField(
+        required=True,
+        widget=forms.NumberInput(
+            attrs={'step': "0.01"}
+        )
+    )
+    grace = forms.IntegerField(
+        required=True,
+        widget=forms.NumberInput(
+            attrs={'step': "1"}
+        )
+    )
+
     class Meta:
         model = Relief
         fields = [

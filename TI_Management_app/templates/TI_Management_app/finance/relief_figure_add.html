@@ -1,26 +1,45 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:relief_figure_add' %}">
-    / Wprowadzanie kwót zapomóg
-</a>
+<a href="#"> / Finanse</a>
+<a href="#"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_figure_add' %}"> / Wprowadzanie kwót zapomóg</a>
 {% endblock %}
 
 {% block content %}
 
 
 <div class="hero-unit">
+    <H2>Wprowadzanie kwót zapomóg</H2>
+    <br />
     {% for relief in all_relief %}
         <div class="notepad">
-            <h3>
-                <a href="#">
-                    {{relief}}
-                </a>
-            </h3>
+            <div style="float:left">
+                <h4>
+                    <a href="{% url 'TI_Management_app:relief_figure_edit' pk=relief.pk %}">
+                        {{ relief.title }}
+                    </a>
+                </h4>
+            </div>
+            <div style="float:right">
+                <H4>
+                    <span style="color: #0088CC">
+                        {{ relief.figure|floatformat:"2" }} zł
+                    </span>
+                    Karencja w miesiącach
+                    <span style="color: #0088CC">
+                        {{ relief.grace }}
+                    </span>
+                </H4>
+            </div>
             <div class="date">
                 <p>
                     Data dodania: {{relief.created_date}}
+                    przez: {{relief.author}}
                 </p>
+                <a href="{% url 'TI_Management_app:relief_figure_delete' pk=relief.pk %}" class="btn btn-danger btn-sm pull-right">
+                    usuń
+                </a>
             </div>
         </div>
     {% endfor %}
@@ -40,7 +59,7 @@
                             style="min-width: 50%!important; min-height: 15px"
                             type="text"
                             placeholder="Nazwa zapomogi"
-                            aria-label="Search"
+                            aria-label="Nazwa"
                             name="title"
                             required>
                 </td>
@@ -50,19 +69,19 @@
                             style="max-width:75px; min-height: 15px"
                             type="number"
                             step="0.01"
-                            placeholder="Kwota"
-                            aria-label="Search"
+                            placeholder="Kwota [zł]"
+                            aria-label="Kwota"
                             name="figure"
                             required>
                 </td>
                 <td>
                     <input
                             class="form-control me-2"
-                            style="max-width:75px; min-height: 15px"
+                            style="max-width:95px; min-height: 15px"
                             type="number"
                             step="1"
-                            placeholder="Karencja"
-                            aria-label="Search"
+                            placeholder="Karencja [m]"
+                            aria-label="Karencja"
                             name="grace"
                             required>
                 </td>
@@ -74,7 +93,6 @@
         <br />
     </form>
 </div>
-
 {% endblock %}
 
 {% block menu %}

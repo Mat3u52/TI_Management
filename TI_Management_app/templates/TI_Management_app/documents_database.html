@@ -8,9 +8,16 @@
 <div class="hero-unit">
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:documents_database_search' %}">
         {% csrf_token %}
-        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-        type="search" placeholder="Szukaj Dokumentu" aria-label="Search" name="searched">
-        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Szukaj Dokumentu"
+                aria-label="Search"
+                name="searched">
+        <button class="btn btn-primary btn-large pull-right" type="submit">
+            Szukaj
+        </button>
     </form>
 </div>
 

@@ -31,9 +31,9 @@
 </div>
 
 <div class="hero-unit">
-    <p>
+    <h4>
         Historia:
-    </p>
+    </h4>
     {% for h in document.history.all %}
         <div class="notepad">
             <table width="100%" border="0">
@@ -55,7 +55,10 @@
                     <td colspan="4">
                         Ketegoria: {{ h.category }}
                     <br />
-                        Tytuł: {{ h.title }}
+                        Tytuł:
+                        <b>
+                            {{ h.title }}
+                        </b>
                     <br />
                         {% if h.file %}
                             <a href="../../media/{{ h.file|escape }}">
