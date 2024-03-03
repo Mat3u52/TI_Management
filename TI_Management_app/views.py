@@ -1936,4 +1936,5 @@ def relief_figure_delete(request, pk):
     one_relief = get_object_or_404(Relief, pk=pk)
     one_relief.author = request.user
     one_relief.delete()
+    one_relief.history.delete()
     return redirect('TI_Management_app:relief_figure_add')
