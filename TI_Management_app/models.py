@@ -204,6 +204,13 @@ class MembersZZTI(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMembers')
     forename = models.CharField(max_length=250, blank=False, null=False)
     surname = models.CharField(max_length=250, blank=False, null=False)
+
+    street = models.CharField(max_length=250, blank=True, null=True)
+    city = models.CharField(max_length=250, blank=True, null=True)
+    postcode = models.CharField(max_length=250, blank=True, null=True)
+    house_number = models.CharField(max_length=50, blank=True, null=True)
+    float_number = models.CharField(max_length=50, blank=True, null=True)
+
     role = models.ForeignKey(MemberFunction, on_delete=models.CASCADE, null=True, blank=True, default=None)
     occupation = models.ForeignKey(MemberOccupation, on_delete=models.CASCADE, null=True, blank=True, default=None)
     member_nr = models.CharField(max_length=250, blank=False, null=False, unique=True)
@@ -501,11 +508,91 @@ class Relief(models.Model):
             self.slug = slugify(f"{self.title}")
         super().save(*args, **kwargs)
 
-    # def get_absolute_url(self):
-    #     return reverse('TI_Management_app:relife_add',
-    #                    args=[self.created_date.year,
-    #                          self.created_date.month,
-    #                          self.created_date.day, self.slug])
+
+class RelationRegisterRelief(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorRelationRegisterRelief')
+    title = models.CharField(max_length=250, null=False, blank=False, unique=True)
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Relacje - Rejestracja Zapomogi'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
+        super().save(*args, **kwargs)
+
+
+class FileRegisterRelief(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroupsFile')
+    register_relief = models.ForeignKey(RegisterRelief, on_delete=models.CASCADE, related_name='registerReliefFile', null=True, blank=True)
+    title = models.CharField(max_length=250, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='uploadsRegisterRelief/%Y/%m/%d/%H%M%S/')
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Grupy Pliki'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}-{self.group}")
+        super().save(*args, **kwargs)
+
+
+class RegisterRelief(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorRegisterRelief')
+
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberRegisterRelief', null=False, blank=False)
+    relief = models.ForeignKey(Relief, on_delete=models.CASCADE, related_name='reliefRegisterRelief', null=False, blank=False)
+    relation = models.ForeignKey(RelationRegisterRelief, on_delete=models.CASCADE, related_name='relationRegisterRelief', null=False, blank=False)
+
+    associate_forename = models.CharField(max_length=250, null=True, blank=True)
+    associate_surname = models.CharField(max_length=250, null=True, blank=True)
+    account_number = models.CharField(max_length=26, null=True, blank=True)
+
+    date_of_completing_the_application = models.DateTimeField(blank=True, null=True)
+    date_of_receipt_the_application = models.DateTimeField(blank=True, null=True)
+    date_of_accident = models.DateTimeField(blank=True, null=True)  # karencja od tej daty
+    """
+    W kontekście ubezpieczeń zdrowotnych: Karencja odnosi się do okresu czasu, który musi upłynąć po rozpoczęciu ubezpieczenia, zanim ubezpieczony będzie mógł składać roszczenia o odszkodowanie. Na przykład, jeśli polisa ubezpieczeniowa ma karencję wynoszącą 30 dni, oznacza to, że ubezpieczony nie może składać roszczeń o odszkodowanie przez pierwsze 30 dni od daty rozpoczęcia ubezpieczenia.
+    """
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Rejestracja zapomogi'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f"{self.slug}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.relief}-{self.member}")
+        super().save(*args, **kwargs)
 
 
 class OrderedCardDocument(models.Model):
@@ -515,7 +602,7 @@ class OrderedCardDocument(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorOrderedCardDocument')
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardOrder', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
-    file = models.FileField(null=False, blank=False, upload_to='OrderedCardDocument/%Y/%m/%d/%H%M%S/')
+    file = models.FileField(null=False, blank=False, upload_to='orderedCardDocument/%Y/%m/%d/%H%M%S/')
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
@@ -541,7 +628,7 @@ class ToBePickedUpCardDocument(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorToBePickedUpCardDocument')
     card = models.ForeignKey(Cards, on_delete=models.CASCADE, related_name='loyaltyCardToBePickedUp', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
-    file = models.FileField(null=False, blank=False, upload_to='ToBePickedUpCardDocument/%Y/%m/%d/%H%M%S/')
+    file = models.FileField(null=False, blank=False, upload_to='toBePickedUpCardDocument/%Y/%m/%d/%H%M%S/')
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 

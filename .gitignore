@@ -18,9 +18,10 @@ mydb.py
 /media/uploadsNotepad/*
 /media/uploadsLoyaltyCards/*
 /media/uploadsLoyaltyCards_a/*
-/media/OrderedCardDocument/*
-/media/ToBePickedUpCardDocument/*
+/media/orderedCardDocument/*
+/media/toBePickedUpCardDocument/*
 /media/documentsDatabase/*
+/media/uploadsRegisterRelief/*
 /TI_Management_app/static/img/*
 /TI_Management_app/static/font/*
 
