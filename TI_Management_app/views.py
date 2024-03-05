@@ -16,7 +16,8 @@ from .models import (
     GroupsNotepad,
     DocumentsDatabase,
     DocumentsDatabaseCategory,
-    Relief
+    Relief,
+    RelationRegisterRelief
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -49,7 +50,8 @@ from .forms import (
     GroupFileForm,
     DocumentsDatabaseForm,
     DocumentsDatabaseCategoryForm,
-    ReliefFigureForm
+    ReliefFigureForm,
+    RelationRegisterReliefForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -1936,5 +1938,61 @@ def relief_figure_delete(request, pk):
     one_relief = get_object_or_404(Relief, pk=pk)
     one_relief.author = request.user
     one_relief.delete()
-    one_relief.history.delete()
+    # one_relief.history.delete()
     return redirect('TI_Management_app:relief_figure_add')
+
+
+@login_required
+def relation_register_relief_add(request):
+    all_relation_register_relief = RelationRegisterRelief.objects.all().order_by('-created_date')
+    if request.method == "POST":
+        form = RelationRegisterReliefForm(request.POST)
+        if form.is_valid():
+            relation = form.save(commit=False)
+            relation.author = request.user
+            relation.save()
+            messages.success(request, f"Dodano nową relacje {relation.title}!")
+            return redirect('TI_Management_app:relation_register_relief_add')
+    else:
+        form = RelationRegisterReliefForm()
+    return render(
+        request,
+        'TI_Management_app/finance/relation_register_relief_add.html',
+        {
+            'form': form,
+            'all_relation_register_relief': all_relation_register_relief
+        }
+    )
+
+
+@login_required
+def relation_register_relief_edit(request, pk):
+    one_relation_register_relief = get_object_or_404(RelationRegisterRelief, pk=pk)
+    if request.method == "POST":
+        form = RelationRegisterReliefForm(request.POST, instance=one_relation_register_relief)
+        if form.is_valid():
+            one_relation = form.save(commit=False)
+            one_relation.author = request.user
+            one_relation.save()
+            messages.success(request, f"Zaktualizowano relacje {one_relation.title}!")
+            return redirect('TI_Management_app:relation_register_relief_add')
+    else:
+        form = RelationRegisterReliefForm(instance=one_relation_register_relief)
+    return render(
+        request,
+        'TI_Management_app/finance/relation_register_relief_edit.html',
+        {
+            'form': form,
+            'one_relation_register_relief': one_relation_register_relief
+        }
+    )
+
+
+@login_required
+def relation_register_relief_delete(request, pk):
+    one_relation = get_object_or_404(RelationRegisterRelief, pk=pk)
+    one_relation.author = request.user
+    one_relation.delete()
+    # one_relation.history.delete()
+    return redirect('TI_Management_app:relation_register_relief_add')
+

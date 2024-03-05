@@ -344,4 +344,19 @@ urlpatterns = [
         views.relief_figure_delete,
         name='relief_figure_delete'
     ),
+    path(
+        'TI_Management_app/relationRegisterReliefAdd',
+        views.relation_register_relief_add,
+        name='relation_register_relief_add'
+    ),
+    path(
+        'TI_Management_app/relationRegisterReliefEdit/<int:pk>',
+        views.relation_register_relief_edit,
+        name='relation_register_relief_edit'
+    ),
+    path(
+        'TI_Management_app/relationRegisterReliefDelete/<int:pk>',
+        views.relation_register_relief_delete,
+        name='relation_register_relief_delete'
+    ),
 ]

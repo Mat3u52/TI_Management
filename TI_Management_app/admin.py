@@ -24,7 +24,10 @@ from .models import (
     GroupsNotepad,
     DocumentsDatabase,
     DocumentsDatabaseCategory,
-    Relief
+    Relief,
+    RelationRegisterRelief,
+    RegisterRelief,
+    FileRegisterRelief
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -822,4 +825,100 @@ class ReliefAdmin(admin.ModelAdmin):
         'title',
     )
     # date_hierarchy = 'created_date'
+
+
+@admin.register(RelationRegisterRelief)
+class RelationRegisterReliefAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title'
+    )
+    search_fields = (
+        'title',
+    )
+
+
+@admin.register(RegisterRelief)
+class RegisterReliefAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'member',
+        'relief',
+        'relation',
+        'associate_forename',
+        'associate_surname',
+        'account_number',
+        'date_of_completing_the_application',
+        'date_of_receipt_the_application',
+        'date_of_accident'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'member',
+        'relief',
+        'relation',
+        'associate_forename',
+        'associate_surname',
+        'account_number',
+        'date_of_completing_the_application',
+        'date_of_receipt_the_application',
+        'date_of_accident'
+    )
+    search_fields = (
+        'relief',
+    )
+
+
+@admin.register(FileRegisterRelief)
+class FileRegisterReliefAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'file'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'file'
+    )
+    search_fields = (
+        'title',
+    )
 

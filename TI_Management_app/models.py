@@ -532,31 +532,6 @@ class RelationRegisterRelief(models.Model):
         super().save(*args, **kwargs)
 
 
-class FileRegisterRelief(models.Model):
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroupsFile')
-    register_relief = models.ForeignKey(RegisterRelief, on_delete=models.CASCADE, related_name='registerReliefFile', null=True, blank=True)
-    title = models.CharField(max_length=250, null=False, blank=False)
-    file = models.FileField(null=False, blank=False, upload_to='uploadsRegisterRelief/%Y/%m/%d/%H%M%S/')
-    history = HistoricalRecords()
-
-    objects = models.Manager()  # default manager
-
-    class Meta:
-        verbose_name_plural = 'Grupy Pliki'
-        ordering = ('-created_date',)
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(f"{self.title}-{self.group}")
-        super().save(*args, **kwargs)
-
-
 class RegisterRelief(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -587,11 +562,36 @@ class RegisterRelief(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return f"{self.slug}"
+        return f"{self.relief}"
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.relief}-{self.member}")
+            self.slug = slugify(f"{self.relief}")
+        super().save(*args, **kwargs)
+
+
+class FileRegisterRelief(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorFileRegisterRelief')
+    register_relief = models.ForeignKey(RegisterRelief, on_delete=models.CASCADE, related_name='regiseterReliefFileRegisterRelief', null=True, blank=True)
+    title = models.CharField(max_length=250, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='uploadsRegisterRelief/%Y/%m/%d/%H%M%S/')
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Pliki - Rejestracja zapomogi'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
         super().save(*args, **kwargs)
 
 

@@ -16,7 +16,8 @@ from .models import (
     GroupsFile,
     DocumentsDatabase,
     DocumentsDatabaseCategory,
-    Relief
+    Relief,
+    RelationRegisterRelief
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -107,12 +108,24 @@ class MemberDeactivateForm(forms.ModelForm):
 
 
 class MemberFunctionForm(forms.ModelForm):
+    member_function = forms.CharField(
+        required=True,
+        max_length=250,
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
+
     class Meta:
         model = MemberFunction
         fields = ['member_function',]
 
 
 class MemberOccupationForm(forms.ModelForm):
+    member_occupation = forms.CharField(
+        required=True,
+        max_length=250,
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
+
     class Meta:
         model = MemberOccupation
         fields = ['member_occupation',]
@@ -514,4 +527,18 @@ class ReliefFigureForm(forms.ModelForm):
             'title',
             'figure',
             'grace'
+        ]
+
+
+class RelationRegisterReliefForm(forms.ModelForm):
+    title = forms.CharField(
+        required=True,
+        max_length=250,
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
+
+    class Meta:
+        model = RelationRegisterRelief
+        fields = [
+            'title'
         ]

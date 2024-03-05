@@ -1,0 +1,66 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="#"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:relation_register_relief_add' %}"> / Wprowadzanie relacji</a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+        <table width="100%">
+            <tr>
+                <td>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; min-height: 15px"
+                            type="text"
+                            placeholder="Relacja"
+                            aria-label="Relacja"
+                            name="title"
+                            required
+                            autofocus>
+                </td>
+            </tr>
+        </table>
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Dodaj
+        </button>
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    <H2>Relacje:</H2>
+    <br />
+    {% for relation in all_relation_register_relief %}
+        <div class="notepad">
+            <div style="float:left">
+                <h4>
+                    <a href="{% url 'TI_Management_app:relation_register_relief_edit' pk=relation.pk %}">
+                        {{ relation.title }}
+                    </a>
+                </h4>
+            </div>
+            <div class="date">
+                <p>
+                    Data dodania: {{relation.created_date}}
+                    przez: {{relation.author}}
+                </p>
+                <a href="{% url 'TI_Management_app:relation_register_relief_delete' pk=relation.pk %}" class="btn btn-danger btn-sm pull-right">
+                    usuń
+                </a>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='relation_register_relief_add' %}
+{% endblock %}
