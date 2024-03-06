@@ -9,11 +9,6 @@ urlpatterns = [
         views.members_list,
         name='members_list'
     ),
-    # path(
-    #     'TI_Management_app/membersList',
-    #     views.members_list,
-    #     name='members_list'
-    # ),
     path(
         'TI_Management_app/membersTableList',
         views.members_table_list,
@@ -135,7 +130,7 @@ urlpatterns = [
         name='member_notepad_delete_all'
     ),
     path(
-        'TI_Management_app/member_search',
+        'TI_Management_app/memberSearch',
         views.member_search,
         name='member_search'
     ),
@@ -359,4 +354,20 @@ urlpatterns = [
         views.relation_register_relief_delete,
         name='relation_register_relief_delete'
     ),
+    path(
+        'TI_Management_app/RegisterReliefStepOne',
+        views.register_relief_step_one,
+        name='register_relief_step_one'
+    ),
+    path(
+        'TI_Management_app/RegisterReliefStepOneSearch',
+        views.register_relief_step_one_search,
+        name='register_relief_step_one_search'
+    ),
+    path(
+        'TI_Management_app/RegisterReliefStepOne/<int:pk>',
+        views.register_relief_step_two,
+        name='register_relief_step_two'
+    ),
 ]
+

@@ -80,10 +80,27 @@ class MemberEditForm(forms.ModelForm):
 
     class Meta:
         model = MembersZZTI
-        fields = ['forename', 'surname', 'role', 'occupation',
-                      'member_nr', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number',
-                      'email', 'date_of_accession', 'date_of_abandonment', 'type_of_contract',
-                      'date_of_contract', 'expiration_date_contract', 'group', 'card', 'image']
+        fields = [
+            'forename',
+            'surname',
+            'role',
+            'occupation',
+            'member_nr',
+            'sex',
+            'birthday',
+            'birthplace',
+            'pin',
+            'phone_number',
+            'email',
+            'date_of_accession',
+            'date_of_abandonment',
+            'type_of_contract',
+            'date_of_contract',
+            'expiration_date_contract',
+            'group',
+            'card',
+            'image'
+        ]
 
         widgets = {
                 # 'birthday': forms.DateInput(attrs={'type': 'date'}),
@@ -98,6 +115,19 @@ class MemberEditForm(forms.ModelForm):
                 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
 
         }
+
+
+class MemberEditReliefForm(forms.ModelForm):
+
+    class Meta:
+        model = MembersZZTI
+        fields = [
+            'street',
+            'city',
+            'postcode',
+            'house_number',
+            'float_number'
+        ]
 
 
 class MemberDeactivateForm(forms.ModelForm):

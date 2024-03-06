@@ -492,6 +492,7 @@ class Relief(models.Model):
     title = models.CharField(max_length=250, null=False, blank=False, unique=True)
     figure = models.FloatField(null=False, blank=False)
     grace = models.IntegerField(null=False, blank=False)
+
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
@@ -552,6 +553,9 @@ class RegisterRelief(models.Model):
     """
     W kontekście ubezpieczeń zdrowotnych: Karencja odnosi się do okresu czasu, który musi upłynąć po rozpoczęciu ubezpieczenia, zanim ubezpieczony będzie mógł składać roszczenia o odszkodowanie. Na przykład, jeśli polisa ubezpieczeniowa ma karencję wynoszącą 30 dni, oznacza to, że ubezpieczony nie może składać roszczeń o odszkodowanie przez pierwsze 30 dni od daty rozpoczęcia ubezpieczenia.
     """
+
+    complete = models.BooleanField(default=False)
+    agreement = models.BooleanField(default=False)
 
     history = HistoricalRecords()
 

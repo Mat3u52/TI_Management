@@ -17,7 +17,8 @@ from .models import (
     DocumentsDatabase,
     DocumentsDatabaseCategory,
     Relief,
-    RelationRegisterRelief
+    RelationRegisterRelief,
+    RegisterRelief
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -51,7 +52,8 @@ from .forms import (
     DocumentsDatabaseForm,
     DocumentsDatabaseCategoryForm,
     ReliefFigureForm,
-    RelationRegisterReliefForm
+    RelationRegisterReliefForm,
+    MemberEditReliefForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -1996,3 +1998,58 @@ def relation_register_relief_delete(request, pk):
     # one_relation.history.delete()
     return redirect('TI_Management_app:relation_register_relief_add')
 
+
+@login_required
+def register_relief_step_one(request):
+    relief_process_ongoing = RegisterRelief.objects.filter(complete=False).order_by('-created_date')
+
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_one.html',
+        {
+            'relief_process_ongoing': relief_process_ongoing
+        }
+    )
+
+
+@login_required
+def register_relief_step_one_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        members = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
+                                             Q(surname__contains=searched.capitalize()) |
+                                             Q(member_nr__contains=searched) |
+                                             Q(phone_number__contains=searched),
+                                             card__isnull=False,
+                                             deactivate=False)
+        return render(request,
+                      'TI_Management_app/finance/register_relief_step_one_search.html',
+                      {'searched': searched,
+                       'members': members})
+    else:
+        return render(request,
+                      'TI_Management_app/finance/register_relief_step_one_search.html',
+                      {})
+
+
+@login_required
+def register_relief_step_two(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    if request.method == "POST":
+        form = MemberEditReliefForm(request.POST, request.FILES, instance=member)
+        if form.is_valid():
+            address_member = form.save(commit=False)
+            address_member.author = request.user
+            address_member.save()
+            messages.success(request, "1/4 - Zaktualizowano adres!")
+            return redirect('TI_Management_app:register_relief_step_three', pk=member.pk)
+    else:
+        form = MemberEditReliefForm(instance=member)
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_two.html',
+        {
+            'form': form,
+            'member': member
+        }
+    )
