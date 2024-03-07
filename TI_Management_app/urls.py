@@ -369,5 +369,13 @@ urlpatterns = [
         views.register_relief_step_two,
         name='register_relief_step_two'
     ),
+    path(
+        'TI_Management_app/RegisterReliefStepThree/<int:pk>',
+        views.register_relief_step_three,
+        name='register_relief_step_three'
+    ),
+    path('TI_Management_app/get-author-details/',
+         views.get_relief_details,
+         name='get_relief_details'),
 ]
 

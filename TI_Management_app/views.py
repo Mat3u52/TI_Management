@@ -53,7 +53,8 @@ from .forms import (
     DocumentsDatabaseCategoryForm,
     ReliefFigureForm,
     RelationRegisterReliefForm,
-    MemberEditReliefForm
+    MemberEditReliefForm,
+    RegisterReliefForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -74,8 +75,8 @@ from reportlab.pdfbase.ttfonts import pdfmetrics, TTFont
 from textwrap import wrap
 from django.contrib import messages
 import csv
-
 from django.conf import settings
+from django.http import JsonResponse
 
 
 # class Image(TemplateView):
@@ -2036,12 +2037,15 @@ def register_relief_step_one_search(request):
 def register_relief_step_two(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
-        form = MemberEditReliefForm(request.POST, request.FILES, instance=member)
+        form = MemberEditReliefForm(request.POST, instance=member)
         if form.is_valid():
             address_member = form.save(commit=False)
             address_member.author = request.user
             address_member.save()
-            messages.success(request, "1/4 - Zaktualizowano adres!")
+            messages.success(
+                request,
+                f"1/4 - Zaktualizowano adres {member.forename} {member.surname}!"
+            )
             return redirect('TI_Management_app:register_relief_step_three', pk=member.pk)
     else:
         form = MemberEditReliefForm(instance=member)
@@ -2051,5 +2055,56 @@ def register_relief_step_two(request, pk):
         {
             'form': form,
             'member': member
+        }
+    )
+
+
+@login_required
+def get_relief_details(request):
+    relief_id = request.GET.get('relief_id')
+    if relief_id:
+        try:
+            relief = Relief.objects.get(pk=relief_id)
+            author_name = relief.author.username if relief.author else "Unknown"
+            author_email = relief.author.email if relief.author else "Unknown"
+            figure = relief.figure if relief.figure else "Unknown"
+            grace = relief.grace if relief.grace else "Unknown"
+            data = {
+                'author_name': author_name,
+                'author_email': author_email,
+                'figure': figure,
+                'grace': grace
+            }
+            return JsonResponse(data)
+        except Relief.DoesNotExist:
+            pass
+    return JsonResponse({'error': 'Relief not found'}, status=400)
+
+
+@login_required
+def register_relief_step_three(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    all_relief = Relief.objects.all().order_by('-created_date')
+    all_relation = RelationRegisterRelief.objects.all().order_by('-created_date')
+
+    if request.method == "POST":
+        form = RegisterReliefForm(request.POST)
+        if form.is_valid():
+            register_relife = form.save(commit=False)
+            register_relife.author = request.user
+            register_relife.member = member
+            register_relife.save()
+            messages.success(request, "2/4 - Walidacja zapomogi!")
+            return redirect('TI_Management_app:register_relief_step_four', pk=member.pk)
+    else:
+        form = RegisterReliefForm()
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_three.html',
+        {
+            'form': form,
+            'member': member,
+            'all_relief': all_relief,
+            'all_relation': all_relation
         }
     )

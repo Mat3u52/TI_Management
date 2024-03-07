@@ -17,7 +17,8 @@ from .models import (
     DocumentsDatabase,
     DocumentsDatabaseCategory,
     Relief,
-    RelationRegisterRelief
+    RelationRegisterRelief,
+    RegisterRelief
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -572,3 +573,29 @@ class RelationRegisterReliefForm(forms.ModelForm):
         fields = [
             'title'
         ]
+
+
+class RegisterReliefForm(forms.ModelForm):
+    title = forms.CharField(
+        required=True,
+        max_length=250,
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
+
+    class Meta:
+        model = RegisterRelief
+        fields = [
+            'relief',
+            'relation',
+            'associate_forename',
+            'associate_surname',
+            'account_number',
+            'date_of_completing_the_application',
+            'date_of_receipt_the_application',
+            'date_of_accident'
+        ]
+        widgets = {
+            'date_of_completing_the_application': forms.DateInput(attrs={'type': 'date'}),
+            'date_of_receipt_the_application': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_accident': forms.TextInput(attrs={'type': 'date'})
+        }

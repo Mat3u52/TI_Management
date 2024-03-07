@@ -4,7 +4,7 @@
 <a href="#"> / Finanse</a>
 <a href="#"> / Zapomogi</a>
 <a href="{% url 'TI_Management_app:register_relief_step_one' %}"> / Rejestrowanie zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_two' pk=member.pk %}"> / Krok 1/4</a>
+<a href="{% url 'TI_Management_app:register_relief_step_two' pk=member.pk %}"> / Krok [1/4]</a>
 {% endblock %}
 
 {% block content %}
@@ -17,6 +17,7 @@
         {% if form.errors %}
             <p>{{form.errors}}</p>
         {% endif %}
+
         <table width="100%">
             <tr>
                 <td>
@@ -25,6 +26,7 @@
                             style="min-width: 50%!important; min-height: 15px"
                             type="text"
                             placeholder="Ulica"
+                            value="{{ member.street }}"
                             aria-label="Ulica"
                             name="street"
                             required
@@ -38,6 +40,7 @@
                             style="min-width: 50%!important; min-height: 15px"
                             type="text"
                             placeholder="Miasto"
+                            value="{{ member.city }}"
                             aria-label="Miasto"
                             name="city"
                             required>
@@ -50,6 +53,7 @@
                             style="min-width: 50%!important; min-height: 15px"
                             type="text"
                             placeholder="Kod pocztowy"
+                            value="{{ member.postcode }}"
                             aria-label="Kod pocztowy"
                             name="postcode"
                             required>
@@ -62,6 +66,7 @@
                             style="min-width: 50%!important; min-height: 15px"
                             type="text"
                             placeholder="Numer domu"
+                            value="{{ member.house_number }}"
                             aria-label="Numer domu"
                             name="house_number"
                             required>
@@ -74,9 +79,10 @@
                             style="min-width: 50%!important; min-height: 15px"
                             type="text"
                             placeholder="Numer mieszkania"
+                            value="{{ member.float_number }}"
                             aria-label="Numer mieszkania"
                             name="float_number"
-                            required>
+                            >
                 </td>
             </tr>
         </table>
@@ -87,83 +93,44 @@
         </form>
     </div>
     <div class="notepad">
-        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
+        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
 
         <table>
-          <tr>
-            <td><p class="tableCredential"><b>Uczestnik:</b></p></td>
-            <td><p>{{member.forename}} {{member.surname}}</p></td>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nr Uczestnika Wnioskującego:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{member.member_nr}}
+                    </p>
+                </td>
           </tr>
           <tr>
-            <td><p class="tableCredential"><b>Funkcja:</b></p></td>
-            <td><p>{{member.role}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Zawód:</b></p></td>
-            <td><p>{{member.occupation}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
-            <td><p>{{member.member_nr}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Płeć: </b></p></td>
-            <td>
-              {% if member.sex == 'male' %}<p>M</p>
-              {% elif member.sex == 'female' %}<p>K</p>
-              {% else %}<p>None</p>{% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Data urodzenia: </b></p></td>
-            <td><p>{{member.birthday}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
-            <td><p>{{member.birthplace}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>PIN: </b></p></td>
-            <td><p>{{member.pin}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-            <td><p>{{member.phone_number}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>E-mail: </b></p></td>
-            <td><p>{{member.email}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
-            <td><p>{{member.date_of_accession}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
-            <td><p>{{member.date_of_abandonment}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
-            <td>
-              {% if member.type_of_contract == 'indefinite_period_of_time' %}<p>Na czas nieokreślony</p>
-              {% elif member.type_of_contract == 'limited_duration' %}<p>Na czas określony</p>
-              {% else %}<p>None</p>{% endif %}
-            </td>
-          </tr>
-          <tr>
-            <td class="tableCredential"><p><b>Data zatrudnienia: </b></p></td>
-            <td><p>{{member.date_of_contract}}</p></td>
-          </tr>
-          <tr>
-            <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
-            <td><p>{{member.expiration_date_contract}}</p></td>
+              <td>
+                  <p class="tableCredential">
+                      <b>
+                          Imię i nazwisko Wnioskującego:
+                      </b>
+                  </p>
+              </td>
+                <td>
+                    <p>
+                        {{member.forename}} {{member.surname}}
+                    </p>
+                </td>
           </tr>
         </table>
+        <br />
+        <br />
+        <br />
+        <br />
     </div>
 </div>
-
-
-{{ member }}
 
 {% endblock %}
 
