@@ -1,3 +1,4 @@
+import re
 from django import forms
 from django.core.validators import RegexValidator
 from .models import (
@@ -576,11 +577,6 @@ class RelationRegisterReliefForm(forms.ModelForm):
 
 
 class RegisterReliefForm(forms.ModelForm):
-    title = forms.CharField(
-        required=True,
-        max_length=250,
-        widget=forms.TextInput(attrs={'autofocus': True})
-    )
 
     class Meta:
         model = RegisterRelief
@@ -599,3 +595,40 @@ class RegisterReliefForm(forms.ModelForm):
             'date_of_receipt_the_application': forms.TextInput(attrs={'type': 'date'}),
             'date_of_accident': forms.TextInput(attrs={'type': 'date'})
         }
+
+    # def clean_bank_account(self, *args, **kwargs):
+    #     bank_account = self.cleaned_data.get('account_number')
+    #     if bank_account:
+    #         if not re.match(r'^\d{26}$', bank_account):
+    #             raise forms.ValidationError("Nieprawidłowy numer konta bankowego.")
+    #     return bank_account
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_of_accident = cleaned_data.get('date_of_accident')
+
+        if not date_of_accident:
+            raise forms.ValidationError("Podaj datę wypadku.")
+
+        relief = cleaned_data.get('relief')
+        if relief:
+            grace_period = relief.grace
+            grace_period = grace_period*30
+        else:
+            raise forms.ValidationError("Nie można pobrać czasu karencji dla tej zapomogi.")
+
+        # Oblicz datę, która będzie o 2 miesiące później
+        # waiting_period_end = date_of_accident + timezone.timedelta(days=60)
+        waiting_period_end = date_of_accident + timezone.timedelta(days=grace_period)
+
+        # Sprawdź czy upłynął już czas karencji
+        if timezone.now() < waiting_period_end:
+            remaining_days = (waiting_period_end - timezone.now()).days
+            raise forms.ValidationError(f"Czas karencji {relief.grace} nie minął. Pozostało {remaining_days} dni.")
+
+        bank_account = cleaned_data.get('account_number')
+        if bank_account:
+            if not re.match(r'^\d{26}$', bank_account):
+                raise forms.ValidationError("Nieprawidłowy numer konta bankowego.")
+
+        return cleaned_data

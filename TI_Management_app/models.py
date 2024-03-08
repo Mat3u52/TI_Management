@@ -541,7 +541,7 @@ class RegisterRelief(models.Model):
 
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberRegisterRelief', null=False, blank=False)
     relief = models.ForeignKey(Relief, on_delete=models.CASCADE, related_name='reliefRegisterRelief', null=False, blank=False)
-    relation = models.ForeignKey(RelationRegisterRelief, on_delete=models.CASCADE, related_name='relationRegisterRelief', null=False, blank=False)
+    relation = models.ForeignKey(RelationRegisterRelief, on_delete=models.CASCADE, related_name='relationReliefRegisterRelief', null=False, blank=False)
 
     associate_forename = models.CharField(max_length=250, null=True, blank=True)
     associate_surname = models.CharField(max_length=250, null=True, blank=True)

@@ -96,8 +96,7 @@
                             placeholder="Imię"
                             aria-label="Imię osoby powiązanej z wnioskiem"
                             name="associate_forename"
-                            required
-                            autofocus>
+                            required>
                 </td>
             </tr>
             <tr>
@@ -112,15 +111,14 @@
                             placeholder="Nazwisko"
                             aria-label="Nazwisko osoby powiązanej z wnioskiem"
                             name="associate_surname"
-                            required
-                            autofocus>
+                            required>
                 </td>
             </tr>
         </table>
         <p>
             Zapomoga:
         </p>
-        <select id="relief_select">
+        <select id="relief_select" class="form-select" name="relief">
             <option value="">Wybierz zapomogę</option>
 
                 {% for relief in all_relief %}
@@ -130,19 +128,30 @@
         </select>
         <div>
             <p>Kwota: <span id="figure"></span> zł</p>
-            <p>Karencja: <span id="grace"></span> wimiesiąc/e</p>
+            <p>Karencja: <span id="grace"></span> miesiąc/e</p>
         </div>
         <p>
             Relacja:
         </p>
-        <select>
+        <select class="form-select" name="relation">
             <option value="">Wybierz relacje</option>
-
                 {% for relation in all_relation %}
-                    <option>{{ relation.title }}</option>
+                    <option value="{{ relation.id }}">{{ relation.title }}</option>
                 {% endfor %}
-
         </select>
+        <div>
+             <p>
+                 Nr Konta:
+             </p>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; min-height: 15px"
+                            type="number"
+                            placeholder="Nr konta"
+                            aria-label="Nr konta"
+                            name="account_number"
+                            required>
+        </div>
 
         <button type="submit" class="btn btn-primary btn-large pull-right">
             3/4 Dalej

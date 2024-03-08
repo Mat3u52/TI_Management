@@ -845,18 +845,18 @@ class RelationRegisterReliefAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
     list_display = (
+        'title',
         'created_date',
         'updated_date',
         'slug',
-        'author',
-        'title'
+        'author'
     )
     list_filter = (
+        'title',
         'created_date',
         'updated_date',
         'slug',
-        'author',
-        'title'
+        'author'
     )
     search_fields = (
         'title',
