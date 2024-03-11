@@ -13,7 +13,7 @@
         <input class="form-control me-2"
                style="min-width: 100%!important; min-height: 35px"
                type="search"
-               placeholder="Szukaj Uczestnika"
+               placeholder="Dodaj Uczestnika"
                aria-label="Search" name="searched">
         <button class="btn btn-primary btn-large pull-right"
                 type="submit">
@@ -22,16 +22,29 @@
     </form>
 </div>
 <div class="hero-unit">
-    <h4>Niedokończony proces rejestracji</h4>
     {% for relife_process in relief_process_ongoing %}
+    <H4>Niedokończone procesy wprowadzania wniosków:</H4>
+    <br/>
+
         <div class="notepad">
-            <h3>
-                <a href="#">
-                    {{relife_process}} - {{relife_process.member.forename}} {{relife_process.member.forename}} {{relife_process.member.member_nr}}
-                </a>
-            </h3>
-            <p>Bark dokumentów</p>
+            {% if relife_process.registerReliefFileRegisterRelief.all %}
+                <h3>
+                    <a href="{% url 'TI_Management_app:register_relief_step_five' pk=relife_process.id %}">
+                        {{relife_process}} - {{relife_process.member.forename}} {{relife_process.member.forename}} {{relife_process.member.member_nr}}
+                    </a>
+                </h3>
+
+                <p>Brak Podpisu</p>
+            {% else %}
+                <h3>
+                    <a href="{% url 'TI_Management_app:register_relief_step_four' pk=relife_process.id %}">
+                        {{relife_process}} - {{relife_process.member.forename}} {{relife_process.member.forename}} {{relife_process.member.member_nr}}
+                    </a>
+                </h3>
+                <p>Bark dokumentów</p>
+            {% endif %}
             <div class="date">
+
                 <p>
                     Data dodania: {{relife_process.created_date}}
                 </p>

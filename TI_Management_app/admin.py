@@ -883,7 +883,9 @@ class RegisterReliefAdmin(admin.ModelAdmin):
         'account_number',
         'date_of_completing_the_application',
         'date_of_receipt_the_application',
-        'date_of_accident'
+        'date_of_accident',
+        'complete',
+        'agreement'
     )
     list_filter = (
         'created_date',
@@ -898,7 +900,9 @@ class RegisterReliefAdmin(admin.ModelAdmin):
         'account_number',
         'date_of_completing_the_application',
         'date_of_receipt_the_application',
-        'date_of_accident'
+        'date_of_accident',
+        'complete',
+        'agreement'
     )
     search_fields = (
         'relief',

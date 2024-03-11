@@ -18,7 +18,8 @@ from .models import (
     DocumentsDatabaseCategory,
     Relief,
     RelationRegisterRelief,
-    RegisterRelief
+    RegisterRelief,
+    FileRegisterRelief
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -54,7 +55,9 @@ from .forms import (
     ReliefFigureForm,
     RelationRegisterReliefForm,
     MemberEditReliefForm,
-    RegisterReliefForm
+    RegisterReliefForm,
+    FileRegisterReliefForm,
+    CardRegisterReliefForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -101,7 +104,7 @@ from django.http import JsonResponse
 #     template_name = 'TI_Management_app/image_display.html'
 #     context_object_name = 'image'
 
-
+@login_required
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
 
@@ -120,6 +123,7 @@ def members_list(request):
                    'members': members})
 
 
+@login_required
 def members_table_list(request):
 
     order_by = request.GET.get('order_by', '-forename')
@@ -2049,6 +2053,7 @@ def register_relief_step_two(request, pk):
             return redirect('TI_Management_app:register_relief_step_three', pk=member.pk)
     else:
         form = MemberEditReliefForm(instance=member)
+        # form = MemberEditReliefForm()
     return render(
         request,
         'TI_Management_app/finance/register_relief_step_two.html',
@@ -2095,7 +2100,7 @@ def register_relief_step_three(request, pk):
             register_relife.member = member
             register_relife.save()
             messages.success(request, "2/4 - Walidacja zapomogi!")
-            return redirect('TI_Management_app:register_relief_step_four', pk=member.pk)
+            return redirect('TI_Management_app:register_relief_step_four', pk=register_relife.pk)
     else:
         form = RegisterReliefForm()
     return render(
@@ -2108,3 +2113,101 @@ def register_relief_step_three(request, pk):
             'all_relation': all_relation
         }
     )
+
+
+@login_required
+def register_relief_step_four(request, pk):
+    one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+
+    if request.method == "POST":
+        form = FileRegisterReliefForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            uploaded_files = request.FILES.getlist('file')
+            for uploaded_file in uploaded_files:
+                FileRegisterRelief.objects.create(
+                    author=request.user,
+                    register_relief=one_registered_relife,
+                    title=uploaded_file.name,
+                    file=uploaded_file
+                )
+
+            messages.success(request, "3/4 - Dodano domumenty do zapomogi!")
+            return redirect('TI_Management_app:register_relief_step_five', pk=one_registered_relife.pk)
+    else:
+        form = FileRegisterReliefForm()
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_four.html',
+        {
+            'form': form,
+            # 'member': member,
+            'one_registered_relife': one_registered_relife
+        }
+    )
+
+
+@login_required
+def register_relief_step_five(request, pk):
+    one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+    member = one_registered_relife.member
+
+    if request.method == "POST":
+        form = CardRegisterReliefForm(request.POST, instance=member)
+
+        if form.is_valid():
+            if member.card is form.cleaned_data['card']:
+                one_registered_relife.complete = True
+                one_registered_relife.save()
+
+                messages.success(request, "4/4 - Dodano domumenty do zapomogi!")
+                return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
+    else:
+        # form = CardRegisterReliefForm(instance=member)
+        form = CardRegisterReliefForm()
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_five.html',
+        {
+            'form': form,
+            'one_registered_relife': one_registered_relife
+        }
+    )
+
+
+@login_required
+def register_relief_valid(request, pk):
+    validation_register_relief = get_object_or_404(RegisterRelief, pk=pk)
+
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_valid.html',
+        {
+            'validation_register_relief': validation_register_relief
+        }
+    )
+
+
+@login_required
+def relief_status_list(request):
+    relief_list = RegisterRelief.objects.filter(complete=True).order_by('-created_date')
+
+    paginator = Paginator(relief_list, 50)
+    page = request.GET.get('page')
+    try:
+        relief = paginator.page(page)
+    except PageNotAnInteger:
+        relief = paginator.page(1)
+    except EmptyPage:
+        relief = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/finance/relief_status_list.html',
+        {
+            'page': page,
+            'relief': relief
+        }
+    )
+
+

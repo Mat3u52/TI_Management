@@ -1,10 +1,230 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="#"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:register_relief_step_one' %}"> / Rejestrowanie zapomogi</a>
+<a href="{% url 'TI_Management_app:register_relief_step_two' pk=one_registered_relife.member.pk %}"> / Krok [1/4]</a>
+<a href="{% url 'TI_Management_app:register_relief_step_three' pk=one_registered_relife.member.pk %}"> / Krok [2/4]</a>
+<a href="{% url 'TI_Management_app:register_relief_step_four' pk=one_registered_relife.pk %}"> / Krok [3/4]</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <div class="notepad">
+        <h4>Krok 3/4 - Dokumenty:</h4>
+        <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <p>
+            <b>Dokument: </b>
+        </p>
+
+            <label class="custom-file-upload-mod">
+                {{form.file|cut:'uploadsRegisterRelief/'}}
+            </label>
+<!--            <input type="file" multiple name="file" id="name" required/>-->
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            4/4 Dalej
+        </button>
+        <br />
+        </form>
+    </div>
+
+    <div class="notepad">
+        <img src="{{ one_registered_relife.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
+
+        <table style="margin-left: auto; margin-right: auto;">
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nr Uczestnika:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.member.member_nr}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Imię i nazwisko:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.member.forename}} {{one_registered_relife.member.surname}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Adres:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        ul. {{one_registered_relife.member.street}}
+                        {{one_registered_relife.member.city}}
+                        {{one_registered_relife.member.postcode}}
+                        {{one_registered_relife.member.house_number}}
+                        {{one_registered_relife.member.float_number}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data wypełnienia wniosku:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.date_of_completing_the_application}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data wpłynięcia wniosku:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.date_of_receipt_the_application}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data zdarzenia, którego dotyczy wniosek:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.date_of_accident}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Rodzaj zapomogi:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.relief.title}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Imię osoby powiązanej z wnioskiem:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.associate_forename}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nazwisko osoby powiązanej z wnioskiem:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.associate_surname}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Kwota:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.relief.figure}} zł
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nr konta:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.account_number}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Karencja:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.relief.grace}} miesiąc/e
+                    </p>
+
+                    <p>
+                        <span style="color: green"><b>&#9745;</b></span>
+                    </p>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <br />
+        <br />
+        <br />
+    </div>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='register_relief_step_one' %}
+{% endblock %}

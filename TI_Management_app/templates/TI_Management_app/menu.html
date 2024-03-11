@@ -39,6 +39,9 @@
     <li class="{% if active_tab == 'relief' %} active {% endif %}">
         <a href="#">&#160;&#160;&#8226; zapomogi</a>
     </li>
+    <li class="{% if active_tab == 'relief_figure_add' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:relief_figure_add' %}">&#160;&#160;&#160;&#160;&#8728; wprowadź kwoty zapomóg</a>
+    </li>
     <li class="{% if active_tab == 'register_relief_step_one' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:register_relief_step_one' %}">&#160;&#160;&#160;&#160;&#8728; wprowadź wniosek</a>
     </li>
@@ -47,9 +50,6 @@
     </li>
     <li class="{% if active_tab == 'relief' %} active {% endif %}">
         <a href="#">&#160;&#160;&#160;&#160;&#8728; Podpisywanie zapomogi</a>
-    </li>
-    <li class="{% if active_tab == 'relief_figure_add' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:relief_figure_add' %}">&#160;&#160;&#160;&#160;&#8728; wprowadź kwoty zapomóg</a>
     </li>
 
     <li class="{% if active_tab == 'documents_database' %} active {% endif %}">

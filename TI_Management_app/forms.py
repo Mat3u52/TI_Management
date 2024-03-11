@@ -19,10 +19,12 @@ from .models import (
     DocumentsDatabaseCategory,
     Relief,
     RelationRegisterRelief,
-    RegisterRelief
+    RegisterRelief,
+    FileRegisterRelief
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
+from django.forms import ClearableFileInput
 
 
 class MemberForm(forms.ModelForm):
@@ -596,13 +598,6 @@ class RegisterReliefForm(forms.ModelForm):
             'date_of_accident': forms.TextInput(attrs={'type': 'date'})
         }
 
-    # def clean_bank_account(self, *args, **kwargs):
-    #     bank_account = self.cleaned_data.get('account_number')
-    #     if bank_account:
-    #         if not re.match(r'^\d{26}$', bank_account):
-    #             raise forms.ValidationError("Nieprawidłowy numer konta bankowego.")
-    #     return bank_account
-
     def clean(self):
         cleaned_data = super().clean()
         date_of_accident = cleaned_data.get('date_of_accident')
@@ -617,11 +612,8 @@ class RegisterReliefForm(forms.ModelForm):
         else:
             raise forms.ValidationError("Nie można pobrać czasu karencji dla tej zapomogi.")
 
-        # Oblicz datę, która będzie o 2 miesiące później
-        # waiting_period_end = date_of_accident + timezone.timedelta(days=60)
         waiting_period_end = date_of_accident + timezone.timedelta(days=grace_period)
 
-        # Sprawdź czy upłynął już czas karencji
         if timezone.now() < waiting_period_end:
             remaining_days = (waiting_period_end - timezone.now()).days
             raise forms.ValidationError(f"Czas karencji {relief.grace} nie minął. Pozostało {remaining_days} dni.")
@@ -632,3 +624,52 @@ class RegisterReliefForm(forms.ModelForm):
                 raise forms.ValidationError("Nieprawidłowy numer konta bankowego.")
 
         return cleaned_data
+
+
+class MultipleFileInput(forms.ClearableFileInput):
+    allow_multiple_selected = True
+
+
+class MultipleFileField(forms.FileField):
+    def __init__(self, *args, **kwargs):
+        kwargs.setdefault("widget", MultipleFileInput())
+        super().__init__(*args, **kwargs)
+
+    def clean(self, data, initial=None):
+        single_file_clean = super().clean
+        if isinstance(data, (list, tuple)):
+            result = [single_file_clean(d, initial) for d in data]
+        else:
+            result = single_file_clean(data, initial)
+        return result
+
+
+class FileRegisterReliefForm(forms.ModelForm):
+    file = MultipleFileField(label='Select files', required=False)
+
+    class Meta:
+        model = FileRegisterRelief
+        fields = ['file']
+
+
+class CardRegisterReliefForm(forms.ModelForm):
+
+    class Meta:
+        model = MembersZZTI
+        fields = ['card']
+
+    def clean(self):
+        cleaned_data = super().clean()
+        card = cleaned_data.get('card')
+
+        # Retrieve the instance being updated
+        instance = self.instance
+
+        if instance and instance.card != card:
+            raise forms.ValidationError("Niepoprawny podpis.")
+
+        return cleaned_data
+
+
+
+
