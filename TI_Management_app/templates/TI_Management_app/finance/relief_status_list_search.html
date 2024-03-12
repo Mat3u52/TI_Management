@@ -1,0 +1,50 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="#"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Podpisywanie zapomogi</a>
+{% endblock %}
+
+{% block content %}
+    {% if searched %}
+        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <br />
+        {% for member in members %}
+            <div class="hero-unit">
+                <img src="{{ member.member.image.url }}" alt="image" width="100px">
+                <h2>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=member.member.pk %}">
+                        {{member.member.forename}} {{member.member.surname}}
+                    </a>
+                </h2>
+                <p>
+                    <b>
+                        Nr:
+                    </b>
+                    {{member.member.member_nr}} 	&#124;
+                    <b>
+                        tel:
+                    </b>
+                    {{member.member.phone_number}} &#124;
+                    <b>
+                        email:
+                    </b>
+                    {{member.member.email}}
+                </p>
+
+                <p>
+                    <a href="#" class="btn btn-primary btn-large pull-right">
+                        Dodaj podpis
+                    </a>
+                </p>
+                <div class="date"><p>Data dodania: {{ member.member.created_date }}</p></div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <h2>Please, insert the phrase into the search area.</h2>
+    {% endif %}
+{% endblock %}
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='relief' %}
+{% endblock %}

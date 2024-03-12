@@ -388,9 +388,19 @@ urlpatterns = [
         name='register_relief_valid'
     ),
     path(
-        'TI_Management_app/finance/to-sign/relief-list/',
+        'TI_Management_app/finance/relief-status-list/',
         views.relief_status_list,
         name='relief_status_list'
+    ),
+    path(
+        'TI_Management_app/finance/relief-status-list-search/',
+        views.relief_status_list_search,
+        name='relief_status_list_search'
+    ),
+    path(
+        'TI_Management_app/finance/relief-status-to-be-signed/<int:pk>/',
+        views.relief_status_to_be_signed,
+        name='relief_status_to_be_signed'
     ),
 ]
 

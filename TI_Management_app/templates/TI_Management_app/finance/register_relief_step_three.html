@@ -201,7 +201,13 @@
                 </td>
                 <td>
                     <p>
-                        ul. {{member.street}} {{member.city}} {{member.postcode}} {{member.house_number}} {{member.float_number}}
+                        ul. {{member.street}}
+                        {{member.city}}
+                        {{member.postcode}}
+                        {{member.house_number}}
+                        {% if member.float_number is not None%}
+                            {{member.float_number}}
+                        {% endif %}
                     </p>
                 </td>
             </tr>

@@ -75,7 +75,9 @@
                         {{one_registered_relife.member.city}}
                         {{one_registered_relife.member.postcode}}
                         {{one_registered_relife.member.house_number}}
-                        {{one_registered_relife.member.float_number}}
+                        {% if one_registered_relife.member.float_number is not None%}
+                            {{one_registered_relife.member.float_number}}
+                        {% endif %}
                     </p>
                 </td>
             </tr>
@@ -202,10 +204,7 @@
                 <td>
                     <p>
                         {{one_registered_relife.relief.grace}} miesiąc/e
-                    </p>
-                </td>
-                <td>
-                    <p>
+
                         <span style="color: green"><b>&#9745;</b></span>
                     </p>
                 </td>

@@ -3,41 +3,59 @@
     <li class="nav-header">Panel</li>
     <li><a href="#"><b>Dashboard</b></a></li>
     <li class="{% if active_tab == 'members_list' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:members_list' %}"><b>Baza Członków</b></a>
+        <a href="{% url 'TI_Management_app:members_list' %}">
+            <b>Baza Członków</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'member_new' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:member_new' %}">&#160;&#160;&#8226; dodaj członka</a>
+        <a href="{% url 'TI_Management_app:member_new' %}">
+            <b>&#160;&#160;&#8226; dodaj członka</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'member_function_add' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:member_function_add' %}">&#160;&#160;&#8226; dodaj funkcje członka</a>
+        <a href="{% url 'TI_Management_app:member_function_add' %}">
+            <b>&#160;&#160;&#8226; dodaj funkcje członka</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'member_occupation_add' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:member_occupation_add' %}">&#160;&#160;&#8226; dodaj stanowsko</a>
+        <a href="{% url 'TI_Management_app:member_occupation_add' %}">
+            <b>&#160;&#160;&#8226; dodaj stanowsko</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'groups' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:groups_list' %}"><b>Grupy</b></a>
     </li>
     <li class="{% if active_tab == 'groups_add' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:groups_add' %}">&#160;&#160;&#8226; dodaj grupe</a>
+        <a href="{% url 'TI_Management_app:groups_add' %}">
+            <b>&#160;&#160;&#8226; dodaj grupe</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'loyalty_card' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b>Karty Lojalnościowe</b></a>
     </li>
     <li class="{% if active_tab == 'loyalty_card_add' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:loyalty_card_add' %}">&#160;&#160;&#8226; dodaj karte lojalnościową</a>
+        <a href="{% url 'TI_Management_app:loyalty_card_add' %}">
+            <b>&#160;&#160;&#8226; dodaj karte lojalnościową</b>
+        </a>
     </li>
 
     <li class="{% if active_tab == 'finance_list' %} active {% endif %}">
         <a href="#"><b>Finanse</b></a>
     </li>
     <li class="{% if active_tab == 'application_add' %} active {% endif %}">
-        <a href="#">&#160;&#160;&#8226; dodaj dokument księgowy</a>
+        <a href="#">
+            <b>&#160;&#160;&#8226; dodaj dokument księgowy</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'stipend' %} active {% endif %}">
-        <a href="#">&#160;&#160;&#8226; stypendia</a>
+        <a href="#">
+            <b>&#160;&#160;&#8226; stypendia</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'relief' %} active {% endif %}">
-        <a href="#">&#160;&#160;&#8226; zapomogi</a>
+        <a href="{% url 'TI_Management_app:relief_status_list' %}">
+            <b>&#160;&#160;&#8226; zapomogi</b>
+        </a>
     </li>
     <li class="{% if active_tab == 'relief_figure_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:relief_figure_add' %}">&#160;&#160;&#160;&#160;&#8728; wprowadź kwoty zapomóg</a>
@@ -48,7 +66,7 @@
     <li class="{% if active_tab == 'relation_register_relief_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:relation_register_relief_add' %}">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#9830; dodaj relacje</a>
     </li>
-    <li class="{% if active_tab == 'relief' %} active {% endif %}">
+    <li class="{% if active_tab == 'relief_sign' %} active {% endif %}">
         <a href="#">&#160;&#160;&#160;&#160;&#8728; Podpisywanie zapomogi</a>
     </li>
 
@@ -56,7 +74,9 @@
         <a href="{% url 'TI_Management_app:documents_database' %}"><b>Baza Dokumentów</b></a>
     </li>
         <li class="{% if active_tab == 'documents_database_category' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:documents_database_category' %}">&#160;&#160;&#8226; dodaj kategorie</a>
+        <a href="{% url 'TI_Management_app:documents_database_category' %}">
+            <b>&#160;&#160;&#8226; dodaj kategorie</b>
+        </a>
     </li>
 </ul>
 </div>

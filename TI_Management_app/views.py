@@ -2158,6 +2158,7 @@ def register_relief_step_five(request, pk):
         if form.is_valid():
             if member.card is form.cleaned_data['card']:
                 one_registered_relife.complete = True
+                one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
                 one_registered_relife.save()
 
                 messages.success(request, "4/4 - Dodano domumenty do zapomogi!")
@@ -2211,3 +2212,41 @@ def relief_status_list(request):
     )
 
 
+@login_required
+def relief_status_list_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        members = RegisterRelief.objects.filter(
+            Q(member__forename__contains=searched.capitalize()) |
+            Q(member__surname__contains=searched.capitalize()) |
+            Q(member__member_nr__contains=searched) |
+            Q(member__phone_number__contains=searched),
+            member__card__isnull=False,
+            member__deactivate=False,
+            complete=True
+        )
+        return render(
+            request,
+            'TI_Management_app/finance/relief_status_list_search.html',
+            {
+                'searched': searched,
+                'members': members
+            }
+        )
+    else:
+        return render(request,
+                      'TI_Management_app/finance/relief_status_list_search.html',
+                      {})
+
+
+@login_required
+def relief_status_to_be_signed(request, pk):
+    relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
+
+    return render(
+        request,
+        'TI_Management_app/finance/relief_status_to_be_signed.html',
+        {
+            'relief_to_be_signed': relief_to_be_signed
+        }
+    )

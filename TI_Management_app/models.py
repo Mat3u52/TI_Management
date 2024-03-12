@@ -489,7 +489,7 @@ class Relief(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorRelief')
-    title = models.CharField(max_length=250, null=False, blank=False, unique=True)
+    title = models.CharField(max_length=250, null=False, blank=False)  # unique = True
     figure = models.FloatField(null=False, blank=False)
     grace = models.IntegerField(null=False, blank=False)
 
@@ -555,7 +555,9 @@ class RegisterRelief(models.Model):
     """
 
     complete = models.BooleanField(default=False)
-    agreement = models.BooleanField(default=False)
+    date_of_signed_by_the_applicant = models.DateTimeField(blank=True, null=True)
+    agreement = models.BooleanField(default=False)  # min 3 signed
+    payment_confirmation = models.BooleanField(default=False)  # min 3 signed
 
     history = HistoricalRecords()
 

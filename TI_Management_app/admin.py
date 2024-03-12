@@ -885,6 +885,7 @@ class RegisterReliefAdmin(admin.ModelAdmin):
         'date_of_receipt_the_application',
         'date_of_accident',
         'complete',
+        'date_of_signed_by_the_applicant',
         'agreement'
     )
     list_filter = (
@@ -902,6 +903,7 @@ class RegisterReliefAdmin(admin.ModelAdmin):
         'date_of_receipt_the_application',
         'date_of_accident',
         'complete',
+        'date_of_signed_by_the_applicant',
         'agreement'
     )
     search_fields = (

@@ -3,21 +3,14 @@
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
 <a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_one' %}"> / Rejestrowanie zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_two' pk=validation_register_relief.pk %}"> / Weryfikacja</a>
+<a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"> / Podpisywanie zapomogi</a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
     <div class="notepad">
-        <h4>Weryfikacja przebiegła pomyślnie:</h4>
-        <H1><span style="color:green">&#10003;</span></H1>
-
-    </div>
-
-    <div class="notepad">
-        <img src="{{ validation_register_relief.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
+        <img src="{{ relief_to_be_signed.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
 
         <table style="margin-left: auto; margin-right: auto;">
             <tr>
@@ -30,7 +23,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.member.member_nr}}
+                        {{relief_to_be_signed.member.member_nr}}
                     </p>
                 </td>
             </tr>
@@ -44,8 +37,8 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.member.forename}}
-                        {{validation_register_relief.member.surname}}
+                        {{relief_to_be_signed.member.forename}}
+                        {{relief_to_be_signed.member.surname}}
                     </p>
                 </td>
             </tr>
@@ -59,12 +52,12 @@
                 </td>
                 <td>
                     <p>
-                        ul. {{validation_register_relief.member.street}}
-                        {{validation_register_relief.member.city}}
-                        {{validation_register_relief.member.postcode}}
-                        {{validation_register_relief.member.house_number}}
-                        {% if validation_register_relief.member.float_number is not None%}
-                            {{validation_register_relief.member.float_number}}
+                        ul. {{relief_to_be_signed.member.street}}
+                        {{relief_to_be_signed.member.city}}
+                        {{relief_to_be_signed.member.postcode}}
+                        {{relief_to_be_signed.member.house_number}}
+                        {% if relief_to_be_signed.member.float_number is not None%}
+                            {{relief_to_be_signed.member.float_number}}
                         {% endif %}
                     </p>
                 </td>
@@ -79,7 +72,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.date_of_completing_the_application}}
+                        {{relief_to_be_signed.date_of_completing_the_application}}
                     </p>
                 </td>
             </tr>
@@ -93,7 +86,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.date_of_receipt_the_application}}
+                        {{relief_to_be_signed.date_of_receipt_the_application}}
                     </p>
                 </td>
             </tr>
@@ -107,7 +100,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.date_of_accident}}
+                        {{relief_to_be_signed.date_of_accident}}
                     </p>
                 </td>
             </tr>
@@ -121,7 +114,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.relief.title}}
+                        {{relief_to_be_signed.relief.title}}
                     </p>
                 </td>
             </tr>
@@ -135,7 +128,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.associate_forename}}
+                        {{relief_to_be_signed.associate_forename}}
                     </p>
                 </td>
             </tr>
@@ -149,7 +142,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.associate_surname}}
+                        {{relief_to_be_signed.associate_surname}}
                     </p>
                 </td>
             </tr>
@@ -163,7 +156,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.relief.figure}} zł
+                        {{relief_to_be_signed.relief.figure}} zł
                     </p>
                 </td>
             </tr>
@@ -177,7 +170,7 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.account_number}}
+                        {{relief_to_be_signed.account_number}}
                     </p>
                 </td>
             </tr>
@@ -191,9 +184,8 @@
                 </td>
                 <td>
                     <p>
-                        {{validation_register_relief.relief.grace}} miesiąc/e
-                    </p>
-                    <p>
+                        {{relief_to_be_signed.relief.grace}} miesiąc/e
+
                         <span style="color: green"><b>&#9745;</b></span>
                     </p>
                 </td>
@@ -207,26 +199,53 @@
                     </p>
                 </td>
                 <td>
-                    {% for file in validation_register_relief.registerReliefFileRegisterRelief.all  %}
-                        {{file.title}}
+                    {% for file in relief_to_be_signed.registerReliefFileRegisterRelief.all  %}
+                        <a href="{{ file.file.url }}">
+                            {{file.title}}
+                        </a>
                     {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Podpis Wnioskującego:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {% if relief_to_be_signed.complete is True %}
+                            {{relief_to_be_signed.member.forename}}
+                            {{relief_to_be_signed.member.surname}}
+                            {{relief_to_be_signed.member.member_nr}}
+                            Data: {{relief_to_be_signed.date_of_signed_by_the_applicant}}
+                            <span style="color: green"><b>&#9745;</b></span>
+                        {% else %}
+                            {{relief_to_be_signed.complete}}
+                        {% endif %}
+                    </p>
                 </td>
             </tr>
         </table>
         <div class="date">
             <p>
-                Data wprowadzenia: {{validation_register_relief.created_date}}
-                przez: {{validation_register_relief.author}}
-                {{validation_register_relief.author.first_name}}
-                {{validation_register_relief.author.last_name}}
+                Data wprowadzenia: {{relief_to_be_signed.created_date}}
+                przez: {{relief_to_be_signed.author}}
+                {{relief_to_be_signed.author.first_name}}
+                {{relief_to_be_signed.author.last_name}}
             </p>
         </div>
         <br />
+    </div>
+    <div class="notepad">
+        Dodaj Podpis:
     </div>
 </div>
 
 {% endblock %}
 
 {% block menu %}
-    {% include 'TI_Management_app/menu.html' with active_tab='register_relief_step_one' %}
+    {% include 'TI_Management_app/menu.html' with active_tab='relief' %}
 {% endblock %}
