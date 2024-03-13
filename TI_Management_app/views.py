@@ -57,7 +57,8 @@ from .forms import (
     MemberEditReliefForm,
     RegisterReliefForm,
     FileRegisterReliefForm,
-    CardRegisterReliefForm
+    CardRegisterReliefForm,
+    SignatureReliefForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -104,6 +105,7 @@ from django.http import JsonResponse
 #     template_name = 'TI_Management_app/image_display.html'
 #     context_object_name = 'image'
 
+
 @login_required
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
@@ -117,10 +119,14 @@ def members_list(request):
     except EmptyPage:
         members = paginator.page(paginator.num_pages)
 
-    return render(request,
-                  'TI_Management_app/members_list.html',
-                  {'page': page,
-                   'members': members})
+    return render(
+        request,
+        'TI_Management_app/members_list.html',
+        {
+            'page': page,
+            'members': members
+        }
+    )
 
 
 @login_required
@@ -2243,10 +2249,23 @@ def relief_status_list_search(request):
 def relief_status_to_be_signed(request, pk):
     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
 
+    if request.method == "POST":
+        form = SignatureReliefForm(request.POST)
+        if form.is_valid():
+            signature = form.save(commit=False)
+            signature.author = request.user
+            # signature.member = member
+            signature.save()
+            messages.success(request, "Dodano podpis!")
+            return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+    else:
+        form = SignatureReliefForm()
+
     return render(
         request,
         'TI_Management_app/finance/relief_status_to_be_signed.html',
         {
+            'form': form,
             'relief_to_be_signed': relief_to_be_signed
         }
     )

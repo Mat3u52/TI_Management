@@ -226,7 +226,8 @@ class MembersZZTI(models.Model):
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
     expiration_date_contract = models.DateTimeField(default=None, blank=True, null=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    card = models.CharField(max_length=250, blank=True, null=True, default=None)
+    card = models.CharField(max_length=250, blank=True, null=True, default='', unique=True)
+    # card = models.CharField(max_length=250, blank=True, null=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
     deactivate = models.BooleanField(default=False)
     history = HistoricalRecords()
@@ -558,6 +559,7 @@ class RegisterRelief(models.Model):
     date_of_signed_by_the_applicant = models.DateTimeField(blank=True, null=True)
     agreement = models.BooleanField(default=False)  # min 3 signed
     payment_confirmation = models.BooleanField(default=False)  # min 3 signed
+    date_of_payment_confirmation = models.DateTimeField(blank=True, null=True)
 
     history = HistoricalRecords()
 
@@ -573,6 +575,31 @@ class RegisterRelief(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.relief}")
+        super().save(*args, **kwargs)
+
+
+class SignatureRelief(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorSignatureRelief')
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberSignatureRelief', null=False, blank=False)
+    register_relief = models.ForeignKey(RegisterRelief, on_delete=models.CASCADE, related_name='registerReliefSignatureRelief', null=False, blank=False)
+    signature = models.BooleanField(default=False)
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Podpisy zapomogi'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.register_relief
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.register_relief}")
         super().save(*args, **kwargs)
 
 

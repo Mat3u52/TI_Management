@@ -20,11 +20,12 @@ from .models import (
     Relief,
     RelationRegisterRelief,
     RegisterRelief,
-    FileRegisterRelief
+    FileRegisterRelief,
+    SignatureRelief
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
-from django.forms import ClearableFileInput
+from django.contrib.auth.models import User
 
 
 class MemberForm(forms.ModelForm):
@@ -671,5 +672,33 @@ class CardRegisterReliefForm(forms.ModelForm):
         return cleaned_data
 
 
+class SignatureReliefForm(forms.ModelForm):
+    card = forms.CharField(
+        required=True,
+        max_length=250,
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
 
+    class Meta:
+        model = MembersZZTI
+        fields = [
+            'card'
+        ]
 
+    def clean_card(self):
+        card = self.cleaned_data['card']
+        # Check if the card exists in the model
+        if not MembersZZTI.objects.filter(card=card).exists():
+            raise forms.ValidationError("Taki Członek nie istnieje!")
+        # else:
+        if MembersZZTI.objects.filter(card=card).exists():
+            member = MembersZZTI.objects.get(card=card)
+            if User.objects.filter(username=member.member_nr).exists():
+                existing_user = User.objects.filter(username=member.member_nr).first()
+                # if existing_user.is_active:
+                if existing_user.is_active:
+                    raise forms.ValidationError(f"{member.member_nr}")
+                else:
+                    raise forms.ValidationError(f"Członek nie jest aktywny!")
+
+        return card

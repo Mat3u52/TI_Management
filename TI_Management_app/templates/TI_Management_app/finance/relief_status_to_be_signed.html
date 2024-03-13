@@ -240,7 +240,21 @@
         <br />
     </div>
     <div class="notepad">
-        Dodaj Podpis:
+        <H4>Dodaj Podpis:</H4>
+
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+            {{form.card}}
+
+            <button type="submit" class="btn btn-primary btn-large pull-right">
+                Zapisz
+            </button>
+            <br />
+        </form>
+
     </div>
 </div>
 

@@ -27,7 +27,8 @@ from .models import (
     Relief,
     RelationRegisterRelief,
     RegisterRelief,
-    FileRegisterRelief
+    FileRegisterRelief,
+    SignatureRelief
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -886,7 +887,9 @@ class RegisterReliefAdmin(admin.ModelAdmin):
         'date_of_accident',
         'complete',
         'date_of_signed_by_the_applicant',
-        'agreement'
+        'agreement',
+        'payment_confirmation',
+        'date_of_payment_confirmation'
     )
     list_filter = (
         'created_date',
@@ -904,10 +907,42 @@ class RegisterReliefAdmin(admin.ModelAdmin):
         'date_of_accident',
         'complete',
         'date_of_signed_by_the_applicant',
-        'agreement'
+        'agreement',
+        'payment_confirmation',
+        'date_of_payment_confirmation'
     )
     search_fields = (
         'relief',
+    )
+
+
+@admin.register(SignatureRelief)
+class SignatureReliefAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'register_relief',
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'member',
+        'signature'
+    )
+    list_filter = (
+        'register_relief',
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'member',
+        'signature'
+    )
+    search_fields = (
+        'register_relief',
     )
 
 

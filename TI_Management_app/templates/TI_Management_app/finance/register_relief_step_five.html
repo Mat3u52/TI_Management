@@ -15,7 +15,7 @@
 <div class="hero-unit">
     <div class="notepad">
         <h4>Krok 4/4 - Podpis Wnioskującego:</h4>
-        <form method="post" class="post-form" enctype="multipart/form-data">
+        <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
             <p>{{form.errors}}</p>
