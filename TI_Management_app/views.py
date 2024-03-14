@@ -19,7 +19,8 @@ from .models import (
     Relief,
     RelationRegisterRelief,
     RegisterRelief,
-    FileRegisterRelief
+    FileRegisterRelief,
+    SignatureRelief
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -58,7 +59,8 @@ from .forms import (
     RegisterReliefForm,
     FileRegisterReliefForm,
     CardRegisterReliefForm,
-    SignatureReliefForm
+    SignatureReliefForm,
+    PaymentConfirmationReliefForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -81,7 +83,7 @@ from django.contrib import messages
 import csv
 from django.conf import settings
 from django.http import JsonResponse
-
+from django.contrib.auth.models import User
 
 # class Image(TemplateView):
 #     form = MemberForm
@@ -2252,14 +2254,59 @@ def relief_status_to_be_signed(request, pk):
     if request.method == "POST":
         form = SignatureReliefForm(request.POST)
         if form.is_valid():
-            signature = form.save(commit=False)
-            signature.author = request.user
-            # signature.member = member
-            signature.save()
-            messages.success(request, "Dodano podpis!")
-            return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+            card = form.cleaned_data['card']
+            member = MembersZZTI.objects.filter(card=card).first()
+            if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
+
+                signature = SignatureRelief.objects.create(
+                    author=request.user,
+                    member=member,
+                    register_relief=relief_to_be_signed,
+                    signature=True
+                )
+                signature.save()
+
+                messages.success(
+                    request,
+                    f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
+                )
+                return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+            else:
+                messages.error(
+                    request,
+                    "Nieprawidłowy podpis."
+                )
     else:
         form = SignatureReliefForm()
+
+    # if request.method == "POST":
+    #
+    #     form_confirmation = PaymentConfirmationReliefForm(request.POST)
+    #     if form.is_valid():
+    #         card = form.cleaned_data['card']
+    #         member = MembersZZTI.objects.filter(card=card).first()
+    #         if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
+    #
+    #             signature = SignatureRelief.objects.create(
+    #                 author=request.user,
+    #                 member=member,
+    #                 register_relief=relief_to_be_signed,
+    #                 signature=True
+    #             )
+    #             signature.save()
+    #
+    #             messages.success(
+    #                 request,
+    #                 f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
+    #             )
+    #             return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+    #         else:
+    #             messages.error(
+    #                 request,
+    #                 "Nieprawidłowy podpis."
+    #             )
+    # else:
+    #     form = SignatureReliefForm()
 
     return render(
         request,
@@ -2269,3 +2316,4 @@ def relief_status_to_be_signed(request, pk):
             'relief_to_be_signed': relief_to_be_signed
         }
     )
+

@@ -653,11 +653,11 @@ class FileRegisterReliefForm(forms.ModelForm):
         fields = ['file']
 
 
-class CardRegisterReliefForm(forms.ModelForm):
+class CardRegisterReliefForm(forms.Form):
 
-    class Meta:
-        model = MembersZZTI
-        fields = ['card']
+    # class Meta:
+    #     model = MembersZZTI
+    #     fields = ['card']
 
     def clean(self):
         cleaned_data = super().clean()
@@ -672,33 +672,32 @@ class CardRegisterReliefForm(forms.ModelForm):
         return cleaned_data
 
 
-class SignatureReliefForm(forms.ModelForm):
+class SignatureReliefForm(forms.Form):
     card = forms.CharField(
         required=True,
         max_length=250,
         widget=forms.TextInput(attrs={'autofocus': True})
     )
 
-    class Meta:
-        model = MembersZZTI
-        fields = [
-            'card'
-        ]
+    # class Meta:
+    #     model = MembersZZTI
+    #     fields = [
+    #         'card'
+    #     ]
 
     def clean_card(self):
         card = self.cleaned_data['card']
-        # Check if the card exists in the model
         if not MembersZZTI.objects.filter(card=card).exists():
             raise forms.ValidationError("Taki Członek nie istnieje!")
-        # else:
         if MembersZZTI.objects.filter(card=card).exists():
             member = MembersZZTI.objects.get(card=card)
             if User.objects.filter(username=member.member_nr).exists():
                 existing_user = User.objects.filter(username=member.member_nr).first()
-                # if existing_user.is_active:
-                if existing_user.is_active:
-                    raise forms.ValidationError(f"{member.member_nr}")
-                else:
+                if not existing_user.is_active:
                     raise forms.ValidationError(f"Członek nie jest aktywny!")
 
         return card
+
+
+class PaymentConfirmationReliefForm(forms.Form):
+    payment_confirmation = forms.BooleanField()

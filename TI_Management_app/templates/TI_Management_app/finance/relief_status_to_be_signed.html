@@ -228,15 +228,76 @@
                     </p>
                 </td>
             </tr>
+
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data wprowadzenia:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.created_date}}
+                        przez: {{relief_to_be_signed.author}}
+                        {{relief_to_be_signed.author.first_name}}
+                        {{relief_to_be_signed.author.last_name}}
+                    </p>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Podpisy Członków Zarządu:
+                        </b><br />
+                            {{relief_to_be_signed.registerReliefSignatureRelief.count}} / 3
+                    </p>
+                </td>
+                <td>
+                    {% for signature in  relief_to_be_signed.registerReliefSignatureRelief.all %}
+                        <p>
+                            {{ signature.member.forename }}
+                            {{ signature.member.surname }}
+                            {{ signature.member.member_nr }}
+                            Dnia: {{ signature.member.created_date }} <span style="color: green"><b>&#9745;</b></span>
+                        </p>
+                    {% endfor %}
+                </td>
+            </tr>
+
+
         </table>
+        {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 3 %}
+            <form method="post" class="post-form">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <p>{{form.errors}}</p>
+                {% endif %}
+                {{form.card}}
+
+                <button type="submit" class="btn btn-primary btn-large pull-right">
+                    Potwierdź wypłatę
+                </button>
+            <br />
+            </form>
+        {% else %}
+            <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
+                Potwierdź wypłatę
+            </button>
+        {% endif %}
         <div class="date">
             <p>
-                Data wprowadzenia: {{relief_to_be_signed.created_date}}
+                Data wprowadzenia: {{relief_to_be_signed.created_date}}<br />
                 przez: {{relief_to_be_signed.author}}
                 {{relief_to_be_signed.author.first_name}}
                 {{relief_to_be_signed.author.last_name}}
             </p>
         </div>
+
         <br />
     </div>
     <div class="notepad">
@@ -256,6 +317,7 @@
         </form>
 
     </div>
+
 </div>
 
 {% endblock %}
