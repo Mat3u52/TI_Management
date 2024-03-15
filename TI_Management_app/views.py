@@ -2253,6 +2253,7 @@ def relief_status_to_be_signed(request, pk):
 
     if request.method == "POST":
         form = SignatureReliefForm(request.POST)
+        form_confirmation = PaymentConfirmationReliefForm(request.POST)
         if form.is_valid():
             card = form.cleaned_data['card']
             member = MembersZZTI.objects.filter(card=card).first()
@@ -2276,43 +2277,37 @@ def relief_status_to_be_signed(request, pk):
                     request,
                     "Nieprawidłowy podpis."
                 )
+
+        if form_confirmation.is_valid():
+            confirmation = form_confirmation.cleaned_data['payment_confirmation']
+            if confirmation is True:
+
+                relief_to_be_signed.agreement = True
+                relief_to_be_signed.payment_confirmation = True
+                relief_to_be_signed.date_of_payment_confirmation = timezone.now()
+                relief_to_be_signed.save()
+
+                messages.success(
+                    request,
+                    f"Potwierdzenie wypłaty"
+                )
+                return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+            else:
+                messages.error(
+                    request,
+                    "Error!"
+                )
+
     else:
         form = SignatureReliefForm()
-
-    # if request.method == "POST":
-    #
-    #     form_confirmation = PaymentConfirmationReliefForm(request.POST)
-    #     if form.is_valid():
-    #         card = form.cleaned_data['card']
-    #         member = MembersZZTI.objects.filter(card=card).first()
-    #         if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
-    #
-    #             signature = SignatureRelief.objects.create(
-    #                 author=request.user,
-    #                 member=member,
-    #                 register_relief=relief_to_be_signed,
-    #                 signature=True
-    #             )
-    #             signature.save()
-    #
-    #             messages.success(
-    #                 request,
-    #                 f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
-    #             )
-    #             return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
-    #         else:
-    #             messages.error(
-    #                 request,
-    #                 "Nieprawidłowy podpis."
-    #             )
-    # else:
-    #     form = SignatureReliefForm()
+        form_confirmation = PaymentConfirmationReliefForm()
 
     return render(
         request,
         'TI_Management_app/finance/relief_status_to_be_signed.html',
         {
             'form': form,
+            'form_confirmation': form_confirmation,
             'relief_to_be_signed': relief_to_be_signed
         }
     )

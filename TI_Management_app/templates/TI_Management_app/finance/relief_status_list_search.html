@@ -2,8 +2,8 @@
 
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Podpisywanie zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Wyszukiwanie</a>
 {% endblock %}
 
 {% block content %}
@@ -34,9 +34,21 @@
                 </p>
 
                 <p>
-                    <a href="#" class="btn btn-primary btn-large pull-right">
-                        Dodaj podpis
-                    </a>
+                    {% if member.payment_confirmation is False %}
+                        {% if member.registerReliefSignatureRelief.count < 2 %}
+                            <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                                Dodaj podpis
+                            </a>
+                        {% else %}
+                            <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                                Dodaj potwierdzenie wypłaty
+                            </a>
+                        {% endif %}
+<!--                    {% elif member.payment_confirmation is True %}-->
+<!--                        <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">-->
+<!--                            Pokaż potwierdzenie-->
+<!--                        </a>-->
+                    {% endif %}
                 </p>
                 <div class="date"><p>Data dodania: {{ member.member.created_date }}</p></div>
             </div>

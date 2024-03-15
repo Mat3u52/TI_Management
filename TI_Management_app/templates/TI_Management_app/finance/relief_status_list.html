@@ -2,8 +2,7 @@
 
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Podpisywanie zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Zapomogi</a>
 {% endblock %}
 
 {% block content %}
@@ -25,6 +24,7 @@
     <H4>Wnioski zapomogi do podpisu:</H4>
     {% for relife_to_sign in relief %}
     <br/>
+        {% if relife_to_sign.registerReliefSignatureRelief.count < 2 %}
         <div class="notepad">
             {% if relife_to_sign.registerReliefFileRegisterRelief.all %}
                 <h3>
@@ -42,6 +42,38 @@
                 </p>
             </div>
         </div>
+        {% endif %}
+    {% endfor %}
+</div>
+
+<div class="hero-unit">
+    <H4>Wnioski do wypłaty:</H4>
+    {% for relife_to_sign in relief %}
+    <br/>
+        {% if relife_to_sign.payment_confirmation is False %}
+            {% if relife_to_sign.registerReliefSignatureRelief.count >= 2 %}
+                <div class="notepad">
+                    {% if relife_to_sign.registerReliefFileRegisterRelief.all %}
+                    <h3>
+                    <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relife_to_sign.pk %}">
+                        {{relife_to_sign}} -
+                        {{relife_to_sign.member.forename}}
+                        {{relife_to_sign.member.forename}} -
+                        {{relife_to_sign.member.member_nr}}
+                    </a>
+<!--                    {% if relife_to_sign.payment_confirmation is True %}-->
+<!--                        <span style="color: green"><b>&#9745;</b></span>-->
+<!--                    {% endif %}-->
+                    </h3>
+                    <div class="date">
+                        <p>
+                            Data dodania: {{relife_to_sign.created_date}}
+                        </p>
+                    </div>
+                    {% endif %}
+                </div>
+            {% endif %}
+        {% endif %}
     {% endfor %}
 </div>
 

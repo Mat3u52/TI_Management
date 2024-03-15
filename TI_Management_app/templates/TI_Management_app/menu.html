@@ -66,8 +66,9 @@
     <li class="{% if active_tab == 'relation_register_relief_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:relation_register_relief_add' %}">&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#9830; dodaj relacje</a>
     </li>
-    <li class="{% if active_tab == 'relief_sign' %} active {% endif %}">
-        <a href="#">&#160;&#160;&#160;&#160;&#8728; Podpisywanie zapomogi</a>
+
+    <li class="{% if active_tab == 'relief_confirmed_list' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:relief_confirmed_list' %}">&#160;&#160;&#160;&#160;&#8728; lista udzielonych zapomóg</a>
     </li>
 
     <li class="{% if active_tab == 'documents_database' %} active {% endif %}">

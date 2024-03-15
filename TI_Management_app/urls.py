@@ -360,12 +360,12 @@ urlpatterns = [
         name='register_relief_step_one_search'
     ),
     path(
-        'TI_Management_app/register-relief-step-one/<int:pk>/',
+        'TI_Management_app/finance/register-relief-step-one/<int:pk>/',
         views.register_relief_step_two,
         name='register_relief_step_two'
     ),
     path(
-        'TI_Management_app/register-relief-step-three/<int:pk>/',
+        'TI_Management_app/finance/register-relief-step-three/<int:pk>/',
         views.register_relief_step_three,
         name='register_relief_step_three'
     ),
@@ -373,17 +373,17 @@ urlpatterns = [
          views.get_relief_details,
          name='get_relief_details'),
     path(
-        'TI_Management_app/register-relief-step-four/<int:pk>/',
+        'TI_Management_app/finance/register-relief-step-four/<int:pk>/',
         views.register_relief_step_four,
         name='register_relief_step_four'
     ),
     path(
-        'TI_Management_app/register-relief-step-five/<int:pk>/',
+        'TI_Management_app/finance/register-relief-step-five/<int:pk>/',
         views.register_relief_step_five,
         name='register_relief_step_five'
     ),
     path(
-        'TI_Management_app/register-relief-valid/<int:pk>/',
+        'TI_Management_app/finance/register-relief-valid/<int:pk>/',
         views.register_relief_valid,
         name='register_relief_valid'
     ),
@@ -401,6 +401,11 @@ urlpatterns = [
         'TI_Management_app/finance/relief-status-to-be-signed/<int:pk>/',
         views.relief_status_to_be_signed,
         name='relief_status_to_be_signed'
+    ),
+    path(
+        'TI_Management_app/finance/relief-confirmed-list/',
+        views.relief_confirmed_list,
+        name='relief_confirmed_list'
     ),
 ]
 

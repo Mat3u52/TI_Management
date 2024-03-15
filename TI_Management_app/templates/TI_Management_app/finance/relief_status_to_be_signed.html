@@ -4,6 +4,7 @@
 <a href="#"> / Finanse</a>
 <a href="#"> / Zapomogi</a>
 <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"> / Podpisywanie zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"> / {{ relief_to_be_signed.relief.title }}</a>
 {% endblock %}
 
 {% block content %}
@@ -202,7 +203,7 @@
                     {% for file in relief_to_be_signed.registerReliefFileRegisterRelief.all  %}
                         <a href="{{ file.file.url }}">
                             {{file.title}}
-                        </a>
+                        </a><br/>
                     {% endfor %}
                 </td>
             </tr>
@@ -269,15 +270,36 @@
                 </td>
             </tr>
 
+            {% if relief_to_be_signed.payment_confirmation is True %}
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Potwierdzenie wypłaty:
+                        </b><br />
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.author.first_name}}
+                        {{relief_to_be_signed.author.last_name}}
+                        {{relief_to_be_signed.author}}
+                        Data: {{relief_to_be_signed.date_of_payment_confirmation}} <span style="color: green"><b>&#9745;</b></span>
+                    </p>
+                </td>
+            </tr>
+            {% endif %}
+
 
         </table>
-        {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 3 %}
+        {% if relief_to_be_signed.payment_confirmation is False %}
+        {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 2 %}
             <form method="post" class="post-form">
                 {% csrf_token %}
-                {% if form.errors %}
-                    <p>{{form.errors}}</p>
+                {% if form_confirmation.errors %}
+                    <p>{{form_confirmation.errors}}</p>
                 {% endif %}
-                {{form.card}}
+                {{form_confirmation.payment_confirmation}}
 
                 <button type="submit" class="btn btn-primary btn-large pull-right">
                     Potwierdź wypłatę
@@ -287,6 +309,11 @@
         {% else %}
             <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
                 Potwierdź wypłatę
+            </button>
+        {% endif %}
+        {% else %}
+            <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
+                Drukuj
             </button>
         {% endif %}
         <div class="date">
@@ -300,6 +327,7 @@
 
         <br />
     </div>
+    {% if relief_to_be_signed.registerReliefSignatureRelief.count < 2 %}
     <div class="notepad">
         <H4>Dodaj Podpis:</H4>
 
@@ -317,6 +345,7 @@
         </form>
 
     </div>
+    {% endif %}
 
 </div>
 
