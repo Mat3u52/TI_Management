@@ -60,7 +60,8 @@ from .forms import (
     FileRegisterReliefForm,
     CardRegisterReliefForm,
     SignatureReliefForm,
-    PaymentConfirmationReliefForm
+    PaymentConfirmationReliefForm,
+    ConfirmedReliefTimeRangeForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -111,6 +112,7 @@ from django.contrib.auth.models import User
 @login_required
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
+    # admin = User.objects.all()
 
     paginator = Paginator(members_obj, 50)
     page = request.GET.get('page')
@@ -127,6 +129,7 @@ def members_list(request):
         {
             'page': page,
             'members': members
+            # 'admin': admin
         }
     )
 
@@ -2161,7 +2164,8 @@ def register_relief_step_five(request, pk):
     member = one_registered_relife.member
 
     if request.method == "POST":
-        form = CardRegisterReliefForm(request.POST, instance=member)
+        # form = CardRegisterReliefForm(request.POST, instance=member)
+        form = CardRegisterReliefForm(request.POST)
 
         if form.is_valid():
             if member.card is form.cleaned_data['card']:
@@ -2242,9 +2246,11 @@ def relief_status_list_search(request):
             }
         )
     else:
-        return render(request,
-                      'TI_Management_app/finance/relief_status_list_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/finance/relief_status_list_search.html',
+            {}
+        )
 
 
 @login_required
@@ -2312,3 +2318,71 @@ def relief_status_to_be_signed(request, pk):
         }
     )
 
+
+@login_required
+def relief_confirmed_list(request):
+    relief_list = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-created_date')
+
+    if request.method == "POST":
+        form = ConfirmedReliefTimeRangeForm(request.POST)
+
+        if form.is_valid():
+            start_date = form.cleaned_data['start_date']
+            end_date = form.cleaned_data['end_date']
+            relief_list = RegisterRelief.objects.filter(
+                payment_confirmation=True,
+                date_of_payment_confirmation__range=(start_date, end_date)
+            ).order_by('-created_date')
+
+            messages.success(request, f"Wybrano zakres {start_date} - {end_date}")
+            # return redirect('TI_Management_app:relief_confirmed_list')
+    else:
+        form = ConfirmedReliefTimeRangeForm()
+
+    paginator = Paginator(relief_list, 50)
+    page = request.GET.get('page')
+    try:
+        relief = paginator.page(page)
+    except PageNotAnInteger:
+        relief = paginator.page(1)
+    except EmptyPage:
+        relief = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/finance/relief_confirmed_list.html',
+        {
+            'page': page,
+            'relief': relief,
+            'form': form
+        }
+    )
+
+
+@login_required
+def relief_confirmed_list_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        members = RegisterRelief.objects.filter(
+            Q(member__forename__contains=searched.capitalize()) |
+            Q(member__surname__contains=searched.capitalize()) |
+            Q(member__member_nr__contains=searched) |
+            Q(member__phone_number__contains=searched),
+            member__card__isnull=False,
+            complete=True,
+            payment_confirmation=True
+        )
+        return render(
+            request,
+            'TI_Management_app/finance/relief_confirmed_list_search.html',
+            {
+                'searched': searched,
+                'members': members
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/finance/relief_confirmed_list_search.html',
+            {}
+        )

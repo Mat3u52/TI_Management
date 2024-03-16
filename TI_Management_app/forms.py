@@ -337,7 +337,9 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^[a-z0-9]+$',
-                message="To pole może składać się tylko z liczb i małych liter.")],
+                message="To pole może składać się tylko z liczb i małych liter."
+            )
+        ],
         required=False
     )
     card_start_pin = forms.CharField(
@@ -701,3 +703,26 @@ class SignatureReliefForm(forms.Form):
 
 class PaymentConfirmationReliefForm(forms.Form):
     payment_confirmation = forms.BooleanField()
+
+
+class ConfirmedReliefTimeRangeForm(forms.Form):
+
+    start_date = forms.DateField(
+        label='Start Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )
+
+    end_date = forms.DateField(
+        label='End Date',
+        required=False,
+        widget=DateInput(
+            attrs={
+                'type': 'date'
+            }
+        )
+    )

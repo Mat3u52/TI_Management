@@ -1,0 +1,66 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Zapomogi</a>
+<a href="{% url 'TI_Management_app:relief_confirmed_list' %}"> / Lista udzielonych zapomóg</a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:relief_confirmed_list_search' %}">
+        {% csrf_token %}
+        <input class="form-control me-2"
+               style="min-width: 100%!important; min-height: 35px"
+               type="search"
+               placeholder="Szukaj"
+               aria-label="Search" name="searched">
+        <button class="btn btn-primary btn-large pull-right"
+                type="submit">
+            Szukaj
+        </button>
+    </form>
+</div>
+
+
+<div class="hero-unit">
+    <div class="notepad">
+        <form method="post" action="{% url 'TI_Management_app:relief_confirmed_list' %}">
+            {% csrf_token %}
+            {{form.start_date}}
+            {{form.end_date}}
+            <button class="btn btn-primary btn-sm pull-right" type="submit">Wygeneruj listę</button>
+        </form>
+    </div>
+</div>
+
+<div class="hero-unit">
+    <H4>Lista udzielonych zapomóg:</H4>
+    {% for relife_confirmed in relief %}
+    <br />
+        <div class="notepad">
+                <h3>
+                    <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relife_confirmed.pk %}">
+                        {{relife_confirmed}} -
+                        {{relife_confirmed.member.forename}}
+                        {{relife_confirmed.member.forename}} -
+                        {{relife_confirmed.member.member_nr}}
+                    </a>
+                </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{relife_confirmed.created_date}}<br />
+                    Data potwierdzenia wypłaty: {{relife_confirmed.date_of_payment_confirmation}}<br />
+                    przez: {{ relife_confirmed.author }}<br />
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% include 'TI_Management_app/pagination.html' with page=relief %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='relief_confirmed_list' %}
+{% endblock %}

@@ -407,5 +407,10 @@ urlpatterns = [
         views.relief_confirmed_list,
         name='relief_confirmed_list'
     ),
+    path(
+        'TI_Management_app/finance/relief-confirmed-list-search/',
+        views.relief_confirmed_list_search,
+        name='relief_confirmed_list_search'
+    ),
 ]
 
