@@ -648,7 +648,7 @@ class MultipleFileField(forms.FileField):
 
 
 class FileRegisterReliefForm(forms.ModelForm):
-    file = MultipleFileField(label='Select files', required=False)
+    file = MultipleFileField(label='Select files', required=True)
 
     class Meta:
         model = FileRegisterRelief
@@ -656,16 +656,28 @@ class FileRegisterReliefForm(forms.ModelForm):
 
 
 class CardRegisterReliefForm(forms.Form):
+    card = forms.CharField(
+        required=True,
+        max_length=250,
+        widget=forms.TextInput(attrs={'autofocus': True})
+    )
 
-    # class Meta:
-    #     model = MembersZZTI
-    #     fields = ['card']
+    class Meta:
+        model = MembersZZTI
+        fields = ['card']
+
+    def __init__(self, *args, **kwargs):
+        self.instance = kwargs.pop('instance', None)
+        super(CardRegisterReliefForm, self).__init__(*args, **kwargs)
+        if self.instance:
+            self.fields['card'].initial = self.instance.card
 
     def clean(self):
         cleaned_data = super().clean()
         card = cleaned_data.get('card')
 
         # Retrieve the instance being updated
+
         instance = self.instance
 
         if instance and instance.card != card:

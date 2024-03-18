@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
@@ -9,8 +10,39 @@
 
     <div class="hero-unit">
       {% if member.created_date %}
+        <div style='display: block; float: right; margin-left: auto;'>
+          <div style="float: right; margin-left: auto;">
+            <img src="{{ member.image.url }}" alt="image" style="width: 250px;">
+          </div>
+          <br/>
 
-        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>
+          {% if member.deactivate %}
+            <span class="label label-warning pull-left">Dezaktywacja!</span>
+          {% endif %}
+
+          {% with existing_user=member.member_nr|admin_exist %}
+            {% if existing_user %}
+              <span class="label label-info pull-right">Administrator</span>
+            {% else %}
+              <!-- User not found -->
+            {% endif %}
+          {% endwith %}
+        </div>
+
+<!--        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>-->
+<!--      <div style='display: block; float: right; margin-left: auto;'>-->
+<!--        {% if member.deactivate %}-->
+<!--            <span class="label label-warning">Dezaktywacja!</span>-->
+<!--        {% endif %}-->
+
+<!--        {% with existing_user=member.member_nr|admin_exist %}-->
+<!--            {% if existing_user %}-->
+<!--                <span class="label label-info">Administrator</span>-->
+<!--            {% else %}-->
+<!--                &lt;!&ndash; User not found &ndash;&gt;-->
+<!--            {% endif %}-->
+<!--        {% endwith %}-->
+<!--          </div>-->
 
         <table>
           <tr>

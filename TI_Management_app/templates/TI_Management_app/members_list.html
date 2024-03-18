@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
@@ -33,6 +34,7 @@
         </table>
     </form>
 </div>
+
 {% for member in members %}
     <div class="hero-unit">
         <h2><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
@@ -64,8 +66,16 @@
           </tr>
         </table>
         {% if member.deactivate %}
-            <span class="label label-danger">Dezaktywacja!</span>
+            <span class="label label-warning">Dezaktywacja!</span>
         {% endif %}
+
+        {% with existing_user=member.member_nr|admin_exist %}
+            {% if existing_user %}
+                <span class="label label-info">Administrator</span>
+            {% else %}
+                <!-- User not found -->
+            {% endif %}
+        {% endwith %}
 
 
         <p><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">

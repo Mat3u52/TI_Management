@@ -84,6 +84,7 @@ from django.contrib import messages
 import csv
 from django.conf import settings
 from django.http import JsonResponse
+
 from django.contrib.auth.models import User
 
 # class Image(TemplateView):
@@ -112,7 +113,6 @@ from django.contrib.auth.models import User
 @login_required
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
-    # admin = User.objects.all()
 
     paginator = Paginator(members_obj, 50)
     page = request.GET.get('page')
@@ -129,7 +129,6 @@ def members_list(request):
         {
             'page': page,
             'members': members
-            # 'admin': admin
         }
     )
 
@@ -2110,7 +2109,7 @@ def register_relief_step_three(request, pk):
             register_relife.author = request.user
             register_relife.member = member
             register_relife.save()
-            messages.success(request, "2/4 - Walidacja zapomogi!")
+            messages.success(request, "2/4 - Walidacja karencji przebiegła pomyślnie!")
             return redirect('TI_Management_app:register_relief_step_four', pk=register_relife.pk)
     else:
         form = RegisterReliefForm()
@@ -2164,17 +2163,19 @@ def register_relief_step_five(request, pk):
     member = one_registered_relife.member
 
     if request.method == "POST":
-        # form = CardRegisterReliefForm(request.POST, instance=member)
-        form = CardRegisterReliefForm(request.POST)
+        form = CardRegisterReliefForm(request.POST, instance=member)
+        # form = CardRegisterReliefForm(request.POST)
 
         if form.is_valid():
-            if member.card is form.cleaned_data['card']:
-                one_registered_relife.complete = True
-                one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
-                one_registered_relife.save()
+            # if member.card is form.cleaned_data['card']:
+            if RegisterRelief.objects.filter(member__card=form.cleaned_data['card']).exists():
+                if form.cleaned_data['card'] == one_registered_relife.member.card:
+                    one_registered_relife.complete = True
+                    one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
+                    one_registered_relife.save()
 
-                messages.success(request, "4/4 - Dodano domumenty do zapomogi!")
-                return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
+                    messages.success(request, "4/4 - Podpisano!")
+                    return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
     else:
         # form = CardRegisterReliefForm(instance=member)
         form = CardRegisterReliefForm()
