@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
@@ -31,10 +32,35 @@
                     <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relife_to_sign.pk %}">
                         {{relife_to_sign}} -
                         {{relife_to_sign.member.forename}}
-                        {{relife_to_sign.member.forename}} -
+                        {{relife_to_sign.member.surname}} -
                         {{relife_to_sign.member.member_nr}}
                     </a>
                 </h3>
+                {% for admin in active_admin %}
+                    {% for missed_signature in relife_to_sign.registerReliefSignatureRelief.all %}
+                        {% if admin.username == missed_signature.member.member_nr %}
+                            <span style="color: green"><b>&#9745;</b></span>
+                            {{ admin }} -
+                            {{ missed_signature.member.forename }}
+                            {{ missed_signature.member.surname }}
+                            <br />
+                        {% else %}
+                            <span style="color: red"><b>&#9746;</b></span>
+                            {{ admin }} -
+                            {{ admin.first_name }}
+                            {{ admin.last_name }}
+                            <br />
+                        {% endif %}
+                    {% endfor %}
+                    {% if relife_to_sign.registerReliefSignatureRelief.count == 0 %}
+                        <span style="color: red"><b>&#9746;</b></span>
+                        {{ admin }} -
+                        {{ admin.first_name }}
+                        {{ admin.last_name }}
+                        <br />
+                    {% endif %}
+                {% endfor %}
+
             {% endif %}
             <div class="date">
                 <p>

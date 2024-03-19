@@ -714,7 +714,7 @@ class SignatureReliefForm(forms.Form):
 
 
 class PaymentConfirmationReliefForm(forms.Form):
-    payment_confirmation = forms.BooleanField()
+    payment_confirmation = forms.BooleanField(initial=True)
 
 
 class ConfirmedReliefTimeRangeForm(forms.Form):

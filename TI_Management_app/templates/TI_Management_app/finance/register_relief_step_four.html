@@ -62,9 +62,9 @@
                     </p>
                 </td>
                 <td>
-                    <p>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=one_registered_relife.member.pk %}">
                         {{one_registered_relife.member.forename}} {{one_registered_relife.member.surname}}
-                    </p>
+                    </a>
                 </td>
             </tr>
             <tr>
@@ -78,12 +78,12 @@
                 <td>
                     <p>
                         ul. {{one_registered_relife.member.street}}
-                        {{one_registered_relife.member.city}}
-                        {{one_registered_relife.member.postcode}}
                         {{one_registered_relife.member.house_number}}
                         {% if one_registered_relife.member.float_number is not None%}
-                            {{one_registered_relife.member.float_number}}
+                            m. {{one_registered_relife.member.float_number}}
                         {% endif %}
+                        {{one_registered_relife.member.postcode}}
+                        {{one_registered_relife.member.city}}
                     </p>
                 </td>
             </tr>
@@ -168,6 +168,20 @@
                 <td>
                     <p>
                         {{one_registered_relife.associate_surname}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Relacja:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.relation}}
                     </p>
                 </td>
             </tr>

@@ -2205,6 +2205,7 @@ def register_relief_valid(request, pk):
 @login_required
 def relief_status_list(request):
     relief_list = RegisterRelief.objects.filter(complete=True).order_by('-created_date')
+    active_admin = User.objects.filter(is_active=True)
 
     paginator = Paginator(relief_list, 50)
     page = request.GET.get('page')
@@ -2220,7 +2221,8 @@ def relief_status_list(request):
         'TI_Management_app/finance/relief_status_list.html',
         {
             'page': page,
-            'relief': relief
+            'relief': relief,
+            'active_admin': active_admin
         }
     )
 

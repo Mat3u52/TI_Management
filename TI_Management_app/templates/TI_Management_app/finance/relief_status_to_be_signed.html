@@ -37,10 +37,9 @@
                     </p>
                 </td>
                 <td>
-                    <p>
-                        {{relief_to_be_signed.member.forename}}
-                        {{relief_to_be_signed.member.surname}}
-                    </p>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=relief_to_be_signed.member.pk %}">
+                        {{relief_to_be_signed.member.forename}} {{relief_to_be_signed.member.surname}}
+                    </a>
                 </td>
             </tr>
             <tr>
@@ -54,12 +53,12 @@
                 <td>
                     <p>
                         ul. {{relief_to_be_signed.member.street}}
-                        {{relief_to_be_signed.member.city}}
-                        {{relief_to_be_signed.member.postcode}}
                         {{relief_to_be_signed.member.house_number}}
                         {% if relief_to_be_signed.member.float_number is not None%}
-                            {{relief_to_be_signed.member.float_number}}
+                            m. {{relief_to_be_signed.member.float_number}}
                         {% endif %}
+                        {{relief_to_be_signed.member.postcode}}
+                        {{relief_to_be_signed.member.city}}
                     </p>
                 </td>
             </tr>
@@ -144,6 +143,20 @@
                 <td>
                     <p>
                         {{relief_to_be_signed.associate_surname}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Relacja:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.relation}}
                     </p>
                 </td>
             </tr>

@@ -186,9 +186,9 @@
                     </p>
                 </td>
                 <td>
-                    <p>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                         {{member.forename}} {{member.surname}}
-                    </p>
+                    </a>
                 </td>
             </tr>
             <tr>
@@ -202,12 +202,12 @@
                 <td>
                     <p>
                         ul. {{member.street}}
-                        {{member.city}}
-                        {{member.postcode}}
                         {{member.house_number}}
-                        {% if member.float_number is not None%}
-                            {{member.float_number}}
+                        {% if member.float_number is not None %}
+                            m. {{member.float_number}}
                         {% endif %}
+                        {{member.postcode}}
+                        {{member.city}}
                     </p>
                 </td>
             </tr>

@@ -43,10 +43,9 @@
                     </p>
                 </td>
                 <td>
-                    <p>
-                        {{validation_register_relief.member.forename}}
-                        {{validation_register_relief.member.surname}}
-                    </p>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=validation_register_relief.member.pk %}">
+                        {{validation_register_relief.member.forename}} {{validation_register_relief.member.surname}}
+                    </a>
                 </td>
             </tr>
             <tr>
@@ -60,12 +59,12 @@
                 <td>
                     <p>
                         ul. {{validation_register_relief.member.street}}
-                        {{validation_register_relief.member.city}}
-                        {{validation_register_relief.member.postcode}}
                         {{validation_register_relief.member.house_number}}
                         {% if validation_register_relief.member.float_number is not None%}
-                            {{validation_register_relief.member.float_number}}
+                            m. {{validation_register_relief.member.float_number}}
                         {% endif %}
+                        {{validation_register_relief.member.postcode}}
+                        {{validation_register_relief.member.city}}
                     </p>
                 </td>
             </tr>
@@ -157,6 +156,20 @@
                 <td>
                     <p class="tableCredential">
                         <b>
+                            Relacja:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{validation_register_relief.relation}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
                             Kwota:
                         </b>
                     </p>
@@ -207,8 +220,13 @@
                     </p>
                 </td>
                 <td>
+<!--                    {% for file in validation_register_relief.registerReliefFileRegisterRelief.all  %}-->
+<!--                        {{file.title}}-->
+<!--                    {% endfor %}-->
                     {% for file in validation_register_relief.registerReliefFileRegisterRelief.all  %}
-                        {{file.title}}
+                        <a href="{{ file.file.url }}">
+                            {{file.title}}
+                        </a><br/>
                     {% endfor %}
                 </td>
             </tr>

@@ -119,9 +119,9 @@
                   </p>
               </td>
                 <td>
-                    <p>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                         {{member.forename}} {{member.surname}}
-                    </p>
+                    </a>
                 </td>
           </tr>
         </table>
