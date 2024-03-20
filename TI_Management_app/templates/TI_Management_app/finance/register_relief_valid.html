@@ -60,7 +60,7 @@
                     <p>
                         ul. {{validation_register_relief.member.street}}
                         {{validation_register_relief.member.house_number}}
-                        {% if validation_register_relief.member.float_number is not None%}
+                        {% if not validation_register_relief.member.float_number|default_if_none:"--" %}
                             m. {{validation_register_relief.member.float_number}}
                         {% endif %}
                         {{validation_register_relief.member.postcode}}

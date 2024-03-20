@@ -24,7 +24,6 @@
 <div class="hero-unit">
     <H4>Wnioski zapomogi do podpisu:</H4>
     {% for relife_to_sign in relief %}
-    <br/>
         {% if relife_to_sign.registerReliefSignatureRelief.count < 2 %}
         <div class="notepad">
             {% if relife_to_sign.registerReliefFileRegisterRelief.all %}
@@ -75,7 +74,6 @@
 <div class="hero-unit">
     <H4>Wnioski do wypłaty:</H4>
     {% for relife_to_sign in relief %}
-    <br/>
         {% if relife_to_sign.payment_confirmation is False %}
             {% if relife_to_sign.registerReliefSignatureRelief.count >= 2 %}
                 <div class="notepad">

@@ -79,7 +79,7 @@
                     <p>
                         ul. {{one_registered_relife.member.street}}
                         {{one_registered_relife.member.house_number}}
-                        {% if one_registered_relife.member.float_number is not None%}
+                        {% if not one_registered_relife.member.float_number|default_if_none:"--"%}
                             m. {{one_registered_relife.member.float_number}}
                         {% endif %}
                         {{one_registered_relife.member.postcode}}

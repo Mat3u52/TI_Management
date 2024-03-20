@@ -203,7 +203,7 @@
                     <p>
                         ul. {{member.street}}
                         {{member.house_number}}
-                        {% if member.float_number is not None %}
+                        {% if not member.float_number|default_if_none:"--" %}
                             m. {{member.float_number}}
                         {% endif %}
                         {{member.postcode}}

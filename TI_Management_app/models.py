@@ -454,7 +454,7 @@ class GroupsMember(models.Model):
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.group}-{self.member}")
+            self.slug = slugify(f"{self.group}")
         super().save(*args, **kwargs)
 
 
@@ -748,7 +748,7 @@ class CardStatus(models.Model):
     def save(self, *args, **kwargs):
         self.card_identity = self.card_identity or None
         if not self.slug:
-            self.slug = slugify(f"{self.card}-{self.member}")
+            self.slug = slugify(f"{self.card}")
         super().save(*args, **kwargs)
 
 

@@ -208,16 +208,73 @@
             <li class="nav-header" id="showFinance">Finanse:</li>
               <li id="objFinance" style="display: none">
 
-                {% for app in member.application.all %}
+<!--                {% for app in member.application.all %}-->
+<!--                    <div class="notepad">-->
+<!--                      <p><b>Tytuł:</b> {{ app.kind_of_application }}</p>-->
+<!--                      <p><b>Treść:</b> {{ app.description }}</p>-->
+<!--                      <p><b>Data wniosku:</b> {{ app.date_of_application }}</p>-->
+<!--                      <p><b>Data wypłaty:</b> {{ app.date_of_payout }}</p>-->
+<!--                    </div>-->
+
+<!--                {% empty %}-->
+<!--                  <p>Brak informacji application</p>-->
+<!--                {% endfor %}-->
+
+                {% for relief_detail in member.memberRegisterRelief.all %}
                     <div class="notepad">
-                      <p><b>Tytuł:</b> {{ app.kind_of_application }}</p>
-                      <p><b>Treść:</b> {{ app.description }}</p>
-                      <p><b>Data wniosku:</b> {{ app.date_of_application }}</p>
-                      <p><b>Data wypłaty:</b> {{ app.date_of_payout }}</p>
+                      <p>{{relief_detail.relief.figure}} zł</p>
+                      <p><b>Zapomoga z tytułu:</b></p>
+
+                      {% if relief_detail.payment_confirmation is False and relief_detail.complete is True %}
+                        {% if relief_detail.registerReliefSignatureRelief.count < 2 %}
+                          <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_detail.pk %}">
+                            {{ relief_detail.relief }}
+                          </a>
+                          <p>Brak podpisów zarządu</p>
+                        {% else %}
+                          <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_detail.pk %}">
+                            {{ relief_detail.relief }}
+                          </a>
+                          <p>Brak potwierdzenia wypłaty</p>
+                        {% endif %}
+
+                      {% elif relief_detail.complete is False %}
+
+
+
+                        {% if relief_detail.registerReliefFileRegisterRelief.all %}
+                          {% if relief_detail.complete is False %}
+                          <a href="{% url 'TI_Management_app:register_relief_step_five' pk=relief_detail.id %}">
+                            {{ relief_detail.relief }}
+                          </a>
+                          <p>Brak Podpisu</p>
+                          {% endif %}
+                        {% else %}
+                          <a href="{% url 'TI_Management_app:register_relief_step_four' pk=relief_detail.id %}">
+                            {{ relief_detail.relief }}
+                          </a>
+                          <p>Bark dokumentów</p>
+                        {% endif %}
+
+                      {% else %}
+
+                        <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_detail.pk %}">
+                          {{ relief_detail.relief }}
+                        </a>
+                        <p>Wypłata potwierdzona</p>
+
+                      {% endif %}
+                      <div class="date">
+                        <p>
+                          Data wprowadzenia: {{relief_detail.created_date}}<br />
+                          przez: {{relief_detail.author}}
+                        </p>
+                      </div>
+
                     </div>
 
                 {% empty %}
-                  <p>Brak informacji</p>
+                  <p>Brak informacji relief</p>
                 {% endfor %}
 
               </li>

@@ -22,10 +22,8 @@
     </form>
 </div>
 <div class="hero-unit">
-    {% for relife_process in relief_process_ongoing %}
     <H4>Niedokończone procesy wprowadzania wniosków:</H4>
-    <br/>
-
+    {% for relife_process in relief_process_ongoing %}
         <div class="notepad">
             {% if relife_process.registerReliefFileRegisterRelief.all %}
                 <h3>

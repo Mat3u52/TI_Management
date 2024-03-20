@@ -54,7 +54,7 @@
                     <p>
                         ul. {{relief_to_be_signed.member.street}}
                         {{relief_to_be_signed.member.house_number}}
-                        {% if relief_to_be_signed.member.float_number is not None%}
+                        {% if not relief_to_be_signed.member.float_number|default_if_none:"--" %}
                             m. {{relief_to_be_signed.member.float_number}}
                         {% endif %}
                         {{relief_to_be_signed.member.postcode}}

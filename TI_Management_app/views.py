@@ -215,7 +215,6 @@ def member_detail(request, pk):
     user_cards = CardStatus.objects.filter(member_id=pk, card__isnull=False)
     card_names = user_cards.values_list('card', flat=True).distinct()
     different_elements = set(accessible_ids).difference(set(card_names))
-    # accessed = get_object_or_404(Cards, pk__in=different_elements)
 
     accessible_group = Groups.objects.all()
     accessible_group_ids = accessible_group.values_list('id', flat=True)
@@ -241,18 +240,23 @@ def member_detail(request, pk):
             note_entries.append(entry)
             seen_note.add(entry.title)
 
-    return render(request, 'TI_Management_app/member_detail.html',
-                  {'member': member,
-                   'accessible_ids': accessible_ids,
-                   'card_names': card_names,
-                   'different_elements': different_elements,
-                   'accessible': accessible,
-                   'accessible_group': accessible_group,
-                   'different_elements_group': different_elements_group,
-                   'card_history_entries': card_history_entries,
-                   'seen_cards': seen_cards,
-                   'note_entries': note_entries,
-                   'seen_note': seen_note})
+    return render(
+        request,
+        'TI_Management_app/member_detail.html',
+        {
+            'member': member,
+            'accessible_ids': accessible_ids,
+            'card_names': card_names,
+            'different_elements': different_elements,
+            'accessible': accessible,
+            'accessible_group': accessible_group,
+            'different_elements_group': different_elements_group,
+            'card_history_entries': card_history_entries,
+            'seen_cards': seen_cards,
+            'note_entries': note_entries,
+            'seen_note': seen_note
+        }
+    )
 
 
 @login_required
