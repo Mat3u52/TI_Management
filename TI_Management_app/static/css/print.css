@@ -14,4 +14,9 @@ body {
     margin: 1cm;
 }
 
+img {
+    display: none;
+}
+
+
 /* Additional print-specific styles */

@@ -11,8 +11,12 @@
 
 <div class="hero-unit">
     <div class="notepad">
-        <img src="{{ relief_to_be_signed.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
-
+        <div class="no-print">
+        <img
+                src="{{ relief_to_be_signed.member.image.url }}"
+                alt="image"
+                style='display: block; float: right; margin-left: auto; width: 150px;'>
+        </div>
         <table style="margin-left: auto; margin-right: auto;">
             <tr>
                 <td>
@@ -143,6 +147,20 @@
                 <td>
                     <p>
                         {{relief_to_be_signed.associate_surname}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Uzasadnienie:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{one_registered_relife.reason}}
                     </p>
                 </td>
             </tr>
@@ -306,7 +324,7 @@
 
         </table>
         {% if relief_to_be_signed.payment_confirmation is False %}
-        {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 2 %}
+        {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 3 %}
             <form method="post" class="post-form">
                 {% csrf_token %}
                 {% if form_confirmation.errors %}
@@ -325,9 +343,11 @@
             </button>
         {% endif %}
         {% else %}
-            <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
-                Drukuj
-            </button>
+            <div class="no-print">
+                <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
+                    Drukuj
+                </button>
+            </div>
         {% endif %}
         <div class="date">
             <p>
@@ -340,7 +360,8 @@
 
         <br />
     </div>
-    {% if relief_to_be_signed.registerReliefSignatureRelief.count < 2 %}
+    {% if relief_to_be_signed.registerReliefSignatureRelief.count < 3 %}
+    <div class="no-print">
     <div class="notepad">
         <H4>Dodaj Podpis:</H4>
 
@@ -357,6 +378,7 @@
             <br />
         </form>
 
+    </div>
     </div>
     {% endif %}
 

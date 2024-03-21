@@ -226,7 +226,7 @@
                       <p><b>Zapomoga z tytułu:</b></p>
 
                       {% if relief_detail.payment_confirmation is False and relief_detail.complete is True %}
-                        {% if relief_detail.registerReliefSignatureRelief.count < 2 %}
+                        {% if relief_detail.registerReliefSignatureRelief.count < 3 %}
                           <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_detail.pk %}">
                             {{ relief_detail.relief }}
                           </a>

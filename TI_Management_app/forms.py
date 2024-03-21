@@ -593,7 +593,8 @@ class RegisterReliefForm(forms.ModelForm):
             'account_number',
             'date_of_completing_the_application',
             'date_of_receipt_the_application',
-            'date_of_accident'
+            'date_of_accident',
+            'reason'
         ]
         widgets = {
             'date_of_completing_the_application': forms.DateInput(attrs={'type': 'date'}),
@@ -693,6 +694,10 @@ class SignatureReliefForm(forms.Form):
         widget=forms.TextInput(attrs={'autofocus': True})
     )
 
+    def __init__(self, relief_to_be_signed, *args, **kwargs):
+        self.relief_to_be_signed = relief_to_be_signed
+        super(SignatureReliefForm, self).__init__(*args, **kwargs)
+
     # class Meta:
     #     model = MembersZZTI
     #     fields = [
@@ -709,6 +714,10 @@ class SignatureReliefForm(forms.Form):
                 existing_user = User.objects.filter(username=member.member_nr).first()
                 if not existing_user.is_active:
                     raise forms.ValidationError(f"Członek nie jest aktywny!")
+
+        existing_signature = self.relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
+        if existing_signature:
+            raise forms.ValidationError("Podpis już istnieje.")
 
         return card
 

@@ -2265,31 +2265,29 @@ def relief_status_to_be_signed(request, pk):
     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
 
     if request.method == "POST":
-        form = SignatureReliefForm(request.POST)
+        form = SignatureReliefForm(relief_to_be_signed, request.POST)
         form_confirmation = PaymentConfirmationReliefForm(request.POST)
         if form.is_valid():
             card = form.cleaned_data['card']
             member = MembersZZTI.objects.filter(card=card).first()
             if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
+                existing_signature = relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
 
-                signature = SignatureRelief.objects.create(
-                    author=request.user,
-                    member=member,
-                    register_relief=relief_to_be_signed,
-                    signature=True
-                )
-                signature.save()
+                if not existing_signature:
 
-                messages.success(
-                    request,
-                    f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
-                )
-                return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
-            else:
-                messages.error(
-                    request,
-                    "Nieprawidłowy podpis."
-                )
+                    signature = SignatureRelief.objects.create(
+                        author=request.user,
+                        member=member,
+                        register_relief=relief_to_be_signed,
+                        signature=True
+                    )
+                    signature.save()
+
+                    messages.success(
+                        request,
+                        f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
+                    )
+                    return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
 
         if form_confirmation.is_valid():
             confirmation = form_confirmation.cleaned_data['payment_confirmation']
@@ -2312,7 +2310,7 @@ def relief_status_to_be_signed(request, pk):
                 )
 
     else:
-        form = SignatureReliefForm()
+        form = SignatureReliefForm(relief_to_be_signed)
         form_confirmation = PaymentConfirmationReliefForm()
 
     return render(

@@ -21,6 +21,7 @@
 
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+        <div class="no-print">
         <div class="navbar navbar-inverse navbar-fixed-top">
             <div class="navbar-inner">
                 <div class="container-fluid">
@@ -62,15 +63,17 @@
             </div>
 
         </div>
+        </div>
 
         <div class="container-fluid">
             <div class="row-fluid">
-
+                <div class="no-print">
                 <div class="span3">
                     <div class="well sidebar-nav">
                         {% block menu %}
                         {% endblock %}
                     </div>
+                </div>
                 </div>
 
                 <div class="span9">
@@ -85,12 +88,14 @@
                 </div>
             </div>
 
+            <div class="no-print">
             <footer class="bg-body-tertiary text-center">
                 <div class="text-center p-3" style="background-color: rgba(0, 0, 0, 0.05);">
                     Copyright &#169; {% now "d-m-Y" %}r.
                     <a class="text-body" href="#">zzti</a>
                 </div>
             </footer>
+            </div>
         </div>
 
     </body>
