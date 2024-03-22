@@ -12,10 +12,19 @@
 <div class="hero-unit">
     <div class="notepad">
         <div class="no-print">
-        <img
+            <img
                 src="{{ relief_to_be_signed.member.image.url }}"
                 alt="image"
                 style='display: block; float: right; margin-left: auto; width: 150px;'>
+            <button class="btn btn-info btn-sm pull-left" onclick="window.print()">
+                Drukuj
+            </button>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
         </div>
         <table style="margin-left: auto; margin-right: auto;">
             <tr>
@@ -41,9 +50,22 @@
                     </p>
                 </td>
                 <td>
-                    <a href="{% url 'TI_Management_app:member_detail' pk=relief_to_be_signed.member.pk %}">
-                        {{relief_to_be_signed.member.forename}} {{relief_to_be_signed.member.surname}}
-                    </a>
+                    <div>
+                        <div style="float:left">
+                            <p>
+                                {{relief_to_be_signed.member.forename}} {{relief_to_be_signed.member.surname}} &nbsp;
+                            </p>
+                        </div>
+                        <div style="float:left">
+                            <div class="no-print">
+                                <a href="{% url 'TI_Management_app:member_detail' pk=relief_to_be_signed.member.pk %}">
+                                    <button class="btn btn-info btn-sm pull-right">
+                                        &#133;
+                                    </button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -232,9 +254,20 @@
                 </td>
                 <td>
                     {% for file in relief_to_be_signed.registerReliefFileRegisterRelief.all  %}
-                        <a href="{{ file.file.url }}">
-                            {{file.title}}
-                        </a><br/>
+                        <div>
+                            <div style="float:left">
+                                <p>{{file.title}}&nbsp;</p>
+                            </div>
+                            <div style="float:left">
+                                <div class="no-print">
+                                    <a href="{{ file.file.url }}">
+                                        <button class="btn btn-info btn-sm pull-right">
+                                            &#133;
+                                        </button>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
                     {% endfor %}
                 </td>
             </tr>
@@ -323,6 +356,7 @@
 
 
         </table>
+        <div class="no-print">
         {% if relief_to_be_signed.payment_confirmation is False %}
         {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 3 %}
             <form method="post" class="post-form">
@@ -342,20 +376,17 @@
                 Potwierdź wypłatę
             </button>
         {% endif %}
-        {% else %}
-            <div class="no-print">
-                <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
-                    Drukuj
-                </button>
-            </div>
+
         {% endif %}
-        <div class="date">
-            <p>
-                Data wprowadzenia: {{relief_to_be_signed.created_date}}<br />
-                przez: {{relief_to_be_signed.author}}
-                {{relief_to_be_signed.author.first_name}}
-                {{relief_to_be_signed.author.last_name}}
-            </p>
+
+            <div class="date">
+                <p>
+                    Data wprowadzenia: {{relief_to_be_signed.created_date}}<br />
+                    przez: {{relief_to_be_signed.author}}
+                    {{relief_to_be_signed.author.first_name}}
+                    {{relief_to_be_signed.author.last_name}}
+                </p>
+            </div>
         </div>
 
         <br />
