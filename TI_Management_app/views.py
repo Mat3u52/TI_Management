@@ -533,7 +533,8 @@ def loyalty_card_member_search(request, pk):
             Q(forename__contains=searched.capitalize()) |
             Q(surname__contains=searched.capitalize()) |
             Q(member_nr__contains=searched) |
-            Q(phone_number__contains=searched)
+            Q(phone_number__contains=searched),
+            deactivate=False
         )
         members_in_validator = []
         for member in loyalty_card_member:
@@ -1153,7 +1154,7 @@ def group_member_search(request, pk):
         group_members = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
                                                    Q(surname__contains=searched.capitalize()) |
                                                    Q(member_nr__contains=searched) |
-                                                   Q(phone_number__contains=searched))
+                                                   Q(phone_number__contains=searched), deactivate=False)
 
         # members_without_group = MembersZZTI.objects.filter(groupsMember__isnull=True)
         members_without_group = group_members.exclude(groupsMember__group__pk=pk)
