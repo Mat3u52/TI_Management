@@ -539,22 +539,18 @@ class RegisterRelief(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorRegisterRelief')
-
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberRegisterRelief', null=False, blank=False)
     relief = models.ForeignKey(Relief, on_delete=models.CASCADE, related_name='reliefRegisterRelief', null=False, blank=False)
     relation = models.ForeignKey(RelationRegisterRelief, on_delete=models.CASCADE, related_name='relationReliefRegisterRelief', null=False, blank=False)
-
     associate_forename = models.CharField(max_length=250, null=True, blank=True)
     associate_surname = models.CharField(max_length=250, null=True, blank=True)
     account_number = models.CharField(max_length=26, null=True, blank=True)
-
     date_of_completing_the_application = models.DateTimeField(blank=True, null=True)
     date_of_receipt_the_application = models.DateTimeField(blank=True, null=True)
     date_of_accident = models.DateTimeField(blank=True, null=True)  # karencja od tej daty
     """
     W kontekście ubezpieczeń zdrowotnych: Karencja odnosi się do okresu czasu, który musi upłynąć po rozpoczęciu ubezpieczenia, zanim ubezpieczony będzie mógł składać roszczenia o odszkodowanie. Na przykład, jeśli polisa ubezpieczeniowa ma karencję wynoszącą 30 dni, oznacza to, że ubezpieczony nie może składać roszczeń o odszkodowanie przez pierwsze 30 dni od daty rozpoczęcia ubezpieczenia.
     """
-
     complete = models.BooleanField(default=False)
     date_of_signed_by_the_applicant = models.DateTimeField(blank=True, null=True)
     agreement = models.BooleanField(default=False)  # min 3 signed
@@ -622,6 +618,55 @@ class FileRegisterRelief(models.Model):
 
     def __str__(self):
         return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
+        super().save(*args, **kwargs)
+
+
+class AverageSalary(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorAverageSalary')
+    title = models.CharField(max_length=250, null=False, blank=False)
+    salary = models.FloatField(null=False, blank=False)
+    # member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberRegisterRelief', null=False, blank=False)
+
+    history = HistoricalRecords()
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Średnia wypłata'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f"{self.title}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
+        super().save(*args, **kwargs)
+
+
+class Scholarships(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorScholarships')
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberScholarships', null=False, blank=False)
+    seminary_start_date = models.DateTimeField(blank=True, null=True)
+
+    history = HistoricalRecords()
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Stypendia'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f"{self.title}"
 
     def save(self, *args, **kwargs):
         if not self.slug:

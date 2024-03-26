@@ -52,6 +52,12 @@
             <b>&#160;&#160;&#8226; stypendia</b>
         </a>
     </li>
+    <li class="{% if active_tab == 'relief_figure_add' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:relief_figure_add' %}">&#160;&#160;&#160;&#160;&#8728; dodaj stypendium</a>
+    </li>
+    <li class="{% if active_tab == 'relief_figure_add' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:relief_figure_add' %}">&#160;&#160;&#160;&#160;&#8728; dodaj przeciętne wynagrodzenie w kwartale poprzedzającym rozpoczęcie semestru</a>
+    </li>
     <li class="{% if active_tab == 'relief' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:relief_status_list' %}">
             <b>&#160;&#160;&#8226; zapomogi</b>
