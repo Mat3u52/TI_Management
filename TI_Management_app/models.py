@@ -547,10 +547,7 @@ class RegisterRelief(models.Model):
     account_number = models.CharField(max_length=26, null=True, blank=True)
     date_of_completing_the_application = models.DateTimeField(blank=True, null=True)
     date_of_receipt_the_application = models.DateTimeField(blank=True, null=True)
-    date_of_accident = models.DateTimeField(blank=True, null=True)  # karencja od tej daty
-    """
-    W kontekście ubezpieczeń zdrowotnych: Karencja odnosi się do okresu czasu, który musi upłynąć po rozpoczęciu ubezpieczenia, zanim ubezpieczony będzie mógł składać roszczenia o odszkodowanie. Na przykład, jeśli polisa ubezpieczeniowa ma karencję wynoszącą 30 dni, oznacza to, że ubezpieczony nie może składać roszczeń o odszkodowanie przez pierwsze 30 dni od daty rozpoczęcia ubezpieczenia.
-    """
+    date_of_accident = models.DateTimeField(blank=True, null=True)
     complete = models.BooleanField(default=False)
     date_of_signed_by_the_applicant = models.DateTimeField(blank=True, null=True)
     agreement = models.BooleanField(default=False)  # min 3 signed
@@ -632,7 +629,6 @@ class AverageSalary(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorAverageSalary')
     title = models.CharField(max_length=250, null=False, blank=False)
     salary = models.FloatField(null=False, blank=False)
-    # member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberRegisterRelief', null=False, blank=False)
 
     history = HistoricalRecords()
     objects = models.Manager()  # default manager
@@ -655,8 +651,16 @@ class Scholarships(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorScholarships')
+    title = models.CharField(max_length=250, null=False, blank=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberScholarships', null=False, blank=False)
     seminary_start_date = models.DateTimeField(blank=True, null=True)
+    seminary_end_date = models.DateTimeField(blank=True, null=True)
+    member_salary = models.FloatField(null=False, blank=False)
+    preferred_university = models.BooleanField(default=False)
+    grading_scale = models.CharField(max_length=250, null=False, blank=False)
+    tuition_fee_amount = models.FloatField(null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='uploadsScholarships/%Y/%m/%d/%H%M%S/')
+    confirmation_of_student_id = models.BooleanField(default=False)
 
     history = HistoricalRecords()
     objects = models.Manager()  # default manager
