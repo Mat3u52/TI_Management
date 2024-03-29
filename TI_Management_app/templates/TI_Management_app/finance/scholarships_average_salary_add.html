@@ -1,10 +1,74 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="{% url 'TI_Management_app:scholarships_list' %}"> / Stypendia</a>
+<a href="{% url 'TI_Management_app:scholarships_average_salary_add' %}"> / Przeciętne wynagrodzenie</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                placeholder="Nazwa"
+                aria-label="Nazwa"
+                name="title"
+                required>
+
+        <input
+                class="form-control me-2"
+                style="max-width:50%; min-height: 15px"
+                type="number"
+                step="0.01"
+                placeholder="Przeciętne wynagrodzenie"
+                aria-label="Przeciętne wynagrodzenie"
+                name="salary"
+                required>
+
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+    </form>
+</div>
+
+
+<div class="hero-unit">
+    <H4>Przeciętne wynagrodzenie:</H4>
+
+    {% for salary in average_salary %}
+        <div class="notepad">
+            <h3>
+                <a href="#">
+                    {{salary.title}}
+                </a>
+            </h3>
+            <p>
+                {{ salary.salary }} zł
+            </p>
+            <div class="date">
+                <p>
+                    Data dodania: {{salary.created_date}}
+                    przez: {{ salary.author }}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% include 'TI_Management_app/pagination.html' with page=average_salary %}
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='average_salary' %}
+{% endblock %}

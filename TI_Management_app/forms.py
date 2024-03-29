@@ -21,7 +21,9 @@ from .models import (
     RelationRegisterRelief,
     RegisterRelief,
     FileRegisterRelief,
-    SignatureRelief
+    SignatureRelief,
+    AverageSalary,
+    Scholarships
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -747,3 +749,36 @@ class ConfirmedReliefTimeRangeForm(forms.Form):
             }
         )
     )
+
+
+class AverageSalaryForm(forms.ModelForm):
+
+    class Meta:
+        model = AverageSalary
+        fields = [
+            'title',
+            'salary'
+        ]
+
+
+class ScholarshipsForm(forms.ModelForm):
+    file = MultipleFileField(label='Wybierz Pliki', required=True)
+
+    class Meta:
+        model = Scholarships
+        fields = [
+            'title',
+            'seminary_start_date',
+            'seminary_end_date',
+            'member_salary',
+            'preferred_university',
+            'grading_scale',
+            'tuition_fee_amount',
+            'file',
+            'confirmation_of_student_id'
+        ]
+
+        widgets = {
+            'seminary_start_date': forms.DateInput(attrs={'type': 'date'}),
+            'seminary_end_date': forms.DateInput(attrs={'type': 'date'}),
+        }

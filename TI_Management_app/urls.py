@@ -412,5 +412,25 @@ urlpatterns = [
         views.relief_confirmed_list_search,
         name='relief_confirmed_list_search'
     ),
+    path(
+        'TI_Management_app/finance/scholarships-list/',
+        views.scholarships_list,
+        name='scholarships_list'
+    ),
+    path(
+        'TI_Management_app/finance/scholarships-list-search/',
+        views.scholarships_list_search,
+        name='scholarships_list_search'
+    ),
+    path(
+        'TI_Management_app/finance/scholarships-average-salary-add/',
+        views.scholarships_average_salary_add,
+        name='scholarships_average_salary_add'
+    ),
+    path(
+        'TI_Management_app/finance/scholarships-add/',
+        views.scholarships_add,
+        name='scholarships_add'
+    ),
 ]
 

@@ -20,7 +20,9 @@ from .models import (
     RelationRegisterRelief,
     RegisterRelief,
     FileRegisterRelief,
-    SignatureRelief
+    SignatureRelief,
+    Scholarships,
+    AverageSalary
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -61,7 +63,9 @@ from .forms import (
     CardRegisterReliefForm,
     SignatureReliefForm,
     PaymentConfirmationReliefForm,
-    ConfirmedReliefTimeRangeForm
+    ConfirmedReliefTimeRangeForm,
+    AverageSalaryForm,
+    ScholarshipsForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -1688,7 +1692,11 @@ def member_notepad_history_pdf(request, pk, title):
     c.save()
     buf.seek(0)
 
-    return FileResponse(buf, as_attachment=True, filename=f"HistoriaKomunikacji-{member.forename} {member.surname}.pdf")
+    return FileResponse(
+        buf,
+        as_attachment=True,
+        filename=f"HistoriaKomunikacji-{member.forename} {member.surname}.pdf"
+    )
 
 
 @login_required
@@ -2392,3 +2400,93 @@ def relief_confirmed_list_search(request):
             'TI_Management_app/finance/relief_confirmed_list_search.html',
             {}
         )
+
+
+@login_required
+def scholarships_list(request):
+    scholarships_all = Scholarships.objects.order_by('-created_date')
+
+    paginator = Paginator(scholarships_all, 50)
+    page = request.GET.get('page')
+    try:
+        scholarships = paginator.page(page)
+    except PageNotAnInteger:
+        scholarships = paginator.page(1)
+    except EmptyPage:
+        scholarships = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/finance/scholarships_list.html',
+        {
+            'page': page,
+            'scholarships': scholarships
+        }
+    )
+
+
+@login_required
+def scholarships_list_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        members = Scholarships.objects.filter(
+            Q(member__forename__contains=searched.capitalize()) |
+            Q(member__surname__contains=searched.capitalize()) |
+            Q(member__member_nr__contains=searched) |
+            Q(member__phone_number__contains=searched)
+        )
+        return render(
+            request,
+            'TI_Management_app/finance/scholarships_list_search.html',
+            {
+                'searched': searched,
+                'members': members
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/finance/scholarships_list_search.html',
+            {}
+        )
+
+
+@login_required
+def scholarships_average_salary_add(request):
+    scholarships_average_salary_list = AverageSalary.objects.order_by('-created_date')
+
+    if request.method == "POST":
+        form = AverageSalaryForm(request.POST)
+        if form.is_valid():
+            salary = form.save(commit=False)
+            salary.author = request.user
+            salary.save()
+
+            messages.success(request, f"Dodano przeciętne wynagrodzenie {salary.title}!")
+            return redirect('TI_Management_app:scholarships_average_salary_add')
+    else:
+        form = AverageSalaryForm()
+
+    paginator = Paginator(scholarships_average_salary_list, 50)
+    page = request.GET.get('page')
+    try:
+        average_salary = paginator.page(page)
+    except PageNotAnInteger:
+        average_salary = paginator.page(1)
+    except EmptyPage:
+        average_salary = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/finance/scholarships_average_salary_add.html',
+        {
+            'form': form,
+            'page': page,
+            'average_salary': average_salary
+        }
+    )
+
+
+@login_required
+def scholarships_add(request):
+    pass

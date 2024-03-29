@@ -35,7 +35,7 @@
 
                 <p>
                     {% if member.payment_confirmation is False %}
-                        {% if member.registerReliefSignatureRelief.count < 2 %}
+                        {% if member.registerReliefSignatureRelief.count < 3 %}
                             <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                                 Dodaj podpis
                             </a>

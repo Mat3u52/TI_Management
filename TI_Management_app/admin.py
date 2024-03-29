@@ -28,7 +28,9 @@ from .models import (
     RelationRegisterRelief,
     RegisterRelief,
     FileRegisterRelief,
-    SignatureRelief
+    SignatureRelief,
+    AverageSalary,
+    Scholarships
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -973,3 +975,74 @@ class FileRegisterReliefAdmin(admin.ModelAdmin):
         'title',
     )
 
+
+@admin.register(AverageSalary)
+class AverageSalaryAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'salary'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'salary'
+    )
+    search_fields = (
+        'title',
+    )
+
+
+@admin.register(Scholarships)
+class ScholarshipsAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'member',
+        'seminary_start_date',
+        'seminary_end_date',
+        'member_salary',
+        'preferred_university',
+        'grading_scale',
+        'tuition_fee_amount',
+        'file',
+        'confirmation_of_student_id'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'member',
+        'seminary_start_date',
+        'seminary_end_date',
+        'member_salary',
+        'preferred_university',
+        'grading_scale',
+        'tuition_fee_amount',
+        'file',
+        'confirmation_of_student_id'
+    )
+    search_fields = (
+        'title',
+    )
