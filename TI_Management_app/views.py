@@ -2050,14 +2050,18 @@ def register_relief_step_one_search(request):
                                              Q(phone_number__contains=searched),
                                              card__isnull=False,
                                              deactivate=False)
-        return render(request,
-                      'TI_Management_app/finance/register_relief_step_one_search.html',
-                      {'searched': searched,
-                       'members': members})
+        return render(
+            request,
+            'TI_Management_app/finance/register_relief_step_one_search.html',
+            {'searched': searched,
+             'members': members}
+        )
     else:
-        return render(request,
-                      'TI_Management_app/finance/register_relief_step_one_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/finance/register_relief_step_one_search.html',
+            {}
+        )
 
 
 @login_required
@@ -2488,5 +2492,51 @@ def scholarships_average_salary_add(request):
 
 
 @login_required
-def scholarships_add(request):
-    pass
+def scholarships_add(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    scholarships_average_salary_list = AverageSalary.objects.order_by('-created_date')
+    if request.method == "POST":
+        form = ScholarshipsForm(request.POST)
+        if form.is_valid():
+            scholarship = form.save(commit=False)
+            scholarship.author = request.user
+            scholarship.save()
+            messages.success(request, f"Dodano nową relacje {scholarship.title}!")
+            return redirect('TI_Management_app:scholarships_add')
+    else:
+        form = ScholarshipsForm()
+    return render(
+        request,
+        'TI_Management_app/finance/scholarships_add.html',
+        {
+            'form': form,
+            'scholarships_average_salary_list': scholarships_average_salary_list,
+            'member': member
+        }
+    )
+
+
+@login_required
+def scholarships_add_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        members = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
+                                             Q(surname__contains=searched.capitalize()) |
+                                             Q(member_nr__contains=searched) |
+                                             Q(phone_number__contains=searched),
+                                             card__isnull=False,
+                                             deactivate=False)
+        return render(
+            request,
+            'TI_Management_app/finance/scholarships_add_search.html',
+            {
+                'searched': searched,
+                'members': members
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/finance/scholarships_add_search.html',
+            {}
+        )
