@@ -428,9 +428,14 @@ urlpatterns = [
         name='scholarships_average_salary_add'
     ),
     path(
-        'TI_Management_app/finance/scholarships-add/',
+        'TI_Management_app/finance/scholarships-add/<int:pk>/',
         views.scholarships_add,
         name='scholarships_add'
+    ),
+    path(
+        'TI_Management_app/finance/scholarships-add-search/',
+        views.scholarships_add_search,
+        name='scholarships_add_search'
     ),
 ]
 

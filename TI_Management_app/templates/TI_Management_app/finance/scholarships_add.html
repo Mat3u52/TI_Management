@@ -1,10 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="#"> / Finanse</a>
+<a href="{% url 'TI_Management_app:scholarships_list' %}"> / Stypendia</a>
+<a href="{% url 'TI_Management_app:scholarships_add'  pk=member.pk %}"> / Dodaj Stypendium</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+        <h4>{{ member.forename }} {{ member.surname }} {{ member.member_nr }}</h4>
+        {{form.member.member.pk}}
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                value="Stypendium - {{ timestamp|show_timestamp }} - {{ member.forename }} {{ member.surname }} {{ member.member_nr }}"
+                placeholder="{{ member.forename }} {{ member.surname }} {{ member.member_nr }}"
+                aria-label="Nazwa"
+                name="title"
+                disabled
+                required>
+        <p>Data rozpoczęcia semestru:</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="date"
+                name="seminary_start_date"
+                required>
+        <p>Data zakończenia semestru:</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="date"
+                name="seminary_end_date"
+                required>
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+    </form>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='scholarships_add_search' %}
+{% endblock %}

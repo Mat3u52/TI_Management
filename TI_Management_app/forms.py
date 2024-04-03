@@ -768,6 +768,7 @@ class ScholarshipsForm(forms.ModelForm):
         model = Scholarships
         fields = [
             'title',
+            'member',
             'seminary_start_date',
             'seminary_end_date',
             'member_salary',
@@ -780,5 +781,20 @@ class ScholarshipsForm(forms.ModelForm):
 
         widgets = {
             'seminary_start_date': forms.DateInput(attrs={'type': 'date'}),
-            'seminary_end_date': forms.DateInput(attrs={'type': 'date'}),
+            'seminary_end_date': forms.DateInput(attrs={'type': 'date'})
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        seminary_start_date = cleaned_data.get('seminary_start_date')
+        member = cleaned_data.get('member')
+
+        if seminary_start_date and member:
+            # Fetching member instance
+            member_instance = MembersZZTI.objects.get(pk=member.pk)
+            # Checking the difference between dates
+            date_of_accession = member_instance.date_of_accession
+            if seminary_start_date > date_of_accession:
+                raise forms.ValidationError(f"{seminary_start_date}Seminary start date cannot be before the member's date of accession.")
+
+        return cleaned_data
