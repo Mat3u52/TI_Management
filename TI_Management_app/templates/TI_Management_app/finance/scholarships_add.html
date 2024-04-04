@@ -15,8 +15,9 @@
         {% if form.errors %}
         <p>{{form.errors}}</p>
         {% endif %}
-        <h4>{{ member.forename }} {{ member.surname }} {{ member.member_nr }}</h4>
-        {{form.member.member.pk}}
+        <h4>
+            {{ member.forename }} {{ member.surname }} {{ member.member_nr }}
+        </h4>
         <input
                 class="form-control me-2"
                 style="min-width: 50%!important; min-height: 15px"
@@ -27,6 +28,9 @@
                 name="title"
                 disabled
                 required>
+        <br />
+        <br />
+
         <p>Data rozpoczęcia semestru:</p>
         <input
                 class="form-control me-2"
@@ -34,6 +38,7 @@
                 type="date"
                 name="seminary_start_date"
                 required>
+
         <p>Data zakończenia semestru:</p>
         <input
                 class="form-control me-2"
@@ -41,6 +46,24 @@
                 type="date"
                 name="seminary_end_date"
                 required>
+
+        <p>Wynagrodzenie Członka:</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="number"
+                step="0.01"
+                placeholder="Wynagrodzenie Członka"
+                aria-label="Wynagrodzenie Członka"
+                name="member_salary"
+                required>
+        <p>
+            <small>
+                Przeciętne wynagrodzenie:
+                {{ scholarships_average_salary_list.title }} -
+                {{ scholarships_average_salary_list.salary }} zł
+            </small>
+        </p>
 
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz

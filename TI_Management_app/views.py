@@ -87,7 +87,9 @@ from textwrap import wrap
 from django.contrib import messages
 import csv
 from django.conf import settings
+
 from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
 
@@ -2491,12 +2493,29 @@ def scholarships_average_salary_add(request):
     )
 
 
+@csrf_exempt  # Use only for demo purposes. CSRF should be handled properly in production.
+def calculate(request, pk):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    scholarships_average_salary_list = AverageSalary.objects.latest('id')
+    if request.method == 'POST' and request.is_ajax():
+        form = ScholarshipsForm(request.POST)
+        if form.is_valid():
+            number1 = form.cleaned_data['number1']
+            number2 = form.cleaned_data['number2']
+            total = number1 + number2
+            return JsonResponse({'success': True, 'total': total})
+        else:
+            return JsonResponse({'success': False, 'errors': form.errors})
+    else:
+        return JsonResponse({'success': False, 'message': 'Invalid request'})
+
+
 @login_required
 def scholarships_add(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
-    scholarships_average_salary_list = AverageSalary.objects.order_by('-created_date')
+    scholarships_average_salary_list = AverageSalary.objects.latest('id')
     if request.method == "POST":
-        form = ScholarshipsForm(request.POST)
+        form = ScholarshipsForm(member, request.POST)
         if form.is_valid():
             scholarship = form.save(commit=False)
             scholarship.author = request.user
@@ -2504,7 +2523,7 @@ def scholarships_add(request, pk):
             messages.success(request, f"Dodano nową relacje {scholarship.title}!")
             return redirect('TI_Management_app:scholarships_add')
     else:
-        form = ScholarshipsForm()
+        form = ScholarshipsForm(member)
     return render(
         request,
         'TI_Management_app/finance/scholarships_add.html',

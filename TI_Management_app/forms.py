@@ -28,6 +28,7 @@ from .models import (
 from django.utils import timezone
 from django.forms.widgets import DateInput
 from django.contrib.auth.models import User
+from datetime import datetime
 
 
 class MemberForm(forms.ModelForm):
@@ -784,17 +785,25 @@ class ScholarshipsForm(forms.ModelForm):
             'seminary_end_date': forms.DateInput(attrs={'type': 'date'})
         }
 
+    # def __init__(self, member, scholarships_average_salary_list, *args, **kwargs):
+    def __init__(self, member, *args, **kwargs):
+        self.member = member
+        # self.scholarships_average_salary_list = scholarships_average_salary_list
+        super(ScholarshipsForm, self).__init__(*args, **kwargs)
+
     def clean(self):
         cleaned_data = super().clean()
         seminary_start_date = cleaned_data.get('seminary_start_date')
-        member = cleaned_data.get('member')
+        # member_salary = cleaned_data.get('member_salary')
 
-        if seminary_start_date and member:
-            # Fetching member instance
-            member_instance = MembersZZTI.objects.get(pk=member.pk)
-            # Checking the difference between dates
-            date_of_accession = member_instance.date_of_accession
-            if seminary_start_date > date_of_accession:
-                raise forms.ValidationError(f"{seminary_start_date}Seminary start date cannot be before the member's date of accession.")
+        if seminary_start_date and self.member:
+            difference = seminary_start_date - self.member.date_of_accession
+            if difference.days < 365:
+                raise forms.ValidationError(f"Członek jest w związkach tylko przez: {difference.days} dni")
+
+        # if member_salary:
+        #     percent_salary = (member_salary / self.scholarships_average_salary_list) * 100
+        #     if percent_salary > 0:
+        #         raise forms.ValidationError(f"{percent_salary} %")
 
         return cleaned_data
