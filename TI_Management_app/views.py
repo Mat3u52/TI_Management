@@ -89,7 +89,7 @@ import csv
 from django.conf import settings
 
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt
+# from django.views.decorators.csrf import csrf_exempt
 
 from django.contrib.auth.models import User
 
@@ -2491,23 +2491,6 @@ def scholarships_average_salary_add(request):
             'average_salary': average_salary
         }
     )
-
-
-@csrf_exempt  # Use only for demo purposes. CSRF should be handled properly in production.
-def calculate(request, pk):
-    member = get_object_or_404(MembersZZTI, pk=pk)
-    scholarships_average_salary_list = AverageSalary.objects.latest('id')
-    if request.method == 'POST' and request.is_ajax():
-        form = ScholarshipsForm(request.POST)
-        if form.is_valid():
-            number1 = form.cleaned_data['number1']
-            number2 = form.cleaned_data['number2']
-            total = number1 + number2
-            return JsonResponse({'success': True, 'total': total})
-        else:
-            return JsonResponse({'success': False, 'errors': form.errors})
-    else:
-        return JsonResponse({'success': False, 'message': 'Invalid request'})
 
 
 @login_required
