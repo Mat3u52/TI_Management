@@ -17,3 +17,8 @@ def show_timestamp(timestamp):
     current_time = datetime.utcnow()
     timestamp = int(current_time.timestamp())
     return timestamp
+
+
+@register.filter(name='comma_to_period')
+def comma_to_period(value):
+    return str(value).replace(',', '.')

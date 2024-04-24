@@ -647,6 +647,16 @@ class AverageSalary(models.Model):
 
 
 class Scholarships(models.Model):
+
+    GRADING_SCALE_CHOICES = (
+        ('2', '2'),
+        ('2.5', '2.5'),
+        ('3', '3'),
+        ('3.5', '3.5'),
+        ('4', '4'),
+        ('4.5', '4.5'),
+    )
+
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)

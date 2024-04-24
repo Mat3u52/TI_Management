@@ -56,6 +56,7 @@
                 placeholder="Wynagrodzenie Członka"
                 aria-label="Wynagrodzenie Członka"
                 name="member_salary"
+                id="inputMemberSalary"
                 required>
         <p>
             <small>
@@ -64,13 +65,66 @@
                 {{ scholarships_average_salary_list.salary }} zł
             </small>
         </p>
+        <div id="messageContainer"></div>
+        <br/>
 
+        <p>Uczelnia preferowana?</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 1%!important; min-height: 15px"
+                type="checkbox"
+                aria-label="Uczelnia preferowana"
+                name="preferred_university"
+                required>
+        <br />
+        <br />
+
+        <p>Uzyskana średnia:</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="number"
+                placeholder="3.5"
+                aria-label="Uzyskana średnia"
+                name="grading_scale"
+                min="0.5"
+                max="5.5"
+                step="0.5"
+                required>
 
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz
         </button>
         <br />
     </form>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    var inputField = document.getElementById('inputMemberSalary');
+    var messageContainer = document.getElementById('messageContainer');
+
+    {% with djangoVariable=scholarships_average_salary_list.salary|comma_to_period %}
+        var djangoVariable = {{ djangoVariable }};
+    {% endwith %}
+
+    inputField.addEventListener('blur', function(event) {
+        var inputValue = parseFloat(inputField.value);
+
+        if (!isNaN(inputValue)) {
+            var result = (inputValue / djangoVariable) * 100;
+
+            result = result.toFixed(2);
+            messageContainer.textContent = 'na poziomie: ' + result + ' %';
+        } else {
+            messageContainer.textContent = 'Proszę podać wynagrodzenie Członka.';
+        }
+    });
+});
+</script>
+
+
 </div>
 {% endblock %}
 
