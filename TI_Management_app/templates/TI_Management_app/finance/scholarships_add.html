@@ -66,7 +66,7 @@
             </small>
         </p>
         <div id="messageContainer"></div>
-        <br/>
+        <br />
 
         <p>Uczelnia preferowana?</p>
         <input
@@ -75,22 +75,38 @@
                 type="checkbox"
                 aria-label="Uczelnia preferowana"
                 name="preferred_university"
+                id="preferredUniversity"
                 required>
-        <br />
+        <div id="messageContainerCheckbox"></div>
         <br />
 
         <p>Uzyskana średnia:</p>
         <input
                 class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
+                style="max-width: 5%!important; min-height: 15px"
                 type="number"
                 placeholder="3.5"
                 aria-label="Uzyskana średnia"
-                name="grading_scale"
+                name="average_grade"
                 min="0.5"
+                max="6"
+                step="0.5"
+                required>
+
+        <p>Skala ocen do:</p>
+        <input
+                class="form-control me-2"
+                style="max-width: 5%!important; min-height: 15px"
+                type="number"
+                placeholder="5"
+                aria-label="Skala ocen"
+                name="grading_scale"
+                min="5"
                 max="5.5"
                 step="0.5"
                 required>
+        <br />
+
 
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz
@@ -104,6 +120,9 @@
 document.addEventListener('DOMContentLoaded', function() {
     var inputField = document.getElementById('inputMemberSalary');
     var messageContainer = document.getElementById('messageContainer');
+    var checkbox = document.getElementById('preferredUniversity'); // Get the checkbox element
+    var messageContainerCheckbox = document.getElementById('messageContainerCheckbox');
+    messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
 
     {% with djangoVariable=scholarships_average_salary_list.salary|comma_to_period %}
         var djangoVariable = {{ djangoVariable }};
@@ -117,10 +136,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
             result = result.toFixed(2);
             messageContainer.textContent = 'na poziomie: ' + result + ' %';
+
         } else {
             messageContainer.textContent = 'Proszę podać wynagrodzenie Członka.';
         }
     });
+
+    checkbox.addEventListener('change', function() {
+        if (this.checked) {
+            messageContainerCheckbox.textContent = 'Tak, uczelnia jest preferowana.';
+        } else {
+            messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
+        }
+    });
+
 });
 </script>
 

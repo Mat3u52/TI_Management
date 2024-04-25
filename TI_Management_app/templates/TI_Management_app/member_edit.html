@@ -3,7 +3,7 @@
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
 <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'TI_Management_app:member_edit' pk=member.pk %}"> / Modyfikuj</a>
+<a href="{% url 'TI_Management_app:member_edit' pk=member.pk %}"> / Aktualizuj</a>
 {% endblock %}
 
 {% block content %}

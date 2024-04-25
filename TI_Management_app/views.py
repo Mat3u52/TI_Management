@@ -2502,7 +2502,7 @@ def scholarships_add(request, pk):
             scholarship = form.save(commit=False)
             scholarship.author = request.user
             scholarship.save()
-            messages.success(request, f"Dodano nową relacje {scholarship.title}!")
+            messages.success(request, f"Dodano stypendium {scholarship.title}!")
             return redirect('TI_Management_app:scholarships_add')
     else:
         form = ScholarshipsForm(member)
