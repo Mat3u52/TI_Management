@@ -10,13 +10,15 @@
 {% block content %}
 
 <div class="hero-unit">
-    <form method="post" class="post-form">
+    <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
         <p>{{form.errors}}</p>
         {% endif %}
         <h4>
-            {{ member.forename }} {{ member.surname }} {{ member.member_nr }}
+            <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                {{ member.forename }} {{ member.surname }} {{ member.member_nr }}
+            </a>
         </h4>
         <input
                 class="form-control me-2"
@@ -106,6 +108,33 @@
                 step="0.5"
                 required>
         <br />
+
+        <p>Wysokość czesnego za semestr:</p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                placeholder="0"
+                aria-label="Skala ocen"
+                name="tuition_fee_amount"
+                min="1"
+                step="0.01"
+                required>
+        zł
+        <br />
+
+        <p>Dokumenty:</p>
+        <p>Wniosek o stypendium</p>
+        <label class="custom-file-upload">
+            {{form.file_scholarship_application}}
+        </label>
+        <br />
+        <p>Skan potwierdzenia płatności za studia</p>
+        <label class="custom-file-upload">
+            {{form.file_scanned_confirmation_of_payment_for_studies}}
+        </label>
+        <br />
+
 
 
         <button type="submit" class="btn btn-primary btn-large pull-right">

@@ -158,7 +158,29 @@ img {
 }
 
 input[type="file"] {
-    display: none;
+    color: #FFFFFF;
+    background: #006DCC;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border: 1px solid #ccc;
+    display: inline-block;
+    padding: 6px 12px;
+    cursor: pointer;
+}
+
+input[type="file"]::file-selector-button {
+    color: #006DCC;
+    border: 2px solid #006DCC;
+    padding: 0.2em 0.4em;
+    border-radius: 0.2em;
+    background-color: #006DCC;
+    transition: 1s;
+}
+
+input[type="file"]::file-selector-button:hover {
+    color: #006DCC;
+    background-color: #006DCC;
+    border: 2px solid #006DCC;
 }
 
 .custom-file-upload {

@@ -29,6 +29,7 @@ from django.utils import timezone
 from django.forms.widgets import DateInput
 from django.contrib.auth.models import User
 from datetime import datetime
+from django.core.exceptions import ValidationError
 
 
 class MemberForm(forms.ModelForm):
@@ -762,8 +763,16 @@ class AverageSalaryForm(forms.ModelForm):
         ]
 
 
+# def validate_pdf(value):
+#     if not value.name.endswith('.pdf'):
+#         raise ValidationError('Only PDF files are allowed.')
+
+
 class ScholarshipsForm(forms.ModelForm):
-    file = MultipleFileField(label='Wybierz Pliki', required=True)
+    # file_scholarship_application = MultipleFileField(label='Wybierz Pliki', required=True)
+    # file_scholarship_application = forms.FileField(validators=[validate_pdf])
+    file_scholarship_application = forms.FileField(label='Select a PDF file', widget=forms.FileInput(attrs={'accept': 'application/pdf'}))
+    file_scanned_confirmation_of_payment_for_studies = forms.FileField(label='Select a PDF file', widget=forms.FileInput(attrs={'accept': 'application/pdf'}))
 
     class Meta:
         model = Scholarships
@@ -774,9 +783,15 @@ class ScholarshipsForm(forms.ModelForm):
             'seminary_end_date',
             'member_salary',
             'preferred_university',
+            'average_grade',
             'grading_scale',
             'tuition_fee_amount',
-            'file',
+            'file_scholarship_application',
+            'file_scanned_confirmation_of_payment_for_studies',
+            'file_declaration_of_income',
+            'file_resolution_consenting',
+            'file_document_confirming_of_the_semester',
+            'file_university_regulations_of_the_grading_scale',
             'confirmation_of_student_id'
         ]
 

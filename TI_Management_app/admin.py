@@ -1025,7 +1025,12 @@ class ScholarshipsAdmin(admin.ModelAdmin):
         'average_grade',
         'grading_scale',
         'tuition_fee_amount',
-        'file',
+        'file_scholarship_application',
+        'file_scanned_confirmation_of_payment_for_studies',
+        'file_declaration_of_income',
+        'file_resolution_consenting',
+        'file_document_confirming_of_the_semester',
+        'file_university_regulations_of_the_grading_scale',
         'confirmation_of_student_id'
     )
     list_filter = (
@@ -1042,7 +1047,12 @@ class ScholarshipsAdmin(admin.ModelAdmin):
         'average_grade',
         'grading_scale',
         'tuition_fee_amount',
-        'file',
+        'file_scholarship_application',
+        'file_scanned_confirmation_of_payment_for_studies',
+        'file_declaration_of_income',
+        'file_resolution_consenting',
+        'file_document_confirming_of_the_semester',
+        'file_university_regulations_of_the_grading_scale',
         'confirmation_of_student_id'
     )
     search_fields = (

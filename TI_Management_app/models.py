@@ -657,21 +657,97 @@ class Scholarships(models.Model):
     #     ('4.5', '4.5'),
     # )
 
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorScholarships')
-    title = models.CharField(max_length=250, null=False, blank=False)
-    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberScholarships', null=False, blank=False)
-    seminary_start_date = models.DateTimeField(blank=True, null=True)
-    seminary_end_date = models.DateTimeField(blank=True, null=True)
-    member_salary = models.FloatField(null=False, blank=False)
-    preferred_university = models.BooleanField(default=False)
-    average_grade = models.FloatField(null=False, blank=False)
-    grading_scale = models.FloatField(null=False, blank=False)
-    tuition_fee_amount = models.FloatField(null=False, blank=False)
-    file = models.FileField(null=False, blank=False, upload_to='uploadsScholarships/%Y/%m/%d/%H%M%S/')
-    confirmation_of_student_id = models.BooleanField(default=False)
+    created_date = models.DateTimeField(
+        auto_now_add=True
+    )
+    updated_date = models.DateTimeField(
+        auto_now=True
+    )
+    slug = models.SlugField(
+        max_length=250,
+        unique_for_date='created_date',
+        default=None,
+        blank=False
+    )
+    author = models.ForeignKey(
+        User,
+        on_delete=models.SET_NULL,
+        null=True,
+        related_name='authorScholarships'
+    )
+    title = models.CharField(
+        max_length=250,
+        null=False,
+        blank=False
+    )
+    member = models.ForeignKey(
+        MembersZZTI,
+        on_delete=models.CASCADE,
+        related_name='memberScholarships',
+        null=False,
+        blank=False
+    )
+    seminary_start_date = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+    seminary_end_date = models.DateTimeField(
+        blank=True,
+        null=True
+    )
+    member_salary = models.FloatField(
+        null=False,
+        blank=False
+    )
+    preferred_university = models.BooleanField(
+        default=False
+    )
+    average_grade = models.FloatField(
+        null=False,
+        blank=False
+    )
+    grading_scale = models.FloatField(
+        null=False,
+        blank=False
+    )
+    tuition_fee_amount = models.FloatField(
+        null=False,
+        blank=False
+    )
+    file_scholarship_application = models.FileField(
+        null=False,
+        blank=False,
+        upload_to='uploadsScholarshipsApplication/%Y/%m/%d/%H%M%S/'
+    )
+    file_scanned_confirmation_of_payment_for_studies = models.FileField(
+        null=False,
+        blank=False,
+        upload_to='uploadsScholarshipsScannedConfirmationOfPaymentForStudies/%Y/%m/%d/%H%M%S/'
+    )
+    file_declaration_of_income = models.FileField(
+        null=False,
+        blank=False,
+        upload_to='uploadsScholarshipsDeclarationOfIncome/%Y/%m/%d/%H%M%S/'
+    )
+    file_resolution_consenting = models.FileField(
+        null=False,
+        blank=False,
+        upload_to='uploadsScholarshipsResolutionConsenting/%Y/%m/%d/%H%M%S/'
+    )
+    file_document_confirming_of_the_semester = models.FileField(
+        null=False,
+        blank=False,
+        upload_to='uploadsScholarshipsDocumentConfirmingOfTheSemester/%Y/%m/%d/%H%M%S/'
+    )
+    file_university_regulations_of_the_grading_scale = models.FileField(
+        null=False,
+        blank=False,
+        upload_to='uploadsScholarshipsUniversityRegulationsOfTheGradingScale/%Y/%m/%d/%H%M%S/'
+    )
+
+    confirmation_of_student_id = models.BooleanField(
+        default=False
+    )
 
     history = HistoricalRecords()
     objects = models.Manager()  # default manager
