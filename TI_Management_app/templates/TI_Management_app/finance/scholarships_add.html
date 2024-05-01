@@ -36,7 +36,7 @@
         <p>Data rozpoczęcia semestru:</p>
         <input
                 class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
+                style="max-width: 50%!important; min-height: 15px"
                 type="date"
                 name="seminary_start_date"
                 required>
@@ -44,7 +44,7 @@
         <p>Data zakończenia semestru:</p>
         <input
                 class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
+                style="max-width: 50%!important; min-height: 15px"
                 type="date"
                 name="seminary_end_date"
                 required>
@@ -52,7 +52,7 @@
         <p>Wynagrodzenie Członka:</p>
         <input
                 class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
+                style="max-width: 25%!important; min-height: 15px"
                 type="number"
                 step="0.01"
                 placeholder="Wynagrodzenie Członka"
@@ -160,6 +160,20 @@
             {{form.file_university_regulations_of_the_grading_scale}}
         </label>
         <br />
+        <br />
+
+        <p>Potwierdzam weryfikację legitymacji studenckiej:</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 1%!important; min-height: 15px"
+                type="checkbox"
+                aria-label="Potwierdzam weryfikację legitymacji studenckiej"
+                name="confirmation_of_student_id"
+                id="studentCard"
+                required>
+        <div id="messageContainerCheckboxStudentCard"></div>
+        <br />
+        <br />
 
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz
@@ -176,6 +190,10 @@ document.addEventListener('DOMContentLoaded', function() {
     var checkbox = document.getElementById('preferredUniversity'); // Get the checkbox element
     var messageContainerCheckbox = document.getElementById('messageContainerCheckbox');
     messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
+
+    var checkboxStudentCard = document.getElementById('studentCard'); // Get the checkbox element
+    var messageContainerCheckboxStudentCard = document.getElementById('messageContainerCheckboxStudentCard');
+    messageContainerCheckboxStudentCard.textContent = 'Niepotwierdzona';
 
     {% with djangoVariable=scholarships_average_salary_list.salary|comma_to_period %}
         var djangoVariable = {{ djangoVariable }};
@@ -200,6 +218,14 @@ document.addEventListener('DOMContentLoaded', function() {
             messageContainerCheckbox.textContent = 'Tak, uczelnia jest preferowana.';
         } else {
             messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
+        }
+    });
+
+    checkboxStudentCard.addEventListener('change', function() {
+        if (this.checked) {
+            messageContainerCheckboxStudentCard.textContent = 'Potwierdzona';
+        } else {
+            messageContainerCheckboxStudentCard.textContent = 'Niepotwierdzona';
         }
     });
 
