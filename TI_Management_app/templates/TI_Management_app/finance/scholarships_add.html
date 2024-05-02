@@ -117,10 +117,13 @@
                 placeholder="0"
                 aria-label="Skala ocen"
                 name="tuition_fee_amount"
+                id="inputTuition"
                 min="1"
                 step="0.01"
                 required>
         zł
+        <br />
+        <div id="messageContainerTuition"></div>
         <br />
 
         <p>Dokumenty:</p>
@@ -187,6 +190,7 @@
 document.addEventListener('DOMContentLoaded', function() {
     var inputField = document.getElementById('inputMemberSalary');
     var messageContainer = document.getElementById('messageContainer');
+
     var checkbox = document.getElementById('preferredUniversity'); // Get the checkbox element
     var messageContainerCheckbox = document.getElementById('messageContainerCheckbox');
     messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
@@ -194,6 +198,9 @@ document.addEventListener('DOMContentLoaded', function() {
     var checkboxStudentCard = document.getElementById('studentCard'); // Get the checkbox element
     var messageContainerCheckboxStudentCard = document.getElementById('messageContainerCheckboxStudentCard');
     messageContainerCheckboxStudentCard.textContent = 'Niepotwierdzona';
+
+    var inputFieldTuition = document.getElementById('inputTuition');
+    var messageContainerTuition = document.getElementById('messageContainerTuition');
 
     {% with djangoVariable=scholarships_average_salary_list.salary|comma_to_period %}
         var djangoVariable = {{ djangoVariable }};
@@ -226,6 +233,20 @@ document.addEventListener('DOMContentLoaded', function() {
             messageContainerCheckboxStudentCard.textContent = 'Potwierdzona';
         } else {
             messageContainerCheckboxStudentCard.textContent = 'Niepotwierdzona';
+        }
+    });
+
+    inputFieldTuition.addEventListener('blur', function(event) {
+        var inputValue = parseFloat(inputFieldTuition.value);
+
+        if (!isNaN(inputValue)) {
+            var result = inputValue * 0.1;
+
+            result = result.toFixed(2);
+            messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
+
+        } else {
+            messageContainerTuition.textContent = 'Niewprowadzony';
         }
     });
 
