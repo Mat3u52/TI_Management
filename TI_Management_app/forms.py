@@ -763,16 +763,60 @@ class AverageSalaryForm(forms.ModelForm):
         ]
 
 
-# def validate_pdf(value):
-#     if not value.name.endswith('.pdf'):
-#         raise ValidationError('Only PDF files are allowed.')
-
-
 class ScholarshipsForm(forms.ModelForm):
-    # file_scholarship_application = MultipleFileField(label='Wybierz Pliki', required=True)
-    # file_scholarship_application = forms.FileField(validators=[validate_pdf])
-    file_scholarship_application = forms.FileField(label='Select a PDF file', widget=forms.FileInput(attrs={'accept': 'application/pdf'}))
-    file_scanned_confirmation_of_payment_for_studies = forms.FileField(label='Select a PDF file', widget=forms.FileInput(attrs={'accept': 'application/pdf'}))
+    file_scholarship_application = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        )
+    )
+
+    file_scanned_confirmation_of_payment_for_studies = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        )
+    )
+
+    file_declaration_of_income = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        )
+    )
+
+    file_resolution_consenting = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        )
+    )
+
+    file_document_confirming_of_the_semester = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        )
+    )
+
+    file_university_regulations_of_the_grading_scale = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        )
+    )
 
     class Meta:
         model = Scholarships
