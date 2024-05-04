@@ -687,6 +687,10 @@ class Scholarships(models.Model):
         null=False,
         blank=False
     )
+    application_creation_date = models.DateTimeField(
+        blank=True,
+        null=True
+    )
     seminary_start_date = models.DateTimeField(
         blank=True,
         null=True

@@ -2506,6 +2506,8 @@ def scholarships_add(request, pk):
             return redirect('TI_Management_app:scholarships_add')
     else:
         form = ScholarshipsForm(member)
+        # initial_data = {'application_creation_date': '2024-05-03'}  # Initial date in the format YYYY-MM-DD
+        # form = ScholarshipsForm(member, initial=initial_data)
     return render(
         request,
         'TI_Management_app/finance/scholarships_add.html',

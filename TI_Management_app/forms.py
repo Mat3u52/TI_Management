@@ -823,6 +823,7 @@ class ScholarshipsForm(forms.ModelForm):
         fields = [
             'title',
             'member',
+            'application_creation_date',
             'seminary_start_date',
             'seminary_end_date',
             'member_salary',
@@ -840,6 +841,7 @@ class ScholarshipsForm(forms.ModelForm):
         ]
 
         widgets = {
+            'application_creation_date': forms.DateInput(attrs={'type': 'date'}),
             'seminary_start_date': forms.DateInput(attrs={'type': 'date'}),
             'seminary_end_date': forms.DateInput(attrs={'type': 'date'})
         }
@@ -847,8 +849,8 @@ class ScholarshipsForm(forms.ModelForm):
     # def __init__(self, member, scholarships_average_salary_list, *args, **kwargs):
     def __init__(self, member, *args, **kwargs):
         self.member = member
-        # self.scholarships_average_salary_list = scholarships_average_salary_list
         super(ScholarshipsForm, self).__init__(*args, **kwargs)
+        # self.fields['application_creation_date'].initial = datetime.now()
 
     def clean(self):
         cleaned_data = super().clean()
