@@ -850,21 +850,25 @@ class ScholarshipsForm(forms.ModelForm):
     def __init__(self, member, *args, **kwargs):
         self.member = member
         super(ScholarshipsForm, self).__init__(*args, **kwargs)
-        # self.fields['application_creation_date'].initial = datetime.now()
 
     def clean(self):
         cleaned_data = super().clean()
         seminary_start_date = cleaned_data.get('seminary_start_date')
-        # member_salary = cleaned_data.get('member_salary')
+        seminary_end_date = cleaned_data.get('seminary_end_date')
+        application_creation_date = cleaned_data.get('application_creation_date')
+        confirmation_of_student_id = cleaned_data.get('confirmation_of_student_id')
 
         if seminary_start_date and self.member:
             difference = seminary_start_date - self.member.date_of_accession
             if difference.days < 365:
                 raise forms.ValidationError(f"Członek jest w związkach tylko przez: {difference.days} dni")
 
-        # if member_salary:
-        #     percent_salary = (member_salary / self.scholarships_average_salary_list) * 100
-        #     if percent_salary > 0:
-        #         raise forms.ValidationError(f"{percent_salary} %")
+        if seminary_end_date and application_creation_date:
+            difference = application_creation_date - seminary_end_date
+            if difference.days > 30:
+                raise forms.ValidationError(f"Okres na złożenie wniosku został przekroczony: {difference.days} dni")
+
+        if confirmation_of_student_id is False:
+            raise forms.ValidationError(f"Niepotwierdzona legitymacja studencka")
 
         return cleaned_data

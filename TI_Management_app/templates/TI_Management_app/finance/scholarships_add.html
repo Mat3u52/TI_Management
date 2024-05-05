@@ -37,8 +37,8 @@
                 class="form-control me-2"
                 style="max-width: 50%!important; min-height: 15px"
                 type="date"
-                value="2024-05-03"
                 name="application_creation_date"
+                id="application_creation_date"
                 required>
 
         <p>Data rozpoczęcia semestru:</p>
@@ -201,6 +201,10 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
+
+    var currentDate = new Date().toISOString().split('T')[0];
+    document.getElementById('application_creation_date').value = currentDate;
+
     var inputField = document.getElementById('inputMemberSalary');
     var messageContainer = document.getElementById('messageContainer');
 
