@@ -648,15 +648,6 @@ class AverageSalary(models.Model):
 
 class Scholarships(models.Model):
 
-    # GRADING_SCALE_CHOICES = (
-    #     ('2', '2'),
-    #     ('2.5', '2.5'),
-    #     ('3', '3'),
-    #     ('3.5', '3.5'),
-    #     ('4', '4'),
-    #     ('4.5', '4.5'),
-    # )
-
     created_date = models.DateTimeField(
         auto_now_add=True
     )
@@ -834,7 +825,7 @@ def validate_unique_or_null(value):
         existing_records = CardStatus.objects.exclude(pk=value.pk).filter(card_identity=value.card_identity)
 
     if existing_records.exists():
-        raise ValidationError('This field must be unique or null.')
+        raise ValidationError('To pole musi być unikalne.')
 
 
 class CardStatus(models.Model):
@@ -881,10 +872,6 @@ class CardStatus(models.Model):
                 f"{self.card} "
                 f"{self.ordered_doc} "
                 f"{self.to_be_picked_up_doc}")
-
-    # def save(self, **kwargs):
-    #     self.card_identity = self.card_identity or None
-    #     super().save(**kwargs)
 
     def save(self, *args, **kwargs):
         self.card_identity = self.card_identity or None

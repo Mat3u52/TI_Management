@@ -355,8 +355,6 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
 
     responsible = forms.CharField(widget=forms.HiddenInput())
 
-    # date_of_action = forms.DateField(initial=timezone.now())
-
     class Meta:
         model = CardStatus
         fields = [
@@ -365,7 +363,6 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
             'card_identity',
             'card_start_pin',
             'card_status',
-            # 'date_of_action',
             'file_name',
             'file',
             'file_date',
@@ -377,7 +374,6 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
         ]
 
         widgets = {
-            # 'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
             'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
             'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
         }
@@ -681,8 +677,6 @@ class CardRegisterReliefForm(forms.Form):
         cleaned_data = super().clean()
         card = cleaned_data.get('card')
 
-        # Retrieve the instance being updated
-
         instance = self.instance
 
         if instance and instance.card != card:
@@ -701,12 +695,6 @@ class SignatureReliefForm(forms.Form):
     def __init__(self, relief_to_be_signed, *args, **kwargs):
         self.relief_to_be_signed = relief_to_be_signed
         super(SignatureReliefForm, self).__init__(*args, **kwargs)
-
-    # class Meta:
-    #     model = MembersZZTI
-    #     fields = [
-    #         'card'
-    #     ]
 
     def clean_card(self):
         card = self.cleaned_data['card']
@@ -846,7 +834,6 @@ class ScholarshipsForm(forms.ModelForm):
             'seminary_end_date': forms.DateInput(attrs={'type': 'date'})
         }
 
-    # def __init__(self, member, scholarships_average_salary_list, *args, **kwargs):
     def __init__(self, member, *args, **kwargs):
         self.member = member
         super(ScholarshipsForm, self).__init__(*args, **kwargs)
