@@ -23,6 +23,11 @@
 
 <div class="hero-unit">
     <H4>Stypendia:</H4>
+    {% for scholarship in scholarships %}
+        <div class="notepad">
+            {{ scholarship.title }}
+        </div>
+    {% endfor %}
 
 </div>
 

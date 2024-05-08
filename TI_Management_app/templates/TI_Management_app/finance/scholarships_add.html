@@ -28,7 +28,7 @@
                 placeholder="{{ member.forename }} {{ member.surname }} {{ member.member_nr }}"
                 aria-label="Nazwa"
                 name="title"
-                disabled
+
                 required>
         <br />
         <br />
@@ -142,39 +142,42 @@
         <p>Dokumenty:</p>
         
         <p>Wniosek o stypendium</p>
-        <label class="custom-file-upload">
-            {{form.file_scholarship_application}}
-        </label>
+            <label class="custom-file-upload">
+                {{form.file_scholarship_application}}
+            </label>
         <br />
 
         <p>Skan potwierdzenia płatności za studia</p>
-        <label class="custom-file-upload">
-            {{form.file_scanned_confirmation_of_payment_for_studies}}
-        </label>
+            <label class="custom-file-upload">
+                {{form.file_scanned_confirmation_of_payment_for_studies}}
+            </label>
         <br />
 
         <p>Oświadczenie o dochodach</p>
-        <label class="custom-file-upload">
-            {{form.file_declaration_of_income}}
-        </label>
+            <label class="custom-file-upload">
+                {{form.file_declaration_of_income}}
+            </label>
         <br />
 
         <p>Uchwała o zgodzie na stypendium</p>
-        <label class="custom-file-upload">
-            {{form.file_resolution_consenting}}
-        </label>
+            <label class="custom-file-upload">
+                {{form.file_resolution_consenting}}
+            </label>
         <br />
 
         <p>Dokument potwierdzający zaliczenie semestru</p>
-        <label class="custom-file-upload">
-            {{form.file_document_confirming_of_the_semester}}
-        </label>
+            <label class="custom-file-upload">
+                {{form.file_document_confirming_of_the_semester}}
+            </label>
         <br />
 
-        <p>Regulamin uczelni z informacją o skali ocen</p>
-        <label class="custom-file-upload">
-            {{form.file_university_regulations_of_the_grading_scale}}
-        </label>
+        <p>Regulamin uczeli z informacją o skali ocen</p>
+            <label class="custom-file-upload">
+                {{form.file_university_regulations_of_the_grading_scale}}
+            </label>
+        <br />
+
+
         <br />
         <br />
 

@@ -22,6 +22,12 @@ mydb.py
 /media/toBePickedUpCardDocument/*
 /media/documentsDatabase/*
 /media/uploadsRegisterRelief/*
+/media/uploadsScholarshipsApplication/*
+/media/uploadsScholarshipsScannedConfirmationOfPaymentForStudies/*
+/media/uploadsScholarshipsDeclarationOfIncome/*
+/media/uploadsScholarshipsResolutionConsenting/*
+/media/uploadsScholarshipsDocumentConfirmingOfTheSemester/*
+/media/uploadsScholarshipsUniversityRegulationsOfTheGradingScale/*
 /TI_Management_app/static/img/*
 /TI_Management_app/static/font/*
 

@@ -1032,7 +1032,9 @@ class ScholarshipsAdmin(admin.ModelAdmin):
         'file_resolution_consenting',
         'file_document_confirming_of_the_semester',
         'file_university_regulations_of_the_grading_scale',
-        'confirmation_of_student_id'
+        'confirmation_of_student_id',
+        'scholarship_rate',
+        'confirmation_of_scholarship'
     )
     list_filter = (
         'created_date',
@@ -1055,7 +1057,9 @@ class ScholarshipsAdmin(admin.ModelAdmin):
         'file_resolution_consenting',
         'file_document_confirming_of_the_semester',
         'file_university_regulations_of_the_grading_scale',
-        'confirmation_of_student_id'
+        'confirmation_of_student_id',
+        'scholarship_rate',
+        'confirmation_of_scholarship'
     )
     search_fields = (
         'title',

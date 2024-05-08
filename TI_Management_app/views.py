@@ -92,6 +92,8 @@ from django.http import JsonResponse
 
 from django.contrib.auth.models import User
 
+from django.core.exceptions import ObjectDoesNotExist
+
 # class Image(TemplateView):
 #     form = MemberForm
 #     template_name = 'TI_Management_app/image.html'
@@ -2432,6 +2434,7 @@ def scholarships_list(request):
 
 @login_required
 def scholarships_list_search(request):
+
     if request.method == "POST":
         searched = request.POST.get('searched', False)
         members = Scholarships.objects.filter(
@@ -2494,16 +2497,21 @@ def scholarships_average_salary_add(request):
 
 @login_required
 def scholarships_add(request, pk):
+
+    # scholarship_rate = models.FloatField(null=False, blank=False)
+    # confirmation_of_scholarship = models.BooleanField(default=False)
+
     member = get_object_or_404(MembersZZTI, pk=pk)
     scholarships_average_salary_list = AverageSalary.objects.latest('id')
+
     if request.method == "POST":
-        form = ScholarshipsForm(member, request.POST)
+        form = ScholarshipsForm(member, request.POST, request.FILES)
         if form.is_valid():
             scholarship = form.save(commit=False)
             scholarship.author = request.user
             scholarship.member = member
             scholarship.save()
-            messages.success(request, f"Dodano stypendium {scholarship.title}!")
+            messages.success(request, f"Dodano stypendium \"{scholarship.title}\"!")
             return redirect('TI_Management_app:scholarships_list')
     else:
         form = ScholarshipsForm(member)
@@ -2520,6 +2528,13 @@ def scholarships_add(request, pk):
 
 @login_required
 def scholarships_add_search(request):
+    # verification whether the record is added in AvaregeSalary
+    try:
+        scholarships_average_salary_list = AverageSalary.objects.latest('id')
+        flag = True
+    except ObjectDoesNotExist:
+        flag = False
+
     if request.method == "POST":
         searched = request.POST.get('searched', False)
         members = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
@@ -2528,11 +2543,13 @@ def scholarships_add_search(request):
                                              Q(phone_number__contains=searched),
                                              card__isnull=False,
                                              deactivate=False)
+
         return render(
             request,
             'TI_Management_app/finance/scholarships_add_search.html',
             {
                 'searched': searched,
+                'flag': flag,
                 'members': members
             }
         )
@@ -2540,5 +2557,7 @@ def scholarships_add_search(request):
         return render(
             request,
             'TI_Management_app/finance/scholarships_add_search.html',
-            {}
+            {
+                'flag': flag
+            }
         )
