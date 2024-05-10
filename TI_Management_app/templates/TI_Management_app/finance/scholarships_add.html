@@ -62,6 +62,7 @@
                 class="form-control me-2"
                 style="max-width: 25%!important; min-height: 15px"
                 type="number"
+                min="0"
                 step="0.01"
                 placeholder="Wynagrodzenie Członka"
                 aria-label="Wynagrodzenie Członka"
@@ -330,10 +331,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageContainerTuition.style.color = 'red';
                 messageContainerTenPctAverageSalary.textContent = '10% przeciętnego wynagrodzenia wynosi: '+ resultTenPctAverageSalary +' zł';
                 messageContainerTenPctAverageSalary.style.color = 'red';
-
                 messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
                 messageContainerFiftyPct.style.color = 'red';
-
                 messageContainerOutcome.textContent = 'Wysokość stypendium: 0 zł';
                 messageContainerOutcome.style.color = 'red';
             }

@@ -25,7 +25,16 @@
     <H4>Stypendia:</H4>
     {% for scholarship in scholarships %}
         <div class="notepad">
-            {{ scholarship.title }}
+            <a href="{% url 'TI_Management_app:scholarships_edit' pk=scholarship.pk %}">
+                {{ scholarship.member.forename }} {{ scholarship.member.surname }} {{ scholarship.member.member_nr }}
+            </a>
+            {% if scholarship.confirmation_of_scholarship is True %}
+                <span style="color:green">Stypendium zatwierdzone</span>
+            {% else %}
+                <span style="color:red">Stypendium niezatwierdzone</span>
+            {% endif %}
+             od {{ scholarship.application_creation_date }}
+
         </div>
     {% endfor %}
 

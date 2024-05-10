@@ -653,6 +653,7 @@ class Scholarships(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorScholarships')
     title = models.CharField(max_length=250, null=False, blank=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberScholarships', null=False, blank=False)
+    average_salary = models.ForeignKey(AverageSalary, on_delete=models.CASCADE, related_name='averageSalaryScholarships', null=False, blank=False)
     application_creation_date = models.DateTimeField(blank=True, null=True)
     seminary_start_date = models.DateTimeField(blank=True, null=True)
     seminary_end_date = models.DateTimeField(blank=True, null=True)
@@ -668,8 +669,7 @@ class Scholarships(models.Model):
     file_document_confirming_of_the_semester = models.FileField(null=False, blank=False, upload_to='uploadsScholarshipsDocumentConfirmingOfTheSemester/%Y/%m/%d/%H%M%S/')
     file_university_regulations_of_the_grading_scale = models.FileField(null=False, blank=False, upload_to='uploadsScholarshipsUniversityRegulationsOfTheGradingScale/%Y/%m/%d/%H%M%S/')
     confirmation_of_student_id = models.BooleanField(default=False)
-
-    scholarship_rate = models.FloatField(null=False, blank=False)  # i have to change the null=False, blank=False
+    scholarship_rate = models.FloatField(null=False, blank=False)
     confirmation_of_scholarship = models.BooleanField(default=False)
 
     history = HistoricalRecords()

@@ -65,7 +65,8 @@ from .forms import (
     PaymentConfirmationReliefForm,
     ConfirmedReliefTimeRangeForm,
     AverageSalaryForm,
-    ScholarshipsForm
+    ScholarshipsForm,
+    ScholarshipsEditForm
 )
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
@@ -93,6 +94,8 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 
 from django.core.exceptions import ObjectDoesNotExist
+
+from datetime import datetime
 
 # class Image(TemplateView):
 #     form = MemberForm
@@ -2506,12 +2509,18 @@ def scholarships_add(request, pk):
 
     if request.method == "POST":
         form = ScholarshipsForm(member, request.POST, request.FILES)
+
+        # scholarship_rate_calculation =
+
+
         if form.is_valid():
             scholarship = form.save(commit=False)
             scholarship.author = request.user
             scholarship.member = member
+            scholarship.average_salary = scholarships_average_salary_list
+            scholarship.scholarship_rate = scholarship_rate_calculation
             scholarship.save()
-            messages.success(request, f"Dodano stypendium \"{scholarship.title}\"!")
+            messages.success(request, f"Dodano stypendium \"{scholarship.title}\"")
             return redirect('TI_Management_app:scholarships_list')
     else:
         form = ScholarshipsForm(member)
@@ -2561,3 +2570,37 @@ def scholarships_add_search(request):
                 'flag': flag
             }
         )
+
+
+@login_required
+def scholarships_edit(request, pk):
+    one_scholarship = get_object_or_404(Scholarships, pk=pk)
+
+
+    # formatted_date = one_scholarship.seminary_start_date.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d %H:%M:%S")
+    formatted_seminary_start_date = one_scholarship.seminary_start_date.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d")
+    formatted_seminary_end_date = one_scholarship.seminary_end_date.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d")
+
+    if request.method == "POST":
+        form = ScholarshipsEditForm(one_scholarship.member, request.POST, request.FILES, instance=one_scholarship)
+        if form.is_valid():
+            one_scholarship_update = form.save(commit=False)
+            one_scholarship_update.author = request.user
+            one_scholarship_update.member = one_scholarship.member
+            one_scholarship_update.title = one_scholarship.title
+            one_scholarship_update.application_creation_date = one_scholarship.application_creation_date
+            one_scholarship_update.save()
+            messages.success(request, f"Zaktualizowano  {one_scholarship_update.title}!")
+            return redirect('TI_Management_app:scholarships_list')
+    else:
+        form = ScholarshipsEditForm(one_scholarship.member, instance=one_scholarship)
+    return render(
+        request,
+        'TI_Management_app/finance/scholarships_edit.html',
+        {
+            'form': form,
+            'one_scholarship': one_scholarship,
+            'formatted_seminary_start_date': formatted_seminary_start_date,
+            'formatted_seminary_end_date': formatted_seminary_end_date
+        }
+    )

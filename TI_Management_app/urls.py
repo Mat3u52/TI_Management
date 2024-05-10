@@ -418,6 +418,11 @@ urlpatterns = [
         name='scholarships_list'
     ),
     path(
+        'TI_Management_app/finance/scholarships-edit/<int:pk>/',
+        views.scholarships_edit,
+        name='scholarships_edit'
+    ),
+    path(
         'TI_Management_app/finance/scholarships-list-search/',
         views.scholarships_list_search,
         name='scholarships_list_search'
