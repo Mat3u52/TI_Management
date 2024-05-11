@@ -130,7 +130,7 @@
 
         <div class="well sidebar-nav">
           <ul class="nav nav-list">
-            <li class="nav-header" id="show">Karta:</li>
+            <li class="nav-header" id="show">Karta HID:</li>
               <li id="obj1" style="display: none">
                 <p><a href="{% url 'TI_Management_app:member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Zmień
@@ -274,7 +274,26 @@
                     </div>
 
                 {% empty %}
-                  <p>Brak informacji relief</p>
+                  <p>Brak zapomóg</p>
+                {% endfor %}
+
+                {% for scholarship_detail in member.memberScholarships.all %}
+                  <div class="notepad">
+                      <p>{{scholarship_detail.scholarship_rate}} zł</p>
+                      <p><b>{{scholarship_detail.title}}:</b></p>
+                      <a href="#">Zobacz szczegóły stypendium</a>
+                      <p>Status</p>
+
+                    <div class="date">
+                        <p>
+                          Data wprowadzenia: {{scholarship_detail.created_date}}<br />
+                          przez: {{scholarship_detail.author}}
+                        </p>
+                      </div>
+                  </div>
+
+                {% empty %}
+                  <p>Brak stypendium</p>
                 {% endfor %}
 
               </li>

@@ -2512,13 +2512,12 @@ def scholarships_add(request, pk):
 
         # scholarship_rate_calculation =
 
-
         if form.is_valid():
             scholarship = form.save(commit=False)
             scholarship.author = request.user
             scholarship.member = member
             scholarship.average_salary = scholarships_average_salary_list
-            scholarship.scholarship_rate = scholarship_rate_calculation
+            # scholarship.scholarship_rate = scholarship_rate_calculation
             scholarship.save()
             messages.success(request, f"Dodano stypendium \"{scholarship.title}\"")
             return redirect('TI_Management_app:scholarships_list')

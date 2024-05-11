@@ -68,7 +68,7 @@
                 aria-label="Wynagrodzenie Członka"
                 name="member_salary"
                 id="inputMemberSalary"
-                required>
+                required> zł
         <p>
             <small>
                 Przeciętne wynagrodzenie:
@@ -131,13 +131,27 @@
                 id="inputTuition"
                 min="1"
                 step="0.01"
-                required>
-        zł
+                required> zł
         <br />
         <div id="messageContainerTuition"></div>
         <div id="messageContainerTenPctAverageSalary"></div>
         <div id="messageContainerFiftyPct"></div>
         <div id="messageContainerOutcome"></div>
+        <br />
+
+        <p>Wysokość stypendium:</p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                placeholder="0"
+                aria-label="Wysokość stypendium"
+                name="scholarship_rate"
+                id="scholarshipRate"
+                min="0"
+                step="0.01"
+                required> zł
+        <br />
         <br />
 
         <p>Dokumenty:</p>
@@ -195,6 +209,7 @@
         <br />
         <br />
 
+
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz
         </button>
@@ -208,6 +223,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     var currentDate = new Date().toISOString().split('T')[0];
     document.getElementById('application_creation_date').value = currentDate;
+
 
     var inputField = document.getElementById('inputMemberSalary');
     var messageContainer = document.getElementById('messageContainer');
@@ -290,8 +306,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageContainerTenPctAverageSalary.style.color = 'green';
                 messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
                 messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
+                messageContainerOutcome.textContent = 'Estymowana wysokość stypendium: '+ resultOutcome +' zł';
                 messageContainerOutcome.style.color = 'green';
+
+                document.getElementById('scholarshipRate').value = resultOutcome
 
             } else if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == true) && (resultGradingScale == 5) && (resultAverageGrade > 4.5)) {
 
@@ -301,8 +319,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageContainerTenPctAverageSalary.style.color = 'green';
                 messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
                 messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
+                messageContainerOutcome.textContent = 'Estymowana wysokość stypendium: '+ resultOutcome +' zł';
                 messageContainerOutcome.style.color = 'green';
+
+                document.getElementById('scholarshipRate').value = resultOutcome
 
             } else if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == false) && (resultGradingScale == 5) && (resultAverageGrade > 4.75)) {
 
@@ -312,8 +332,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageContainerTenPctAverageSalary.style.color = 'green';
                 messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
                 messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
+                messageContainerOutcome.textContent = 'Estymowana wysokość stypendium: '+ resultOutcome +' zł';
                 messageContainerOutcome.style.color = 'green';
+
+                document.getElementById('scholarshipRate').value = resultOutcome
 
             } else if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == false) && (resultGradingScale == 5.5) && (resultAverageGrade > 5.23)) {
 
@@ -323,8 +345,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageContainerTenPctAverageSalary.style.color = 'green';
                 messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
                 messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
+                messageContainerOutcome.textContent = 'Estymowana wysokość stypendium: '+ resultOutcome +' zł';
                 messageContainerOutcome.style.color = 'green';
+
+                document.getElementById('scholarshipRate').value = resultOutcome
 
             } else {
                 messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
@@ -333,8 +357,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 messageContainerTenPctAverageSalary.style.color = 'red';
                 messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
                 messageContainerFiftyPct.style.color = 'red';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: 0 zł';
+                messageContainerOutcome.textContent = 'Estymowana wysokość stypendium: 0 zł';
                 messageContainerOutcome.style.color = 'red';
+
+                document.getElementById('scholarshipRate').value = 0.00
             }
 
         } else {

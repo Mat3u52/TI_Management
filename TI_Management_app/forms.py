@@ -831,7 +831,8 @@ class ScholarshipsForm(forms.ModelForm):
             'file_resolution_consenting',
             'file_document_confirming_of_the_semester',
             'file_university_regulations_of_the_grading_scale',
-            'confirmation_of_student_id'
+            'confirmation_of_student_id',
+            'scholarship_rate'
         ]
 
         widgets = {
@@ -850,6 +851,7 @@ class ScholarshipsForm(forms.ModelForm):
         seminary_end_date = cleaned_data.get('seminary_end_date')
         application_creation_date = cleaned_data.get('application_creation_date')
         confirmation_of_student_id = cleaned_data.get('confirmation_of_student_id')
+        scholarship_rate = cleaned_data.get('scholarship_rate')
 
         if seminary_start_date and self.member:
             difference = seminary_start_date - self.member.date_of_accession
@@ -863,6 +865,9 @@ class ScholarshipsForm(forms.ModelForm):
 
         if confirmation_of_student_id is False:
             raise forms.ValidationError(f"Niepotwierdzona legitymacja studencka")
+
+        if scholarship_rate == 0:
+            raise forms.ValidationError(f"Stypendium nie przysługuje")
 
         return cleaned_data
 
@@ -947,7 +952,8 @@ class ScholarshipsEditForm(forms.ModelForm):
             'file_resolution_consenting',
             'file_document_confirming_of_the_semester',
             'file_university_regulations_of_the_grading_scale',
-            'confirmation_of_student_id'
+            'confirmation_of_student_id',
+            'scholarship_rate'
         ]
 
         widgets = {
@@ -966,6 +972,7 @@ class ScholarshipsEditForm(forms.ModelForm):
         seminary_end_date = cleaned_data.get('seminary_end_date')
         application_creation_date = cleaned_data.get('application_creation_date')
         confirmation_of_student_id = cleaned_data.get('confirmation_of_student_id')
+        scholarship_rate = cleaned_data.get('scholarship_rate')
 
         if seminary_start_date and self.member:
             difference = seminary_start_date - self.member.date_of_accession
@@ -979,5 +986,8 @@ class ScholarshipsEditForm(forms.ModelForm):
 
         if confirmation_of_student_id is False:
             raise forms.ValidationError(f"Niepotwierdzona legitymacja studencka")
+
+        if scholarship_rate == 0:
+            raise forms.ValidationError(f"Stypendium nie przysługuje")
 
         return cleaned_data

@@ -74,12 +74,12 @@
                 aria-label="Wynagrodzenie Członka"
                 name="member_salary"
                 id="inputMemberSalary"
-                required>
+                required> zł
         <p>
             <small>
                 Przeciętne wynagrodzenie:
-                {{ scholarships_average_salary_list.title }} -
-                {{ scholarships_average_salary_list.salary }} zł
+                {{ one_scholarship.average_salary.title }} -
+                {{ one_scholarship.average_salary.salary }} zł
             </small>
         </p>
         <div id="messageContainer"></div>
@@ -93,6 +93,9 @@
                 aria-label="Uczelnia preferowana"
                 name="preferred_university"
                 id="preferredUniversity"
+                {% if one_scholarship.preferred_university is True %}
+                    checked
+                {% endif %}
                 required>
         <div id="messageContainerCheckbox"></div>
         <br />
@@ -137,8 +140,7 @@
                 id="inputTuition"
                 min="1"
                 step="0.01"
-                required>
-        zł
+                required> zł
         <br />
         <div id="messageContainerTuition"></div>
         <div id="messageContainerTenPctAverageSalary"></div>
@@ -201,9 +203,17 @@
         <br />
         <br />
 
-        <button type="submit" class="btn btn-primary btn-large pull-right">
-            Zapisz
-        </button>
+        {% if user.is_superuser %}
+            <button type="submit" class="btn btn-primary btn-large pull-right">
+                Potwierdzam zgodność danych i wypłatę stypendium
+            </button>
+        {% else %}
+            <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
+                Potwierdzam zgodność danych i wypłatę stypendium
+            </button>
+        {% endif %}
+
+
         <br />
     </form>
 
