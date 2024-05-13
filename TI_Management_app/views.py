@@ -2575,10 +2575,11 @@ def scholarships_add_search(request):
 def scholarships_edit(request, pk):
     one_scholarship = get_object_or_404(Scholarships, pk=pk)
 
-
     # formatted_date = one_scholarship.seminary_start_date.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d %H:%M:%S")
     formatted_seminary_start_date = one_scholarship.seminary_start_date.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d")
     formatted_seminary_end_date = one_scholarship.seminary_end_date.astimezone(timezone.get_current_timezone()).strftime("%Y-%m-%d")
+
+    member_earnings_pct = (one_scholarship.member_salary / one_scholarship.average_salary.salary) * 100
 
     if request.method == "POST":
         form = ScholarshipsEditForm(one_scholarship.member, request.POST, request.FILES, instance=one_scholarship)
@@ -2600,6 +2601,7 @@ def scholarships_edit(request, pk):
             'form': form,
             'one_scholarship': one_scholarship,
             'formatted_seminary_start_date': formatted_seminary_start_date,
-            'formatted_seminary_end_date': formatted_seminary_end_date
+            'formatted_seminary_end_date': formatted_seminary_end_date,
+            'member_earnings_pct': member_earnings_pct
         }
     )

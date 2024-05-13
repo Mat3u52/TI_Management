@@ -51,6 +51,7 @@
                 type="date"
                 value="{{ formatted_seminary_start_date }}"
                 name="seminary_start_date"
+                disabled
                 required>
 
         <p>Data zakończenia semestru:</p>
@@ -60,6 +61,7 @@
                 type="date"
                 value="{{ formatted_seminary_end_date }}"
                 name="seminary_end_date"
+                disabled
                 required>
 
         <p>Wynagrodzenie Członka:</p>
@@ -70,11 +72,11 @@
                 min="0"
                 step="0.01"
                 value="{{ one_scholarship.member_salary|comma_to_period }}"
-                placeholder="{{ one_scholarship.member_salary|comma_to_period|floatformat:2 }}"
+                placeholder="{{ one_scholarship.member_salary|comma_to_period|floatformat:2 }} - {{ member_earnings_pct }}%"
                 aria-label="Wynagrodzenie Członka"
                 name="member_salary"
-                id="inputMemberSalary"
-                required> zł
+                disabled
+                required> zł - {{ member_earnings_pct }}%
         <p>
             <small>
                 Przeciętne wynagrodzenie:
@@ -92,12 +94,17 @@
                 type="checkbox"
                 aria-label="Uczelnia preferowana"
                 name="preferred_university"
-                id="preferredUniversity"
                 {% if one_scholarship.preferred_university is True %}
                     checked
                 {% endif %}
+                disabled
                 required>
-        <div id="messageContainerCheckbox"></div>
+        {% if one_scholarship.preferred_university is True %}
+            <div>Tak, uczelnia preferowana</div>
+        {% else %}
+            <div>Nie, uczelnia nie jest preferowana</div>
+        {% endif %}
+
         <br />
 
         <p>Uzyskana średnia:</p>
@@ -108,10 +115,11 @@
                 placeholder="3.5"
                 aria-label="Uzyskana średnia"
                 name="average_grade"
-                id="inputAverageGrade"
+                value="{{ one_scholarship.average_grade|comma_to_period }}"
                 min="0.5"
                 max="6"
                 step="0.01"
+                disabled
                 required>
 
         <p>Skala ocen do:</p>
@@ -122,10 +130,11 @@
                 placeholder="5"
                 aria-label="Skala ocen"
                 name="grading_scale"
-                id="inputGradingScale"
+                value="{{ one_scholarship.grading_scale|comma_to_period }}"
                 min="5"
                 max="5.5"
                 step="0.5"
+                disabled
                 required>
         <br />
 
@@ -137,22 +146,39 @@
                 placeholder="0"
                 aria-label="Skala ocen"
                 name="tuition_fee_amount"
-                id="inputTuition"
+                value="{{ one_scholarship.tuition_fee_amount|comma_to_period }}"
                 min="1"
+                step="0.01"
+                disabled
+                required> zł
+        <br />
+        <br />
+
+        <p>Wysokość stypendium:</p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                placeholder="0"
+                aria-label="Wysokość stypendium"
+                name="scholarship_rate"
+                value="{{ one_scholarship.scholarship_rate|comma_to_period }}"
+                min="0"
                 step="0.01"
                 required> zł
         <br />
-        <div id="messageContainerTuition"></div>
-        <div id="messageContainerTenPctAverageSalary"></div>
-        <div id="messageContainerFiftyPct"></div>
-        <div id="messageContainerOutcome"></div>
         <br />
 
         <p>Dokumenty:</p>
         
         <p>Wniosek o stypendium</p>
+            Dodaj dokument:
             <label class="custom-file-upload">
                 {{form.file_scholarship_application}}
+            </label>
+            Zamień dokument:
+            <label class="custom-file-upload-mod">
+                {{form.file_scholarship_application|cut:'uploadsScholarshipsApplication/'}}
             </label>
         <br />
 
@@ -197,9 +223,7 @@
                 type="checkbox"
                 aria-label="Potwierdzam weryfikację legitymacji studenckiej"
                 name="confirmation_of_student_id"
-                id="studentCard"
                 required>
-        <div id="messageContainerCheckboxStudentCard"></div>
         <br />
         <br />
 
@@ -213,154 +237,8 @@
             </button>
         {% endif %}
 
-
         <br />
     </form>
-
-
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-
-
-    var inputField = document.getElementById('inputMemberSalary');
-    var messageContainer = document.getElementById('messageContainer');
-
-    var checkbox = document.getElementById('preferredUniversity'); // Get the checkbox element
-    var messageContainerCheckbox = document.getElementById('messageContainerCheckbox');
-    messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
-    var checkboxFlag = false;
-
-    var checkboxStudentCard = document.getElementById('studentCard'); // Get the checkbox element
-    var messageContainerCheckboxStudentCard = document.getElementById('messageContainerCheckboxStudentCard');
-    messageContainerCheckboxStudentCard.textContent = 'Niepotwierdzona';
-
-    var inputFieldTuition = document.getElementById('inputTuition');
-    var messageContainerTuition = document.getElementById('messageContainerTuition');
-    var messageContainerTenPctAverageSalary = document.getElementById('messageContainerTenPctAverageSalary');
-
-    var inputGradingScale = document.getElementById('inputGradingScale'); // Get the grading_scale element
-    var inputAverageGrade = document.getElementById('inputAverageGrade'); // Get the inputAverageGrade element
-
-    {% with djangoVariable=scholarships_average_salary_list.salary|comma_to_period %}
-        var djangoVariable = {{ djangoVariable }};
-    {% endwith %}
-
-    inputField.addEventListener('blur', function(event) {
-        var inputValue = parseFloat(inputField.value);
-
-        if (!isNaN(inputValue)) {
-            var result = (inputValue / djangoVariable) * 100;
-
-            result = result.toFixed(2);
-
-            messageContainer.textContent = 'na poziomie: ' + result + '% ';
-            messageContainer.style.color = 'blue';
-
-        } else {
-            messageContainer.textContent = 'Proszę podać wynagrodzenie Członka.';
-        }
-    });
-
-    checkbox.addEventListener('change', function() {
-        if (this.checked) {
-            messageContainerCheckbox.textContent = 'Tak, uczelnia jest preferowana.';
-            checkboxFlag = true;
-        } else {
-            messageContainerCheckbox.textContent = 'Nie, uczelnia nie jest preferowana.';
-            checkboxFlag = false;
-        }
-    });
-
-    checkboxStudentCard.addEventListener('change', function() {
-        if (this.checked) {
-            messageContainerCheckboxStudentCard.textContent = 'Potwierdzona';
-        } else {
-            messageContainerCheckboxStudentCard.textContent = 'Niepotwierdzona';
-        }
-    });
-
-    inputFieldTuition.addEventListener('blur', function(event) {
-        var inputValue = parseFloat(inputFieldTuition.value);
-        var resultTenPctAverageSalary = parseFloat(djangoVariable * 0.1);
-        var resultGradingScale = parseFloat(inputGradingScale.value);
-        var resultAverageGrade = parseFloat(inputAverageGrade.value);
-
-        if (!isNaN(inputValue)) {
-            var result = parseFloat(inputValue * 0.1);
-            var resultFiftyPct = parseFloat(inputValue * 0.5)
-            var resultOutcome = parseFloat(result + resultFiftyPct)
-
-            result = result.toFixed(2);
-            resultTenPctAverageSalary = resultTenPctAverageSalary.toFixed(2);
-            resultFiftyPct = resultFiftyPct.toFixed(2);
-            resultOutcome = resultOutcome.toFixed(2);
-
-            if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == true) && (resultGradingScale >= 5.5) && (resultAverageGrade > 4.95)) {
-
-                messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
-                messageContainerTuition.style.color = 'green';
-                messageContainerTenPctAverageSalary.textContent = '10% przeciętnego wynagrodzenia wynosi: '+ resultTenPctAverageSalary +' zł';
-                messageContainerTenPctAverageSalary.style.color = 'green';
-                messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
-                messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
-                messageContainerOutcome.style.color = 'green';
-
-            } else if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == true) && (resultGradingScale == 5) && (resultAverageGrade > 4.5)) {
-
-                messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
-                messageContainerTuition.style.color = 'green';
-                messageContainerTenPctAverageSalary.textContent = '10% przeciętnego wynagrodzenia wynosi: '+ resultTenPctAverageSalary +' zł';
-                messageContainerTenPctAverageSalary.style.color = 'green';
-                messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
-                messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
-                messageContainerOutcome.style.color = 'green';
-
-            } else if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == false) && (resultGradingScale == 5) && (resultAverageGrade > 4.75)) {
-
-                messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
-                messageContainerTuition.style.color = 'green';
-                messageContainerTenPctAverageSalary.textContent = '10% przeciętnego wynagrodzenia wynosi: '+ resultTenPctAverageSalary +' zł';
-                messageContainerTenPctAverageSalary.style.color = 'green';
-                messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
-                messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
-                messageContainerOutcome.style.color = 'green';
-
-            } else if ((parseFloat(result) < parseFloat(resultTenPctAverageSalary)) && (checkboxFlag == false) && (resultGradingScale == 5.5) && (resultAverageGrade > 5.23)) {
-
-                messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
-                messageContainerTuition.style.color = 'green';
-                messageContainerTenPctAverageSalary.textContent = '10% przeciętnego wynagrodzenia wynosi: '+ resultTenPctAverageSalary +' zł';
-                messageContainerTenPctAverageSalary.style.color = 'green';
-                messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
-                messageContainerFiftyPct.style.color = 'green';
-                messageContainerOutcome.textContent = 'Wysokość stypendium: '+ resultOutcome +' zł';
-                messageContainerOutcome.style.color = 'green';
-
-            } else {
-                messageContainerTuition.textContent = '10% wysokości czesnego to: ' + result + ' zł';
-                messageContainerTuition.style.color = 'red';
-                messageContainerTenPctAverageSalary.textContent = '10% przeciętnego wynagrodzenia wynosi: '+ resultTenPctAverageSalary +' zł';
-                messageContainerTenPctAverageSalary.style.color = 'red';
-
-                messageContainerFiftyPct.textContent = '50% wysokości czesnego to: '+ resultFiftyPct +' zł';
-                messageContainerFiftyPct.style.color = 'red';
-
-                messageContainerOutcome.textContent = 'Wysokość stypendium: 0 zł';
-                messageContainerOutcome.style.color = 'red';
-            }
-
-        } else {
-            messageContainerTuition.textContent = 'Niewprowadzony';
-        }
-    });
-
-});
-</script>
-
 
 </div>
 {% endblock %}

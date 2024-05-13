@@ -53,6 +53,29 @@
                     </b>
                     {{member.email}}
                 </p>
+                <br />
+
+                {% for scholarship_detail in member.memberScholarships.all %}
+                  <div class="notepad">
+                      <p>{{scholarship_detail.scholarship_rate}} zł</p>
+                      <p><b>{{scholarship_detail.title}}:</b></p>
+                      <a href="#">Zobacz szczegóły stypendium</a>
+                      <p>Status</p>
+
+                    <div class="date">
+                        <p>
+                          Data wprowadzenia: {{scholarship_detail.created_date}}<br />
+                          przez: {{scholarship_detail.author}}
+                        </p>
+                      </div>
+                  </div>
+
+                {% empty %}
+                  <p>Brak stypendium</p>
+                {% endfor %}
+                <br />
+
+
 
                 <p>
                     <a href="{% url 'TI_Management_app:scholarships_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
