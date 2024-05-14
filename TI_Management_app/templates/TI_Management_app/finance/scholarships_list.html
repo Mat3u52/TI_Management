@@ -23,6 +23,7 @@
 
 <div class="hero-unit">
     <H4>Stypendia:</H4>
+    <br />
     {% for scholarship in scholarships %}
         <div class="notepad">
             <a href="{% url 'TI_Management_app:scholarships_edit' pk=scholarship.pk %}">
@@ -34,7 +35,16 @@
                 <span style="color:red">Stypendium niezatwierdzone</span>
             {% endif %}
              od {{ scholarship.application_creation_date }}
-
+            <br />
+            <br />
+            <div class="date">
+                <p>
+                    Data dodania: {{scholarship.created_date}}
+                </p>
+                <p>
+                    Dodany przez: {{scholarship.author}}
+                </p>
+            </div>
         </div>
     {% endfor %}
 
