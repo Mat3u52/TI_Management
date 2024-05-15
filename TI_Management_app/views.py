@@ -68,6 +68,7 @@ from .forms import (
     ScholarshipsForm,
     ScholarshipsEditForm
 )
+from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
 from django.views.generic import TemplateView
 from django.views.generic import CreateView
@@ -2463,6 +2464,7 @@ def scholarships_list_search(request):
 
 
 @login_required
+# @require_POST #  I have to start before using the slug
 def scholarships_average_salary_add(request):
     scholarships_average_salary_list = AverageSalary.objects.order_by('-created_date')
 
@@ -2499,6 +2501,7 @@ def scholarships_average_salary_add(request):
 
 
 @login_required
+# @require_POST
 def scholarships_add(request, pk):
 
     # scholarship_rate = models.FloatField(null=False, blank=False)
@@ -2572,6 +2575,7 @@ def scholarships_add_search(request):
 
 
 @login_required
+# @require_POST
 def scholarships_edit(request, pk):
     one_scholarship = get_object_or_404(Scholarships, pk=pk)
 
@@ -2582,18 +2586,16 @@ def scholarships_edit(request, pk):
     member_earnings_pct = (one_scholarship.member_salary / one_scholarship.average_salary.salary) * 100
 
     if request.method == "POST":
-        form = ScholarshipsEditForm(one_scholarship.member, request.POST, request.FILES, instance=one_scholarship)
+        form = ScholarshipsEditForm(request.POST, request.FILES, instance=one_scholarship)
         if form.is_valid():
             one_scholarship_update = form.save(commit=False)
             one_scholarship_update.author = request.user
             one_scholarship_update.member = one_scholarship.member
-            one_scholarship_update.title = one_scholarship.title
-            one_scholarship_update.application_creation_date = one_scholarship.application_creation_date
             one_scholarship_update.save()
-            messages.success(request, f"Zaktualizowano  {one_scholarship_update.title}!")
+            messages.success(request, f"Potwierdzono  {one_scholarship_update.title}!")
             return redirect('TI_Management_app:scholarships_list')
     else:
-        form = ScholarshipsEditForm(one_scholarship.member, instance=one_scholarship)
+        form = ScholarshipsEditForm(instance=one_scholarship)
     return render(
         request,
         'TI_Management_app/finance/scholarships_edit.html',
@@ -2605,3 +2607,19 @@ def scholarships_edit(request, pk):
             'member_earnings_pct': member_earnings_pct
         }
     )
+
+
+@login_required
+# @require_POST
+def scholarships_delete(request, pk):
+    scholarship = get_object_or_404(Scholarships, pk=pk)
+    scholarship.author = request.user
+    scholarship.file_scholarship_application.delete()
+    scholarship.file_scanned_confirmation_of_payment_for_studies.delete()
+    scholarship.file_declaration_of_income.delete()
+    scholarship.file_resolution_consenting.delete()
+    scholarship.file_document_confirming_of_the_semester.delete()
+    scholarship.file_university_regulations_of_the_grading_scale.delete()
+    scholarship.delete()
+
+    return redirect('TI_Management_app:scholarships_list')

@@ -105,7 +105,7 @@ urlpatterns = [
         name='member_group_delete'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-Notepad-add/',
+        'TI_Management_app/<int:pk>/edit-member-notepad-add/',
         views.member_notepad_add,
         name='member_notepad_add'
     ),
@@ -421,6 +421,11 @@ urlpatterns = [
         'TI_Management_app/finance/scholarships-edit/<int:pk>/',
         views.scholarships_edit,
         name='scholarships_edit'
+    ),
+    path(
+        'TI_Management_app/finance/scholarships-delete/<int:pk>/',
+        views.scholarships_delete,
+        name='scholarships_delete'
     ),
     path(
         'TI_Management_app/finance/scholarships-list-search/',

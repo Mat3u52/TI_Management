@@ -938,54 +938,42 @@ class ScholarshipsEditForm(forms.ModelForm):
         fields = [
             # 'title',
             # 'member',
-            'application_creation_date',
-            'seminary_start_date',
-            'seminary_end_date',
-            'member_salary',
-            'preferred_university',
-            'average_grade',
-            'grading_scale',
-            'tuition_fee_amount',
+            # 'application_creation_date',
+            # 'seminary_start_date',
+            # 'seminary_end_date',
+            # 'member_salary',
+            # 'preferred_university',
+            # 'average_grade',
+            # 'grading_scale',
+            # 'tuition_fee_amount',
             'file_scholarship_application',
             'file_scanned_confirmation_of_payment_for_studies',
             'file_declaration_of_income',
             'file_resolution_consenting',
             'file_document_confirming_of_the_semester',
             'file_university_regulations_of_the_grading_scale',
-            'confirmation_of_student_id',
-            'scholarship_rate'
+            # 'confirmation_of_student_id',
+            'scholarship_rate',
+            'confirmation_of_scholarship'
         ]
 
-        widgets = {
-            'application_creation_date': forms.DateInput(attrs={'type': 'date'}),
-            'seminary_start_date': forms.DateInput(attrs={'type': 'date'}),
-            'seminary_end_date': forms.DateInput(attrs={'type': 'date'})
-        }
+        # widgets = {
+        #     # 'application_creation_date': forms.DateInput(attrs={'type': 'date'}),
+        #     # 'seminary_start_date': forms.DateInput(attrs={'type': 'date'}),
+        #     # 'seminary_end_date': forms.DateInput(attrs={'type': 'date'})
+        # }
 
-    def __init__(self, member, *args, **kwargs):
-        self.member = member
+    def __init__(self, *args, **kwargs):
+        # self.member = member
         super(ScholarshipsEditForm, self).__init__(*args, **kwargs)
 
     def clean(self):
         cleaned_data = super().clean()
-        seminary_start_date = cleaned_data.get('seminary_start_date')
-        seminary_end_date = cleaned_data.get('seminary_end_date')
-        application_creation_date = cleaned_data.get('application_creation_date')
-        confirmation_of_student_id = cleaned_data.get('confirmation_of_student_id')
+        confirmation_of_scholarship = cleaned_data.get('confirmation_of_scholarship')
         scholarship_rate = cleaned_data.get('scholarship_rate')
 
-        if seminary_start_date and self.member:
-            difference = seminary_start_date - self.member.date_of_accession
-            if difference.days < 365:
-                raise forms.ValidationError(f"Członek jest w związkach tylko przez: {difference.days} dni")
-
-        if seminary_end_date and application_creation_date:
-            difference = application_creation_date - seminary_end_date
-            if difference.days > 30:
-                raise forms.ValidationError(f"Okres na złożenie wniosku został przekroczony: {difference.days} dni")
-
-        if confirmation_of_student_id is False:
-            raise forms.ValidationError(f"Niepotwierdzona legitymacja studencka")
+        if confirmation_of_scholarship is False:
+            raise forms.ValidationError(f"Proszę potwierdzić albo odrzucić wniosek")
 
         if scholarship_rate == 0:
             raise forms.ValidationError(f"Stypendium nie przysługuje")

@@ -166,6 +166,9 @@
                 value="{{ one_scholarship.scholarship_rate|comma_to_period }}"
                 min="0"
                 step="0.01"
+                {% if one_scholarship.confirmation_of_scholarship is True %}
+                    disabled
+                {% endif %}
                 required> zł
         <br />
         <br />
@@ -176,54 +179,66 @@
         <a href="{{ one_scholarship.file_scholarship_application.url }}">
             Wniosek o stypendium
         </a>
-            <label class="custom-file-upload-mod">
-                {{form.file_scholarship_application}}
-            </label>
+            {% if one_scholarship.confirmation_of_scholarship is False %}
+                <label class="custom-file-upload-mod">
+                    {{form.file_scholarship_application}}
+                </label>
+            {% endif %}
         <br />
 
         <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
         <a href="{{ one_scholarship.file_scanned_confirmation_of_payment_for_studies.url }}">
             Skan potwierdzenia płatności za studia
         </a>
-            <label class="custom-file-upload-mod">
-                {{form.file_scanned_confirmation_of_payment_for_studies}}
-            </label>
+            {% if one_scholarship.confirmation_of_scholarship is False %}
+                <label class="custom-file-upload-mod">
+                    {{form.file_scanned_confirmation_of_payment_for_studies}}
+                </label>
+            {% endif %}
         <br />
 
         <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
         <a href="{{ one_scholarship.file_declaration_of_income.url }}">
             Oświadczenie o dochodach
         </a>
-            <label class="custom-file-upload-mod">
-                {{form.file_declaration_of_income}}
-            </label>
+            {% if one_scholarship.confirmation_of_scholarship is False %}
+                <label class="custom-file-upload-mod">
+                    {{form.file_declaration_of_income}}
+                </label>
+            {% endif %}
         <br />
 
         <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
         <a href="{{ one_scholarship.file_resolution_consenting.url }}">
             Uchwała o zgodzie na stypendium
         </a>
-            <label class="custom-file-upload-mod">
-                {{form.file_resolution_consenting}}
-            </label>
+            {% if one_scholarship.confirmation_of_scholarship is False %}
+                <label class="custom-file-upload-mod">
+                    {{form.file_resolution_consenting}}
+                </label>
+            {% endif %}
         <br />
 
         <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
         <a href="{{ one_scholarship.file_document_confirming_of_the_semester.url }}">
             Dokument potwierdzający zaliczenie semestru
         </a>
-            <label class="custom-file-upload-mod">
-                {{form.file_document_confirming_of_the_semester}}
-            </label>
+            {% if one_scholarship.confirmation_of_scholarship is False %}
+                <label class="custom-file-upload-mod">
+                    {{form.file_document_confirming_of_the_semester}}
+                </label>
+            {% endif %}
         <br />
 
         <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
         <a href="{{ one_scholarship.file_university_regulations_of_the_grading_scale.url }}">
             Regulamin uczeli z informacją o skali ocen
         </a>
-            <label class="custom-file-upload-mod">
-                {{form.file_university_regulations_of_the_grading_scale}}
-            </label>
+            {% if one_scholarship.confirmation_of_scholarship is False %}
+                <label class="custom-file-upload-mod">
+                    {{form.file_university_regulations_of_the_grading_scale}}
+                </label>
+            {% endif %}
         <br />
         <br />
         <br />
@@ -255,30 +270,82 @@
                 aria-label="Potwierdzam zgodność danych i wypłatę stypendium"
                 name="confirmation_of_scholarship"
                 checked
+                {% if one_scholarship.confirmation_of_scholarship is True %}
+                    disabled
+                {% endif %}
                 required>
-        Potwierdzam
+        Zaakceptowane
 
-        {% if user.is_superuser %}
+        {% if user.is_superuser and one_scholarship.confirmation_of_scholarship is False %}
             <button type="submit" class="btn btn-primary btn-large pull-right">
                 Potwierdzam zgodność danych i wypłatę stypendium
             </button>
             <br />
             <br />
-<!--            <div style="text-align: right">lub</div>-->
 
             <button type="submit" class="btn btn-danger btn-large pull-right">
                 Nie potwierdzam zgodność danych
             </button>
         {% else %}
+            {% if one_scholarship.confirmation_of_student_id is False %}
             <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
                 Potwierdzam zgodność danych i wypłatę stypendium
             </button>
+            {% else %}
+
+            {% endif %}
         {% endif %}
 
         <br />
     </form>
 
 </div>
+
+{% if one_scholarship.confirmation_of_student_id is True %}
+<div class="hero-unit">
+    Historia:
+    {% for h in one_scholarship.history.all %}
+    <div class="notepad">
+        <table width="100%" border="0">
+            <tr>
+                <td>
+                    {{ h.history_id }}
+                </td>
+                <td>
+                    {{ h.history_type }}
+                </td>
+                <td>
+                    {{ h.history_user }}
+                </td>
+                <td>
+                    {{ h.history_date }}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                        <b>Tytuł:</b>
+                            {{ h.title }}
+                    <br />
+                        <b>Data dodania:</b>
+                            {{ h.application_creation_date }}
+                    <br />
+
+                    
+
+
+                        <b>Data modyfikacji:</b>
+                            {{ h.updated_date }}
+                    <br />
+                        <b>Osoba odpowiedzialna:</b>
+                        {{ h.author }}
+                </td>
+            </tr>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
 {% endblock %}
 
 {% block menu %}
