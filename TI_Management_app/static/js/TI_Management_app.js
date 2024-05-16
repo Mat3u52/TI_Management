@@ -62,4 +62,7 @@ $(document).ready(function(){
     $("#showGroupAddCollection").click(function(){
         $("#objGroupAddCollection").show(1000);
     });
+    $("#showHistoryScholarship").click(function(){
+        $("#objHistoryScholarship").show(1000);
+    });
 });

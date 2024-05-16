@@ -2544,6 +2544,7 @@ def scholarships_add_search(request):
         scholarships_average_salary_list = AverageSalary.objects.latest('id')
         flag = True
     except ObjectDoesNotExist:
+        scholarships_average_salary_list = 0.00
         flag = False
 
     if request.method == "POST":
@@ -2569,7 +2570,8 @@ def scholarships_add_search(request):
             request,
             'TI_Management_app/finance/scholarships_add_search.html',
             {
-                'flag': flag
+                'flag': flag,
+                'scholarships_average_salary_list': scholarships_average_salary_list
             }
         )
 

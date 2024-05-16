@@ -2,6 +2,7 @@ from django import template
 from ..models import MembersZZTI
 from django.contrib.auth.models import User
 from datetime import datetime
+import os
 
 register = template.Library()
 
@@ -22,3 +23,8 @@ def show_timestamp(timestamp):
 @register.filter(name='comma_to_period')
 def comma_to_period(value):
     return str(value).replace(',', '.')
+
+
+@register.filter
+def filename(value):
+    return os.path.basename(value)

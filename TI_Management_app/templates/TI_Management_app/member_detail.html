@@ -274,15 +274,21 @@
                     </div>
 
                 {% empty %}
-                  <p>Brak zapomóg</p>
+                  <div class="notepad">
+                    <p>Brak zapomóg</p>
+                  </div>
                 {% endfor %}
 
                 {% for scholarship_detail in member.memberScholarships.all %}
                   <div class="notepad">
                       <p>{{scholarship_detail.scholarship_rate}} zł</p>
                       <p><b>{{scholarship_detail.title}}:</b></p>
-                      <a href="#">Zobacz szczegóły stypendium</a>
-                      <p>Status</p>
+                      <a href="{% url 'TI_Management_app:scholarships_edit' pk=scholarship_detail.pk %}">Zobacz szczegóły stypendium</a>
+                      {% if scholarship_detail.confirmation_of_scholarship is True %}
+                        <p>Zaakceptowane</p>
+                      {% else %}
+                        <p>Oczekuje na zaakceptowanie</p>
+                      {% endif %}
 
                     <div class="date">
                         <p>
@@ -293,7 +299,9 @@
                   </div>
 
                 {% empty %}
-                  <p>Brak stypendium</p>
+                  <div class="notepad">
+                    <p>Brak stypendium</p>
+                  </div>
                 {% endfor %}
 
               </li>
@@ -331,7 +339,9 @@
                     </div>
 
                 {% empty %}
-                  <p>Brak informacji</p>
+                  <div class="notepad">
+                    <p>Brak przypisanych kart lojalnościowych</p>
+                  </div>
                 {% endfor %}
 
               </li>
@@ -358,7 +368,9 @@
                     </div>
 
                 {% empty %}
-                  <p>Brak informacji</p>
+                  <div class="notepad">
+                    <p>Brak aktywności</p>
+                  </div>
                 {% endfor %}
 
               </li>
@@ -381,7 +393,9 @@
                     </div>
 
                 {% empty %}
-                  <p>Brak dostępnych głosowań</p>
+                  <div class="notepad">
+                    <p>Brak dostępnych głosowań</p>
+                  </div>
                 {% endfor %}
 
               </li>
@@ -413,7 +427,9 @@
                     </p>
                   </div>
                 {% empty %}
-                  <p>Brak grupy</p>
+                  <div class="notepad">
+                    <p>Brak grupy</p>
+                  </div>
                 {% endfor %}
               </li>
           </ul>
@@ -521,14 +537,6 @@
                       <tr>
                         <td>{{ h.history_id }}</td>
                         <td>{{ h.history_type }}</td>
-<!--                      <td>-->
-<!--                        {% if 'toorder' in h.history_object|lower %}Do zlecenia-->
-<!--                        {% elif 'ordered' in h.history_object|lower %}Zlecona-->
-<!--                        {% elif 'tobepickedup' in h.history_object|lower %}Do odbioru-->
-<!--                        {% elif 'deactivated' in h.history_object|lower %}Dezaktywowana-->
-<!--                        {% elif 'none' in h.history_object|lower %}Brak statusu-->
-<!--                        {% else %}None{% endif %}-->
-<!--                      </td>-->
                         <td>{{ h.history_user }}</td>
                         <td>{{ h.history_date }}</td>
                       </tr>

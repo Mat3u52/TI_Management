@@ -87,9 +87,11 @@
         {% endfor %}
     {% else %}
         <div class="hero-unit">
-            <h4>
-                Proszę, wprowadź imię, nazwisko, numer Członka lub numer telefonu, żeby dodać stypendium.
-            </h4>
+            {% if flag is True %}
+            <p>
+                Bieżące przeciętne wynagrodzenie:<b> {{ scholarships_average_salary_list }} - {{ scholarships_average_salary_list.salary|floatformat:2 }} zł </b>
+            </p>
+            {% endif %}
         </div>
     {% endif %}
 {% endblock %}
