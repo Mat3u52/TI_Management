@@ -458,30 +458,54 @@ class GroupsMember(models.Model):
         super().save(*args, **kwargs)
 
 
-class Application(models.Model):  # Finances member explicitly
+# class Application(models.Model):  # Finances member explicitly
+#     created_date = models.DateTimeField(auto_now_add=True)
+#     updated_date = models.DateTimeField(auto_now=True)
+#     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+#     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorApplication')
+#     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='application', null=True, blank=True)
+#     kind_of_application = models.CharField(max_length=250, null=False, blank=False)
+#     description = models.TextField(null=True, blank=True, default=None)
+#     date_of_application = models.DateTimeField(default=timezone.now)
+#     date_of_payout = models.DateTimeField(default=timezone.now)
+#     history = HistoricalRecords()
+#
+#     objects = models.Manager()  # default manager
+#
+#     class Meta:
+#         verbose_name_plural = 'Finanse'
+#         ordering = ('-created_date',)
+#
+#     def __str__(self):
+#         return self.kind_of_application
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(f"{self.kind_of_application}-{self.member}")
+#         super().save(*args, **kwargs)
+
+
+class KindOfFinanceDocument(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorApplication')
-    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='application', null=True, blank=True)
-    kind_of_application = models.CharField(max_length=250, null=False, blank=False)
-    description = models.TextField(null=True, blank=True, default=None)
-    date_of_application = models.DateTimeField(default=timezone.now)
-    date_of_payout = models.DateTimeField(default=timezone.now)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorKindOfFinanceDocument')
+    title = models.CharField(max_length=250, null=False, blank=False)
+    # file = models.FileField(null=False, blank=False, upload_to='uploadsFileFinance/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
 
     class Meta:
-        verbose_name_plural = 'Finanse'
+        verbose_name_plural = 'Finanse - Rodzaj dokumentu'
         ordering = ('-created_date',)
 
     def __str__(self):
-        return self.kind_of_application
+        return self.title
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.kind_of_application}-{self.member}")
+            self.slug = slugify(f"{self.title}")
         super().save(*args, **kwargs)
 
 
