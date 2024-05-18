@@ -7,7 +7,7 @@ from .models import (
     CardStatus,
     MembersZZTI,
     Notepad,
-    Application,
+    # Application,
     Task,
     GroupsMember,
     MembersFile,
@@ -372,7 +372,8 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'created_date',
         'updated_date',
         'slug',
-        'author'
+        'author',
+        'recommended_by'
     )
     list_filter = (
         'id',
@@ -403,7 +404,8 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'created_date',
         'updated_date',
         'slug',
-        'author'
+        'author',
+        'recommended_by'
     )
     search_fields = (
         'surname',
@@ -549,38 +551,38 @@ class NotepadAdmin(admin.ModelAdmin):
     # date_hierarchy = 'created_date'
 
 
-@admin.register(Application)
-class ApplicationAdmin(admin.ModelAdmin):
-
-    def get_readonly_fields(self, request, obj=None):
-        if obj:  # when editing an object
-            return ['created_date']
-        return self.readonly_fields
-
-    list_display = (
-        'kind_of_application',
-        'date_of_application',
-        'date_of_payout',
-        'member',
-        'created_date',
-        'slug',
-        'author',
-        'updated_date'
-    )
-    list_filter = (
-        'kind_of_application',
-        'date_of_application',
-        'date_of_payout',
-        'member',
-        'created_date',
-        'slug',
-        'author',
-        'updated_date'
-    )
-    search_fields = (
-        'kind_of_application',
-    )
-    # date_hierarchy = 'created_date'
+# @admin.register(Application)
+# class ApplicationAdmin(admin.ModelAdmin):
+#
+#     def get_readonly_fields(self, request, obj=None):
+#         if obj:  # when editing an object
+#             return ['created_date']
+#         return self.readonly_fields
+#
+#     list_display = (
+#         'kind_of_application',
+#         'date_of_application',
+#         'date_of_payout',
+#         'member',
+#         'created_date',
+#         'slug',
+#         'author',
+#         'updated_date'
+#     )
+#     list_filter = (
+#         'kind_of_application',
+#         'date_of_application',
+#         'date_of_payout',
+#         'member',
+#         'created_date',
+#         'slug',
+#         'author',
+#         'updated_date'
+#     )
+#     search_fields = (
+#         'kind_of_application',
+#     )
+#     # date_hierarchy = 'created_date'
 
 
 @admin.register(Activities)

@@ -227,9 +227,10 @@ class MembersZZTI(models.Model):
     expiration_date_contract = models.DateTimeField(default=None, blank=True, null=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
     card = models.CharField(max_length=250, blank=True, null=True, default='', unique=True)
-    # card = models.CharField(max_length=250, blank=True, null=True, default=None)
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
     deactivate = models.BooleanField(default=False)
+    recommended_by = models.CharField(max_length=250, blank=True, null=True, default=None)
+
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
@@ -491,13 +492,71 @@ class KindOfFinanceDocument(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorKindOfFinanceDocument')
     title = models.CharField(max_length=250, null=False, blank=False)
-    # file = models.FileField(null=False, blank=False, upload_to='uploadsFileFinance/%Y/%m/%d/%H%M%S/')
+    file = models.FileField(null=False, blank=False, upload_to='uploadsKindOfFinanceDocument/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Finanse - Rodzaj dokumentu'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
+        super().save(*args, **kwargs)
+
+
+class KindOfFinanceExpense(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorKindOfFinanceExpense')
+    title = models.CharField(max_length=250, null=False, blank=False)
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Finanse - Rodzaj wydatku'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title}")
+        super().save(*args, **kwargs)
+
+
+class FileFinance(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorFileFinance')
+
+    title = models.CharField(max_length=250, null=False, blank=False)
+    type_of_document = models.ForeignKey(KindOfFinanceDocument, on_delete=models.CASCADE, null=True, related_name='typeOfDocumentFileFinance')
+    figure = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
+    quantity = models.IntegerField(null=True, blank=True, default=0)
+    payment_date = models.DateTimeField(blank=True, null=True)
+    resolution = models.ForeignKey(DocumentsDatabase, on_delete=models.CASCADE, null=True, related_name='resolutionFileFinance')
+    resolution_requirement = models.BooleanField(default=False)
+    expense_name = models.ForeignKey(KindOfFinanceExpense, on_delete=models.CASCADE, null=True, related_name='expenseNameFileFinance')
+    psychologist = models.BooleanField(default=False)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberFileFinance', null=True, blank=True)
+    description = models.TextField(null=True, blank=True, default=None)
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Finanse - dokumenty'
         ordering = ('-created_date',)
 
     def __str__(self):
