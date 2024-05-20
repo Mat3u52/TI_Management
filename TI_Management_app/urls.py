@@ -447,5 +447,10 @@ urlpatterns = [
         views.scholarships_add_search,
         name='scholarships_add_search'
     ),
+    path(
+        'TI_Management_app/finance/finance-file-add/',
+        views.finance_file_add,
+        name='finance_file_add'
+    ),
 ]
 

@@ -30,7 +30,10 @@ from .models import (
     FileRegisterRelief,
     SignatureRelief,
     AverageSalary,
-    Scholarships
+    Scholarships,
+    KindOfFinanceDocument,
+    KindOfFinanceExpense,
+    FileFinance
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -1068,3 +1071,104 @@ class ScholarshipsAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+
+
+@admin.register(KindOfFinanceDocument)
+class KindOfFinanceDocumentAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title'
+    )
+    search_fields = (
+        'title',
+    )
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(KindOfFinanceExpense)
+class KindOfFinanceExpenseAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title'
+    )
+    search_fields = (
+        'title',
+    )
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(FileFinance)
+class FileFinanceAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'file',
+        'type_of_document',
+        'figure',
+        'quantity',
+        'payment_date',
+        'resolution',
+        'resolution_requirement',
+        'expense_name',
+        'psychologist',
+        'member'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'file',
+        'type_of_document',
+        'figure',
+        'quantity',
+        'payment_date',
+        'resolution',
+        'resolution_requirement',
+        'expense_name',
+        'psychologist',
+        'member'
+    )
+    search_fields = (
+        'title',
+    )
+    # date_hierarchy = 'created_date'

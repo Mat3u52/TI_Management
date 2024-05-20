@@ -1,10 +1,49 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
+<a href="#"> / Dodawanie dokumentu finansowego</a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form_kind_of_document.errors %}
+        <p>{{form_kind_of_document.errors}}</p>
+        {% endif %}
+        <h2>Dodawanie dokumentu księgowego</h2>
+        <br />
+
+        <p>Rodzaj dokumentu:</p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                list="kind_of_finance_document"
+                placeholder="Rodaj dokumentu"
+                aria-label="Rodzaj dokumentu"
+                name="title"
+                required />
+        <datalist id="kind_of_finance_document">
+            {% for document_kind in kind_of_finance_document %}
+                <option value="{{ document_kind.title }}"></option>
+            {% endfor %}
+        </datalist>
+        <br />
+        <p>Kwota:</p>
+
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+    </form>
+</div>
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='finance_file_add' %}
+{% endblock %}

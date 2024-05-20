@@ -27,7 +27,7 @@
     </li>
     <li class="{% if active_tab == 'groups_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:groups_add' %}">
-            <b>&#160;&#160;&#8226; dodaj grupe</b>
+            <b>&#160;&#160;&#8226; dodaj grupę</b>
         </a>
     </li>
     <li class="{% if active_tab == 'loyalty_card' %} active {% endif %}">
@@ -35,15 +35,15 @@
     </li>
     <li class="{% if active_tab == 'loyalty_card_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:loyalty_card_add' %}">
-            <b>&#160;&#160;&#8226; dodaj karte lojalnościową</b>
+            <b>&#160;&#160;&#8226; dodaj kartę lojalnościową</b>
         </a>
     </li>
 
     <li class="{% if active_tab == 'finance_list' %} active {% endif %}">
         <a href="#"><b>Finanse</b></a>
     </li>
-    <li class="{% if active_tab == 'application_add' %} active {% endif %}">
-        <a href="#">
+    <li class="{% if active_tab == 'finance_file_add' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:finance_file_add' %}">
             <b>&#160;&#160;&#8226; dodaj dokument księgowy</b>
         </a>
     </li>

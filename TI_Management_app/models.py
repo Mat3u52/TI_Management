@@ -492,7 +492,6 @@ class KindOfFinanceDocument(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorKindOfFinanceDocument')
     title = models.CharField(max_length=250, null=False, blank=False)
-    file = models.FileField(null=False, blank=False, upload_to='uploadsKindOfFinanceDocument/%Y/%m/%d/%H%M%S/')
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
@@ -540,6 +539,7 @@ class FileFinance(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorFileFinance')
 
     title = models.CharField(max_length=250, null=False, blank=False)
+    file = models.FileField(null=True, blank=True, upload_to='uploadsFileFinance/%Y/%m/%d/%H%M%S/')
     type_of_document = models.ForeignKey(KindOfFinanceDocument, on_delete=models.CASCADE, null=True, related_name='typeOfDocumentFileFinance')
     figure = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
     quantity = models.IntegerField(null=True, blank=True, default=0)
@@ -550,7 +550,6 @@ class FileFinance(models.Model):
     psychologist = models.BooleanField(default=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberFileFinance', null=True, blank=True)
     description = models.TextField(null=True, blank=True, default=None)
-
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager

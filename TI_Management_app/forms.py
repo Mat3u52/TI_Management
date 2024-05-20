@@ -23,7 +23,10 @@ from .models import (
     FileRegisterRelief,
     SignatureRelief,
     AverageSalary,
-    Scholarships
+    Scholarships,
+    KindOfFinanceDocument,
+    KindOfFinanceExpense,
+    FileFinance
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -979,3 +982,37 @@ class ScholarshipsEditForm(forms.ModelForm):
             raise forms.ValidationError(f"Stypendium nie przysługuje")
 
         return cleaned_data
+
+
+class KindOfFinanceDocumentForm(forms.ModelForm):
+    class Meta:
+        model = KindOfFinanceDocument
+        fields = ['title']
+
+
+class KindOfFinanceExpenseForm(forms.ModelForm):
+    class Meta:
+        model = KindOfFinanceExpense
+        fields = ['title']
+
+
+class FileFinanceForm(forms.ModelForm):
+    class Meta:
+        model = FileFinance
+        fields = [
+            'title',
+            'file',
+            'type_of_document',
+            'figure',
+            'quantity',
+            'payment_date',
+            'resolution',
+            'resolution_requirement',
+            'expense_name',
+            'psychologist',
+            'member',
+            'description'
+        ]
+        widgets = {
+            'payment_date': forms.DateInput(attrs={'type': 'date'})
+        }

@@ -22,7 +22,8 @@ from .models import (
     FileRegisterRelief,
     SignatureRelief,
     Scholarships,
-    AverageSalary
+    AverageSalary,
+    KindOfFinanceDocument
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -66,7 +67,10 @@ from .forms import (
     ConfirmedReliefTimeRangeForm,
     AverageSalaryForm,
     ScholarshipsForm,
-    ScholarshipsEditForm
+    ScholarshipsEditForm,
+    KindOfFinanceDocumentForm,
+    KindOfFinanceExpenseForm,
+    FileFinanceForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -2625,3 +2629,31 @@ def scholarships_delete(request, pk):
     scholarship.delete()
 
     return redirect('TI_Management_app:scholarships_list')
+
+
+@login_required
+# @require_POST
+def finance_file_add(request):
+    kind_of_finance_document = KindOfFinanceDocument.objects.all()
+
+    if request.method == "POST":
+        form_kind_of_document = KindOfFinanceDocumentForm(request.POST)
+        form_file_finance = FileFinanceForm(request.POST, request.FILES)
+
+        if all([form_kind_of_document.is_valid(), form_file_finance.is_valid()]):
+            finance_file = form_kind_of_document.save(commit=False)
+            finance_file.author = request.user
+            finance_file.save()
+            messages.success(request, f"Dodano dokument finansowy")
+            return redirect('TI_Management_app:finance_list')
+    else:
+        form = KindOfFinanceDocumentForm()
+    return render(
+        request,
+        'TI_Management_app/finance/finance_file_add.html',
+        {
+            'form_kind_of_document': form_kind_of_document,
+            'kind_of_finance_document': kind_of_finance_document
+        }
+    )
+
