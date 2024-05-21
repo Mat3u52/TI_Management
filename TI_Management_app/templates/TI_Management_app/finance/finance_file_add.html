@@ -12,12 +12,12 @@
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form_kind_of_document.errors %}
-        <p>{{form_kind_of_document.errors}}</p>
+            {{form_kind_of_document.errors}}
         {% endif %}
         <h2>Dodawanie dokumentu księgowego</h2>
         <br />
 
-        <p>Rodzaj dokumentu:</p>
+        <p><b>Rodzaj dokumentu:</b></p>
         <input
                 class="form-control me-2"
                 style="min-width: 50%!important; min-height: 15px"
@@ -33,7 +33,59 @@
             {% endfor %}
         </datalist>
         <br />
-        <p>Kwota:</p>
+        <p><b>Document:</b></p>
+            <label class="file">
+                {{form_file_finance.file}}
+            </label>
+        <br />
+        <p><b>Kwota:</b></p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                placeholder="0"
+                aria-label="Kwota"
+                name="figure"
+                min="0"
+                step="0.01"
+                required /> zł
+        <br />
+        <p><b>Pozycji na wyciągu:</b></p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                placeholder="0"
+                aria-label="Pozycji na wyciągu"
+                name="quantity"
+                min="0"
+                step="1"
+                required />
+        <br />
+        <p><b>Data:</b></p>
+        <input
+                class="form-control me-2"
+                style="max-width: 50%!important; min-height: 15px"
+                type="date"
+                name="payment_date"
+                required />
+        <br />
+        <p><b>Przypnij uchwałę:</b></p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                list="doc_database"
+                placeholder="Uchwały"
+                aria-label="Uchwały"
+                name="title"
+                required />
+        <datalist id="doc_database">
+            {% for doc in doc_database %}
+            <option value="{{ doc.title }}">{{doc.category}}</option>
+            {% endfor %}
+        </datalist>
+        <br />
 
 
         <button type="submit" class="btn btn-primary btn-large pull-right">

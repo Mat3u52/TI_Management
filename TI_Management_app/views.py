@@ -2635,25 +2635,43 @@ def scholarships_delete(request, pk):
 # @require_POST
 def finance_file_add(request):
     kind_of_finance_document = KindOfFinanceDocument.objects.all()
+    doc_database = DocumentsDatabase.objects.filter(Q(category__title__icontains='Uchwały'))
 
     if request.method == "POST":
         form_kind_of_document = KindOfFinanceDocumentForm(request.POST)
         form_file_finance = FileFinanceForm(request.POST, request.FILES)
+        form_kind_of_expense = KindOfFinanceExpenseForm(request.POST)
 
         if all([form_kind_of_document.is_valid(), form_file_finance.is_valid()]):
-            finance_file = form_kind_of_document.save(commit=False)
+            document_title = form_kind_of_document.cleaned_data['title']
+            expense_title = form_kind_of_expense.cleaned_data['title']
+
+            title = document_title + expense_title
+
+            finance_document_kind = form_kind_of_document.save(commit=False)
+            finance_document_kind.author = request.user
+            finance_document_kind.save()
+
+            finance_file = form_file_finance.save(commit=False)
             finance_file.author = request.user
+            finance_file.title = title
             finance_file.save()
+
             messages.success(request, f"Dodano dokument finansowy")
             return redirect('TI_Management_app:finance_list')
     else:
-        form = KindOfFinanceDocumentForm()
+        form_kind_of_document = KindOfFinanceDocumentForm()
+        form_file_finance = FileFinanceForm()
+        form_kind_of_expense = KindOfFinanceExpenseForm()
     return render(
         request,
         'TI_Management_app/finance/finance_file_add.html',
         {
             'form_kind_of_document': form_kind_of_document,
-            'kind_of_finance_document': kind_of_finance_document
+            'form_file_finance': form_file_finance,
+            'form_kind_of_expense': form_kind_of_expense,
+            'kind_of_finance_document': kind_of_finance_document,
+            'doc_database': doc_database
         }
     )
 

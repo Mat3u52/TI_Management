@@ -1000,7 +1000,7 @@ class FileFinanceForm(forms.ModelForm):
     class Meta:
         model = FileFinance
         fields = [
-            'title',
+            # 'title',
             'file',
             'type_of_document',
             'figure',
