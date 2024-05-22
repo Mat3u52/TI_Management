@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
-<a href="#"> / Dodawanie dokumentu finansowego</a>
+<a href="#"> / Dodawanie dokumentu księgowego</a>
 {% endblock %}
 
 {% block content %}
@@ -33,11 +33,14 @@
             {% endfor %}
         </datalist>
         <br />
-        <p><b>Document:</b></p>
+        <hr>
+        <p><b>Dodaj document:</b></p>
             <label class="file">
                 {{form_file_finance.file}}
             </label>
         <br />
+        <hr>
+
         <p><b>Kwota:</b></p>
         <input
                 class="form-control me-2"
@@ -50,6 +53,7 @@
                 step="0.01"
                 required /> zł
         <br />
+        <hr>
         <p><b>Pozycji na wyciągu:</b></p>
         <input
                 class="form-control me-2"
@@ -62,6 +66,7 @@
                 step="1"
                 required />
         <br />
+        <hr>
         <p><b>Data:</b></p>
         <input
                 class="form-control me-2"
@@ -70,21 +75,83 @@
                 name="payment_date"
                 required />
         <br />
+        <hr>
+        <p><b>Dokument bez uchwały:</b></p>
+        <input
+                class="form-control me-2"
+                style="min-width: 1%!important; min-height: 15px"
+                type="checkbox"
+                aria-label="Dokument bez uchwały"
+                name="confirmation_of_student_id"
+                id="documentRequirement" />
+        <br />
+        <hr>
         <p><b>Przypnij uchwałę:</b></p>
+<!--        <label for="resolution">Uchwały</label>-->
+        <select name="resolution" id="resolution">
+            <optgroup label="Kategoria uchwały">
+                <option value="none">Brak</option>
+            {% for doc in doc_database %}
+                <option value="{{ doc.title }}">{{ doc.title }}</option>
+            {% endfor %}
+            </optgroup>
+        </select>
+        <br />
+        <hr>
+        <p><b>Nazwa wydatku:</b></p>
         <input
                 class="form-control me-2"
                 style="min-width: 50%!important; min-height: 15px"
                 type="text"
                 list="doc_database"
-                placeholder="Uchwały"
-                aria-label="Uchwały"
-                name="title"
+                placeholder="Nazwa wydatku"
+                aria-label="Nazwa wydatku"
+                name="expense_name"
                 required />
         <datalist id="doc_database">
-            {% for doc in doc_database %}
-            <option value="{{ doc.title }}">{{doc.category}}</option>
-            {% endfor %}
+        {% for expense in expense_names %}
+            <option value="{{ expanse.expanse_name }}"></option>
+        {% endfor %}
         </datalist>
+        <br />
+        <hr>
+        <p><b>Pomoc psychologa?</b></p>
+        <input
+                class="form-control me-2"
+                style="min-width: 1%!important; min-height: 15px"
+                type="checkbox"
+                aria-label="Pomoc psychologa"
+                name="psychologist"
+                id="PsychologistHelp" />
+        <br />
+        <div id="memberDiv" style="display: none;">
+            <br />
+            <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                list="members"
+                placeholder="Nr Członka"
+                aria-label="Nr Członka"
+                name="member" />
+            <datalist id="members">
+                {% for member in members %}
+                <option value="{{ member.member_nr }}">{{ member.member_nr }}</option>
+                {% endfor %}
+            </datalist>
+
+
+<!--            <p><small>Nr Członka:</small></p>-->
+<!--            <select name="member" id="member">-->
+<!--                <optgroup label="Nr Członka">-->
+<!--                    <option value="none">Brak</option>-->
+<!--                    {% for member in members %}-->
+<!--                        <option value="{{ member.member_nr }}">{{ member.member_nr }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </optgroup>-->
+<!--            </select>-->
+        </div>
+        <hr>
         <br />
 
 
@@ -94,6 +161,24 @@
         <br />
     </form>
 </div>
+<script>
+    document.getElementById('documentRequirement').addEventListener('change', function() {
+        var resolutionSelect = document.getElementById('resolution');
+        resolutionSelect.disabled = this.checked;
+    });
+    document.getElementById('resolution').addEventListener('change', function() {
+        var documentRequirement = document.getElementById('documentRequirement');
+        documentRequirement.disabled = this.value !== 'none';
+    });
+    document.getElementById('PsychologistHelp').addEventListener('change', function() {
+        var memberDiv = document.getElementById('memberDiv');
+        if (this.checked) {
+            memberDiv.style.display = 'block';
+        } else {
+            memberDiv.style.display = 'none';
+        }
+    });
+</script>
 {% endblock %}
 
 {% block menu %}

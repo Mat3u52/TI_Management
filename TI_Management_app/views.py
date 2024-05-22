@@ -23,7 +23,8 @@ from .models import (
     SignatureRelief,
     Scholarships,
     AverageSalary,
-    KindOfFinanceDocument
+    KindOfFinanceDocument,
+    FileFinance
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -2636,6 +2637,8 @@ def scholarships_delete(request, pk):
 def finance_file_add(request):
     kind_of_finance_document = KindOfFinanceDocument.objects.all()
     doc_database = DocumentsDatabase.objects.filter(Q(category__title__icontains='Uchwały'))
+    expense_names = FileFinance.objects.all()
+    members = MembersZZTI.objects.all().order_by('member_nr')
 
     if request.method == "POST":
         form_kind_of_document = KindOfFinanceDocumentForm(request.POST)
@@ -2646,7 +2649,7 @@ def finance_file_add(request):
             document_title = form_kind_of_document.cleaned_data['title']
             expense_title = form_kind_of_expense.cleaned_data['title']
 
-            title = document_title + expense_title
+            title = f"{document_title} {expense_title}"
 
             finance_document_kind = form_kind_of_document.save(commit=False)
             finance_document_kind.author = request.user
@@ -2671,7 +2674,9 @@ def finance_file_add(request):
             'form_file_finance': form_file_finance,
             'form_kind_of_expense': form_kind_of_expense,
             'kind_of_finance_document': kind_of_finance_document,
-            'doc_database': doc_database
+            'doc_database': doc_database,
+            'expense_names': expense_names,
+            'members' : members
         }
     )
 
