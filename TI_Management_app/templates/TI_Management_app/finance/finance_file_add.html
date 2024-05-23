@@ -14,6 +14,12 @@
         {% if form_kind_of_document.errors %}
             {{form_kind_of_document.errors}}
         {% endif %}
+        {% if form_file_finance.errors %}
+            {{form_file_finance.errors}}
+        {% endif %}
+        {% if form_kind_of_expense.errors %}
+            {{form_kind_of_expense.errors}}
+        {% endif %}
         <h2>Dodawanie dokumentu księgowego</h2>
         <br />
 
@@ -46,7 +52,7 @@
                 class="form-control me-2"
                 style="max-width: 25%!important; min-height: 15px"
                 type="number"
-                placeholder="0"
+                placeholder="0.00"
                 aria-label="Kwota"
                 name="figure"
                 min="0"
@@ -82,7 +88,7 @@
                 style="min-width: 1%!important; min-height: 15px"
                 type="checkbox"
                 aria-label="Dokument bez uchwały"
-                name="confirmation_of_student_id"
+                name="resolution_requirement"
                 id="documentRequirement" />
         <br />
         <hr>
@@ -106,7 +112,7 @@
                 list="doc_database"
                 placeholder="Nazwa wydatku"
                 aria-label="Nazwa wydatku"
-                name="expense_name"
+                name="title"
                 required />
         <datalist id="doc_database">
         {% for expense in expense_names %}
@@ -139,6 +145,12 @@
                 <option value="{{ member.member_nr }}">{{ member.member_nr }}</option>
                 {% endfor %}
             </datalist>
+            <div id="memberDetails" style="display: none;">
+            <!-- Member details will be shown here -->
+            </div>
+            <div id="error" style="color: red; display: none;">
+            <!-- Error message will be shown here -->
+            </div>
 
 
 <!--            <p><small>Nr Członka:</small></p>-->
@@ -153,6 +165,16 @@
         </div>
         <hr>
         <br />
+        <p><b>Opis:</b></p>
+        <textarea
+                class="form-control"
+                name="description"
+                rows="4"
+                cols="50" >
+
+        </textarea>
+        <br />
+        <hr>
 
 
         <button type="submit" class="btn btn-primary btn-large pull-right">
@@ -162,6 +184,8 @@
     </form>
 </div>
 <script>
+    const baseUrl = '{% url "TI_Management_app:get_member_details" "dummy_member_nr" %}'.replace('dummy_member_nr/', '');
+
     document.getElementById('documentRequirement').addEventListener('change', function() {
         var resolutionSelect = document.getElementById('resolution');
         resolutionSelect.disabled = this.checked;
@@ -178,6 +202,62 @@
             memberDiv.style.display = 'none';
         }
     });
+
+    document.querySelector('input[name="member"]').addEventListener('change', function() {
+        var memberNr = this.value;
+        console.log('Member number changed: ', memberNr);
+        if (memberNr !== 'none') {
+            fetchMemberDetails(memberNr);
+        } else {
+            document.getElementById('memberDetails').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+    });
+
+    function fetchMemberDetails(memberNr) {
+        console.log('Fetching member details for: ', memberNr);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', baseUrl + memberNr + '/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    console.log('Received member details: ', xhr.responseText);
+                    var memberDetails = JSON.parse(xhr.responseText);
+                    displayMemberDetails(memberDetails);
+                    document.getElementById('error').style.display = 'none';
+                } else if (xhr.status === 404) {
+                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                    document.getElementById('memberDetails').style.display = 'none';
+                    displayError('Taki Członek nie istnieje');
+                } else {
+                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                    document.getElementById('memberDetails').style.display = 'none';
+                    displayError('Taki Członek nie istnieje lub jest dezaktywowany');
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function displayMemberDetails(details) {
+        var memberDetailsDiv = document.getElementById('memberDetails');
+        memberDetailsDiv.style.display = 'block';
+        memberDetailsDiv.innerHTML = `
+            <p><b>Imię:</b> ${details.first_name}</p>
+<!--                <p><b>Nazwisko:</b> ${details.last_name}</p>-->
+<!--                <p><b>Email:</b> ${details.email}</p>-->
+            <!-- Add more details as needed -->
+        `;
+        console.log('Displaying member details: ', details);
+    }
+
+    function displayError(errorMessage) {
+        var errorDiv = document.getElementById('error');
+        errorDiv.style.display = 'block';
+        errorDiv.innerText = errorMessage;
+        console.log('Displaying error: ', errorMessage);
+    }
 </script>
 {% endblock %}
 

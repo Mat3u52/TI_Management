@@ -2632,6 +2632,22 @@ def scholarships_delete(request, pk):
     return redirect('TI_Management_app:scholarships_list')
 
 
+def get_member_details(request, member_nr):
+    try:
+        member = get_object_or_404(MembersZZTI, member_nr=member_nr, card__isnull=False, deactivate=False)
+        member_details = {
+            'first_name': member.forename,
+            # 'last_name': member.surname,
+            # 'email': member.email,
+            # Add more fields as needed
+        }
+        return JsonResponse(member_details)
+    except MembersZZTI.DoesNotExist:
+        return JsonResponse({'error': 'Member not found'}, status=404)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+
 @login_required
 # @require_POST
 def finance_file_add(request):
@@ -2645,7 +2661,7 @@ def finance_file_add(request):
         form_file_finance = FileFinanceForm(request.POST, request.FILES)
         form_kind_of_expense = KindOfFinanceExpenseForm(request.POST)
 
-        if all([form_kind_of_document.is_valid(), form_file_finance.is_valid()]):
+        if all([form_kind_of_document.is_valid(), form_file_finance.is_valid(), form_kind_of_expense.is_valid()]):
             document_title = form_kind_of_document.cleaned_data['title']
             expense_title = form_kind_of_expense.cleaned_data['title']
 
@@ -2658,9 +2674,10 @@ def finance_file_add(request):
             finance_file = form_file_finance.save(commit=False)
             finance_file.author = request.user
             finance_file.title = title
+            finance_file.type_of_document = document_title
             finance_file.save()
 
-            messages.success(request, f"Dodano dokument finansowy")
+            messages.success(request, f"Dodano dokument księgowy - {title}")
             return redirect('TI_Management_app:finance_list')
     else:
         form_kind_of_document = KindOfFinanceDocumentForm()
@@ -2676,7 +2693,7 @@ def finance_file_add(request):
             'kind_of_finance_document': kind_of_finance_document,
             'doc_database': doc_database,
             'expense_names': expense_names,
-            'members' : members
+            'members': members
         }
     )
 

@@ -447,6 +447,9 @@ urlpatterns = [
         views.scholarships_add_search,
         name='scholarships_add_search'
     ),
+
+    path('TI_Management_app/finance/get_member_details/<str:member_nr>/', views.get_member_details, name='get_member_details'),
+
     path(
         'TI_Management_app/finance/finance-file-add/',
         views.finance_file_add,

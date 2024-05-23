@@ -967,7 +967,6 @@ class ScholarshipsEditForm(forms.ModelForm):
         # }
 
     def __init__(self, *args, **kwargs):
-        # self.member = member
         super(ScholarshipsEditForm, self).__init__(*args, **kwargs)
 
     def clean(self):
@@ -1016,3 +1015,17 @@ class FileFinanceForm(forms.ModelForm):
         widgets = {
             'payment_date': forms.DateInput(attrs={'type': 'date'})
         }
+
+    def __init__(self, *args, **kwargs):
+        super(FileFinanceForm, self).__init__(*args, **kwargs)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        psychologist = cleaned_data.get('psychologist')
+        member_nr = cleaned_data.get('member')
+
+        if psychologist is True:
+            if not member_nr:
+                raise forms.ValidationError(f"Proszę podać numer Członka")
+
+        return cleaned_data
