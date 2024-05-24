@@ -2661,9 +2661,15 @@ def finance_file_add(request):
         form_file_finance = FileFinanceForm(request.POST, request.FILES)
         form_kind_of_expense = KindOfFinanceExpenseForm(request.POST)
 
+        # print(request.POST.get('member'))
+
+
         if all([form_kind_of_document.is_valid(), form_file_finance.is_valid(), form_kind_of_expense.is_valid()]):
             document_title = form_kind_of_document.cleaned_data['title']
             expense_title = form_kind_of_expense.cleaned_data['title']
+            member_nr = form_file_finance.cleaned_data['member_nr']
+            # member = MembersZZTI.objects.get(member_nr=member_nr)
+            # member_nr = MembersZZTI.objects.filter(member_nr=member, card__isnull=False, deactivate=False).exists()
 
             title = f"{document_title} {expense_title}"
 
@@ -2675,6 +2681,8 @@ def finance_file_add(request):
             finance_file.author = request.user
             finance_file.title = title
             finance_file.type_of_document = document_title
+            finance_file.expense_name = expense_title
+            finance_file.member = MembersZZTI.objects.get(member_nr=member_nr)
             finance_file.save()
 
             messages.success(request, f"Dodano dokument księgowy - {title}")

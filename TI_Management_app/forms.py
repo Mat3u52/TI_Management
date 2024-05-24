@@ -996,20 +996,32 @@ class KindOfFinanceExpenseForm(forms.ModelForm):
 
 
 class FileFinanceForm(forms.ModelForm):
+    member_nr = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'style': 'min-width: 50%!important; min-height: 15px',
+                'list': 'members',
+                'placeholder': 'Nr Członka',
+                'aria-label': 'Nr Członka'
+            }
+        )
+    )
+
     class Meta:
         model = FileFinance
         fields = [
             # 'title',
             'file',
-            'type_of_document',
+            # 'type_of_document',
             'figure',
             'quantity',
             'payment_date',
             'resolution',
             'resolution_requirement',
-            'expense_name',
+            # 'expense_name',
             'psychologist',
-            'member',
+            'member_nr',
             'description'
         ]
         widgets = {
@@ -1018,14 +1030,15 @@ class FileFinanceForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         super(FileFinanceForm, self).__init__(*args, **kwargs)
+        # self.fields['member'].queryset = MembersZZTI.objects.all().order_by('member_nr')
+        self.fields['member_nr'].queryset = MembersZZTI.objects.filter(card__isnull=False, deactivate=False).order_by('member_nr')
 
     def clean(self):
         cleaned_data = super().clean()
         psychologist = cleaned_data.get('psychologist')
-        member_nr = cleaned_data.get('member')
+        member_nr = cleaned_data.get('member_nr')
 
-        if psychologist is True:
-            if not member_nr:
-                raise forms.ValidationError(f"Proszę podać numer Członka")
+        if psychologist and not member_nr:
+                self.add_error('member', "Proszę podać numer Członka")
 
         return cleaned_data

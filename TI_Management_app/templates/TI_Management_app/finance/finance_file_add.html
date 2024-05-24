@@ -65,10 +65,11 @@
                 class="form-control me-2"
                 style="max-width: 25%!important; min-height: 15px"
                 type="number"
-                placeholder="0"
+                placeholder="1"
+                value="1"
                 aria-label="Pozycji na wyciągu"
                 name="quantity"
-                min="0"
+                min="1"
                 step="1"
                 required />
         <br />
@@ -93,15 +94,16 @@
         <br />
         <hr>
         <p><b>Przypnij uchwałę:</b></p>
-<!--        <label for="resolution">Uchwały</label>-->
+
         <select name="resolution" id="resolution">
             <optgroup label="Kategoria uchwały">
                 <option value="none">Brak</option>
             {% for doc in doc_database %}
-                <option value="{{ doc.title }}">{{ doc.title }}</option>
+                <option value="{{ doc.id }}">{{ doc.title }}</option>
             {% endfor %}
             </optgroup>
         </select>
+<!--        {{ form_file_finance.resolution }}-->
         <br />
         <hr>
         <p><b>Nazwa wydatku:</b></p>
@@ -139,18 +141,14 @@
                 list="members"
                 placeholder="Nr Członka"
                 aria-label="Nr Członka"
-                name="member" />
+                name="member_nr" />
             <datalist id="members">
                 {% for member in members %}
-                <option value="{{ member.member_nr }}">{{ member.member_nr }}</option>
+                <option value="{{ member.member_nr }}"></option>
                 {% endfor %}
             </datalist>
-            <div id="memberDetails" style="display: none;">
-            <!-- Member details will be shown here -->
-            </div>
-            <div id="error" style="color: red; display: none;">
-            <!-- Error message will be shown here -->
-            </div>
+            <div id="memberDetails" style="display: none;"></div>
+            <div id="error" style="color: red; display: none;"></div>
 
 
 <!--            <p><small>Nr Członka:</small></p>-->
