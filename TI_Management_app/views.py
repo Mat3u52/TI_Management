@@ -24,7 +24,8 @@ from .models import (
     Scholarships,
     AverageSalary,
     KindOfFinanceDocument,
-    FileFinance
+    FileFinance,
+    KindOfFinanceExpense
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -2653,7 +2654,7 @@ def get_member_details(request, member_nr):
 def finance_file_add(request):
     kind_of_finance_document = KindOfFinanceDocument.objects.all()
     doc_database = DocumentsDatabase.objects.filter(Q(category__title__icontains='Uchwały'))
-    expense_names = FileFinance.objects.all()
+    expense_names = KindOfFinanceExpense.objects.all()
     members = MembersZZTI.objects.all().order_by('member_nr')
 
     if request.method == "POST":
@@ -2661,28 +2662,37 @@ def finance_file_add(request):
         form_file_finance = FileFinanceForm(request.POST, request.FILES)
         form_kind_of_expense = KindOfFinanceExpenseForm(request.POST)
 
-        # print(request.POST.get('member'))
-
-
         if all([form_kind_of_document.is_valid(), form_file_finance.is_valid(), form_kind_of_expense.is_valid()]):
-            document_title = form_kind_of_document.cleaned_data['title']
-            expense_title = form_kind_of_expense.cleaned_data['title']
+            document_title = form_kind_of_document.cleaned_data['title_doc']
+            expense_title = form_kind_of_expense.cleaned_data['title_expense']
             member_nr = form_file_finance.cleaned_data['member_nr']
+            psychologist = form_file_finance.cleaned_data['psychologist']
+            title = f"{document_title} {expense_title}"
             # member = MembersZZTI.objects.get(member_nr=member_nr)
             # member_nr = MembersZZTI.objects.filter(member_nr=member, card__isnull=False, deactivate=False).exists()
 
-            title = f"{document_title} {expense_title}"
+            if not KindOfFinanceDocument.objects.filter(title_doc=document_title).exists():
+                finance_document_kind = form_kind_of_document.save(commit=False)
+                finance_document_kind.title = document_title
+                finance_document_kind.author = request.user
+                finance_document_kind.save()
 
-            finance_document_kind = form_kind_of_document.save(commit=False)
-            finance_document_kind.author = request.user
-            finance_document_kind.save()
+            if not KindOfFinanceExpense.objects.filter(title_expense=expense_title).exists():
+                kind_of_expense = form_kind_of_expense.save(commit=False)
+                kind_of_expense.title = expense_title
+                kind_of_expense.author = request.user
+                kind_of_expense.save()
 
             finance_file = form_file_finance.save(commit=False)
             finance_file.author = request.user
             finance_file.title = title
-            finance_file.type_of_document = document_title
-            finance_file.expense_name = expense_title
-            finance_file.member = MembersZZTI.objects.get(member_nr=member_nr)
+            # finance_file.type_of_document = KindOfFinanceDocument.objects.get(title_doc=document_title)
+            finance_file.type_of_document = KindOfFinanceDocument.objects.filter(title_doc=document_title).latest('id')
+            # finance_file.expense_name = KindOfFinanceExpense.objects.get(title_expense=expense_title)
+            finance_file.expense_name = KindOfFinanceExpense.objects.filter(title_expense=expense_title).latest('id')
+            # finance_file.member = MembersZZTI.objects.get(member_nr=member_nr)
+            if psychologist is True and MembersZZTI.objects.filter(member_nr=member_nr).exists():
+                finance_file.member = MembersZZTI.objects.filter(member_nr=member_nr).latest('id')
             finance_file.save()
 
             messages.success(request, f"Dodano dokument księgowy - {title}")

@@ -31,7 +31,7 @@
                 list="kind_of_finance_document"
                 placeholder="Rodaj dokumentu"
                 aria-label="Rodzaj dokumentu"
-                name="title"
+                name="title_doc"
                 required />
         <datalist id="kind_of_finance_document">
             {% for document_kind in kind_of_finance_document %}
@@ -114,7 +114,7 @@
                 list="doc_database"
                 placeholder="Nazwa wydatku"
                 aria-label="Nazwa wydatku"
-                name="title"
+                name="title_expense"
                 required />
         <datalist id="doc_database">
         {% for expense in expense_names %}
@@ -149,8 +149,6 @@
             </datalist>
             <div id="memberDetails" style="display: none;"></div>
             <div id="error" style="color: red; display: none;"></div>
-
-
 <!--            <p><small>Nr Członka:</small></p>-->
 <!--            <select name="member" id="member">-->
 <!--                <optgroup label="Nr Członka">-->
@@ -201,7 +199,7 @@
         }
     });
 
-    document.querySelector('input[name="member"]').addEventListener('change', function() {
+    document.querySelector('input[name="member_nr"]').addEventListener('change', function() {
         var memberNr = this.value;
         console.log('Member number changed: ', memberNr);
         if (memberNr !== 'none') {

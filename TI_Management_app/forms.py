@@ -986,26 +986,31 @@ class ScholarshipsEditForm(forms.ModelForm):
 class KindOfFinanceDocumentForm(forms.ModelForm):
     class Meta:
         model = KindOfFinanceDocument
-        fields = ['title']
+        fields = ['title_doc']
 
 
 class KindOfFinanceExpenseForm(forms.ModelForm):
+
     class Meta:
         model = KindOfFinanceExpense
-        fields = ['title']
+        fields = ['title_expense']
 
 
 class FileFinanceForm(forms.ModelForm):
+    # member_nr = forms.CharField(
+    #     required=False
+    #     # widget=forms.TextInput(
+    #     #     attrs={
+    #     #         'class': 'form-control me-2',
+    #     #         'style': 'min-width: 50%!important; min-height: 15px',
+    #     #         'list': 'members',
+    #     #         'placeholder': 'Nr Członka',
+    #     #         'aria-label': 'Nr Członka'
+    #     #     }
+    #     # )
+    # )
     member_nr = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control me-2',
-                'style': 'min-width: 50%!important; min-height: 15px',
-                'list': 'members',
-                'placeholder': 'Nr Członka',
-                'aria-label': 'Nr Członka'
-            }
-        )
+        required=False
     )
 
     class Meta:
@@ -1037,8 +1042,11 @@ class FileFinanceForm(forms.ModelForm):
         cleaned_data = super().clean()
         psychologist = cleaned_data.get('psychologist')
         member_nr = cleaned_data.get('member_nr')
+        resolution_requirement = cleaned_data.get('resolution_requirement')
+        if resolution_requirement is False:
+            self.fields['resolution'].required = False
 
         if psychologist and not member_nr:
-                self.add_error('member', "Proszę podać numer Członka")
+            self.add_error('member', "Proszę podać numer Członka")
 
         return cleaned_data

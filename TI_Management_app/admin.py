@@ -1085,17 +1085,17 @@ class KindOfFinanceDocumentAdmin(admin.ModelAdmin):
         'updated_date',
         'slug',
         'author',
-        'title'
+        'title_doc'
     )
     list_filter = (
         'created_date',
         'updated_date',
         'slug',
         'author',
-        'title'
+        'title_doc'
     )
     search_fields = (
-        'title',
+        'title_doc',
     )
     # date_hierarchy = 'created_date'
 
@@ -1112,17 +1112,17 @@ class KindOfFinanceExpenseAdmin(admin.ModelAdmin):
         'updated_date',
         'slug',
         'author',
-        'title'
+        'title_expense'
     )
     list_filter = (
         'created_date',
         'updated_date',
         'slug',
         'author',
-        'title'
+        'title_expense'
     )
     search_fields = (
-        'title',
+        'title_expense',
     )
     # date_hierarchy = 'created_date'
 

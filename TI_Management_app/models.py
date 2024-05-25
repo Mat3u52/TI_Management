@@ -491,7 +491,8 @@ class KindOfFinanceDocument(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorKindOfFinanceDocument')
-    title = models.CharField(max_length=250, null=False, blank=False)
+    # title = models.CharField(max_length=250, null=False, blank=False)
+    title_doc = models.CharField(max_length=250, null=False, blank=False)
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
@@ -501,11 +502,11 @@ class KindOfFinanceDocument(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return self.title
+        return self.title_doc
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.title}")
+            self.slug = slugify(f"{self.title_doc}")
         super().save(*args, **kwargs)
 
 
@@ -514,7 +515,8 @@ class KindOfFinanceExpense(models.Model):
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorKindOfFinanceExpense')
-    title = models.CharField(max_length=250, null=False, blank=False)
+    # title = models.CharField(max_length=250, null=False, blank=False)
+    title_expense = models.CharField(max_length=250, null=False, blank=False)
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
@@ -524,11 +526,11 @@ class KindOfFinanceExpense(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return self.title
+        return self.title_expense
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.title}")
+            self.slug = slugify(f"{self.title_expense}")
         super().save(*args, **kwargs)
 
 
