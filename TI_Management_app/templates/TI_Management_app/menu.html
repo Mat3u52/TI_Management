@@ -40,7 +40,7 @@
     </li>
 
     <li class="{% if active_tab == 'finance_list' %} active {% endif %}">
-        <a href="#"><b>Finanse</b></a>
+        <a href="{% url 'TI_Management_app:finance_list' %}"><b>Finanse</b></a>
     </li>
     <li class="{% if active_tab == 'finance_file_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:finance_file_add' %}">

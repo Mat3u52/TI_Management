@@ -1,10 +1,46 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+  <h2>Finanse - Przegląd dokumentów finansowych</h2>
+  <div class="notepad">
+  {% if years %}
+    {% for year, entries in years.object_list %}
+      <h2>{{ year }}</h2>
+      <ul>
+        {% for entry in entries %}
+          <li>{{ entry.expense_name }} {{ entry.relief.title }} - {{ entry.payment_date }} {{ entry.date_of_payment_confirmation }}</li>
+        {% endfor %}
+      </ul>
+    {% endfor %}
+  </div>
+  <div class="pagination">
+      <span class="step-links">
+        {% if years.has_previous %}
+          <a href="?page={{ years.previous_page_number }}">Następny rok</a>
+        {% endif %}
+
+        <span class="current">
+            {{ years.number }} / {{ years.paginator.num_pages }}
+        </span>
+
+        {% if years.has_next %}
+          <a href="?page={{ years.next_page_number }}">poprzedni rok</a>
+        {% endif %}
+      </span>
+    </div>
+  {% else %}
+    <p>No entries available.</p>
+  {% endif %}
+</div>
+{% endblock %}
+
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='finance_list' %}
+{% endblock %}

@@ -101,8 +101,9 @@ from django.http import JsonResponse
 from django.contrib.auth.models import User
 
 from django.core.exceptions import ObjectDoesNotExist
-
+from itertools import chain
 from datetime import datetime
+from collections import defaultdict
 
 # class Image(TemplateView):
 #     form = MemberForm
@@ -2667,9 +2668,7 @@ def finance_file_add(request):
             expense_title = form_kind_of_expense.cleaned_data['title_expense']
             member_nr = form_file_finance.cleaned_data['member_nr']
             psychologist = form_file_finance.cleaned_data['psychologist']
-            title = f"{document_title} {expense_title}"
-            # member = MembersZZTI.objects.get(member_nr=member_nr)
-            # member_nr = MembersZZTI.objects.filter(member_nr=member, card__isnull=False, deactivate=False).exists()
+            title = f"{document_title} - {expense_title}"
 
             if not KindOfFinanceDocument.objects.filter(title_doc=document_title).exists():
                 finance_document_kind = form_kind_of_document.save(commit=False)
@@ -2715,3 +2714,91 @@ def finance_file_add(request):
         }
     )
 
+
+# @login_required
+# def finance_list(request):
+#     # Fetch the data from FileFinance model
+#     finance_obj = FileFinance.objects.all().order_by('-payment_date')
+#
+#     # If you have other models to include in the combined list, uncomment and adjust the following lines:
+#     register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
+#     # scholarships_obj = Scholarships.objects.all().order_by('-created_date')
+#
+#     # Combine the data into a single list, currently only using finance_obj
+#     combined_list = sorted(
+#         chain(finance_obj),
+#         key=lambda obj: obj.payment_date,
+#         reverse=True
+#     )
+#
+#     # Group entries by the year of their payment_date
+#     grouped_by_year = defaultdict(list)
+#     for obj in combined_list:
+#         year = obj.payment_date.year
+#         grouped_by_year[year].append(obj)
+#
+#     # Convert the dictionary to a sorted list of tuples (year, entries)
+#     sorted_years = sorted(grouped_by_year.items(), key=lambda x: x[0], reverse=True)
+#
+#     # Paginate the years
+#     paginator = Paginator(sorted_years, 1)  # One year per page
+#     page = request.GET.get('page')
+#     try:
+#         years = paginator.page(page)
+#     except PageNotAnInteger:
+#         years = paginator.page(1)
+#     except EmptyPage:
+#         years = paginator.page(paginator.num_pages)
+#
+#     return render(
+#         request,
+#         'TI_Management_app/finance/finance_list.html',
+#         {
+#             'years': years,  # List of tuples (year, entries)
+#             'page': page,
+#         }
+#     )
+
+@login_required
+def finance_list(request):
+    # Fetch the data from FileFinance model
+    finance_obj = FileFinance.objects.all().order_by('-payment_date')
+
+    # Fetch the data from RegisterRelief model where payment_confirmation is True
+    register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
+
+    # Combine the data into a single list, including both finance_obj and register_relief_obj
+    combined_list = sorted(
+        chain(finance_obj, register_relief_obj),
+        key=lambda obj: obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation,
+        reverse=True
+    )
+
+    # Group entries by the year of their payment_date or date_of_payment_confirmation
+    grouped_by_year = defaultdict(list)
+    for obj in combined_list:
+        date_field = obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation
+        year = date_field.year
+        grouped_by_year[year].append(obj)
+
+    # Convert the dictionary to a sorted list of tuples (year, entries)
+    sorted_years = sorted(grouped_by_year.items(), key=lambda x: x[0], reverse=True)
+
+    # Paginate the years
+    paginator = Paginator(sorted_years, 1)  # One year per page
+    page = request.GET.get('page')
+    try:
+        years = paginator.page(page)
+    except PageNotAnInteger:
+        years = paginator.page(1)
+    except EmptyPage:
+        years = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/finance/finance_list.html',
+        {
+            'years': years,  # List of tuples (year, entries)
+            'page': page,
+        }
+    )

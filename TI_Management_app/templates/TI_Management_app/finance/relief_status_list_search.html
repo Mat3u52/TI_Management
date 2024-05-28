@@ -39,10 +39,12 @@
                             <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                                 Dodaj podpis
                             </a>
+                            <br />
                         {% else %}
                             <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                                 Dodaj potwierdzenie wypłaty
                             </a>
+                            <br />
                         {% endif %}
 <!--                    {% elif member.payment_confirmation is True %}-->
 <!--                        <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">-->

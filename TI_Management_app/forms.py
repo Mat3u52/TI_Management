@@ -1037,16 +1037,23 @@ class FileFinanceForm(forms.ModelForm):
         super(FileFinanceForm, self).__init__(*args, **kwargs)
         # self.fields['member'].queryset = MembersZZTI.objects.all().order_by('member_nr')
         self.fields['member_nr'].queryset = MembersZZTI.objects.filter(card__isnull=False, deactivate=False).order_by('member_nr')
+        self.fields['resolution'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
         psychologist = cleaned_data.get('psychologist')
         member_nr = cleaned_data.get('member_nr')
+        quantity = cleaned_data.get('quantity')
         resolution_requirement = cleaned_data.get('resolution_requirement')
         if resolution_requirement is False:
-            self.fields['resolution'].required = False
+            self.fields['resolution'].required = True
 
-        if psychologist and not member_nr:
+        if psychologist is True and not member_nr:
             self.add_error('member', "Proszę podać numer Członka")
+        if psychologist is True and not MembersZZTI.objects.filter(member_nr=member_nr).exists():
+            raise forms.ValidationError(f"Członek nie istnieje w bazie")
+
+        if quantity < 0:
+            raise forms.ValidationError(f"Tylko liczby dodatnie")
 
         return cleaned_data

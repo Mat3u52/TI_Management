@@ -3,6 +3,7 @@ from ..models import MembersZZTI
 from django.contrib.auth.models import User
 from datetime import datetime
 import os
+import calendar
 
 register = template.Library()
 
@@ -28,3 +29,8 @@ def comma_to_period(value):
 @register.filter
 def filename(value):
     return os.path.basename(value)
+
+
+@register.filter
+def month_name(month_number):
+    return calendar.month_name[month_number]
