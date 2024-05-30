@@ -1040,7 +1040,8 @@ class ScholarshipsAdmin(admin.ModelAdmin):
         'file_university_regulations_of_the_grading_scale',
         'confirmation_of_student_id',
         'scholarship_rate',
-        'confirmation_of_scholarship'
+        'confirmation_of_scholarship',
+        'confirmation_date'
     )
     list_filter = (
         'created_date',
@@ -1066,7 +1067,8 @@ class ScholarshipsAdmin(admin.ModelAdmin):
         'file_university_regulations_of_the_grading_scale',
         'confirmation_of_student_id',
         'scholarship_rate',
-        'confirmation_of_scholarship'
+        'confirmation_of_scholarship',
+        'confirmation_date'
     )
     search_fields = (
         'title',

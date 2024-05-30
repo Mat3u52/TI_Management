@@ -464,5 +464,10 @@ urlpatterns = [
         views.finance_list,
         name='finance_list'
     ),
+    path(
+        'TI_Management_app/finance/finance-detail/<int:year>/<int:month>/',
+        views.finance_detail,
+        name='finance_detail'
+    ),
 ]
 

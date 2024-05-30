@@ -10,13 +10,20 @@
   <h2>Finanse - Przegląd dokumentów finansowych</h2>
   <div class="notepad">
   {% if years %}
-    {% for year, entries in years.object_list %}
+    {% for year, entries, finance_figure, scholarship_figure, relief_figure in years.object_list %}
       <h2>{{ year }}</h2>
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=1 %}">Styczeń</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=2 %}">Luty</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=3 %}">Marzec</a>
       <ul>
         {% for entry in entries %}
-          <li>{{ entry.expense_name }} {{ entry.relief.title }} - {{ entry.payment_date }} {{ entry.date_of_payment_confirmation }}</li>
+          <li>{{ entry.payment_date }} {{ entry.date_of_payment_confirmation }} {{ entry.confirmation_date }} : {{ entry.relief.title }} {{ entry.title }}</li>
         {% endfor %}
       </ul>
+    <br />
+      <p><b>Wydatki dokumenty księgowe:</b> {{ finance_figure }} zł</p>
+      <p><b>Wydatki stypendia:</b> {{ scholarship_figure|floatformat:"2" }} zł</p>
+      <p><b>Zapomogi:</b> {{ relief_figure|floatformat:"2" }} zł</p>
     {% endfor %}
   </div>
   <div class="pagination">
@@ -37,6 +44,8 @@
   {% else %}
     <p>No entries available.</p>
   {% endif %}
+  <p>Wpływy:</p>
+  <p>Wydatki:</p>
 </div>
 {% endblock %}
 

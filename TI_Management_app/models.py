@@ -755,6 +755,7 @@ class Scholarships(models.Model):
     confirmation_of_student_id = models.BooleanField(default=False)
     scholarship_rate = models.FloatField(null=False, blank=False)
     confirmation_of_scholarship = models.BooleanField(default=False)
+    confirmation_date = models.DateTimeField(blank=True, null=True)
 
     history = HistoricalRecords()
     objects = models.Manager()  # default manager

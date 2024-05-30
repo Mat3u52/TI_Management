@@ -1,10 +1,22 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
+<a href="{% url 'TI_Management_app:finance_detail' year=year month=month %}"> / Finanse {{ year }} {{ month }}</a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2>{{ year }} - {{ month }}</h2>
+    {{ finances }}
+    {{ reliefs }}
+    {{ scholarships }}
+
+</div>
+{% endblock %}
+
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='finance_list' %}
+{% endblock %}

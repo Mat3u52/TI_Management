@@ -104,6 +104,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from itertools import chain
 from datetime import datetime
 from collections import defaultdict
+import pytz
+
 
 # class Image(TemplateView):
 #     form = MemberForm
@@ -1903,23 +1905,6 @@ def documents_database_delete(request, pk):
 
 
 @login_required
-def finance_list(request):
-    members_obj = MembersZZTI.objects.all().order_by('-created_date')
-    paginator = Paginator(members_obj, 50)
-    page = request.GET.get('page')
-    try:
-        members = paginator.page(page)
-    except PageNotAnInteger:
-        members = paginator.page(1)
-    except EmptyPage:
-        members = paginator.page(paginator.num_pages)
-    return render(request,
-                  'TI_Management_app/members_list.html',
-                  {'page': page,
-                   'members': members})
-
-
-@login_required
 def relief_figure_add(request):
     all_relief = Relief.objects.all().order_by('-created_date')
     if request.method == "POST":
@@ -2600,6 +2585,7 @@ def scholarships_edit(request, pk):
             one_scholarship_update = form.save(commit=False)
             one_scholarship_update.author = request.user
             one_scholarship_update.member = one_scholarship.member
+            one_scholarship_update.confirmation_date = timezone.now()
             one_scholarship_update.save()
             messages.success(request, f"Potwierdzono  {one_scholarship_update.title}!")
             return redirect('TI_Management_app:scholarships_list')
@@ -2715,50 +2701,6 @@ def finance_file_add(request):
     )
 
 
-# @login_required
-# def finance_list(request):
-#     # Fetch the data from FileFinance model
-#     finance_obj = FileFinance.objects.all().order_by('-payment_date')
-#
-#     # If you have other models to include in the combined list, uncomment and adjust the following lines:
-#     register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
-#     # scholarships_obj = Scholarships.objects.all().order_by('-created_date')
-#
-#     # Combine the data into a single list, currently only using finance_obj
-#     combined_list = sorted(
-#         chain(finance_obj),
-#         key=lambda obj: obj.payment_date,
-#         reverse=True
-#     )
-#
-#     # Group entries by the year of their payment_date
-#     grouped_by_year = defaultdict(list)
-#     for obj in combined_list:
-#         year = obj.payment_date.year
-#         grouped_by_year[year].append(obj)
-#
-#     # Convert the dictionary to a sorted list of tuples (year, entries)
-#     sorted_years = sorted(grouped_by_year.items(), key=lambda x: x[0], reverse=True)
-#
-#     # Paginate the years
-#     paginator = Paginator(sorted_years, 1)  # One year per page
-#     page = request.GET.get('page')
-#     try:
-#         years = paginator.page(page)
-#     except PageNotAnInteger:
-#         years = paginator.page(1)
-#     except EmptyPage:
-#         years = paginator.page(paginator.num_pages)
-#
-#     return render(
-#         request,
-#         'TI_Management_app/finance/finance_list.html',
-#         {
-#             'years': years,  # List of tuples (year, entries)
-#             'page': page,
-#         }
-#     )
-
 @login_required
 def finance_list(request):
     # Fetch the data from FileFinance model
@@ -2767,22 +2709,47 @@ def finance_list(request):
     # Fetch the data from RegisterRelief model where payment_confirmation is True
     register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
 
-    # Combine the data into a single list, including both finance_obj and register_relief_obj
+    # Fetch the data from Scholarships model where confirmation_of_scholarship is True
+    scholarships_obj = Scholarships.objects.filter(confirmation_of_scholarship=True).order_by('-confirmation_date')
+
+    # Combine the data into a single list, including finance_obj, register_relief_obj, and scholarships_obj
     combined_list = sorted(
-        chain(finance_obj, register_relief_obj),
-        key=lambda obj: obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation,
+        chain(finance_obj, register_relief_obj, scholarships_obj),
+        key=lambda obj: obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation if hasattr(obj, 'date_of_payment_confirmation') else obj.confirmation_date,
         reverse=True
     )
 
-    # Group entries by the year of their payment_date or date_of_payment_confirmation
+    # Group entries by the year of their payment_date, date_of_payment_confirmation, or confirmation_date
     grouped_by_year = defaultdict(list)
     for obj in combined_list:
-        date_field = obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation
+        date_field = obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation if hasattr(obj, 'date_of_payment_confirmation') else obj.confirmation_date
         year = date_field.year
         grouped_by_year[year].append(obj)
 
+    summarized_data = []
+    for year, entries in grouped_by_year.items():
+        finance_figure = sum(getattr(entry, 'figure', 0) for entry in entries if isinstance(entry, FileFinance))
+        scholarship_figure = sum(
+            getattr(entry, 'scholarship_rate', 0) for entry in entries if isinstance(entry, Scholarships))
+        relief_figure = sum(
+            getattr(entry.relief, 'figure', 0) for entry in entries if isinstance(entry, RegisterRelief))
+
+        summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure))
+
     # Convert the dictionary to a sorted list of tuples (year, entries)
-    sorted_years = sorted(grouped_by_year.items(), key=lambda x: x[0], reverse=True)
+    sorted_years = sorted(summarized_data, key=lambda x: x[0], reverse=True)
+
+    # summarized_data = []
+    # for year, entries in grouped_by_year.items():
+    #     finance_figure = sum(getattr(entry, 'figure', 0) for entry in entries)
+    #     scholarship_figure = sum(getattr(entry, 'scholarship_rate', 0) for entry in entries)
+    #     relief_figure = sum(getattr(entry.relief, 'figure', 0) for entry in entries)
+    #
+    #     summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure))
+    #
+    # # Convert the dictionary to a sorted list of tuples (year, entries)
+    # # sorted_years = sorted(grouped_by_year.items(), key=lambda x: x[0], reverse=True)
+    # sorted_years = sorted(summarized_data, key=lambda x: x[0], reverse=True)
 
     # Paginate the years
     paginator = Paginator(sorted_years, 1)  # One year per page
@@ -2802,3 +2769,48 @@ def finance_list(request):
             'page': page,
         }
     )
+
+
+@login_required
+def finance_detail(request, year, month):
+    year = 2024
+    month = 5
+
+    tz = pytz.timezone('Europe/Warsaw')
+
+    # Define the start and end of the month in the specified timezone
+    start_date = timezone.make_aware(datetime(year, month, 1), tz)
+    end_date = timezone.make_aware(datetime(year, month + 1, 1), tz) if month < 12 else timezone.make_aware(
+        datetime(year + 1, 1, 1), tz)
+
+    # Run the query
+    finances = FileFinance.objects.filter(
+        payment_date__gte=start_date,
+        payment_date__lt=end_date
+    ).exclude(payment_date__isnull=True).order_by('-payment_date')
+
+    reliefs = RegisterRelief.objects.filter(
+        payment_confirmation=True,
+        date_of_payment_confirmation__gte=start_date,
+        date_of_payment_confirmation__lt=end_date
+    ).exclude(date_of_payment_confirmation__isnull=True).order_by('-date_of_payment_confirmation')
+
+    scholarships = Scholarships.objects.filter(
+        confirmation_of_scholarship=True,
+        confirmation_date__gte=start_date,
+        confirmation_date__lt=end_date
+    ).exclude(confirmation_date__isnull=True).order_by('-confirmation_date')
+
+
+    return render(
+        request,
+        'TI_Management_app/finance/finance_detail.html',
+        {
+            'finances': finances,
+            'reliefs': reliefs,
+            'scholarships': scholarships,
+            'year': year,
+            'month': month
+        }
+    )
+
