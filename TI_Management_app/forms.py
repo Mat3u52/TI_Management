@@ -26,7 +26,8 @@ from .models import (
     Scholarships,
     KindOfFinanceDocument,
     KindOfFinanceExpense,
-    FileFinance
+    FileFinance,
+    BankStatement
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -997,20 +998,19 @@ class KindOfFinanceExpenseForm(forms.ModelForm):
 
 
 class FileFinanceForm(forms.ModelForm):
-    # member_nr = forms.CharField(
-    #     required=False
-    #     # widget=forms.TextInput(
-    #     #     attrs={
-    #     #         'class': 'form-control me-2',
-    #     #         'style': 'min-width: 50%!important; min-height: 15px',
-    #     #         'list': 'members',
-    #     #         'placeholder': 'Nr Członka',
-    #     #         'aria-label': 'Nr Członka'
-    #     #     }
-    #     # )
-    # )
+
     member_nr = forms.CharField(
         required=False
+    )
+
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
     )
 
     class Meta:
@@ -1057,3 +1057,27 @@ class FileFinanceForm(forms.ModelForm):
             raise forms.ValidationError(f"Tylko liczby dodatnie")
 
         return cleaned_data
+
+
+class BankStatementForm(forms.ModelForm):
+
+    file_bank_statement = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
+    )
+
+    class Meta:
+        model = BankStatement
+        fields = [
+            'title_bank_statement',
+            'file_bank_statement',
+            'quantity_bank_statement',
+            'starting_balance',
+            'final_balance',
+            'income_bank_statement'
+        ]

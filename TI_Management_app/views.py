@@ -25,7 +25,8 @@ from .models import (
     AverageSalary,
     KindOfFinanceDocument,
     FileFinance,
-    KindOfFinanceExpense
+    KindOfFinanceExpense,
+    BankStatement
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -72,7 +73,8 @@ from .forms import (
     ScholarshipsEditForm,
     KindOfFinanceDocumentForm,
     KindOfFinanceExpenseForm,
-    FileFinanceForm
+    FileFinanceForm,
+    BankStatementForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -105,6 +107,7 @@ from itertools import chain
 from datetime import datetime
 from collections import defaultdict
 import pytz
+from decimal import Decimal
 
 
 # class Image(TemplateView):
@@ -2727,29 +2730,28 @@ def finance_list(request):
         grouped_by_year[year].append(obj)
 
     summarized_data = []
+    total_finance_figure = Decimal(0)
+    total_scholarship_figure = Decimal(0)
+    total_relief_figure = Decimal(0)
+
     for year, entries in grouped_by_year.items():
-        finance_figure = sum(getattr(entry, 'figure', 0) for entry in entries if isinstance(entry, FileFinance))
-        scholarship_figure = sum(
-            getattr(entry, 'scholarship_rate', 0) for entry in entries if isinstance(entry, Scholarships))
-        relief_figure = sum(
-            getattr(entry.relief, 'figure', 0) for entry in entries if isinstance(entry, RegisterRelief))
+        finance_figure = sum(Decimal(getattr(entry, 'figure', 0)) for entry in entries if isinstance(entry, FileFinance))
+        scholarship_figure = sum(Decimal(
+            getattr(entry, 'scholarship_rate', 0)) for entry in entries if isinstance(entry, Scholarships))
+        relief_figure = sum(Decimal(
+            getattr(entry.relief, 'figure', 0)) for entry in entries if isinstance(entry, RegisterRelief))
+
+        total_finance_figure += finance_figure
+        total_scholarship_figure += scholarship_figure
+        total_relief_figure += relief_figure
 
         summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure))
 
     # Convert the dictionary to a sorted list of tuples (year, entries)
     sorted_years = sorted(summarized_data, key=lambda x: x[0], reverse=True)
 
-    # summarized_data = []
-    # for year, entries in grouped_by_year.items():
-    #     finance_figure = sum(getattr(entry, 'figure', 0) for entry in entries)
-    #     scholarship_figure = sum(getattr(entry, 'scholarship_rate', 0) for entry in entries)
-    #     relief_figure = sum(getattr(entry.relief, 'figure', 0) for entry in entries)
-    #
-    #     summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure))
-    #
-    # # Convert the dictionary to a sorted list of tuples (year, entries)
-    # # sorted_years = sorted(grouped_by_year.items(), key=lambda x: x[0], reverse=True)
-    # sorted_years = sorted(summarized_data, key=lambda x: x[0], reverse=True)
+    total_sum = total_finance_figure + total_scholarship_figure + total_relief_figure
+
 
     # Paginate the years
     paginator = Paginator(sorted_years, 1)  # One year per page
@@ -2767,6 +2769,7 @@ def finance_list(request):
         {
             'years': years,  # List of tuples (year, entries)
             'page': page,
+            'total_sum': total_sum
         }
     )
 
@@ -2801,6 +2804,20 @@ def finance_detail(request, year, month):
         confirmation_date__lt=end_date
     ).exclude(confirmation_date__isnull=True).order_by('-confirmation_date')
 
+    # one_scholarship = get_object_or_404(Scholarships)
+
+    if request.method == "POST":
+        form = BankStatementForm(request.POST, request.FILES)
+        if form.is_valid():
+            bank_statement = form.save(commit=False)
+            bank_statement.author = request.user
+            bank_statement.year_bank_statement = year
+            bank_statement.month_bank_statement = month
+            bank_statement.save()
+            messages.success(request, f"Dodano dokument sprawozdawczy {bank_statement.title_bank_statement}!")
+            return redirect('TI_Management_app:finance_list')
+    else:
+        form = BankStatementForm()
 
     return render(
         request,
@@ -2810,7 +2827,9 @@ def finance_detail(request, year, month):
             'reliefs': reliefs,
             'scholarships': scholarships,
             'year': year,
-            'month': month
+            'month': month,
+            'form': form
         }
     )
+
 

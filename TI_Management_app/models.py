@@ -569,6 +569,36 @@ class FileFinance(models.Model):
         super().save(*args, **kwargs)
 
 
+class BankStatement(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorBankStatement')
+    title_bank_statement = models.CharField(max_length=250, null=False, blank=False)
+    file_bank_statement = models.FileField(null=False, blank=False, upload_to='uploadsBankStatement/%Y/%m/%d/%H%M%S/')
+    year_bank_statement = models.IntegerField(null=False, blank=False)
+    month_bank_statement = models.IntegerField(null=False, blank=False)
+    quantity_bank_statement = models.IntegerField(null=False, blank=False, default=1)
+    starting_balance = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
+    final_balance = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
+    income_bank_statement = models.DecimalField(max_digits=10, decimal_places=2, null=False, blank=False)
+
+    history = HistoricalRecords()
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Wyciąg Bankowy'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f"{self.title_bank_statement}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.title_bank_statement}")
+        super().save(*args, **kwargs)
+
+
 class Relief(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)

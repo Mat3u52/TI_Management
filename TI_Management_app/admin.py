@@ -33,7 +33,8 @@ from .models import (
     Scholarships,
     KindOfFinanceDocument,
     KindOfFinanceExpense,
-    FileFinance
+    FileFinance,
+    BankStatement
 )
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
@@ -1172,5 +1173,48 @@ class FileFinanceAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'title',
+    )
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(BankStatement)
+class BankStatementAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title_bank_statement',
+        'file_bank_statement',
+        'year_bank_statement',
+        'month_bank_statement',
+        'quantity_bank_statement',
+        'starting_balance',
+        'final_balance',
+        'income_bank_statement'
+
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title_bank_statement',
+        'file_bank_statement',
+        'year_bank_statement',
+        'month_bank_statement',
+        'quantity_bank_statement',
+        'starting_balance',
+        'final_balance',
+        'income_bank_statement'
+
+    )
+    search_fields = (
+        'title_bank_statement',
     )
     # date_hierarchy = 'created_date'

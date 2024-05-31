@@ -1,5 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
+{% load i18n %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
@@ -8,8 +9,9 @@
 {% block content %}
 <div class="hero-unit">
   <h2>Finanse - Przegląd dokumentów finansowych</h2>
-  <div class="notepad">
+
   {% if years %}
+  <div class="notepad">
     {% for year, entries, finance_figure, scholarship_figure, relief_figure in years.object_list %}
       <h2>{{ year }}</h2>
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=1 %}">Styczeń</a> |
@@ -17,7 +19,7 @@
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=3 %}">Marzec</a>
       <ul>
         {% for entry in entries %}
-          <li>{{ entry.payment_date }} {{ entry.date_of_payment_confirmation }} {{ entry.confirmation_date }} : {{ entry.relief.title }} {{ entry.title }}</li>
+          <li>{{ entry.payment_date|date:"j E Y" }} {{ entry.date_of_payment_confirmation|date:"j E Y" }} {{ entry.confirmation_date|date:"j E Y" }} : {{ entry.relief.title }} {{ entry.title }} | {{ entry.figure }} {{ entry.relief.figure|floatformat:"2" }} {{ entry.scholarship_rate|floatformat:"2" }} zł</li>
         {% endfor %}
       </ul>
     <br />
@@ -45,7 +47,7 @@
     <p>No entries available.</p>
   {% endif %}
   <p>Wpływy:</p>
-  <p>Wydatki:</p>
+  <p>Wydatki: {{ total_sum }} zł</p>
 </div>
 {% endblock %}
 
