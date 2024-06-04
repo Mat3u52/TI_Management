@@ -108,6 +108,7 @@ from datetime import datetime
 from collections import defaultdict
 import pytz
 from decimal import Decimal
+from django.db.models import Sum, Case, When, DecimalField
 
 
 # class Image(TemplateView):
@@ -2763,13 +2764,20 @@ def finance_list(request):
     except EmptyPage:
         years = paginator.page(paginator.num_pages)
 
+    # Extract the years for filtering bank statements
+    years_list = [year for year, _, _, _, _ in sorted_years]
+
+    # bank_statements = BankStatement.objects.all().order_by('-year_bank_statement')
+    bank_statements = BankStatement.objects.filter(year_bank_statement__in=years_list).order_by('-year_bank_statement')
+
     return render(
         request,
         'TI_Management_app/finance/finance_list.html',
         {
             'years': years,  # List of tuples (year, entries)
             'page': page,
-            'total_sum': total_sum
+            'total_sum': total_sum,
+            'bank_statements': bank_statements
         }
     )
 
@@ -2792,11 +2800,25 @@ def finance_detail(request, year, month):
         payment_date__lt=end_date
     ).exclude(payment_date__isnull=True).order_by('-payment_date')
 
+    total_figure = finances.aggregate(Sum('figure'))['figure__sum']
+    total_figure = total_figure if total_figure is not None else 0
+
     reliefs = RegisterRelief.objects.filter(
         payment_confirmation=True,
         date_of_payment_confirmation__gte=start_date,
         date_of_payment_confirmation__lt=end_date
     ).exclude(date_of_payment_confirmation__isnull=True).order_by('-date_of_payment_confirmation')
+
+    total_reliefs = RegisterRelief.objects.aggregate(
+        total=Sum(
+            Case(
+                When(payment_confirmation=True, then='relief__figure'),
+                default=0,
+                output_field=DecimalField()
+            )
+        )
+    )['total']
+    total_reliefs = total_reliefs if total_reliefs is not None else 0
 
     scholarships = Scholarships.objects.filter(
         confirmation_of_scholarship=True,
@@ -2804,7 +2826,21 @@ def finance_detail(request, year, month):
         confirmation_date__lt=end_date
     ).exclude(confirmation_date__isnull=True).order_by('-confirmation_date')
 
-    # one_scholarship = get_object_or_404(Scholarships)
+    # total_scholarships = scholarships.aggregate(Sum('scholarship_rate'))['scholarship_rate__sum']
+    total_scholarships = scholarships.aggregate(
+        total=Sum(
+            Case(
+                When(confirmation_of_scholarship=True, then='scholarship_rate'),
+                default=0,
+                output_field=DecimalField()
+            )
+        )
+    )['total']
+    total_scholarships = total_scholarships if total_scholarships is not None else 0
+
+    total_expenses = total_figure + total_reliefs + total_scholarships
+
+    bank_statements = BankStatement.objects.filter(year_bank_statement=year, month_bank_statement=month).order_by('-month_bank_statement')
 
     if request.method == "POST":
         form = BankStatementForm(request.POST, request.FILES)
@@ -2828,7 +2864,12 @@ def finance_detail(request, year, month):
             'scholarships': scholarships,
             'year': year,
             'month': month,
-            'form': form
+            'form': form,
+            'total_figure': total_figure,
+            'total_scholarships': total_scholarships,
+            'total_reliefs': total_reliefs,
+            'total_expenses': total_expenses,
+            'bank_statements': bank_statements
         }
     )
 

@@ -1,6 +1,7 @@
 asgiref==3.7.2
 chardet==5.2.0
 Django==4.2.7
+django-dbbackup==4.1.0
 django-phone-field==1.8.1
 django-simple-history==3.4.0
 mysql==0.0.3

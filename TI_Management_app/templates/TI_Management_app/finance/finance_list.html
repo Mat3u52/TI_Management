@@ -17,16 +17,30 @@
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=1 %}">Styczeń</a> |
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=2 %}">Luty</a> |
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=3 %}">Marzec</a>
+    <hr>
+    <p><b>Dokumenty sprawozdawcze:</b></p>
+    {% for bank_statement in bank_statements %}
+      {% if bank_statement.file_bank_statement %}
+        <ul>
+            <li><a href="{{ bank_statement.file_bank_statement.url }}" target="_blank">{{ bank_statement.title_bank_statement }}</a></li>
+        </ul>
+      {% endif %}
+    {% endfor %}
+    <br />
+    <p><b>Wydatki:</b></p>
       <ul>
         {% for entry in entries %}
           <li>{{ entry.payment_date|date:"j E Y" }} {{ entry.date_of_payment_confirmation|date:"j E Y" }} {{ entry.confirmation_date|date:"j E Y" }} : {{ entry.relief.title }} {{ entry.title }} | {{ entry.figure }} {{ entry.relief.figure|floatformat:"2" }} {{ entry.scholarship_rate|floatformat:"2" }} zł</li>
         {% endfor %}
       </ul>
     <br />
+    <hr>
       <p><b>Wydatki dokumenty księgowe:</b> {{ finance_figure }} zł</p>
       <p><b>Wydatki stypendia:</b> {{ scholarship_figure|floatformat:"2" }} zł</p>
       <p><b>Zapomogi:</b> {{ relief_figure|floatformat:"2" }} zł</p>
+    <br />
     {% endfor %}
+
   </div>
   <div class="pagination">
       <span class="step-links">
@@ -43,11 +57,11 @@
         {% endif %}
       </span>
     </div>
+  <p>Wpływy ogółem:</p>
+  <p>Wydatki ogółem: {{ total_sum|floatformat:"2" }} zł</p>
   {% else %}
-    <p>No entries available.</p>
+    <p>Nie ma jeszcze danych</p>
   {% endif %}
-  <p>Wpływy:</p>
-  <p>Wydatki: {{ total_sum }} zł</p>
 </div>
 {% endblock %}
 
