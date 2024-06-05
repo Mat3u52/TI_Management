@@ -34,3 +34,11 @@ def filename(value):
 @register.filter
 def month_name(month_number):
     return calendar.month_name[month_number]
+
+
+@register.filter
+def to_int(value):
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        return value

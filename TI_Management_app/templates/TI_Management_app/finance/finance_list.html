@@ -10,9 +10,14 @@
 <div class="hero-unit">
   <h2>Finanse - Przegląd dokumentów finansowych</h2>
 
+
+  {{ context_years }}
+
+
+
   {% if years %}
+  {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense in years.object_list %}
   <div class="notepad">
-    {% for year, entries, finance_figure, scholarship_figure, relief_figure in years.object_list %}
       <h2>{{ year }}</h2>
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=1 %}">Styczeń</a> |
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=2 %}">Luty</a> |
@@ -37,11 +42,48 @@
     <hr>
       <p><b>Wydatki dokumenty księgowe:</b> {{ finance_figure }} zł</p>
       <p><b>Wydatki stypendia:</b> {{ scholarship_figure|floatformat:"2" }} zł</p>
-      <p><b>Zapomogi:</b> {{ relief_figure|floatformat:"2" }} zł</p>
+      <p><b>Wydatki zapomogi:</b> {{ relief_figure|floatformat:"2" }} zł</p>
     <br />
-    {% endfor %}
+    <hr>
+    <p><b>Wpływy ogółem:</b> {{ total_income|floatformat:"2" }} zł</p>
+    <p><b>Wydatki ogółem:</b> {{ total_expense|floatformat:"2" }} zł</p>
 
   </div>
+
+  <div class="notepadChart">
+    <canvas id="myChart" width="500" height="500"></canvas>
+  </div>
+<script>
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'pie', // or 'bar', 'pie', etc.
+        data: {
+            labels: ["Wydatki ogółem {{total_expense|to_int}} zł", "Wpływy ogółem {{total_income}} zł"],
+            datasets: [{
+                label: 'suma w zł',
+                data: [{{total_expense|to_int}}, {{total_income|to_int}}],
+                backgroundColor: [
+                    'rgba(106, 90, 205, 0.2)',
+                    'rgba(40, 176, 50, 0.2)'
+                ],
+                borderColor: [
+                    'rgba(106, 90, 205, 1)',
+                    'rgba(40, 176, 50, 1)'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+</script>
+  {% endfor %}
+
   <div class="pagination">
       <span class="step-links">
         {% if years.has_previous %}
@@ -56,9 +98,7 @@
           <a href="?page={{ years.next_page_number }}">poprzedni rok</a>
         {% endif %}
       </span>
-    </div>
-  <p>Wpływy ogółem:</p>
-  <p>Wydatki ogółem: {{ total_sum|floatformat:"2" }} zł</p>
+  </div>
   {% else %}
     <p>Nie ma jeszcze danych</p>
   {% endif %}

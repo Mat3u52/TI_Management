@@ -79,6 +79,19 @@ img {
     padding-right: 15px;
 }
 
+.notepadChart {
+    width: 50%;
+    height: 50%;
+    background: #FFFFFF;
+    padding: 40px;
+    margin-top: 10px;
+    border-radius: 10px;
+}
+#myChart {
+    width: 50%;
+    height: 50%;
+}
+
 .notepad {
     background: #FFFFFF;
     padding: 40px;

@@ -161,5 +161,5 @@ DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
 
 CRONJOBS = [
-    ('*/120 * * * *', 'TI_Management.cron.ti_management_backup')
+    ('*/59 * * * *', 'TI_Management.cron.ti_management_backup')
 ]

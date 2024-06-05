@@ -14,7 +14,7 @@
     <div class="notepad">
     {% if year %}
         <h2>Maj</h2>
-        <p><b>Dokumenty księgowe:</b></p>
+        <h3>Dokumenty księgowe:</h3>
         <ul>
             {% for finance in finances %}
                 {% if finance %}
@@ -22,7 +22,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
-        <p><b>Zapomogi:</b></p>
+        <h3>Zapomogi:</h3>
         <ul>
             {% for relief in reliefs %}
                 {% if relief %}
@@ -30,7 +30,7 @@
                 {% endif %}
             {% endfor %}
         </ul>
-        <p><b>Stypendia:</b></p>
+        <h3>Stypendia:</h3>
         <ul>
             {% for scholarship in scholarships %}
                 {% if scholarship %}
@@ -38,30 +38,39 @@
                 {% endif %}
             {% endfor %}
         </ul>
-
-        <br />
         <hr>
-        <p><b>Wydatki dokumenty księgowe:</b> {{ total_figure }} zł</p>
-        <p><b>Wydatki stypendia:</b> {{ total_scholarships }} zł</p>
-        <p><b>Wydatki zapomogi:</b> {{ total_reliefs }} zł</p>
+        <p><b>Wydatki dokumenty księgowe:</b> {{ total_figure|floatformat:"2" }} zł</p>
+        <p><b>Wydatki stypendia:</b> {{ total_scholarships|floatformat:"2" }} zł</p>
+        <p><b>Wydatki zapomogi:</b> {{ total_reliefs|floatformat:"2" }} zł</p>
 
         <hr>
-        <p><b>Wydatki ogółem:</b> {{ total_expenses }} zł</p>
-        <hr>
-        <p><b>Dokumenty sprawozdawcze:</b></p>
+        <h3>Dokumenty sprawozdawcze:</h3>
         <ul>
             {% for bank_statement in bank_statements %}
                 {% if bank_statement %}
-                    <li>{{bank_statement}}</li>
+                    <li>
+                        <a href="{{ bank_statement.file_bank_statement.url }}">{{bank_statement.title_bank_statement}}</a>
+                        <ul>
+                            <li>Ilość pozycji: {{bank_statement.quantity_bank_statement}} </li>
+                            <li>Saldo początkowe: {{bank_statement.starting_balance}} zł</li>
+                            <li>Saldo końcowe: {{bank_statement.final_balance}} zł</li>
+                            <li>Wpływy: {{bank_statement.income_bank_statement}} zł</li>
+                        </ul>
+<!--                        Wydatki: {{bank_statement.}}-->
+
+                    </li>
                 {% endif %}
             {% endfor %}
         </ul>
+        <hr>
+        <p><b>Wydatki ogółem:</b> {{ total_expenses|floatformat:"2" }} zł</p>
+        <p><b>Wpływy ogółem:</b> {{ total_income|floatformat:"2" }} zł</p>
 
     {% endif %}
     </div>
     <br />
 
-    <div class="notepad">
+    <div class="notepadChart">
         <canvas id="myChart" width="500" height="500"></canvas>
     </div>
 <script>
@@ -69,19 +78,21 @@
     var myChart = new Chart(ctx, {
         type: 'pie', // or 'bar', 'pie', etc.
         data: {
-            labels: ["Wydatki dokumenty księgowe", "Wydatki stypendia", "Wydatki zapomogi"],
+            labels: ["Wydatki dokumenty księgowe {{total_figure|to_int}} zł", "Wydatki stypendia {{total_scholarships|to_int}} zł", "Wydatki zapomogi {{total_reliefs}} zł", "Wpływy ogółem {{total_income}} zł"],
             datasets: [{
                 label: 'suma w zł',
-                data: [{{total_figure}}, {{total_scholarships}}, {{total_reliefs}}],
+                data: [{{total_figure|to_int}}, {{total_scholarships|to_int}}, {{total_reliefs|to_int}}, {{total_income|to_int}}],
                 backgroundColor: [
                     'rgba(0, 0, 255, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
-                    'rgba(106, 90, 205, 0.2)'
+                    'rgba(106, 90, 205, 0.2)',
+                    'rgba(40, 176, 50, 0.2)'
                 ],
                 borderColor: [
                     'rgba(0, 0, 255, 1)',
                     'rgba(54, 162, 235, 1)',
-                    'rgba(106, 90, 205, 1)'
+                    'rgba(106, 90, 205, 1)',
+                    'rgba(40, 176, 50, 1)'
                 ],
                 borderWidth: 1
             }]
