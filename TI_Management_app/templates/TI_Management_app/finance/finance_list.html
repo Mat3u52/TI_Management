@@ -1,6 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
 {% load i18n %}
+{% load static %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
@@ -8,27 +9,40 @@
 
 {% block content %}
 <div class="hero-unit">
-  <h2>Finanse - Przegląd dokumentów finansowych</h2>
-
-
-  {{ context_years }}
-
-
-
+  <h2>Przegląd dokumentów finansowych</h2>
   {% if years %}
-  {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense in years.object_list %}
+  {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income in years.object_list %}
   <div class="notepad">
       <h2>{{ year }}</h2>
+      {% for bank_statement in bank_statements %}
+
+        {% if year == bank_statement.year_bank_statement %}
+            {{bank_statement.month_bank_statement}}
+        {% endif %}
+      {% endfor %}
+
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=1 %}">Styczeń</a> |
       <a href="{% url 'TI_Management_app:finance_detail' year=year month=2 %}">Luty</a> |
-      <a href="{% url 'TI_Management_app:finance_detail' year=year month=3 %}">Marzec</a>
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=3 %}">Marzec</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=4 %}">Kwiecień</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=5 %}">Maj</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=6 %}">Czerwiec</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=7 %}">Lipiec</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=8 %}">Sierpień</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=9 %}">Wrzesień</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=10 %}">Październik</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=11 %}">Listopad</a> |
+      <a href="{% url 'TI_Management_app:finance_detail' year=year month=12 %}">Grudzień</a>
     <hr>
     <p><b>Dokumenty sprawozdawcze:</b></p>
     {% for bank_statement in bank_statements %}
       {% if bank_statement.file_bank_statement %}
-        <ul>
-            <li><a href="{{ bank_statement.file_bank_statement.url }}" target="_blank">{{ bank_statement.title_bank_statement }}</a></li>
-        </ul>
+        {% if year == bank_statement.year_bank_statement %}
+
+          <ul>
+            <li><img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20"><a href="{{ bank_statement.file_bank_statement.url }}" target="_blank">{{ bank_statement.title_bank_statement }}</a></li>
+          </ul>
+        {% endif %}
       {% endif %}
     {% endfor %}
     <br />
@@ -63,11 +77,11 @@
                 label: 'suma w zł',
                 data: [{{total_expense|to_int}}, {{total_income|to_int}}],
                 backgroundColor: [
-                    'rgba(106, 90, 205, 0.2)',
+                    'rgba(245, 7, 7, 0.2)',
                     'rgba(40, 176, 50, 0.2)'
                 ],
                 borderColor: [
-                    'rgba(106, 90, 205, 1)',
+                    'rgba(245, 7, 7, 1)',
                     'rgba(40, 176, 50, 1)'
                 ],
                 borderWidth: 1

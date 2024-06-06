@@ -9,11 +9,12 @@
 
 {% block content %}
 <div class="hero-unit">
-    <h2>{{ year }} - {{ month }}</h2>
+    <h2>{{ year }} / {{ month_name }} - Przegląd dokumentów finansowych</h2>
     <br />
     <div class="notepad">
+        <h2>{{ month_name }} - {{ year }}</h2>
+        <hr>
     {% if year %}
-        <h2>Maj</h2>
         <h3>Dokumenty księgowe:</h3>
         <ul>
             {% for finance in finances %}
