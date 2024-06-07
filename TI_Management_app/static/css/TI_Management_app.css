@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700');
 body {
     padding-top: 60px;
     padding-bottom: 40px;
@@ -10,6 +11,54 @@ textarea {
 a {
     text-decoration: none;
 }
+
+
+
+
+
+
+.menu ul{
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+}
+.menu li{
+  display: inline-block;
+  margin: 0 15px;
+}
+.menu a{
+  text-decoration: none;
+  display: block;
+  position: relative;
+}
+.menu a::before{
+  content: "";
+  width: 100%;
+  height: 4px;
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  background: #fff;
+  transition: 0.5s transform ease;
+  transform: scale3d(0,1,1);
+  transform-origin: 0 50%;
+}
+.menu a:hover::before{
+  transform: scale3d(1,1,1);
+}
+.menu-1 a::before{
+  background: #E91E63;
+  transform-origin: 100% 50%;
+}
+.menu-1 a:hover::before{
+  transform-origin: 0 50%;
+}
+
+
+
+
+
 
 a:hover {
     text-decoration: none;
