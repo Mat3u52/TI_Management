@@ -1065,7 +1065,7 @@ class BankStatementForm(forms.ModelForm):
         label='Select a PDF file',
         widget=forms.FileInput(
             attrs={
-                'accept': 'application/pdf'
+                'accept': 'application/pdf,image/jpeg,image/png'
             }
         ),
         required=True
@@ -1074,6 +1074,7 @@ class BankStatementForm(forms.ModelForm):
     class Meta:
         model = BankStatement
         fields = [
+            'year_bank_statement',
             'title_bank_statement',
             'file_bank_statement',
             'quantity_bank_statement',
