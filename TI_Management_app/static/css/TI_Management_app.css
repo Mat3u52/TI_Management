@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css?family=Open+Sans+Condensed:700');
+
 body {
     padding-top: 60px;
     padding-bottom: 40px;
@@ -48,7 +48,7 @@ a {
   transform: scale3d(1,1,1);
 }
 .menu-1 a::before{
-  background: #E91E63;
+  background: #0088CC;
   transform-origin: 100% 50%;
 }
 .menu-1 a:hover::before{
