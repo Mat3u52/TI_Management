@@ -6,6 +6,8 @@ from django.core.exceptions import ValidationError
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.utils.text import slugify
+# from ckeditor.fields import RichTextField
+from django_ckeditor_5.fields import CKEditor5Field
 
 
 class Groups(models.Model):
@@ -551,7 +553,9 @@ class FileFinance(models.Model):
     expense_name = models.ForeignKey(KindOfFinanceExpense, on_delete=models.CASCADE, null=True, related_name='expenseNameFileFinance')
     psychologist = models.BooleanField(default=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberFileFinance', null=True, blank=True)
-    description = models.TextField(null=True, blank=True, default=None)
+    # description = RichTextField(null=True, blank=True)
+    description = CKEditor5Field(null=True, blank=True)
+    # description = models.TextField(null=True, blank=True, default=None)
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager

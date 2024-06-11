@@ -33,6 +33,29 @@ DEBUG = config('DEBUG', default=False, cast=bool)
 
 ALLOWED_HOSTS = ['127.0.0.1', '.pythonanywhere.com']
 
+CKEDITOR_5_CONFIGS = {
+    'default': {
+        'toolbar': {
+            'items': [
+                'heading', '|',
+                'bold', 'italic', 'link', 'bulletedList', 'numberedList', 'blockQuote', '|',
+                'insertTable', 'tableColumn', 'tableRow', 'mergeTableCells', '|',
+                'undo', 'redo'
+            ],
+            'shouldNotGroupWhenFull': True
+        },
+        'image': {
+            'toolbar': [
+                'imageTextAlternative', 'imageStyle:full', 'imageStyle:side'
+            ]
+        },
+        'height': 300,
+        'width': '100%',
+        'filebrowserUploadUrl': '/ckeditor5/upload/',
+        'filebrowserBrowseUrl': '/ckeditor5/browse/',
+    }
+}
+
 # Application definition
 
 INSTALLED_APPS = [
@@ -48,6 +71,8 @@ INSTALLED_APPS = [
     'users',
     'simple_history',
     'dbbackup',
+    'localflavor',
+    'django_ckeditor_5',
 ]
 
 MIDDLEWARE = [
@@ -161,5 +186,5 @@ DBBACKUP_STORAGE = 'django.core.files.storage.FileSystemStorage'
 DBBACKUP_STORAGE_OPTIONS = {'location': os.path.join(BASE_DIR, 'backups')}
 
 CRONJOBS = [
-    ('*/59 * * * *', 'TI_Management.cron.ti_management_backup')
+    ('0 */2 * * *', 'TI_Management.cron.ti_management_backup')
 ]

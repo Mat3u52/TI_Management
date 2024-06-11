@@ -68,3 +68,21 @@ def get_months_until_now(year=None):
 @register.filter(name='record_exist')
 def record_exist(year, month):
     return BankStatement.objects.filter(year_bank_statement=year, month_bank_statement=month).first()
+
+
+@register.filter(name='get_item')
+def get_item(dictionary, key):
+    return dictionary.get(key)
+
+
+@register.simple_tag
+def add(*args):
+    return sum(args)
+
+
+@register.simple_tag
+def subtract(value, *args):
+    result = value
+    for arg in args:
+        result -= arg
+    return result

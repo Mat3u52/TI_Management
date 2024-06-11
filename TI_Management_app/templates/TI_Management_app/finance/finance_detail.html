@@ -3,8 +3,8 @@
 {% load i18n %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
-<a href="{% url 'TI_Management_app:finance_detail' year=year month=month %}"> / Finanse {{ year }} {{ month }}</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:finance_detail' year=year month=month %}"><b> / Finanse {{ year }} - {{ month }}</b></a>
 {% endblock %}
 
 {% block content %}
@@ -45,27 +45,25 @@
         <p><b>Wydatki zapomogi:</b> {{ total_reliefs|floatformat:"2" }} zł</p>
 
         <hr>
-        <h3>Dokumenty sprawozdawcze:</h3>
-        <ul>
-            {% for bank_statement in bank_statements %}
-                {% if bank_statement %}
-                    <li>
-                        <a href="{{ bank_statement.file_bank_statement.url }}">{{bank_statement.title_bank_statement}}</a>
-                        <ul>
-                            <li>Ilość pozycji: {{bank_statement.quantity_bank_statement}} </li>
-                            <li>Saldo początkowe: {{bank_statement.starting_balance}} zł</li>
-                            <li>Saldo końcowe: {{bank_statement.final_balance}} zł</li>
-                            <li>Wpływy: {{bank_statement.income_bank_statement}} zł</li>
-                        </ul>
-<!--                        Wydatki: {{bank_statement.}}-->
-
-                    </li>
-                {% endif %}
-            {% endfor %}
-        </ul>
-        <hr>
+<!--        <h3>Dokumenty sprawozdawcze:</h3>-->
+<!--        <ul>-->
+<!--            {% for bank_statement in bank_statements %}-->
+<!--                {% if bank_statement %}-->
+<!--                    <li>-->
+<!--                        <a href="{{ bank_statement.file_bank_statement.url }}">{{bank_statement.title_bank_statement}}</a>-->
+<!--                        <ul>-->
+<!--                            <li>Ilość pozycji: {{bank_statement.quantity_bank_statement}} </li>-->
+<!--                            <li>Saldo początkowe: {{bank_statement.starting_balance}} zł</li>-->
+<!--                            <li>Saldo końcowe: {{bank_statement.final_balance}} zł</li>-->
+<!--                            <li>Wpływy: {{bank_statement.income_bank_statement}} zł</li>-->
+<!--                        </ul>-->
+<!--                    </li>-->
+<!--                {% endif %}-->
+<!--            {% endfor %}-->
+<!--        </ul>-->
+<!--        <hr>-->
         <p><b>Wydatki ogółem:</b> {{ total_expenses|floatformat:"2" }} zł</p>
-        <p><b>Wpływy ogółem:</b> {{ total_income|floatformat:"2" }} zł</p>
+<!--        <p><b>Wpływy ogółem:</b> {{ total_income|floatformat:"2" }} zł</p>-->
 
     {% endif %}
     </div>
@@ -79,21 +77,19 @@
     var myChart = new Chart(ctx, {
         type: 'pie', // or 'bar', 'pie', etc.
         data: {
-            labels: ["Wydatki dokumenty księgowe {{total_figure|to_int}} zł", "Wydatki stypendia {{total_scholarships|to_int}} zł", "Wydatki zapomogi {{total_reliefs}} zł", "Wpływy ogółem {{total_income}} zł"],
+            labels: ["Wydatki dokumenty księgowe {{total_figure|to_int}} zł", "Wydatki stypendia {{total_scholarships|to_int}} zł", "Wydatki zapomogi {{total_reliefs}} zł"],
             datasets: [{
                 label: 'suma w zł',
-                data: [{{total_figure|to_int}}, {{total_scholarships|to_int}}, {{total_reliefs|to_int}}, {{total_income|to_int}}],
+                data: [{{total_figure|to_int}}, {{total_scholarships|to_int}}, {{total_reliefs|to_int}}],
                 backgroundColor: [
                     'rgba(0, 0, 255, 0.2)',
                     'rgba(54, 162, 235, 0.2)',
-                    'rgba(106, 90, 205, 0.2)',
-                    'rgba(40, 176, 50, 0.2)'
+                    'rgba(106, 90, 205, 0.2)'
                 ],
                 borderColor: [
                     'rgba(0, 0, 255, 1)',
                     'rgba(54, 162, 235, 1)',
-                    'rgba(106, 90, 205, 1)',
-                    'rgba(40, 176, 50, 1)'
+                    'rgba(106, 90, 205, 1)'
                 ],
                 borderWidth: 1
             }]
@@ -109,86 +105,86 @@
 </script>
     <br />
 
-    <form method="post" class="post-form" enctype="multipart/form-data">
-        {% csrf_token %}
-        {% if form.errors %}
-        <p>{{form.errors}}</p>
-        {% endif %}
+<!--    <form method="post" class="post-form" enctype="multipart/form-data">-->
+<!--        {% csrf_token %}-->
+<!--        {% if form.errors %}-->
+<!--        <p>{{form.errors}}</p>-->
+<!--        {% endif %}-->
 
-        <p><b>Dodaj dokument sprawozdawczy:</b></p>
-        <input
-            class="form-control me-2"
-            style="min-width: 50%!important; min-height: 15px"
-            type="text"
-            value=""
-            placeholder="Tytuł - {{ year }} - {{ month }}"
-            aria-label="Tytuł"
-            name="title_bank_statement"
-            required />
-        <br />
-        <label class="custom-file-upload">
-            {{form.file_bank_statement}}
-        </label>
-        <br />
+<!--        <p><b>Dodaj dokument sprawozdawczy:</b></p>-->
+<!--        <input-->
+<!--            class="form-control me-2"-->
+<!--            style="min-width: 50%!important; min-height: 15px"-->
+<!--            type="text"-->
+<!--            value=""-->
+<!--            placeholder="Tytuł - {{ year }} - {{ month }}"-->
+<!--            aria-label="Tytuł"-->
+<!--            name="title_bank_statement"-->
+<!--            required />-->
+<!--        <br />-->
+<!--        <label class="custom-file-upload">-->
+<!--            {{form.file_bank_statement}}-->
+<!--        </label>-->
+<!--        <br />-->
 
-        <p><b>Ilość pozycji:</b></p>
-        <input
-            class="form-control me-2"
-            style="max-width: 25%!important; min-height: 15px"
-            type="number"
-            min="0"
-            step="1"
-            placeholder="Ilość pozycji"
-            aria-label="Ilość pozycji"
-            name="quantity_bank_statement"
-            required />
-        <br />
+<!--        <p><b>Ilość pozycji:</b></p>-->
+<!--        <input-->
+<!--            class="form-control me-2"-->
+<!--            style="max-width: 25%!important; min-height: 15px"-->
+<!--            type="number"-->
+<!--            min="0"-->
+<!--            step="1"-->
+<!--            placeholder="Ilość pozycji"-->
+<!--            aria-label="Ilość pozycji"-->
+<!--            name="quantity_bank_statement"-->
+<!--            required />-->
+<!--        <br />-->
 
-        <p><b>Saldo początkowe:</b></p>
-        <input
-            class="form-control me-2"
-            style="max-width: 25%!important; min-height: 15px"
-            type="number"
-            min="0.00"
-            step="0.01"
-            placeholder="Saldo początkowe"
-            aria-label="Saldo początkowe"
-            name="starting_balance"
-            required /> zł
-        <br />
+<!--        <p><b>Saldo początkowe:</b></p>-->
+<!--        <input-->
+<!--            class="form-control me-2"-->
+<!--            style="max-width: 25%!important; min-height: 15px"-->
+<!--            type="number"-->
+<!--            min="0.00"-->
+<!--            step="0.01"-->
+<!--            placeholder="Saldo początkowe"-->
+<!--            aria-label="Saldo początkowe"-->
+<!--            name="starting_balance"-->
+<!--            required /> zł-->
+<!--        <br />-->
 
-        <p><b>Saldo końcowe:</b></p>
-        <input
-            class="form-control me-2"
-            style="max-width: 25%!important; min-height: 15px"
-            type="number"
-            min="0.00"
-            step="0.01"
-            placeholder="Saldo końcowe"
-            aria-label="Saldo końcowe"
-            name="final_balance"
-            required /> zł
-        <br />
+<!--        <p><b>Saldo końcowe:</b></p>-->
+<!--        <input-->
+<!--            class="form-control me-2"-->
+<!--            style="max-width: 25%!important; min-height: 15px"-->
+<!--            type="number"-->
+<!--            min="0.00"-->
+<!--            step="0.01"-->
+<!--            placeholder="Saldo końcowe"-->
+<!--            aria-label="Saldo końcowe"-->
+<!--            name="final_balance"-->
+<!--            required /> zł-->
+<!--        <br />-->
 
-        <p><b>Wpływy:</b></p>
-        <input
-            class="form-control me-2"
-            style="max-width: 25%!important; min-height: 15px"
-            value="0.00"
-            type="number"
-            min="0.00"
-            step="0.01"
-            placeholder="Wpływy"
-            aria-label="Wpływy"
-            name="income_bank_statement"
-            required /> zł
-        <br />
+<!--        <p><b>Wpływy:</b></p>-->
+<!--        <input-->
+<!--            class="form-control me-2"-->
+<!--            style="max-width: 25%!important; min-height: 15px"-->
+<!--            value="0.00"-->
+<!--            type="number"-->
+<!--            min="0.00"-->
+<!--            step="0.01"-->
+<!--            placeholder="Wpływy"-->
+<!--            aria-label="Wpływy"-->
+<!--            name="income_bank_statement"-->
+<!--            required /> zł-->
+<!--        <br />-->
 
-        <button type="submit" class="btn btn-primary btn-large pull-right">
-            Zapisz
-        </button>
-        <br />
-    </form>
+<!--        <button type="submit" class="btn btn-primary btn-large pull-right">-->
+<!--            Zapisz-->
+<!--        </button>-->
+<!--        <br />-->
+<!--    </form>-->
 
 </div>
 {% endblock %}

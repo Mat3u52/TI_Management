@@ -453,11 +453,15 @@ urlpatterns = [
         views.get_member_details,
         name='get_member_details'
     ),
-
     path(
         'TI_Management_app/finance/finance-file-add/',
         views.finance_file_add,
         name='finance_file_add'
+    ),
+    path(
+        'TI_Management_app/finance/finance-reporting-doc/',
+        views.finance_reporting_doc,
+        name='finance_reporting_doc'
     ),
     path(
         'TI_Management_app/finance/finance-list/',

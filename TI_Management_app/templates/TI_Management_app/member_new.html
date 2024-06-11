@@ -7,7 +7,7 @@
 {% block content %}
 
     <div class="hero-unit">
-        <form method="post" class="post-form" enctype="multipart/form-data">
+        <form method="post" class="post-form" enctype="multipart/form-data" autocomplete="off">
             {% csrf_token %}
 <!--            {% if form.errors %}-->
 <!--                <p>{{form.errors}}</p>-->

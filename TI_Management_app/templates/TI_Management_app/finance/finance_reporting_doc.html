@@ -1,10 +1,116 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load i18n %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:finance_reporting_doc' %}"><b> / Dodaj dokument sprawozdawczy</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2>Dodawanie dokumentu sprawozdawczego</h2>
+    <br />
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+        <p>{{form.errors}}</p>
+        {% endif %}
+
+        <p><b>Dodaj dokument sprawozdawczy:</b></p>
+        <input
+            class="form-control me-2"
+            style="min-width: 50%!important; min-height: 15px"
+            type="text"
+            value=""
+            placeholder="Tytuł"
+            aria-label="Tytuł"
+            name="title_bank_statement"
+            required />
+        <br />
+        <label class="custom-file-upload">
+            {{form.file_bank_statement}}
+        </label>
+        <hr>
+
+        <p><b>Dokument za rok:</b></p>
+        <input
+            class="form-control me-2"
+            style="max-width: 25%!important; min-height: 15px"
+            type="number"
+            min="2019"
+            max="2200"
+            step="1"
+            value="{{previous_year}}"
+            placeholder="{{previous_year}}"
+            aria-label="rok"
+            name="year_bank_statement"
+            required /> rok
+        <hr>
+
+        <p><b>Ilość pozycji:</b></p>
+        <input
+            class="form-control me-2"
+            style="max-width: 25%!important; min-height: 15px"
+            type="number"
+            min="0"
+            step="1"
+            value="1"
+            placeholder="Ilość pozycji"
+            aria-label="Ilość pozycji"
+            name="quantity_bank_statement"
+            required />
+        <hr>
+
+        <p><b>Saldo początkowe:</b></p>
+        <input
+            class="form-control me-2"
+            style="max-width: 25%!important; min-height: 15px"
+            type="number"
+            min="0.00"
+            step="0.01"
+            placeholder="Saldo początkowe"
+            aria-label="Saldo początkowe"
+            name="starting_balance"
+            required /> zł
+        <hr>
+
+        <p><b>Saldo końcowe:</b></p>
+        <input
+            class="form-control me-2"
+            style="max-width: 25%!important; min-height: 15px"
+            type="number"
+            min="0.00"
+            step="0.01"
+            placeholder="Saldo końcowe"
+            aria-label="Saldo końcowe"
+            name="final_balance"
+            required /> zł
+        <hr>
+
+        <p><b>Wpływy:</b></p>
+        <input
+            class="form-control me-2"
+            style="max-width: 25%!important; min-height: 15px"
+            value="0.00"
+            type="number"
+            min="0.00"
+            step="0.01"
+            placeholder="Wpływy"
+            aria-label="Wpływy"
+            name="income_bank_statement"
+            required /> zł
+        <br />
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+    </form>
+</div>
+{% endblock %}
+
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='finance_reporting_doc' %}
+{% endblock %}

@@ -32,11 +32,13 @@ from .models import (
 from django.utils import timezone
 from django.forms.widgets import DateInput
 from django.contrib.auth.models import User
+from localflavor.pl.forms import PLPostalCodeField
 from datetime import datetime
 from django.core.exceptions import ValidationError
 
 
 class MemberForm(forms.ModelForm):
+
     phone_number = forms.CharField(
         required=False,
         validators=[RegexValidator(r'^\+?1?\d{9,15}$',
@@ -50,6 +52,19 @@ class MemberForm(forms.ModelForm):
         required=True,
         validators=[RegexValidator(r'^\d{0,8}$',
                                    message="To pole musi być liczbą.")]
+    )
+    image = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'image/jpeg,image/png'
+            }
+        ),
+        required=True
+    )
+    # email = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off'}))
+    card = forms.CharField(
+        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
     )
 
     class Meta:
@@ -89,6 +104,15 @@ class MemberEditForm(forms.ModelForm):
         required=True,
         validators=[RegexValidator(r'^\d{0,8}$',
                                    message="To pole musi być liczbą.")]
+    )
+    image = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'image/jpeg,image/png'
+            }
+        ),
+        required=True
     )
 
     class Meta:
@@ -131,6 +155,7 @@ class MemberEditForm(forms.ModelForm):
 
 
 class MemberEditReliefForm(forms.ModelForm):
+    postcode = PLPostalCodeField()
 
     class Meta:
         model = MembersZZTI
@@ -526,6 +551,16 @@ class GroupFileForm(forms.ModelForm):
 
 
 class DocumentsDatabaseForm(forms.ModelForm):
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
+    )
+
     class Meta:
         model = DocumentsDatabase
         fields = [
@@ -1007,7 +1042,7 @@ class FileFinanceForm(forms.ModelForm):
         label='Select a PDF file',
         widget=forms.FileInput(
             attrs={
-                'accept': 'application/pdf'
+                'accept': 'application/pdf,image/jpeg,image/png'
             }
         ),
         required=True

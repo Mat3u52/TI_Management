@@ -82,6 +82,7 @@ from django.views.generic import TemplateView
 from django.views.generic import CreateView
 from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -108,7 +109,7 @@ from datetime import datetime
 from collections import defaultdict
 import pytz
 from decimal import Decimal
-from django.db.models import Sum, Case, When, DecimalField
+from django.db.models import Sum, Case, When, DecimalField, OuterRef, Subquery, Max
 
 
 # class Image(TemplateView):
@@ -328,6 +329,8 @@ def member_new(request):
         if form.is_valid():
             member = form.save(commit=False)
             member.author = request.user
+            if form.cleaned_data['card']:
+                member.card = make_password(form.cleaned_data['card'])
             member.save()
             messages.success(request, "Dodano nowego członka!")
             return redirect('TI_Management_app:member_detail', pk=member.pk)
@@ -2707,23 +2710,16 @@ def finance_file_add(request):
 
 @login_required
 def finance_list(request):
-    # Fetch the data from FileFinance model
     finance_obj = FileFinance.objects.all().order_by('-payment_date')
-
-    # Fetch the data from RegisterRelief model where payment_confirmation is True
     register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
-
-    # Fetch the data from Scholarships model where confirmation_of_scholarship is True
     scholarships_obj = Scholarships.objects.filter(confirmation_of_scholarship=True).order_by('-confirmation_date')
 
-    # Combine the data into a single list, including finance_obj, register_relief_obj, and scholarships_obj
     combined_list = sorted(
         chain(finance_obj, register_relief_obj, scholarships_obj),
         key=lambda obj: obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation if hasattr(obj, 'date_of_payment_confirmation') else obj.confirmation_date,
         reverse=True
     )
 
-    # Group entries by the year of their payment_date, date_of_payment_confirmation, or confirmation_date
     grouped_by_year = defaultdict(list)
     for obj in combined_list:
         date_field = obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation if hasattr(obj, 'date_of_payment_confirmation') else obj.confirmation_date
@@ -2734,31 +2730,27 @@ def finance_list(request):
 
     for year, entries in grouped_by_year.items():
         finance_figure = sum(Decimal(getattr(entry, 'figure', 0)) for entry in entries if isinstance(entry, FileFinance))
+        finance_quantity = sum(getattr(entry, 'quantity', 0) for entry in entries if isinstance(entry, FileFinance))
         scholarship_figure = sum(Decimal(getattr(entry, 'scholarship_rate', 0)) for entry in entries if isinstance(entry, Scholarships))
         relief_figure = sum(Decimal(getattr(entry, 'figure', 0)) for entry in entries if isinstance(entry, RegisterRelief))
 
         total_expense = finance_figure + scholarship_figure + relief_figure
 
-        summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure, total_expense))
+        summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, finance_quantity))
 
-    # Convert the dictionary to a sorted list of tuples (year, entries)
     sorted_years = sorted(summarized_data, key=lambda x: x[0], reverse=True)
 
-    # Extract the years for filtering bank statements
-    years_list = [year for year, _, _, _, _, _ in sorted_years]
+    years_list = [year for year, _, _, _, _, _, _ in sorted_years]
 
-    # Fetch bank statements and calculate total income per year
     bank_statements_by_year = BankStatement.objects.filter(year_bank_statement__in=years_list).values('year_bank_statement').annotate(total_income=Sum('income_bank_statement')).order_by('-year_bank_statement')
 
     bank_income_by_year = {entry['year_bank_statement']: entry['total_income'] for entry in bank_statements_by_year}
 
-    # Add total_income to sorted_years
     sorted_years_with_income = []
-    for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense in sorted_years:
+    for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, finance_quantity in sorted_years:
         total_income = bank_income_by_year.get(year, Decimal(0))
-        sorted_years_with_income.append((year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income))
+        sorted_years_with_income.append((year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income, finance_quantity))
 
-    # Paginate the years
     paginator = Paginator(sorted_years_with_income, 1)  # One year per page
     page = request.GET.get('page')
     try:
@@ -2768,32 +2760,159 @@ def finance_list(request):
     except EmptyPage:
         years = paginator.page(paginator.num_pages)
 
-    bank_statements = BankStatement.objects.filter(year_bank_statement__in=years_list).order_by('-year_bank_statement')
+    latest_ids_subquery = BankStatement.objects.filter(
+        year_bank_statement=OuterRef('year_bank_statement')
+    ).values('year_bank_statement').annotate(
+        max_id=Max('id')
+    ).values('max_id')
+
+    bank_statements = BankStatement.objects.filter(
+        id__in=Subquery(latest_ids_subquery)
+    ).filter(year_bank_statement__in=years_list).order_by('-year_bank_statement')
+
+    latest_bank_statements = BankStatement.objects.filter(
+        id__in=Subquery(latest_ids_subquery)
+    ).values('year_bank_statement', 'income_bank_statement')
+    latest_income_by_year = {entry['year_bank_statement']: entry['income_bank_statement'] for entry in
+                             latest_bank_statements}
+
+    all_years = [entry[0] for entry in sorted_years]
 
     return render(
         request,
         'TI_Management_app/finance/finance_list.html',
         {
-            'years': years,  # Paginated list of tuples (year, entries)
+            'years': years,
             'page': page,
-            'bank_statements': bank_statements
+            'bank_statements': bank_statements,
+            'latest_income': latest_income_by_year,
+            'all_years': all_years
+        }
+    )
+
+# @login_required
+# def finance_list(request):
+#     finance_obj = FileFinance.objects.all().order_by('-payment_date')
+#
+#     register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
+#
+#     scholarships_obj = Scholarships.objects.filter(confirmation_of_scholarship=True).order_by('-confirmation_date')
+#
+#     combined_list = sorted(
+#         chain(finance_obj, register_relief_obj, scholarships_obj),
+#         key=lambda obj: obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation if hasattr(obj, 'date_of_payment_confirmation') else obj.confirmation_date,
+#         reverse=True
+#     )
+#
+#     grouped_by_year = defaultdict(list)
+#     for obj in combined_list:
+#         date_field = obj.payment_date if hasattr(obj, 'payment_date') else obj.date_of_payment_confirmation if hasattr(obj, 'date_of_payment_confirmation') else obj.confirmation_date
+#         year = date_field.year
+#         grouped_by_year[year].append(obj)
+#
+#     summarized_data = []
+#
+#     for year, entries in grouped_by_year.items():
+#         finance_figure = sum(Decimal(getattr(entry, 'figure', 0)) for entry in entries if isinstance(entry, FileFinance))
+#         scholarship_figure = sum(Decimal(getattr(entry, 'scholarship_rate', 0)) for entry in entries if isinstance(entry, Scholarships))
+#         relief_figure = sum(Decimal(getattr(entry, 'figure', 0)) for entry in entries if isinstance(entry, RegisterRelief))
+#
+#         total_expense = finance_figure + scholarship_figure + relief_figure
+#
+#         summarized_data.append((year, entries, finance_figure, scholarship_figure, relief_figure, total_expense))
+#
+#     sorted_years = sorted(summarized_data, key=lambda x: x[0], reverse=True)
+#
+#     years_list = [year for year, _, _, _, _, _ in sorted_years]
+#
+#     bank_statements_by_year = BankStatement.objects.filter(year_bank_statement__in=years_list).values('year_bank_statement').annotate(total_income=Sum('income_bank_statement')).order_by('-year_bank_statement')
+#
+#     bank_income_by_year = {entry['year_bank_statement']: entry['total_income'] for entry in bank_statements_by_year}
+#
+#     sorted_years_with_income = []
+#     for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense in sorted_years:
+#         total_income = bank_income_by_year.get(year, Decimal(0))
+#         sorted_years_with_income.append((year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income))
+#
+#     paginator = Paginator(sorted_years_with_income, 1)  # One year per page
+#     page = request.GET.get('page')
+#     try:
+#         years = paginator.page(page)
+#     except PageNotAnInteger:
+#         years = paginator.page(1)
+#     except EmptyPage:
+#         years = paginator.page(paginator.num_pages)
+#
+#     latest_ids_subquery = BankStatement.objects.filter(
+#         year_bank_statement=OuterRef('year_bank_statement')
+#     ).values('year_bank_statement').annotate(
+#         max_id=Max('id')
+#     ).values('max_id')
+#
+#     bank_statements = BankStatement.objects.filter(
+#         id__in=Subquery(latest_ids_subquery)
+#     ).filter(year_bank_statement__in=years_list).order_by('-year_bank_statement')
+#
+#     latest_bank_statements = BankStatement.objects.filter(
+#         id__in=Subquery(latest_ids_subquery)
+#     ).values('year_bank_statement', 'income_bank_statement')
+#     latest_income_by_year = {entry['year_bank_statement']: entry['income_bank_statement'] for entry in
+#                              latest_bank_statements}
+#
+#     all_years = [entry[0] for entry in sorted_years]
+#
+#     return render(
+#         request,
+#         'TI_Management_app/finance/finance_list.html',
+#         {
+#             'years': years,
+#             'page': page,
+#             'bank_statements': bank_statements,
+#             'latest_income': latest_income_by_year,
+#             'all_years': all_years
+#         }
+#     )
+
+
+@login_required
+def finance_reporting_doc(request):
+    current_date = datetime.now()
+    current_year = current_date.year
+    previous_year = current_year-1
+    month = 0
+
+    if request.method == "POST":
+        form = BankStatementForm(request.POST, request.FILES)
+        if form.is_valid():
+            bank_statement = form.save(commit=False)
+            bank_statement.author = request.user
+            bank_statement.month_bank_statement = month
+            bank_statement.save()
+            messages.success(request, f"Dodano dokument sprawozdawczy {bank_statement.title_bank_statement}!")
+            return redirect('TI_Management_app:finance_list')
+    else:
+        form = BankStatementForm()
+
+    return render(
+        request,
+        'TI_Management_app/finance/finance_reporting_doc.html',
+        {
+            'form': form,
+            'current_year': current_year,
+            'previous_year': previous_year
         }
     )
 
 
 @login_required
 def finance_detail(request, year, month):
-    # year = 2024
-    # month = 5
 
     tz = pytz.timezone('Europe/Warsaw')
 
-    # Define the start and end of the month in the specified timezone
     start_date = timezone.make_aware(datetime(year, month, 1), tz)
     end_date = timezone.make_aware(datetime(year, month + 1, 1), tz) if month < 12 else timezone.make_aware(
         datetime(year + 1, 1, 1), tz)
 
-    # Run the query
     finances = FileFinance.objects.filter(
         payment_date__gte=start_date,
         payment_date__lt=end_date
@@ -2825,7 +2944,6 @@ def finance_detail(request, year, month):
         confirmation_date__lt=end_date
     ).exclude(confirmation_date__isnull=True).order_by('-confirmation_date')
 
-    # total_scholarships = scholarships.aggregate(Sum('scholarship_rate'))['scholarship_rate__sum']
     total_scholarships = scholarships.aggregate(
         total=Sum(
             Case(

@@ -47,6 +47,11 @@
             <b>&#160;&#160;&#8226; dodaj dokument księgowy</b>
         </a>
     </li>
+    <li class="{% if active_tab == 'finance_reporting_doc' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:finance_reporting_doc' %}">
+            <b>&#160;&#160;&#8226; dodaj dokument sprawozdawczy</b>
+        </a>
+    </li>
     <li class="{% if active_tab == 'scholarships' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:scholarships_list' %}">
             <b>&#160;&#160;&#8226; stypendia</b>

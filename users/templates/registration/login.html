@@ -7,10 +7,10 @@
     <form method="post" action="{% url 'users:login' %}">
         {% csrf_token %}
         {{ form.as_p }}
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">Zaloguj</button>
 <!--        <input type="hidden" name="next" value="{% url 'TI_Management_app:members_list' %}" />-->
         <input type="hidden" name="next" value="{{ next }}" />
-        <br />
         <br />
     </form>
 </div>

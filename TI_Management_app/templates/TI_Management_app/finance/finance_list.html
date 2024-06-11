@@ -4,14 +4,15 @@
 {% load static %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
   <h2>Przegląd dokumentów finansowych</h2>
+    <br />
   {% if years %}
-  {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income in years.object_list %}
+  {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income, finance_quantity in years.object_list %}
   <div class="notepad">
 
 <!--    <nav class="menu menu-1">-->
@@ -26,35 +27,59 @@
       <h2>{{ year }}</h2>
       <nav class="menu menu-1">
           <ul>
-      {% get_months_until_now year as months %}
-
-      {% for month_name, numeric_month in months %}
+            {% get_months_until_now year as months %}
+            {% for month_name, numeric_month in months %}
               <li>
-
-        <a href="{% url 'TI_Management_app:finance_detail' year=year month=numeric_month %}">
-            {{ month_name }}
-            {% if year|record_exist:numeric_month %}
-            {% else %}
-                <span style="color: red"><b>!</b></span>
-            {% endif %}
-        </a></li>
-
-      {% endfor %}
-              </ul>
+                <a href="{% url 'TI_Management_app:finance_detail' year=year month=numeric_month %}">
+                {{ month_name }}
+                    {% if year|record_exist:numeric_month %}
+                    {% else %}
+<!--                <span style="color: red"><b>!</b></span>-->
+                    {% endif %}
+                </a>
+              </li>
+            {% endfor %}
+          </ul>
       </nav>
     <hr>
     <p><b>Dokumenty sprawozdawcze:</b></p>
     {% for bank_statement in bank_statements %}
       {% if bank_statement.file_bank_statement %}
         {% if year == bank_statement.year_bank_statement %}
-
-          <ul>
-            <li><img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20"><a href="{{ bank_statement.file_bank_statement.url }}" target="_blank">{{ bank_statement.title_bank_statement }}</a></li>
+        <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
+          <ul style="list-style-type: none;">
+            <li>
+                <a href="{{ bank_statement.file_bank_statement.url }}" target="_blank">
+                    {{ bank_statement.title_bank_statement }}
+                </a>
+                <ul>
+                    <li>Ilość pozycji: {{bank_statement.quantity_bank_statement}} </li>
+                    <li>Saldo początkowe: {{bank_statement.starting_balance}} zł</li>
+                    <li>Saldo końcowe: {{bank_statement.final_balance}} zł</li>
+                    <li>Wpływy: {{bank_statement.income_bank_statement}} zł</li>
+                </ul>
+            </li>
           </ul>
+            {% add bank_statement.starting_balance bank_statement.income_bank_statement as total %}
+
+            {% subtract total total_expense as final_balance %}
+            <b>Stan:</b>
+            <br />
+            {% if final_balance != bank_statement.final_balance %}
+                <span style="color: red">Dane niezgodne!</span> Balans: {{ final_balance }} zł
+            {% else %}
+                <span style="color: green">Dane zgodne</span>
+            {% endif %}
+            <br />
+            {% if bank_statement.quantity_bank_statement|to_int != finance_quantity|to_int %}
+                <span style="color: red">Ilość dokumentów księgowych nie jest zgodna z ilością pozycji na wyciągu</span>
+                {{ bank_statement.quantity_bank_statement }} / {{ finance_quantity }}
+            {% endif %}
         {% endif %}
       {% endif %}
     {% endfor %}
     <br />
+    <hr>
     <p><b>Wydatki:</b></p>
       <ul>
         {% for entry in entries %}
@@ -67,8 +92,9 @@
       <p><b>Wydatki stypendia:</b> {{ scholarship_figure|floatformat:"2" }} zł</p>
       <p><b>Wydatki zapomogi:</b> {{ relief_figure|floatformat:"2" }} zł</p>
     <br />
+      Ilość wprowadzonych dokumentów księgowych vs ilość pozycji na wyciągu
     <hr>
-    <p><b>Wpływy ogółem:</b> {{ total_income|floatformat:"2" }} zł</p>
+    <p><b>Wpływy ogółem:</b> {{ latest_income|get_item:year|floatformat:"2" }} zł</p>
     <p><b>Wydatki ogółem:</b> {{ total_expense|floatformat:"2" }} zł</p>
 
   </div>
@@ -81,10 +107,10 @@
     var myChart = new Chart(ctx, {
         type: 'pie', // or 'bar', 'pie', etc.
         data: {
-            labels: ["Wydatki ogółem {{total_expense|to_int}} zł", "Wpływy ogółem {{total_income|to_int}} zł"],
+            labels: ["Wydatki ogółem {{total_expense|to_int}} zł", "Wpływy ogółem {{latest_income|get_item:year|to_int}} zł"],
             datasets: [{
                 label: 'suma w zł',
-                data: [{{total_expense|to_int}}, {{total_income|to_int}}],
+                data: [{{total_expense|to_int}}, {{latest_income|get_item:year|to_int}}],
                 backgroundColor: [
                     'rgba(245, 7, 7, 0.2)',
                     'rgba(40, 176, 50, 0.2)'
@@ -110,16 +136,28 @@
   <div class="pagination">
       <span class="step-links">
         {% if years.has_previous %}
+<!--          <a href="?page={{ years.previous_page_number }}">Następny rok</a>-->
           <a href="?page={{ years.previous_page_number }}">Następny rok</a>
         {% endif %}
 
-        <span class="current">
-            {{ years.number }} / {{ years.paginator.num_pages }}
-        </span>
+            <span class="current">
+                {{ years.number }} / {{ years.paginator.num_pages }}
+            </span>
+<!--          <span class="current">-->
+<!--            {{ current_year }} / {{ years.paginator.num_pages }}-->
+<!--          </span>-->
 
         {% if years.has_next %}
+<!--          <a href="?page={{ years.next_page_number }}">poprzedni rok</a>-->
           <a href="?page={{ years.next_page_number }}">poprzedni rok</a>
         {% endif %}
+      </span>
+      <br />
+      <span class="year-links">
+        Wszystkie dostępne lata:
+        {% for year in all_years %}
+          <a href="?page={{ forloop.counter }}">{{ year }}</a>
+        {% endfor %}
       </span>
   </div>
   {% else %}

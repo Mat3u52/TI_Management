@@ -2,8 +2,8 @@
 {% load ti_management_tags %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:finance_list' %}"> / Finanse</a>
-<a href="#"> / Dodawanie dokumentu księgowego</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:finance_file_add' %}"><b> / Dodawanie dokumentu księgowego</b></a>
 {% endblock %}
 
 {% block content %}
@@ -162,13 +162,15 @@
         <hr>
         <br />
         <p><b>Opis:</b></p>
-        <textarea
-                class="form-control"
-                name="description"
-                rows="4"
-                cols="50" >
+            {{ form_file_finance.media }}
+            {{ form_file_finance.description }}
+<!--        <textarea-->
+<!--                class="form-control"-->
+<!--                name="description"-->
+<!--                rows="4"-->
+<!--                cols="50" >-->
 
-        </textarea>
+<!--        </textarea>-->
         <br />
         <hr>
 

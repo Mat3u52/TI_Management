@@ -10,6 +10,7 @@ urlpatterns = [
     path('users/', include('users.urls', namespace='users')),
     # path('', include('TI_Management_app.urls')),
     path('', include('TI_Management_app.urls', namespace='TI_Management_app')),
+    path('ckeditor5/', include('django_ckeditor_5.urls')),
     # path('images/', Image.as_view(), name='image'),
     # path('images/<int:pk>/', ImageDisplay.as_view(), name="image_display"),
 ]
