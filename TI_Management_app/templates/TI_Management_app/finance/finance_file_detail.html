@@ -1,0 +1,24 @@
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load i18n %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:finance_file_detail' pk=finance_file_details.pk %}"><b> / Aktualizacja dokumentu księgowego {{ finance_file_details.title }}</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja dokumentu księgowego {{ finance_file_details.title }}</h2>
+    <br />
+    <div class="notepad">
+
+    </div>
+    <br />
+</div>
+{% endblock %}
+
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='finance_list' %}
+{% endblock %}

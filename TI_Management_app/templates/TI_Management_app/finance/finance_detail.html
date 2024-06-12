@@ -9,7 +9,7 @@
 
 {% block content %}
 <div class="hero-unit">
-    <h2>{{ year }} / {{ month_name }} - Przegląd dokumentów finansowych</h2>
+    <h2 class="fadeInUp-animation">{{ year }} / {{ month_name }} - Przegląd dokumentów finansowych</h2>
     <br />
     <div class="notepad">
         <h2>{{ month_name }} - {{ year }}</h2>
@@ -19,7 +19,7 @@
         <ul>
             {% for finance in finances %}
                 {% if finance %}
-                    <li>{{ finance.payment_date|date:"j E Y" }}: {{ finance.title }} | {{ finance.figure }} zł</li>
+                    <li>{{ finance.payment_date|date:"j E Y" }}: <a href="{% url 'TI_Management_app:finance_file_detail' pk=finance.pk %}"><b>{{ finance.title }}</b></a> | {{ finance.figure }} zł</li>
                 {% endif %}
             {% endfor %}
         </ul>

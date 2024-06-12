@@ -9,21 +9,11 @@
 
 {% block content %}
 <div class="hero-unit">
-  <h2>Przegląd dokumentów finansowych</h2>
+  <h2 class="fadeInUp-animation">Przegląd dokumentów finansowych</h2>
     <br />
   {% if years %}
   {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income, finance_quantity in years.object_list %}
   <div class="notepad">
-
-<!--    <nav class="menu menu-1">-->
-<!--  <ul>-->
-<!--    <li><a href="#">Home</a></li>-->
-<!--    <li><a href="#">About</a></li>-->
-<!--    <li><a href="#">Blog</a></li>-->
-<!--    <li><a href="#">contact</a></li>-->
-<!--  </ul>-->
-<!--</nav>-->
-
       <h2>{{ year }}</h2>
       <nav class="menu menu-1">
           <ul>
@@ -50,7 +40,9 @@
           <ul style="list-style-type: none;">
             <li>
                 <a href="{{ bank_statement.file_bank_statement.url }}" target="_blank">
-                    {{ bank_statement.title_bank_statement }}
+                    <b>
+                       {{ bank_statement.title_bank_statement }}
+                    </b>
                 </a>
                 <ul>
                     <li>Ilość pozycji: {{bank_statement.quantity_bank_statement}} </li>

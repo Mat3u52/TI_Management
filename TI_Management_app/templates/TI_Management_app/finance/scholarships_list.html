@@ -1,8 +1,8 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="{% url 'TI_Management_app:scholarships_list' %}"> / Stypendia</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:scholarships_list' %}"><b> / Stypendia</b></a>
 {% endblock %}
 
 {% block content %}
@@ -22,7 +22,7 @@
 </div>
 
 <div class="hero-unit">
-    <H4>Stypendia:</H4>
+    <H2 class="fadeInUp-animation">Stypendia:</H2>
     <br />
     {% for scholarship in scholarships %}
         <div class="notepad">

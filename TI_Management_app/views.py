@@ -2998,3 +2998,14 @@ def finance_detail(request, year, month):
     )
 
 
+@login_required
+def finance_file_detail(request, pk):
+    finance_file_details = get_object_or_404(FileFinance, pk=pk)
+
+    return render(
+        request,
+        'TI_Management_app/finance/finance_file_detail.html',
+        {
+            'finance_file_details': finance_file_details,
+        }
+    )
