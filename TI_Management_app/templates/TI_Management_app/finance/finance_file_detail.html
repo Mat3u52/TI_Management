@@ -4,7 +4,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
-<a href="{% url 'TI_Management_app:finance_file_detail' pk=finance_file_details.pk %}"><b> / Aktualizacja dokumentu księgowego {{ finance_file_details.title }}</b></a>
+<a href="{% url 'TI_Management_app:finance_file_detail' pk=finance_file_details.pk %}"><b> / Szczegóły dokumentu księgowego {{ finance_file_details.title }}</b></a>
 {% endblock %}
 
 {% block content %}
@@ -12,9 +12,117 @@
     <h2 class="fadeInUp-animation">Aktualizacja dokumentu księgowego {{ finance_file_details.title }}</h2>
     <br />
     <div class="notepad">
+        <b>Tytuł:</b> {{finance_file_details.title}}
+        <br />
+        {% if finance_file_details.file %}
+            <a href="{{ finance_file_details.file.url }}" target="_blank">
+                <b>
+                    {{ finance_file_details.file|filename }}
+                </b>
+            </a>
+        {% endif %}
+        <br />
+        <b>Rodzaj dokumentu:</b> {{finance_file_details.type_of_document}}
+        <br />
+        <b>Kwota:</b> {{finance_file_details.figure}}
+        <br />
+        <b>Ilość pozycji:</b> {{finance_file_details.quantity}}
+        <br />
+        <b>Data płatności:</b> {{finance_file_details.payment_date}}
+        <br />
+        {% if not finance_file_details.resolution_requirement %}
+            <b>Uchwała:</b> {{finance_file_details.resolution}}
+        {% endif %}
+        <br />
+        <b>Nazwa wydatku:</b> {{finance_file_details.expense_name}}
+        <br />
+        {% if finance_file_details.psychologist %}
+            <b>Członek:</b> {{finance_file_details.member.member_nr}}
+        {% endif %}
+        <br />
+        <b>Opis:</b>
+        <br />
+        {{finance_file_details.description|safe}}
 
+        <div class="date">
+            <p>
+                Data dodania: {{finance_file_details.created_date}} przez {{finance_file_details.author}}
+            </p>
+        </div>
+
+        <a href="{% url 'TI_Management_app:finance_file_edit' pk=finance_file_details.pk %}">
+          <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        </a>
+        <br />
     </div>
     <br />
+</div>
+<div class="hero-unit">
+    <div class="well sidebar-nav">
+          <ul class="nav nav-list">
+            <li class="nav-header" id="showHistoryFinanceFileDetail">Historia:</li>
+              <li id="objHistoryFinanceFileDetail" style="display: none">
+
+                {% for h in finance_file_details.history.all %}
+                <div class="notepad">
+                    <table width="100%" border="0">
+                        <tr>
+                            <td>
+                                {{ h.history_id }}
+                            </td>
+                            <td>
+                                {{ h.history_type }}
+                            </td>
+                            <td>
+                                {{ h.history_user }}
+                            </td>
+                            <td>
+                                {{ h.history_date }}
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="4">
+                                <b>Tytuł:</b>
+                                    {{ h.title }}
+                                <br />
+                                {% if finance_file_details.file %}
+                                    <a href="{{ finance_file_details.file.url }}" target="_blank">
+                                        <b>
+                                            {{ finance_file_details.file }}
+                                        </b>
+                                    </a>
+                                {% endif %}
+                                <br />
+                                <b>Rodzaj dokumentu:</b> {{finance_file_details.type_of_document}}
+                                <br />
+                                <b>Kwota:</b> {{finance_file_details.figure}}
+                                <br />
+                                <b>Ilość pozycji:</b> {{finance_file_details.quantity}}
+                                <br />
+                                <b>Data płatności:</b> {{finance_file_details.payment_date}}
+                                <br />
+                                {% if not finance_file_details.resolution_requirement %}
+                                    <b>Uchwała:</b> {{finance_file_details.resolution}}
+                                {% endif %}
+                                <br />
+                                <b>Nazwa wydatku:</b> {{finance_file_details.expense_name}}
+                                <br />
+                                {% if finance_file_details.psychologist %}
+                                    <b>Członek:</b> {{finance_file_details.member.member_nr}}
+                                {% endif %}
+                                <br />
+                                <b>Opis:</b>
+                                <br />
+                                {{finance_file_details.description|safe}}
+                            </td>
+                        </tr>
+                    </table>
+                </div>
+                {% endfor %}
+
+              </li>
+          </ul>
+    </div>
 </div>
 {% endblock %}
 

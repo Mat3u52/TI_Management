@@ -1,10 +1,311 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:finance_file_detail' pk=finance_file_details.pk %}"><b> / Szczegóły dokumentu księgowego {{ finance_file_details.title }}</b></a>
+<a href="{% url 'TI_Management_app:finance_file_edit' pk=finance_file_details.pk %}"><b> / Aktualizacja dokumentu księgowego</b></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form_kind_of_document.errors %}
+            {{form_kind_of_document.errors}}
+        {% endif %}
+        {% if form_file_finance.errors %}
+            {{form_file_finance.errors}}
+        {% endif %}
+        {% if form_kind_of_expense.errors %}
+            {{form_kind_of_expense.errors}}
+        {% endif %}
+        <h2 class="fadeInUp-animation">Aktualizacja dokumentu księgowego: {{ finance_file_details.title }}</h2>
+        <br />
+
+        <p><b>Rodzaj dokumentu:</b></p>
+<!--        {{form_kind_of_document.title_doc}}-->
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                value="{{finance_file_details.type_of_document.title_doc}}"
+                list="kind_of_finance_document"
+                placeholder="Rodaj dokumentu"
+                aria-label="Rodzaj dokumentu"
+                name="title_doc"
+                required />
+        <datalist id="kind_of_finance_document">
+            {% for document_kind in kind_of_finance_document %}
+                <option value="{{ document_kind.title }}"></option>
+            {% endfor %}
+        </datalist>
+        <br />
+        <hr>
+        <p><b>Zmień dokument:</b></p>
+        {% if finance_file_details.file %}
+            <a href="{{ finance_file_details.file.url }}" target="_blank">
+                <b>
+                    {{ finance_file_details.file|filename }}
+                </b>
+            </a>
+            <label class="custom-file-upload-mod">
+                {{form_file_finance.file}}
+            </label>
+        {% else %}
+            <label class="file">
+                {{form_file_finance.file}}
+            </label>
+        {% endif %}
+
+        <br />
+        <hr>
+        <p><b>Kwota:</b></p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                value="{{finance_file_details.figure|comma_to_period}}"
+                placeholder="0.00"
+                aria-label="Kwota"
+                name="figure"
+                min="0"
+                step="0.01"
+                required /> zł
+        <br />
+        <hr>
+        <p><b>Pozycji na wyciągu:</b></p>
+        <input
+                class="form-control me-2"
+                style="max-width: 25%!important; min-height: 15px"
+                type="number"
+                value="{{finance_file_details.quantity}}"
+                placeholder="1"
+                aria-label="Pozycji na wyciągu"
+                name="quantity"
+                min="1"
+                step="1"
+                required />
+        <br />
+        <hr>
+        <p><b>Data:</b></p>
+        <input
+                class="form-control me-2"
+                style="max-width: 50%!important; min-height: 15px"
+                type="date"
+                value="{{formatted_payment_date}}"
+                name="payment_date"
+                required />
+        <br />
+        <hr>
+        <p><b>Dokument bez uchwały:</b></p>
+        <input
+                class="form-control me-2"
+                style="min-width: 1%!important; min-height: 15px"
+                type="checkbox"
+                aria-label="Dokument bez uchwały"
+                name="resolution_requirement"
+                id="documentRequirement"
+                {% if finance_file_details.resolution_requirement %}
+                    checked
+                {% endif %} />
+        <br />
+        <hr>
+        <p><b>Przypnij uchwałę:</b></p>
+        {% if not finance_file_details.resolution_requirement %}
+            <a href="{{ finance_file_details.resolution.file.url }}" target="_blank">
+                <b>
+                    {{ finance_file_details.resolution.file|filename }}
+                </b>
+            </a>
+            <br />
+        {% endif %}
+
+        <select name="resolution" id="resolution"
+                {% if finance_file_details.resolution_requirement %}
+                    disabled
+                {% endif %}
+        >
+            <optgroup label="Kategoria uchwały">
+                {% if not finance_file_details.resolution_requirement %}
+                    <option value="{{finance_file_details.resolution.pk}}">{{finance_file_details.resolution}}</option>
+                {% else %}
+                    <option value="none">Brak</option>
+
+                {% endif %}
+            {% for doc in doc_database %}
+                <option value="{{ doc.id }}">{{ doc.title }}</option>
+            {% endfor %}
+
+            </optgroup>
+        </select>
+<!--        {{ form_file_finance.resolution }}-->
+        <br />
+        <hr>
+        <p><b>Nazwa wydatku:</b></p>
+        <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                value="{{finance_file_details.expense_name.title_expense}}"
+                list="doc_database"
+                placeholder="Nazwa wydatku"
+                aria-label="Nazwa wydatku"
+                name="title_expense"
+                required />
+        <datalist id="doc_database">
+        {% for expense in expense_names %}
+            <option value="{{ expense_names.expanse_name }}"></option>
+        {% endfor %}
+        </datalist>
+        <br />
+        <hr>
+        <p><b>Pomoc psychologa?</b></p>
+        <input
+            class="form-control me-2"
+            style="min-width: 1%!important; min-height: 15px"
+            type="checkbox"
+            aria-label="Pomoc psychologa"
+            name="psychologist"
+            id="PsychologistHelp"
+            {% if finance_file_details.psychologist %}
+                checked
+            {% endif %}
+        />
+        <br />
+        {% if finance_file_details.psychologist %}
+            <div id="memberDiv" style="display: block;">
+        {% else %}
+            <div id="memberDiv" style="display: none;">
+        {% endif %}
+            <br />
+            <input
+                class="form-control me-2"
+                style="min-width: 50%!important; min-height: 15px"
+                type="text"
+                value="{{finance_file_details.member.member_nr}}"
+                list="members"
+                placeholder="Nr Członka"
+                aria-label="Nr Członka"
+                name="member_nr" />
+            <datalist id="members">
+                {% for member in members %}
+                <option value="{{ member.member_nr }}"></option>
+                {% endfor %}
+            </datalist>
+            <div id="memberDetails" style="display: none;"></div>
+            <div id="error" style="color: red; display: none;"></div>
+<!--            <p><small>Nr Członka:</small></p>-->
+<!--            <select name="member" id="member">-->
+<!--                <optgroup label="Nr Członka">-->
+<!--                    <option value="none">Brak</option>-->
+<!--                    {% for member in members %}-->
+<!--                        <option value="{{ member.member_nr }}">{{ member.member_nr }}</option>-->
+<!--                    {% endfor %}-->
+<!--                </optgroup>-->
+<!--            </select>-->
+        </div>
+        <hr>
+        <br />
+        <p><b>Opis:</b></p>
+            {{ form_file_finance.media }}
+            {{ form_file_finance.description }}
+<!--        <textarea-->
+<!--                class="form-control"-->
+<!--                name="description"-->
+<!--                rows="4"-->
+<!--                cols="50" >-->
+
+<!--        </textarea>-->
+        <br />
+        <hr>
+
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+    </form>
+</div>
+<script>
+    const baseUrl = '{% url "TI_Management_app:get_member_details" "dummy_member_nr" %}'.replace('dummy_member_nr/', '');
+
+    document.getElementById('documentRequirement').addEventListener('change', function() {
+        var resolutionSelect = document.getElementById('resolution');
+        resolutionSelect.disabled = this.checked;
+    });
+    document.getElementById('resolution').addEventListener('change', function() {
+        var documentRequirement = document.getElementById('documentRequirement');
+        documentRequirement.disabled = this.value !== 'none';
+    });
+    document.getElementById('PsychologistHelp').addEventListener('change', function() {
+        var memberDiv = document.getElementById('memberDiv');
+        if (this.checked) {
+            memberDiv.style.display = 'block';
+        } else {
+            memberDiv.style.display = 'none';
+        }
+    });
+
+    document.querySelector('input[name="member_nr"]').addEventListener('change', function() {
+        var memberNr = this.value;
+        console.log('Member number changed: ', memberNr);
+        if (memberNr !== 'none') {
+            fetchMemberDetails(memberNr);
+        } else {
+            document.getElementById('memberDetails').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+    });
+
+    function fetchMemberDetails(memberNr) {
+        console.log('Fetching member details for: ', memberNr);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', baseUrl + memberNr + '/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    console.log('Received member details: ', xhr.responseText);
+                    var memberDetails = JSON.parse(xhr.responseText);
+                    displayMemberDetails(memberDetails);
+                    document.getElementById('error').style.display = 'none';
+                } else if (xhr.status === 404) {
+                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                    document.getElementById('memberDetails').style.display = 'none';
+                    displayError('Taki Członek nie istnieje');
+                } else {
+                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                    document.getElementById('memberDetails').style.display = 'none';
+                    displayError('Taki Członek nie istnieje lub jest dezaktywowany');
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function displayMemberDetails(details) {
+        var memberDetailsDiv = document.getElementById('memberDetails');
+        memberDetailsDiv.style.display = 'block';
+        memberDetailsDiv.innerHTML = `
+            <p><b>Imię:</b> ${details.first_name}</p>
+<!--                <p><b>Nazwisko:</b> ${details.last_name}</p>-->
+<!--                <p><b>Email:</b> ${details.email}</p>-->
+            <!-- Add more details as needed -->
+        `;
+        console.log('Displaying member details: ', details);
+    }
+
+    function displayError(errorMessage) {
+        var errorDiv = document.getElementById('error');
+        errorDiv.style.display = 'block';
+        errorDiv.innerText = errorMessage;
+        console.log('Displaying error: ', errorMessage);
+    }
+</script>
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='finance_list' %}
+{% endblock %}

@@ -3009,3 +3009,72 @@ def finance_file_detail(request, pk):
             'finance_file_details': finance_file_details,
         }
     )
+
+
+@login_required
+def finance_file_edit(request, pk):
+    finance_file_details = get_object_or_404(FileFinance, pk=pk)
+    kind_of_finance_document = KindOfFinanceDocument.objects.all()
+    doc_database = DocumentsDatabase.objects.filter(Q(category__title__icontains='Uchwały'))
+    expense_names = KindOfFinanceExpense.objects.all()
+    members = MembersZZTI.objects.all().order_by('member_nr')
+    formatted_payment_date = finance_file_details.payment_date.astimezone(
+        timezone.get_current_timezone()).strftime("%Y-%m-%d")
+
+    if request.method == "POST":
+        form_kind_of_document = KindOfFinanceDocumentForm(request.POST, instance=finance_file_details.type_of_document)
+        form_file_finance = FileFinanceForm(request.POST, request.FILES, instance=finance_file_details)
+        form_kind_of_expense = KindOfFinanceExpenseForm(request.POST, instance=finance_file_details.expense_name)
+
+        if all([form_kind_of_document.is_valid(), form_file_finance.is_valid(), form_kind_of_expense.is_valid()]):
+            document_title = form_kind_of_document.cleaned_data['title_doc']
+            expense_title = form_kind_of_expense.cleaned_data['title_expense']
+            member_nr = form_file_finance.cleaned_data['member_nr']
+            psychologist = form_file_finance.cleaned_data['psychologist']
+            title = f"{document_title} - {expense_title}"
+
+            if not KindOfFinanceDocument.objects.filter(title_doc=document_title).exists():
+                finance_document_kind = form_kind_of_document.save(commit=False)
+                finance_document_kind.title = document_title
+                finance_document_kind.author = request.user
+                finance_document_kind.save()
+
+            if not KindOfFinanceExpense.objects.filter(title_expense=expense_title).exists():
+                kind_of_expense = form_kind_of_expense.save(commit=False)
+                kind_of_expense.title = expense_title
+                kind_of_expense.author = request.user
+                kind_of_expense.save()
+
+            finance_file = form_file_finance.save(commit=False)
+            finance_file.author = request.user
+            finance_file.title = title
+            # finance_file.type_of_document = KindOfFinanceDocument.objects.get(title_doc=document_title)
+            finance_file.type_of_document = KindOfFinanceDocument.objects.filter(title_doc=document_title).latest('id')
+            # finance_file.expense_name = KindOfFinanceExpense.objects.get(title_expense=expense_title)
+            finance_file.expense_name = KindOfFinanceExpense.objects.filter(title_expense=expense_title).latest('id')
+            # finance_file.member = MembersZZTI.objects.get(member_nr=member_nr)
+            if psychologist is True and MembersZZTI.objects.filter(member_nr=member_nr).exists():
+                finance_file.member = MembersZZTI.objects.filter(member_nr=member_nr).latest('id')
+            finance_file.save()
+
+            messages.success(request, "Zaktualizowano!")
+            return redirect('TI_Management_app:finance_file_edit', pk=finance_file_details.pk)
+    else:
+        form_kind_of_document = KindOfFinanceDocumentForm(instance=finance_file_details.type_of_document)
+        form_file_finance = FileFinanceForm(instance=finance_file_details)
+        form_kind_of_expense = KindOfFinanceExpenseForm(instance=finance_file_details.expense_name)
+    return render(
+        request,
+        'TI_Management_app/finance/finance_file_edit.html',
+        {
+            'form_kind_of_document': form_kind_of_document,
+            'form_file_finance': form_file_finance,
+            'form_kind_of_expense': form_kind_of_expense,
+            'finance_file_details': finance_file_details,
+            'kind_of_finance_document': kind_of_finance_document,
+            'doc_database': doc_database,
+            'expense_names': expense_names,
+            'members': members,
+            'formatted_payment_date': formatted_payment_date
+        }
+    )

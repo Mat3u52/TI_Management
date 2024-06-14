@@ -73,6 +73,7 @@
                         {% else %}
                             <p>{{form.phone_number}}</p>
                         {% endif %}
+                        <p>{{form.phone_number_1}}</p>
                     </td>
                 </tr>
                 <tr>
@@ -130,6 +131,9 @@
             <br />
         </form>
     </div>
+
+
+{{form.as_p}}
 
 {% endblock %}
 

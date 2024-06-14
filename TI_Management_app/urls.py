@@ -478,5 +478,10 @@ urlpatterns = [
         views.finance_file_detail,
         name='finance_file_detail'
     ),
+    path(
+        'TI_Management_app/finance/finance-file-edit/<int:pk>/',
+        views.finance_file_edit,
+        name='finance_file_edit'
+    ),
 ]
 

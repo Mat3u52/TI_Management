@@ -29,6 +29,9 @@ def comma_to_period(value):
 
 @register.filter(name='filename')
 def filename(value):
+    # return os.path.basename(value)
+    if hasattr(value, 'path'):
+        return os.path.basename(value.path)
     return os.path.basename(value)
 
 

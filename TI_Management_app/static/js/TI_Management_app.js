@@ -65,4 +65,7 @@ $(document).ready(function(){
     $("#showHistoryScholarship").click(function(){
         $("#objHistoryScholarship").show(1000);
     });
+    $("#showHistoryFinanceFileDetail").click(function(){
+        $("#objHistoryFinanceFileDetail").show(1000);
+    });
 });

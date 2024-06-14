@@ -35,15 +35,25 @@ from django.contrib.auth.models import User
 from localflavor.pl.forms import PLPostalCodeField
 from datetime import datetime
 from django.core.exceptions import ValidationError
+from phone_field import PhoneField
 
 
+def validate_phone_number(value):
+    # Customize your validation logic here
+    phone_pattern = re.compile(r'^\+?1?\d{9,15}$')  # Example pattern: accepts +, country code, and 10-15 digits
+    if not phone_pattern.match(value):
+        raise ValidationError('Wprowadź włąściwy numer telefonu.')
+
+    
 class MemberForm(forms.ModelForm):
 
-    phone_number = forms.CharField(
-        required=False,
-        validators=[RegexValidator(r'^\+?1?\d{9,15}$',
-                                   message="Wprowadź włąściwy numer telefonu.")]
-    )
+    # phone_number = forms.CharField(
+    #     required=False,
+    #     validators=[RegexValidator(r'^\+?1?\d{9,15}$',
+    #                                message="Wprowadź włąściwy numer telefonu.")]
+    # )
+    phone_number = PhoneField(blank=True, help_text='Contact phone number', validators=[validate_phone_number])
+
     member_nr = forms.CharField(
         validators=[RegexValidator(r'^\d{0,10}$',
                                    message="To pole musi być liczbą.")]
