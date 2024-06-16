@@ -83,6 +83,7 @@
         </a></p>
         <div class="date"><p>Data dodania: {{member.created_date}}</p></div>
     </div>
+{{forloop.counter}}. {{ member }}
 {% endfor %}
 
 {% include 'TI_Management_app/pagination.html' with page=members %}

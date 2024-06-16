@@ -1,26 +1,28 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:member_function_add' %}"> / Dodaj funkcję dla członka</a>
+<a href="{% url 'TI_Management_app:member_function_add' %}"><b> / Dodaj funkcję dla członka</b></a>
 {% endblock %}
 
 {% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodawanie nowego Członka</h2>
+    <br />
 
-    <div class="hero-unit">
-
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
-                <p>{{form.errors}}</p>
-            {% endif %}
-            <p>Funkcja Członka:</p>
-            {{form.member_function}}
-
-            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
-            <br />
-            <br />
-        </form>
-    </div>
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <h4>Funkcja Członka:</h4>
+        {{form.member_function}}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 <div class="hero-unit">
     {% for function in all_functions %}

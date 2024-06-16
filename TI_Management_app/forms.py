@@ -39,8 +39,7 @@ from phone_field import PhoneField
 
 
 def validate_phone_number(value):
-    # Customize your validation logic here
-    phone_pattern = re.compile(r'^\+?1?\d{9,15}$')  # Example pattern: accepts +, country code, and 10-15 digits
+    phone_pattern = re.compile(r'^\+?1?\d{9,15}$')
     if not phone_pattern.match(value):
         raise ValidationError('Wprowadź włąściwy numer telefonu.')
 
@@ -52,7 +51,27 @@ class MemberForm(forms.ModelForm):
     #     validators=[RegexValidator(r'^\+?1?\d{9,15}$',
     #                                message="Wprowadź włąściwy numer telefonu.")]
     # )
-    phone_number = PhoneField(blank=True, help_text='Contact phone number', validators=[validate_phone_number])
+    # phone_number = PhoneField(blank=True, help_text='Contact phone number', validators=[validate_phone_number])
+
+    phone_number = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'placeholder': '500 500 500',
+            'class': 'phone-number'
+        }),
+        label="Numer kontaktowy",
+        help_text='Numer telefonu',
+        required=False,
+        validators=[validate_phone_number]
+    )
+
+    extension = forms.CharField(widget=forms.TextInput(attrs={
+        'placeholder': '+48',
+        'class': 'ext-input',
+        'disabled': 'disabled'
+        }),
+        required=False,
+        initial='+48'
+    )
 
     member_nr = forms.CharField(
         validators=[RegexValidator(r'^\d{0,10}$',
@@ -79,7 +98,11 @@ class MemberForm(forms.ModelForm):
 
     class Meta:
         model = MembersZZTI
-        fields = ['forename', 'surname', 'role', 'occupation',
+        fields = [
+            'forename',
+            'surname',
+            # 'role',
+            'occupation',
                   'member_nr', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number',
                   'email', 'date_of_accession', 'date_of_abandonment', 'type_of_contract',
                   'date_of_contract', 'expiration_date_contract', 'group', 'card', 'image']
@@ -97,6 +120,22 @@ class MemberForm(forms.ModelForm):
             # 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
 
         }
+
+    def __init__(self, *args, **kwargs):
+        super(MemberForm, self).__init__(*args, **kwargs)
+
+        self.fields['forename'].widget.attrs['placeholder'] = 'Imię'
+        self.fields['surname'].widget.attrs['placeholder'] = 'Nazwisko'
+        # self.fields['role'].widget.attrs['placeholder'] = 'Funkcja'
+
+        # for field_name, field in self.fields.items():
+        #     self.fields[field_name].widget.attrs['placeholder'] = field.label
+
+    def clean_phone_number(self):
+        phone_number = self.cleaned_data.get('phone_number')
+        # Validate phone number using PhoneField's validator
+        PhoneField().clean(phone_number, None)
+        return phone_number
 
 
 class MemberEditForm(forms.ModelForm):
@@ -187,14 +226,22 @@ class MemberDeactivateForm(forms.ModelForm):
 
 class MemberFunctionForm(forms.ModelForm):
     member_function = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Funkcja',
+                'aria-label': 'Funkcja Członka',
+                'list': 'roles_database'
+            }
+        ),
         required=True,
-        max_length=250,
-        widget=forms.TextInput(attrs={'autofocus': True})
+        max_length=250
     )
 
     class Meta:
         model = MemberFunction
         fields = ['member_function',]
+
 
 
 class MemberOccupationForm(forms.ModelForm):
