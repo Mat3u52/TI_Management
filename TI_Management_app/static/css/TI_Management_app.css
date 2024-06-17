@@ -94,6 +94,7 @@ input {
 
 .hero-unit {
     padding-bottom: 30px;
+     border: 1px solid #e3e3e3;
 }
 
 .sidebar-nav {
@@ -141,7 +142,50 @@ img {
 }
 
 .tableCredential {
+    margin-bottom: 12px;
     padding-right: 15px;
+}
+
+.form-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    width: 90%;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    flex-grow: 1;
+}
+
+.flag-icon img {
+    width: 25px;
+    height: 24px;
+    margin-right: 1px;
+    margin-bottom: 21px;
+}
+
+.phone-number {
+    padding: 8px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex-grow: 1;
+    width: 90%;
+}
+
+.ext-input {
+    display: flex;
+    align-items: center;
+    margin-left: 10px;
+}
+
+.ext-input .ext-input {
+    padding: 5px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    flex-grow: 1;
+    width: 40px;
 }
 
 .notepadChart {
@@ -211,19 +255,20 @@ img {
 }
 
 .hint input[type=text] {
-    border: 2px solid #C30010;
+    border: 1px solid #C30010;
     background-color: #fdc5b9;
     color: #000000;
+    width: 90%; /* Ensure input takes full width of its container */
 }
 
 .hint input[type=number] {
-    border: 2px solid #C30010;
+    border: 1px solid #C30010;
     background-color: #fdc5b9;
     color: #000000;
 }
 
 .hint input[type=email] {
-    border: 2px solid #C30010;
+    border: 1px solid #C30010;
     background-color: #FDC5B9;
     color: #000000;
 }
