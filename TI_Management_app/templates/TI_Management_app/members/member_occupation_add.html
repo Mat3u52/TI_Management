@@ -1,25 +1,29 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:member_occupation_add' %}"> / Dodaj stanowisko</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_occupation_add' %}"><b> / Dodaj stanowisko</b></a>
 {% endblock %}
 
 {% block content %}
-
-    <div class="hero-unit">
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
-                <p>{{form.errors}}</p>
-            {% endif %}
-            <p>Stanowisko:</p>
-            {{form.member_occupation}}
-
-            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
-            <br />
-            <br />
-        </form>
-    </div>
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodawanie stanowiska Członka</h2>
+    <hr>
+    <br />
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <H4>Stanowisko:</H4>
+        {{form.member_occupation}}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 <div class="hero-unit">
     {% for occupation in all_occupation %}

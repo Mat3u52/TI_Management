@@ -199,7 +199,7 @@ class MembersZZTI(models.Model):
         ('indefinite_period_of_time', 'Na czas nieokreślony'),
         ('limited_duration', 'Na czas określony'),
     )
-    # created_date = models.DateTimeField(default=timezone.now)
+
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)

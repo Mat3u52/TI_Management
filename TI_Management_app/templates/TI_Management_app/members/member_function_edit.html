@@ -1,19 +1,25 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:member_function_edit' pk=function.pk %}"> / Aktualizuj funkcję członka</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_function_edit' pk=function.pk %}"><b> / Aktualizuj funkcję członka</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja funkcji Członka</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
             <p>{{form.errors}}</p>
         {% endif %}
-        <p>Funkcja Członka:</p>
+        <H4>Funkcja Członka:</H4>
         {{form.member_function}}
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
         <br />
         <br />

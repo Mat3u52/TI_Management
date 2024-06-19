@@ -1,12 +1,14 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
 <a href="{% url 'TI_Management_app:member_function_add' %}"><b> / Dodaj funkcję dla członka</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <h2 class="fadeInUp-animation">Dodawanie nowego Członka</h2>
+    <h2 class="fadeInUp-animation">Dodawanie funkcji Członka</h2>
+    <hr>
     <br />
 
     <form method="post" class="post-form">

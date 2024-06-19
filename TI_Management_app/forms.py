@@ -33,7 +33,8 @@ from django.utils import timezone
 from django.forms.widgets import DateInput
 from django.contrib.auth.models import User
 from localflavor.pl.forms import PLPostalCodeField
-from datetime import datetime
+from datetime import datetime, date, timedelta
+
 from django.core.exceptions import ValidationError
 from phone_field import PhoneField
 
@@ -54,34 +55,49 @@ class MemberForm(forms.ModelForm):
     # phone_number = PhoneField(blank=True, help_text='Contact phone number', validators=[validate_phone_number])
 
     phone_number = forms.CharField(
-        widget=forms.TextInput(attrs={
-            'placeholder': '500 500 500',
-            'class': 'phone-number'
-        }),
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '500 500 500',
+                'class': 'phone-number'
+            }
+        ),
         label="Numer kontaktowy",
         help_text='Numer telefonu',
         required=False,
         validators=[validate_phone_number]
     )
 
-    extension = forms.CharField(widget=forms.TextInput(attrs={
-        'placeholder': '+48',
-        'class': 'ext-input',
-        'disabled': 'disabled'
-        }),
+    extension = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '+48',
+                'class': 'ext-input',
+                'disabled': 'disabled'
+            }
+        ),
         required=False,
         initial='+48'
     )
 
     member_nr = forms.CharField(
-        validators=[RegexValidator(r'^\d{0,10}$',
-                                   message="To pole musi być liczbą.")]
+        validators=[
+            RegexValidator(
+                r'^\d{0,10}$',
+                message="To pole musi być liczbą."
+            )
+        ]
     )
+
     pin = forms.IntegerField(
         required=True,
-        validators=[RegexValidator(r'^\d{0,8}$',
-                                   message="To pole musi być liczbą.")]
+        validators=[
+            RegexValidator(
+                r'^\d{0,8}$',
+                message="To pole musi być liczbą."
+            )
+        ]
     )
+
     image = forms.FileField(
         label='Select a PDF file',
         widget=forms.FileInput(
@@ -91,9 +107,13 @@ class MemberForm(forms.ModelForm):
         ),
         required=True
     )
-    # email = forms.CharField(widget=forms.TextInput(attrs={'autocomplete': 'off'}))
+
     card = forms.CharField(
-        widget=forms.PasswordInput(attrs={'autocomplete': 'new-password'})
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password'
+            }
+        )
     )
 
     class Meta:
@@ -102,10 +122,23 @@ class MemberForm(forms.ModelForm):
             'forename',
             'surname',
             # 'role',
-            'occupation',
-                  'member_nr', 'sex', 'birthday', 'birthplace', 'pin', 'phone_number',
-                  'email', 'date_of_accession', 'date_of_abandonment', 'type_of_contract',
-                  'date_of_contract', 'expiration_date_contract', 'group', 'card', 'image']
+            # 'occupation',
+            'member_nr',
+            'sex',
+            'birthday',
+            'birthplace',
+            'pin',
+            'phone_number',
+            'email',
+            'date_of_accession',
+            'date_of_abandonment',
+            'type_of_contract',
+            'date_of_contract',
+            'expiration_date_contract',
+            'group',
+            'card',
+            'image'
+        ]
 
         widgets = {
             'birthday': forms.DateInput(attrs={'type': 'date'}),
@@ -126,7 +159,25 @@ class MemberForm(forms.ModelForm):
 
         self.fields['forename'].widget.attrs['placeholder'] = 'Imię'
         self.fields['surname'].widget.attrs['placeholder'] = 'Nazwisko'
-        # self.fields['role'].widget.attrs['placeholder'] = 'Funkcja'
+        self.fields['member_nr'].widget.attrs['placeholder'] = 'od 0 do 10 znaków'
+        eighteen_years_ago = date.today() - timedelta(days=18 * 365)
+        eighteen_years_ago_str = eighteen_years_ago.strftime('%Y-%m-%d')
+        self.fields['birthday'].initial = eighteen_years_ago_str
+        self.fields['birthplace'].widget.attrs['placeholder'] = 'Miejsce urodzenia'
+        self.fields['pin'].widget.attrs['placeholder'] = 'od 0 do 8 znaków'
+        self.fields['email'].widget.attrs['placeholder'] = 'user@user.com'
+        current_data = date.today()
+        current_data_str = current_data.strftime('%Y-%m-%d')
+        self.fields['date_of_accession'].initial = current_data_str
+        one_year_later = date.today().replace(year=date.today().year + 1)
+        one_year_later_str = one_year_later.strftime('%Y-%m-%d')
+        self.fields['date_of_abandonment'].initial = one_year_later_str
+        today_str = date.today().strftime('%Y-%m-%d')
+        self.fields['date_of_contract'].initial = today_str
+        three_year_later = date.today().replace(year=date.today().year + 3)
+        three_year_later_str = three_year_later.strftime('%Y-%m-%d')
+        self.fields['expiration_date_contract'].initial = three_year_later_str
+        self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
 
         # for field_name, field in self.fields.items():
         #     self.fields[field_name].widget.attrs['placeholder'] = field.label
@@ -243,12 +294,23 @@ class MemberFunctionForm(forms.ModelForm):
         fields = ['member_function',]
 
 
-
 class MemberOccupationForm(forms.ModelForm):
+    # member_occupation = forms.CharField(
+    #     required=True,
+    #     max_length=250,
+    #     widget=forms.TextInput(attrs={'autofocus': True})
+    # )
     member_occupation = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Stanowisko',
+                'aria-label': 'Stanowisko Członka',
+                'list': 'occupation_database'
+            }
+        ),
         required=True,
-        max_length=250,
-        widget=forms.TextInput(attrs={'autofocus': True})
+        max_length=250
     )
 
     class Meta:

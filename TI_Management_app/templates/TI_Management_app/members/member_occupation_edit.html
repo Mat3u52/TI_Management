@@ -1,21 +1,27 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:member_occupation_edit' pk=occupation.pk %}"> / Aktualizuj stanowisko</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_occupation_edit' pk=occupation.pk %}"><b> / Aktualizuj stanowisko</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
-  <form method="post" class="post-form">
-    {% csrf_token %}
-    {% if form.errors %}
-    <p>{{form.errors}}</p>
-    {% endif %}
-      <p>Stanowisko:</p>
-    {{form.member_occupation}}
-    <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+    <h2 class="fadeInUp-animation">Aktualizacja stanowiska Członka</h2>
+    <hr>
     <br />
+    <form method="post" class="post-form">
+      {% csrf_token %}
+      {% if form.errors %}
+        <p>{{form.errors}}</p>
+      {% endif %}
+      <h4>Stanowisko:</h4>
+      {{form.member_occupation}}
+      <br />
+      <br />
+      <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+      <br />
       <br />
   </form>
 </div>

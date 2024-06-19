@@ -1,12 +1,14 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Wyszukiwarka</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="#"><b> / Wyszukiwarka</b></a>
 {% endblock %}
 
 {% block content %}
     {% if searched %}
-        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <h2 class="fadeInUp-animation">Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <hr>
         <br />
         {% for member in members %}
             <div class="hero-unit">
@@ -23,7 +25,10 @@
             </div>
         {% endfor %}
     {% else %}
-        <h2>Please, insert the phrase into the search area.</h2>
+        <div class="hero-unit">
+            <h4>Proszę, wprowadź frazę w pole wyszukiwania</h4>
+            <br />
+        </div>
     {% endif %}
 {% endblock %}
 {% block menu %}

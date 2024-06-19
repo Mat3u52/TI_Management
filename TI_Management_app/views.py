@@ -150,7 +150,7 @@ def members_list(request):
 
     return render(
         request,
-        'TI_Management_app/members_list.html',
+        'TI_Management_app/members/members_list.html',
         {
             'page': page,
             'members': members
@@ -160,7 +160,6 @@ def members_list(request):
 
 @login_required
 def members_table_list(request):
-
     order_by = request.GET.get('order_by', '-forename')
     members_obj = MembersZZTI.objects.all().order_by(order_by)
 
@@ -173,10 +172,14 @@ def members_table_list(request):
     except EmptyPage:
         members = paginator.page(paginator.num_pages)
 
-    return render(request,
-                  'TI_Management_app/members_table_list.html',
-                  {'page': page,
-                   'members': members})
+    return render(
+        request,
+        'TI_Management_app/members/members_table_list.html',
+        {
+            'page': page,
+            'members': members
+        }
+    )
 
 
 def member_export_csv(request):
@@ -324,19 +327,58 @@ def error_404_view(request, exception):
 
 @login_required
 def member_new(request):
+    roles = MemberFunction.objects.all()
+    occupations = MemberOccupation.objects.all()
     if request.method == "POST":
         form = MemberForm(request.POST, request.FILES)
-        if form.is_valid():
+        form_role = MemberFunctionForm(request.POST)
+        form_occupation = MemberOccupationForm(request.POST)
+
+        if all([form.is_valid, form_role.is_valid(), form_occupation.is_valid()]):
+
+            role = form_role.cleaned_data['member_function']
+            if not MemberFunction.objects.filter(member_function=role).exists():
+                role_insert = form_role.save(commit=False)
+                role_insert.author = request.user
+                role_insert.save()
+
+            occupation = form_role.cleaned_data['member_occupation']
+            if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
+                occupation_insert = form_role.save(commit=False)
+                occupation_insert.author = request.user
+                occupation_insert.save()
+
+            forename = form.cleaned_data['forename']
+            surname = form.cleaned_data['surname']
+            birthplace = form.cleaned_data['birthplace']
+
             member = form.save(commit=False)
             member.author = request.user
+            member.forename = forename.title()
+            member.surname = surname.title()
+            member.birthplace = birthplace.title()
+            member.role = MemberFunction.objects.filter(member_function=role).latest('id')
+            member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
             if form.cleaned_data['card']:
                 member.card = make_password(form.cleaned_data['card'])
             member.save()
-            messages.success(request, "Dodano nowego członka!")
+            messages.success(request, f"Gratulacje! {member.forename} jest naszym nowym Członkiem.")
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberForm()
-    return render(request, 'TI_Management_app/member_new.html', {'form': form})
+        form_role = MemberFunctionForm()
+        form_occupation = MemberOccupationForm()
+    return render(
+        request,
+        'TI_Management_app/members/member_new.html',
+        {
+            'form': form,
+            'form_role': form_role,
+            'form_occupation': form_occupation,
+            'roles': roles,
+            'occupations': occupations
+         }
+    )
 
 
 @login_required
@@ -374,7 +416,7 @@ def member_function_add(request):
         form = MemberFunctionForm()
     return render(
         request,
-        'TI_Management_app/member_function_add.html',
+        'TI_Management_app/members/member_function_add.html',
         {
             'form': form,
             'all_functions': all_functions
@@ -398,7 +440,7 @@ def member_function_edit(request, pk):
         form = MemberFunctionForm(instance=function)
     return render(
         request,
-        'TI_Management_app/member_function_edit.html',
+        'TI_Management_app/members/member_function_edit.html',
         {
             'form': form,
             'all_functions': all_functions,
@@ -416,12 +458,18 @@ def member_occupation_add(request):
             occupation = form.save(commit=False)
             occupation.author = request.user
             occupation.save()
-            messages.success(request, f"Dodano nowy zawód {occupation.member_occupation}!")
+            messages.success(request, f"Dodano nowe stanowisko {occupation.member_occupation}!")
             return redirect('TI_Management_app:member_occupation_add')
     else:
         form = MemberOccupationForm()
-    return render(request, 'TI_Management_app/member_occupation_add.html',
-                  {'form': form, 'all_occupation': all_occupation})
+    return render(
+        request,
+        'TI_Management_app/members/member_occupation_add.html',
+        {
+            'form': form,
+            'all_occupation': all_occupation
+        }
+    )
 
 
 @login_required
@@ -434,13 +482,13 @@ def member_occupation_edit(request, pk):
             one_occupation = form.save(commit=False)
             one_occupation.author = request.user
             one_occupation.save()
-            messages.success(request, f"Zaktualizowano zawód {occupation.member_occupation}!")
+            messages.success(request, f"Zaktualizowano stanowisko {occupation.member_occupation}!")
             return redirect('TI_Management_app:member_occupation_add')
     else:
         form = MemberOccupationForm(instance=occupation)
     return render(
         request,
-        'TI_Management_app/member_occupation_edit.html',
+        'TI_Management_app/members/member_occupation_edit.html',
         {
             'form': form,
             'all_occupation': all_occupation,
@@ -469,6 +517,7 @@ def member_card_edit(request, pk):
                   )
 
 
+@login_required
 def member_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -476,14 +525,20 @@ def member_search(request):
                                              Q(surname__contains=searched.capitalize()) |
                                              Q(member_nr__contains=searched) |
                                              Q(phone_number__contains=searched))
-        return render(request,
-                      'TI_Management_app/member_search.html',
-                      {'searched': searched,
-                       'members': members})
+        return render(
+            request,
+            'TI_Management_app/members/member_search.html',
+            {
+                'searched': searched,
+                'members': members
+            }
+        )
     else:
-        return render(request,
-                      'TI_Management_app/member_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/members/member_search.html',
+            {}
+        )
 
 
 @login_required

@@ -2,6 +2,7 @@
 <ul class="nav nav-list">
     <li class="nav-header">Panel</li>
     <li><a href="#"><h4><b>Dashboard</b></h4></a></li>
+    <hr>
     <li class="{% if active_tab == 'members_list' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:members_list' %}">
             <h4><b>Baza Członków</b></h4>
@@ -22,6 +23,7 @@
             <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;stanowsko</b>
         </a>
     </li>
+    <hr>
     <li class="{% if active_tab == 'groups' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:groups_list' %}"><h4><b>Grupy</b></h4></a>
     </li>

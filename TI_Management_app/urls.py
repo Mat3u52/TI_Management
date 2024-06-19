@@ -5,17 +5,17 @@ app_name = 'TI_Management_app'
 
 urlpatterns = [
     path(
-        '',
+        'TI_Management_app/members/members-list/',
         views.members_list,
         name='members_list'
     ),
     path(
-        'TI_Management_app/members-table-list/',
+        'TI_Management_app/members/members-table-list/',
         views.members_table_list,
         name='members_table_list'
     ),
     path(
-        'TI_Management_app/members-list-export-csv/',
+        'TI_Management_app/members/members-list-export-csv/',
         views.member_export_csv,
         name='member_export_csv'
     ),
@@ -25,27 +25,27 @@ urlpatterns = [
         name='member_detail'
     ),
     path(
-        'TI_Management_app/new/',
+        'TI_Management_app/members/member_new/',
         views.member_new,
         name='member_new'
     ),
     path(
-        'TI_Management_app/member-function-add/',
+        'TI_Management_app/members/member-function-add/',
         views.member_function_add,
         name='member_function_add'
     ),
     path(
-        'TI_Management_app/member-function-edit/<int:pk>/',
+        'TI_Management_app/members/member-function-edit/<int:pk>/',
         views.member_function_edit,
         name='member_function_edit'
     ),
     path(
-        'TI_Management_app/member-occupation-add/',
+        'TI_Management_app/members/member-occupation-add/',
         views.member_occupation_add,
         name='member_occupation_add'
     ),
     path(
-        'TI_Management_app/member-occupation-edit/<int:pk>/',
+        'TI_Management_app/members/member-occupation-edit/<int:pk>/',
         views.member_occupation_edit,
         name='member_occupation_edit'
     ),
@@ -130,7 +130,7 @@ urlpatterns = [
         name='member_notepad_delete_all'
     ),
     path(
-        'TI_Management_app/member-search/',
+        'TI_Management_app/members/member-search/',
         views.member_search,
         name='member_search'
     ),

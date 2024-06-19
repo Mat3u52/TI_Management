@@ -1,139 +1,217 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load static %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:member_new' %}"> / Dodaj Członka</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_new' %}"><b> / Dodaj Członka</b></a>
 {% endblock %}
 
 {% block content %}
 
-    <div class="hero-unit">
-        <form method="post" class="post-form" enctype="multipart/form-data" autocomplete="off">
-            {% csrf_token %}
-<!--            {% if form.errors %}-->
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodawanie nowego Członka</h2>
+    <hr>
+    <br />
+    <form method="post" class="post-form" enctype="multipart/form-data" autocomplete="off">
+        {% csrf_token %}
+<!--           {% if form.errors %}-->
 <!--                <p>{{form.errors}}</p>-->
 <!--            {% endif %}-->
-            <table width="100%">
-                <tr>
-                    <td><p class="tableCredential"><b>Imie: </b></p></td>
-                    <td><p>{{form.forename}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Nazwisko: </b></p></td>
-                    <td><p>{{form.surname}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Funkcja: </b></p></td>
-                    <td><p>{{form.role}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Numer uczestnika: </b></p></td>
-                    <td>
-                        {% if form.member_nr.errors %}
-                            <p class="hint">{{form.member_nr}}</p>
-                            <p>{{form.member_nr.errors}}</p>
-                        {% else %}
-                            <p>{{form.member_nr}}</p>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Płeć: </b></p></td>
-                    <td><p>{{form.sex}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Data urodzenia: </b></p></td>
-                    <td><p>{{form.birthday}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
-                    <td><p>{{form.birthplace}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>PP ID: </b></p></td>
-                    <td>
-                        {% if form.pin.errors %}
-                            <p class="hint">{{form.pin}}</p>
-                            <p>{{form.pin.errors}}</p>
-                        {% else %}
-                            <p>{{form.pin}}</p>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Stanowisko: </b></p></td>
-                    <td><p>{{form.occupation}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-                    <td>
-                        {% if form.phone_number.errors %}
-                            <p class="hint">{{form.phone_number}}</p>
-                            <p>{{form.phone_number.errors}}</p>
-                        {% else %}
-                            <p>{{form.phone_number}}</p>
-                        {% endif %}
-                        <p>{{form.phone_number_1}}</p>
-                    </td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>E-mail: </b></p></td>
-                    <td>
-                        {% if form.email.errors %}
-                            <p class="hint">{{form.email}}</p>
-                            <p>{{form.email.errors}}</p>
-                        {% else %}
-                            <p>{{form.email}}</p>
-                        {% endif %}
-                    </td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
-                    <td><p>{{form.date_of_accession}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
-                    <td><p>{{form.date_of_abandonment}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
-                    <td><p>{{form.type_of_contract}}</p></td>
-                </tr>
-                <tr>
-                    <td class="tableCredential"><p><b>Data zatrudnienia: </b></p></td>
-                    <td><p>{{form.date_of_contract}}</p></td>
-                </tr>
-                <tr>
-                    <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
-                    <td><p>{{form.expiration_date_contract}}</p></td>
-                </tr>
-                <tr>
-                    <td><p class="tableCredential"><b>Grupa: </b></p></td>
-                    <td><p>{{form.group}}</p></td>
-                </tr>
-                <tr>
-                    <td class="tableCredential"><p><b>Karta: </b></p></td>
-                    <td><p>{{form.card}}</p></td>
-                </tr>
-                <tr>
-                    <td class="tableCredential"><p><b>Zdjęcie: </b></p></td>
-                    <td>
-<!--                        <p>{{form.image}}</p>-->
-                        <label class="custom-file-upload">
-                            Dodaj zdjęcie
-                            {{form.image}}
-                        </label>
-                    </td>
-                </tr>
-            </table>
+        <table width="100%">
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Imię nowego Członka: </b></p></td>
+                <td width="70%"><div>{{form.forename}}</div></td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Nazwisko nowego Członka: </b></p></td>
+                <td width="70%"><div>{{form.surname}}</div></td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Funkcja Członka: </b></p></td>
+<!--                <td><p>{{form.role}}</p></td>-->
+                <td width="70%">
+                    <div>
+                        {{form_role.member_function}}
+                        <datalist id="roles_database">
+                            {% for role in roles %}
+                                <option value="{{ role }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Numer uczestnika: </b></p></td>
+                <td width="70%">
+                    {% if form.member_nr.errors %}
+                        <p class="hint">{{form.member_nr}}</p>
+                        <p>{{form.member_nr.errors}}</p>
+                    {% else %}
+                        <p>{{form.member_nr}}</p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Płeć: </b></p></td>
+                <td width="70%">
+                    <p>{{form.sex}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Data urodzenia: </b></p></td>
+                <td width="70%">
+                    <p>{{form.birthday}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
+                <td width="70%">
+                    <p>{{form.birthplace}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>PP ID: </b></p></td>
+                <td width="70%">
+                    {% if form.pin.errors %}
+                        <p class="hint">{{form.pin}}</p>
+                        <p>{{form.pin.errors}}</p>
+                    {% else %}
+                        <p>{{form.pin}}</p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Stanowisko: </b></p></td>
+<!--                <td width="70%">-->
+<!--                    <p>{{form.occupation}}</p>-->
+<!--                </td>-->
+                <td width="70%">
+                    <div>
+                        {{form_occupation.member_occupation}}
+                        <datalist id="occupation_database">
+                            {% for occupation in occupations %}
+                                <option value="{{ occupation }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
+                <td width="70%">
+                    {% if form.phone_number.errors %}
+                        <div class="form-row">
+                            <div class="input-group">
+                                <div class="hint">{{ form.phone_number }}</div>
+                            </div>
+                            <div class="ext-input">
+                                <span class="flag-icon"><img src="{% static 'img/poland-flag.png' %}" alt="Poland Flag"></span>
+                                    {{ form.extension }}
+                            </div>
+                        </div>
+                        {{ form.phone_number.errors }}
+                    {% else %}
+                        <div class="form-row">
+                            <div class="input-group">
+                                {{ form.phone_number }}
+                            </div>
+                            <div class="ext-input">
+                                <span class="flag-icon"><img src="{% static 'img/poland-flag.png' %}" alt="Poland Flag"></span>
+                                    {{ form.extension }}
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>e-mail: </b></p></td>
+                <td width="70%">
+                    {% if form.email.errors %}
+                        <p class="hint">{{form.email}}</p>
+                        <p>{{form.email.errors}}</p>
+                    {% else %}
+                        <p>{{form.email}}</p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
+                <td width="70%">
+                    <p>{{form.date_of_accession}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
+                <td width="70%">
+                    <p>{{form.date_of_abandonment}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p><b>Data zatrudnienia: </b></p></td>
+                <td width="70%">
+                    <p>{{form.date_of_contract}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
+                <td width="70%">
+                    <p>{{form.type_of_contract}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p><b>Data rozwiązania umowy: </b></p></td>
+                <td width="70%">
+                    <p>{{form.expiration_date_contract}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p class="tableCredential"><b>Grupa: </b></p></td>
+                <td width="70%">
+                    <p>{{form.group}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p><b>Karta: </b></p></td>
+                <td width="70%">
+                    <p>{{form.card}}</p>
+                </td>
+            </tr>
+            <tr>
+                <td width="30%"><p><b>Zdjęcie: </b></p></td>
+                <td width="70%">
+                    <label class="custom-file-upload">
+                        Dodaj zdjęcie
+                        {{form.image}}
+                    </label>
+                </td>
+            </tr>
+        </table>
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+    </form>
+</div>
 
-            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
-            <br />
-        </form>
-    </div>
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const typeOfContractField = document.querySelector('#id_type_of_contract');
+    const expirationDateFieldWrapper = document.querySelector('tr:has(#id_expiration_date_contract)');
 
+    function toggleExpirationDateField() {
+        if (typeOfContractField.value === 'limited_duration') {
+            expirationDateFieldWrapper.style.display = '';
+        } else {
+            expirationDateFieldWrapper.style.display = 'none';
+        }
+    }
 
-{{form.as_p}}
+    typeOfContractField.addEventListener('change', toggleExpirationDateField);
+
+    // Initial check
+    toggleExpirationDateField();
+});
+</script>
 
 {% endblock %}
 

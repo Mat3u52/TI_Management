@@ -1,9 +1,19 @@
-
+html {
+    background-color: rgba(175, 175, 175, 0.6);
+    height: 100%;
+}
 body {
     padding-top: 60px;
     padding-bottom: 40px;
     font-family: century-gothic, sans-serif;
+    background: linear-gradient(rgba(175, 175, 175, 0.4), rgba(175, 175, 175, 0.4)), url("/static/img/wallpaper.jpg");
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    height: 100%;
+    margin: 0;
 }
+
 
 textarea {
     width: 100%;
