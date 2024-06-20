@@ -177,6 +177,60 @@
                     <p>{{form.card}}</p>
                 </td>
             </tr>
+
+
+
+            <tr>
+                <td width="30%">
+                    <p><b>Rekomendacja? </b>
+                    <input
+                        class="form-control me-2"
+                        style="min-width: 1%!important; min-height: 15px"
+                        type="checkbox"
+                        aria-label="rekomendacja"
+                        name="rekomendacja"
+                        id="rekomendacja" /></p>
+                </td>
+                <td width="70%">
+                    <div id="memberDiv" style="display: none;">
+                <input
+                    class="form-control me-2"
+                    style="min-width: 50%!important; min-height: 15px"
+                    type="text"
+                    list="members"
+                    placeholder="Nr Członka"
+                    aria-label="Nr Członka"
+                    name="member_nr" />
+                <datalist id="members">
+                    {% for member in members %}
+                        <option value="{{ member.member_nr }}">{{ member.forename }}</option>
+                    {% endfor %}
+                </datalist>
+                <div id="memberDetails" style="display: none;"></div>
+                <div id="error" style="color: red; display: none;"></div>
+                </div>
+
+                </td>
+            </tr>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
             <tr>
                 <td width="30%"><p><b>Zdjęcie: </b></p></td>
                 <td width="70%">
@@ -211,6 +265,76 @@ document.addEventListener('DOMContentLoaded', function () {
     // Initial check
     toggleExpirationDateField();
 });
+</script>
+
+<script>
+    const baseUrl = '{% url "TI_Management_app:get_member_details" "dummy_member_nr" %}'.replace('dummy_member_nr/', '');
+
+
+    document.getElementById('rekomendacja').addEventListener('change', function() {
+        var memberDiv = document.getElementById('memberDiv');
+        if (this.checked) {
+            memberDiv.style.display = 'block';
+        } else {
+            memberDiv.style.display = 'none';
+        }
+    });
+
+    document.querySelector('input[name="member_nr"]').addEventListener('change', function() {
+        var memberNr = this.value;
+        console.log('Member number changed: ', memberNr);
+        if (memberNr !== 'none') {
+            fetchMemberDetails(memberNr);
+        } else {
+            document.getElementById('memberDetails').style.display = 'none';
+            document.getElementById('error').style.display = 'none';
+        }
+    });
+
+    function fetchMemberDetails(memberNr) {
+        console.log('Fetching member details for: ', memberNr);
+        var xhr = new XMLHttpRequest();
+        xhr.open('GET', baseUrl + memberNr + '/', true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4) {
+                if (xhr.status === 200) {
+                    console.log('Received member details: ', xhr.responseText);
+                    var memberDetails = JSON.parse(xhr.responseText);
+                    displayMemberDetails(memberDetails);
+                    document.getElementById('error').style.display = 'none';
+                } else if (xhr.status === 404) {
+                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                    document.getElementById('memberDetails').style.display = 'none';
+                    displayError('Taki Członek nie istnieje');
+                } else {
+                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                    document.getElementById('memberDetails').style.display = 'none';
+                    displayError('Taki Członek nie istnieje lub jest dezaktywowany');
+                }
+            }
+        };
+        xhr.send();
+    }
+
+    function displayMemberDetails(details) {
+        var memberDetailsDiv = document.getElementById('memberDetails');
+        memberDetailsDiv.style.display = 'block';
+        memberDetailsDiv.innerHTML = `
+            <p><b>Imię:</b> ${details.first_name}</p>
+<!--                <p><b>Nazwisko:</b> ${details.last_name}</p>-->
+<!--                <p><b>Email:</b> ${details.email}</p>-->
+            <!-- Add more details as needed -->
+        `;
+        console.log('Displaying member details: ', details);
+    }
+
+    function displayError(errorMessage) {
+        var errorDiv = document.getElementById('error');
+        errorDiv.style.display = 'block';
+        errorDiv.innerText = errorMessage;
+        console.log('Displaying error: ', errorMessage);
+    }
 </script>
 
 {% endblock %}

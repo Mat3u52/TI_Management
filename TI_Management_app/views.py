@@ -329,6 +329,7 @@ def error_404_view(request, exception):
 def member_new(request):
     roles = MemberFunction.objects.all()
     occupations = MemberOccupation.objects.all()
+    members = MembersZZTI.objects.all().order_by('member_nr')
     if request.method == "POST":
         form = MemberForm(request.POST, request.FILES)
         form_role = MemberFunctionForm(request.POST)
@@ -342,9 +343,9 @@ def member_new(request):
                 role_insert.author = request.user
                 role_insert.save()
 
-            occupation = form_role.cleaned_data['member_occupation']
+            occupation = form_occupation.cleaned_data['member_occupation']
             if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
-                occupation_insert = form_role.save(commit=False)
+                occupation_insert = form_occupation.save(commit=False)
                 occupation_insert.author = request.user
                 occupation_insert.save()
 
@@ -376,7 +377,8 @@ def member_new(request):
             'form_role': form_role,
             'form_occupation': form_occupation,
             'roles': roles,
-            'occupations': occupations
+            'occupations': occupations,
+            'members': members
          }
     )
 

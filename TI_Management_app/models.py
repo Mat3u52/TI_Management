@@ -232,6 +232,7 @@ class MembersZZTI(models.Model):
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
     deactivate = models.BooleanField(default=False)
     recommended_by = models.CharField(max_length=250, blank=True, null=True, default=None)
+    # recommended_by = models.ForeignKey(MembersZZTI, on_delete=models.SET_NULL, null=True, related_name='authorMembers')
 
     history = HistoricalRecords()
 

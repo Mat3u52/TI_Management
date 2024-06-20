@@ -137,6 +137,7 @@ class MemberForm(forms.ModelForm):
             'expiration_date_contract',
             'group',
             'card',
+            'recommended_by',
             'image'
         ]
 
@@ -178,6 +179,7 @@ class MemberForm(forms.ModelForm):
         three_year_later_str = three_year_later.strftime('%Y-%m-%d')
         self.fields['expiration_date_contract'].initial = three_year_later_str
         self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
+        self.fields['recommended_by'].widget.attrs['placeholder'] = 'Rekomendacja'
 
         # for field_name, field in self.fields.items():
         #     self.fields[field_name].widget.attrs['placeholder'] = field.label
