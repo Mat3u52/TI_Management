@@ -14,8 +14,14 @@
     <br />
     <form method="post" class="post-form" enctype="multipart/form-data" autocomplete="off">
         {% csrf_token %}
-<!--           {% if form.errors %}-->
-<!--                <p>{{form.errors}}</p>-->
+           {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+<!--            {% if form_role.errors %}-->
+<!--                <p>{{form_role.errors}}</p>-->
+<!--            {% endif %}-->
+<!--            {% if form_occupation.errors %}-->
+<!--                <p>{{form_occupation.errors}}</p>-->
 <!--            {% endif %}-->
         <table width="100%">
             <tr>
@@ -31,7 +37,8 @@
 <!--                <td><p>{{form.role}}</p></td>-->
                 <td width="70%">
                     <div>
-                        {{form_role.member_function}}
+
+                        {{form.member_function}}
                         <datalist id="roles_database">
                             {% for role in roles %}
                                 <option value="{{ role }}"></option>
@@ -88,7 +95,7 @@
 <!--                </td>-->
                 <td width="70%">
                     <div>
-                        {{form_occupation.member_occupation}}
+                        {{form.member_occupation}}
                         <datalist id="occupation_database">
                             {% for occupation in occupations %}
                                 <option value="{{ occupation }}"></option>
@@ -178,58 +185,24 @@
                 </td>
             </tr>
 
-
-
             <tr>
                 <td width="30%">
-                    <p><b>Rekomendacja? </b>
-                    <input
-                        class="form-control me-2"
-                        style="min-width: 1%!important; min-height: 15px"
-                        type="checkbox"
-                        aria-label="rekomendacja"
-                        name="rekomendacja"
-                        id="rekomendacja" /></p>
+                    <p><b>Rekomendacja? </b>{{ form.recommendation }}</p>
                 </td>
                 <td width="70%">
                     <div id="memberDiv" style="display: none;">
-                <input
-                    class="form-control me-2"
-                    style="min-width: 50%!important; min-height: 15px"
-                    type="text"
-                    list="members"
-                    placeholder="Nr Członka"
-                    aria-label="Nr Członka"
-                    name="member_nr" />
-                <datalist id="members">
-                    {% for member in members %}
-                        <option value="{{ member.member_nr }}">{{ member.forename }}</option>
-                    {% endfor %}
-                </datalist>
-                <div id="memberDetails" style="display: none;"></div>
-                <div id="error" style="color: red; display: none;"></div>
-                </div>
+                        {{ form.recommended_member_nr }}
+                        <datalist id="members">
+                            {% for member in members %}
+                                <option value="{{ member.member_nr }}">{{ member.forename }}</option>
+                            {% endfor %}
+                        </datalist>
+                        <div id="memberDetails" style="display: none;"></div>
+                        <div id="error" style="color: red; display: none;"></div>
+                    </div>
 
                 </td>
             </tr>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
             <tr>
                 <td width="30%"><p><b>Zdjęcie: </b></p></td>
@@ -271,7 +244,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const baseUrl = '{% url "TI_Management_app:get_member_details" "dummy_member_nr" %}'.replace('dummy_member_nr/', '');
 
 
-    document.getElementById('rekomendacja').addEventListener('change', function() {
+    document.getElementById('recommendation').addEventListener('change', function() {
         var memberDiv = document.getElementById('memberDiv');
         if (this.checked) {
             memberDiv.style.display = 'block';
@@ -280,7 +253,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    document.querySelector('input[name="member_nr"]').addEventListener('change', function() {
+    document.querySelector('input[name="recommended_member_nr"]').addEventListener('change', function() {
         var memberNr = this.value;
         console.log('Member number changed: ', memberNr);
         if (memberNr !== 'none') {

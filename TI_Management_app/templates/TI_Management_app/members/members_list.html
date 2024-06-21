@@ -1,5 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
+{% load thumbnail %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
@@ -40,10 +42,16 @@
 
 {% for member in members %}
     <div class="hero-unit">
-        <h2><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
             {{member.forename}} {{member.surname}}
-        </a></h2>
-            <img src="{{ member.image.url }}" alt="image" width="150px">
+        </a>
+        </h3>
+        <hr>
+<!--            <img src="{{ member.image.url }}" alt="image" width="150px">-->
+            <a href="{{ member.image.url }}">
+                <img src="{% thumbnail member.image 150x0  quality=100 %}">
+            </a>
+
         <table>
           <tr>
             <td><p class="tableCredential"><b>Funkcja:</b></p></td>
@@ -61,10 +69,10 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-            <td><p>{{member.phone_number}}</p></td>
+            <td><p>{{member.phone_number|phone_number}}</p></td>
           </tr>
           <tr>
-            <td><p class="tableCredential"><b>E-mail: </b></p></td>
+            <td><p class="tableCredential"><b>e-mail: </b></p></td>
             <td><p>{{member.email}}</p></td>
           </tr>
         </table>
@@ -86,7 +94,7 @@
         </a></p>
         <div class="date"><p>Data dodania: {{member.created_date}}</p></div>
     </div>
-{{forloop.counter}}. {{ member }}
+{{ forloop.counter }} {{ forloop.counter0 }} of {{ forloop.last|yesno:"total," }} {{ forloop.revcounter }}
 {% endfor %}
 
 {% include 'TI_Management_app/pagination.html' with page=members %}

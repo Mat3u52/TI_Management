@@ -73,6 +73,7 @@ INSTALLED_APPS = [
     'dbbackup',
     'localflavor',
     'django_ckeditor_5',
+    'easy_thumbnails',
 ]
 
 MIDDLEWARE = [

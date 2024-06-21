@@ -110,6 +110,7 @@ from collections import defaultdict
 import pytz
 from decimal import Decimal
 from django.db.models import Sum, Case, When, DecimalField, OuterRef, Subquery, Max
+# from django.db import IntegrityError
 
 
 # class Image(TemplateView):
@@ -325,29 +326,102 @@ def error_404_view(request, exception):
     return render(request, 'TI_Management_app/404.html', data)
 
 
+# @login_required
+# def member_new(request):
+#     roles = MemberFunction.objects.all()
+#     occupations = MemberOccupation.objects.all()
+#     members = MembersZZTI.objects.all().order_by('member_nr')
+#     if request.method == "POST":
+#         form = MemberForm(request.POST, request.FILES)
+#         form_role = MemberFunctionForm(request.POST)
+#         form_occupation = MemberOccupationForm(request.POST)
+#
+#         # if all([form.is_valid, form_role.is_valid(), form_occupation.is_valid()]):
+#         if form.is_valid and form_role.is_valid and form_occupation.is_valid:
+#
+#             role = form_role.cleaned_data['member_function']
+#             if not MemberFunction.objects.filter(member_function=role).exists():
+#                 role_insert = form_role.save(commit=False)
+#                 role_insert.author = request.user
+#                 role_insert.save()
+#
+#             occupation = form_occupation.cleaned_data['member_occupation']
+#             if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
+#                 occupation_insert = form_occupation.save(commit=False)
+#                 occupation_insert.author = request.user
+#                 occupation_insert.save()
+#
+#             forename = form.cleaned_data['forename']
+#             surname = form.cleaned_data['surname']
+#             birthplace = form.cleaned_data['birthplace']
+#             # if form.cleaned_data['recommended_member_nr']:
+#             #     recommended_member_nr = form.cleaned_data['recommended_member_nr']
+#             # if form.cleaned_data['card']:
+#             #     card = form.cleaned_data['card']
+#
+#             member = form.save(commit=False)
+#             member.author = request.user
+#             member.forename = forename.title()
+#             member.surname = surname.title()
+#             member.birthplace = birthplace.title()
+#             member.role = MemberFunction.objects.filter(member_function=role).latest('id')
+#             member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
+#             if form.cleaned_data['card']:
+#                 member.card = make_password(form.cleaned_data['card'])
+#             if form.cleaned_data['recommended_member_nr']:
+#                 member.recommended_by = form.cleaned_data['recommended_member_nr']
+#             member.save()
+#             messages.success(request, f"Gratulacje! {member.forename} jest naszym nowym Członkiem.")
+#             return redirect('TI_Management_app:member_detail', pk=member.pk)
+#     else:
+#         form = MemberForm()
+#         form_role = MemberFunctionForm()
+#         form_occupation = MemberOccupationForm()
+#     return render(
+#         request,
+#         'TI_Management_app/members/member_new.html',
+#         {
+#             'form': form,
+#             'form_role': form_role,
+#             'form_occupation': form_occupation,
+#             'roles': roles,
+#             'occupations': occupations,
+#             'members': members
+#          }
+#     )
 @login_required
 def member_new(request):
     roles = MemberFunction.objects.all()
     occupations = MemberOccupation.objects.all()
     members = MembersZZTI.objects.all().order_by('member_nr')
+
     if request.method == "POST":
         form = MemberForm(request.POST, request.FILES)
-        form_role = MemberFunctionForm(request.POST)
-        form_occupation = MemberOccupationForm(request.POST)
+        # form_role = MemberFunctionForm(request.POST)
+        # form_occupation = MemberOccupationForm(request.POST)
 
-        if all([form.is_valid, form_role.is_valid(), form_occupation.is_valid()]):
+        # if form.is_valid() and form_role.is_valid() and form_occupation.is_valid():
+        if form.is_valid():
 
-            role = form_role.cleaned_data['member_function']
+            # role = form_role.cleaned_data['member_function']
+            role = form.cleaned_data['member_function']
+
             if not MemberFunction.objects.filter(member_function=role).exists():
-                role_insert = form_role.save(commit=False)
+                # role_insert = form_role.save(commit=False)
+                role_insert = form.save(commit=False)
                 role_insert.author = request.user
                 role_insert.save()
 
-            occupation = form_occupation.cleaned_data['member_occupation']
+
+            # occupation = form_occupation.cleaned_data['member_occupation']
+            occupation = form.cleaned_data['member_occupation']
+
             if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
-                occupation_insert = form_occupation.save(commit=False)
+                # occupation_insert = form_occupation.save(commit=False)
+                occupation_insert = form.save(commit=False)
                 occupation_insert.author = request.user
                 occupation_insert.save()
+
 
             forename = form.cleaned_data['forename']
             surname = form.cleaned_data['surname']
@@ -360,27 +434,37 @@ def member_new(request):
             member.birthplace = birthplace.title()
             member.role = MemberFunction.objects.filter(member_function=role).latest('id')
             member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
-            if form.cleaned_data['card']:
-                member.card = make_password(form.cleaned_data['card'])
+
+            card = form.cleaned_data.get('card')
+            if card:
+                member.card = make_password(card)
+
+            recommended_member_nr = form.cleaned_data.get('recommended_member_nr')
+            if recommended_member_nr:
+                member.recommended_by = recommended_member_nr
+
             member.save()
             messages.success(request, f"Gratulacje! {member.forename} jest naszym nowym Członkiem.")
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberForm()
-        form_role = MemberFunctionForm()
-        form_occupation = MemberOccupationForm()
+        # form_role = MemberFunctionForm()
+        # form_occupation = MemberOccupationForm()
+
     return render(
         request,
         'TI_Management_app/members/member_new.html',
         {
             'form': form,
-            'form_role': form_role,
-            'form_occupation': form_occupation,
+            # 'form_role': form_role,
+            # 'form_occupation': form_occupation,
             'roles': roles,
             'occupations': occupations,
             'members': members
-         }
+        }
     )
+
+
 
 
 @login_required

@@ -87,6 +87,9 @@ a:hover {
 
 h1, h2{
     font-family: Corbel, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans-serif;
+    background: -webkit-linear-gradient(#eee, #000);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
 
 

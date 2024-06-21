@@ -39,7 +39,7 @@ class MemberFunction(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMemberFunction')
     member_function = models.CharField(max_length=250, blank=False, default=None, unique=True)
 
-    objects = models.Manager()  # default manager
+    objects = models.Manager()
 
     class Meta:
         verbose_name_plural = 'Funkcja Członka'

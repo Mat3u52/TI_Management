@@ -47,13 +47,6 @@ def validate_phone_number(value):
     
 class MemberForm(forms.ModelForm):
 
-    # phone_number = forms.CharField(
-    #     required=False,
-    #     validators=[RegexValidator(r'^\+?1?\d{9,15}$',
-    #                                message="Wprowadź włąściwy numer telefonu.")]
-    # )
-    # phone_number = PhoneField(blank=True, help_text='Contact phone number', validators=[validate_phone_number])
-
     phone_number = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -105,7 +98,7 @@ class MemberForm(forms.ModelForm):
                 'accept': 'image/jpeg,image/png'
             }
         ),
-        required=True
+        required=False
     )
 
     card = forms.CharField(
@@ -113,7 +106,58 @@ class MemberForm(forms.ModelForm):
             attrs={
                 'autocomplete': 'new-password'
             }
-        )
+        ),
+        required=False
+    )
+
+    recommendation = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'form-control me-2',
+                'style': 'min-width: 1%!important; min-height: 15px',
+                'aria-label': 'rekomendacja',
+                'id': 'recommendation',
+            }
+        ),
+        required=False
+    )
+
+    recommended_member_nr = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'style': 'min-width: 50%!important; min-height: 15px',
+                'type': 'text',
+                'list': 'members',
+                'aria-label': 'Nr Członka',
+                'name': 'recommended_member_nr',
+            }
+        ),
+        required=False
+    )
+    member_function = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Funkcja',
+                'aria-label': 'Funkcja Członka',
+                'list': 'roles_database'
+            }
+        ),
+        required=True,
+        max_length=250
+    )
+    member_occupation = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Stanowisko',
+                'aria-label': 'Stanowisko Członka',
+                'list': 'occupation_database'
+            }
+        ),
+        required=True,
+        max_length=250
     )
 
     class Meta:
@@ -121,6 +165,8 @@ class MemberForm(forms.ModelForm):
         fields = [
             'forename',
             'surname',
+            'member_function',
+            'member_occupation',
             # 'role',
             # 'occupation',
             'member_nr',
@@ -137,7 +183,9 @@ class MemberForm(forms.ModelForm):
             'expiration_date_contract',
             'group',
             'card',
-            'recommended_by',
+            'recommendation',
+            'recommended_member_nr',
+            # 'recommended_by',
             'image'
         ]
 
@@ -179,7 +227,7 @@ class MemberForm(forms.ModelForm):
         three_year_later_str = three_year_later.strftime('%Y-%m-%d')
         self.fields['expiration_date_contract'].initial = three_year_later_str
         self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
-        self.fields['recommended_by'].widget.attrs['placeholder'] = 'Rekomendacja'
+        self.fields['recommended_member_nr'].widget.attrs['placeholder'] = 'Nr Członka'
 
         # for field_name, field in self.fields.items():
         #     self.fields[field_name].widget.attrs['placeholder'] = field.label

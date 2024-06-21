@@ -89,3 +89,13 @@ def subtract(value, *args):
     for arg in args:
         result -= arg
     return result
+
+
+@register.filter(name='phone_number')
+def phone_number_format(value):
+    """Formats a phone number to (XXX) XXX-XXXX format."""
+    value = str(value)  # Ensure value is treated as a string
+    if len(value) == 9:
+        return f'(+48) {value[0:3]}-{value[3:6]}-{value[6:9]}'
+    else:
+        return value  # Return original value if not 10 characters (no formatting)
