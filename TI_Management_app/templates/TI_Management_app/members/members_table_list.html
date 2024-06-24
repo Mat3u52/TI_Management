@@ -31,6 +31,7 @@
     </form>
 </div>
 <!--<div class="hero-unit">-->
+<!--<div style="background-color: white">-->
     <table id="dtBasicExample" class="table table-striped table-hover table-bordered">
         <thead class="table">
             <tr>
@@ -110,7 +111,7 @@
         </thead>
 
         {% for member in members %}
-        <tr>
+        <tr style="background-color: #ffffff;">
             <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}}</a></td>
             <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.surname}}</a></td>
             <td><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.member_nr}}</a></td>

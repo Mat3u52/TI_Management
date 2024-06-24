@@ -74,7 +74,8 @@ from .forms import (
     KindOfFinanceDocumentForm,
     KindOfFinanceExpenseForm,
     FileFinanceForm,
-    BankStatementForm
+    BankStatementForm,
+    MemberCardEditForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -110,6 +111,7 @@ from collections import defaultdict
 import pytz
 from decimal import Decimal
 from django.db.models import Sum, Case, When, DecimalField, OuterRef, Subquery, Max
+from .common.decorators import ajax_required
 # from django.db import IntegrityError
 
 
@@ -326,69 +328,6 @@ def error_404_view(request, exception):
     return render(request, 'TI_Management_app/404.html', data)
 
 
-# @login_required
-# def member_new(request):
-#     roles = MemberFunction.objects.all()
-#     occupations = MemberOccupation.objects.all()
-#     members = MembersZZTI.objects.all().order_by('member_nr')
-#     if request.method == "POST":
-#         form = MemberForm(request.POST, request.FILES)
-#         form_role = MemberFunctionForm(request.POST)
-#         form_occupation = MemberOccupationForm(request.POST)
-#
-#         # if all([form.is_valid, form_role.is_valid(), form_occupation.is_valid()]):
-#         if form.is_valid and form_role.is_valid and form_occupation.is_valid:
-#
-#             role = form_role.cleaned_data['member_function']
-#             if not MemberFunction.objects.filter(member_function=role).exists():
-#                 role_insert = form_role.save(commit=False)
-#                 role_insert.author = request.user
-#                 role_insert.save()
-#
-#             occupation = form_occupation.cleaned_data['member_occupation']
-#             if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
-#                 occupation_insert = form_occupation.save(commit=False)
-#                 occupation_insert.author = request.user
-#                 occupation_insert.save()
-#
-#             forename = form.cleaned_data['forename']
-#             surname = form.cleaned_data['surname']
-#             birthplace = form.cleaned_data['birthplace']
-#             # if form.cleaned_data['recommended_member_nr']:
-#             #     recommended_member_nr = form.cleaned_data['recommended_member_nr']
-#             # if form.cleaned_data['card']:
-#             #     card = form.cleaned_data['card']
-#
-#             member = form.save(commit=False)
-#             member.author = request.user
-#             member.forename = forename.title()
-#             member.surname = surname.title()
-#             member.birthplace = birthplace.title()
-#             member.role = MemberFunction.objects.filter(member_function=role).latest('id')
-#             member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
-#             if form.cleaned_data['card']:
-#                 member.card = make_password(form.cleaned_data['card'])
-#             if form.cleaned_data['recommended_member_nr']:
-#                 member.recommended_by = form.cleaned_data['recommended_member_nr']
-#             member.save()
-#             messages.success(request, f"Gratulacje! {member.forename} jest naszym nowym Członkiem.")
-#             return redirect('TI_Management_app:member_detail', pk=member.pk)
-#     else:
-#         form = MemberForm()
-#         form_role = MemberFunctionForm()
-#         form_occupation = MemberOccupationForm()
-#     return render(
-#         request,
-#         'TI_Management_app/members/member_new.html',
-#         {
-#             'form': form,
-#             'form_role': form_role,
-#             'form_occupation': form_occupation,
-#             'roles': roles,
-#             'occupations': occupations,
-#             'members': members
-#          }
-#     )
 @login_required
 def member_new(request):
     roles = MemberFunction.objects.all()
@@ -405,23 +344,33 @@ def member_new(request):
 
             # role = form_role.cleaned_data['member_function']
             role = form.cleaned_data['member_function']
-
-            if not MemberFunction.objects.filter(member_function=role).exists():
-                # role_insert = form_role.save(commit=False)
-                role_insert = form.save(commit=False)
-                role_insert.author = request.user
-                role_insert.save()
+            if role:
+                if not MemberFunction.objects.filter(member_function=role).exists():
+                    # role_insert = form_role.save(commit=False)
+                    # role_insert = form.save(commit=False)
+                    # role_insert.author = request.user
+                    # role_insert.save()
+                    member_function = MemberFunction.objects.create(
+                        author=request.user,
+                        member_function=role
+                    )
+                    member_function.save()
 
 
             # occupation = form_occupation.cleaned_data['member_occupation']
             occupation = form.cleaned_data['member_occupation']
 
-            if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
-                # occupation_insert = form_occupation.save(commit=False)
-                occupation_insert = form.save(commit=False)
-                occupation_insert.author = request.user
-                occupation_insert.save()
-
+            if occupation:
+                if not MemberOccupation.objects.filter(member_occupation=occupation).exists():
+                    # occupation_insert = form_occupation.save(commit=False)
+                    # occupation_insert = form.save(commit=False)
+                    # occupation_insert.author = request.user
+                    # occupation_insert.save()
+                    member_occupation = MemberOccupation.objects.create(
+                        author=request.user,
+                        member_occupation=occupation
+                    )
+                    member_occupation.save()
 
             forename = form.cleaned_data['forename']
             surname = form.cleaned_data['surname']
@@ -431,9 +380,12 @@ def member_new(request):
             member.author = request.user
             member.forename = forename.title()
             member.surname = surname.title()
-            member.birthplace = birthplace.title()
-            member.role = MemberFunction.objects.filter(member_function=role).latest('id')
-            member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
+            if birthplace:
+                member.birthplace = birthplace.title()
+            if role:
+                member.role = MemberFunction.objects.filter(member_function=role).latest('id')
+            if occupation:
+                member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
 
             card = form.cleaned_data.get('card')
             if card:
@@ -442,6 +394,10 @@ def member_new(request):
             recommended_member_nr = form.cleaned_data.get('recommended_member_nr')
             if recommended_member_nr:
                 member.recommended_by = recommended_member_nr
+
+            type_of_contract = form.cleaned_data.get('type_of_contract')
+            if type_of_contract == 'indefinite_period_of_time':
+                member.expiration_date_contract = None
 
             member.save()
             messages.success(request, f"Gratulacje! {member.forename} jest naszym nowym Członkiem.")
@@ -587,20 +543,26 @@ def member_occupation_edit(request, pk):
 def member_card_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
-        form = MemberForm(request.POST, request.FILES, instance=member)
+        form = MemberCardEditForm(request.POST, instance=member)
         if form.is_valid():
             member = form.save(commit=False)
             member.author = request.user
+            card = form.cleaned_data.get('card')
+            if card:
+                member.card = make_password(card)
             member.save()
             messages.success(request, "Zaktualizowano!")
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
-        form = MemberForm(instance=member)
-    return render(request, 'TI_Management_app/member_card_edit.html',
-                  {
-                      'form': form,
-                      'member': member}
-                  )
+        form = MemberCardEditForm(instance=member)
+    return render(
+        request,
+        'TI_Management_app/members/member_card_edit.html',
+        {
+            'form': form,
+            'member': member
+        }
+    )
 
 
 @login_required
@@ -2768,6 +2730,8 @@ def scholarships_delete(request, pk):
     return redirect('TI_Management_app:scholarships_list')
 
 
+@ajax_required
+@login_required
 def get_member_details(request, member_nr):
     try:
         member = get_object_or_404(MembersZZTI, member_nr=member_nr, card__isnull=False, deactivate=False)

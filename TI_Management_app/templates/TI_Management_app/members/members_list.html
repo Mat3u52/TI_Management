@@ -41,61 +41,68 @@
 </div>
 
 {% for member in members %}
-    <div class="hero-unit">
-        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
-            {{member.forename}} {{member.surname}}
-        </a>
-        </h3>
-        <hr>
+<div class="hero-unit">
+    <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+        {{member.forename}} {{member.surname}}
+    </a>
+    </h3>
+    <hr>
 <!--            <img src="{{ member.image.url }}" alt="image" width="150px">-->
+
+
+        <div class="notepad">
             <a href="{{ member.image.url }}">
                 <img src="{% thumbnail member.image 150x0  quality=100 %}">
             </a>
 
-        <table>
-          <tr>
-            <td><p class="tableCredential"><b>Funkcja:</b></p></td>
-            <td><p>{{member.role}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
-            <td><p>{{member.member_nr}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Płeć: </b></p></td>
-            <td>{% if member.sex == 'male' %}<p>M</p>
-                {% elif member.sex == 'female' %}<p>K</p>
-                {% else %}<p>None</p>{% endif %}</td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-            <td><p>{{member.phone_number|phone_number}}</p></td>
-          </tr>
-          <tr>
-            <td><p class="tableCredential"><b>e-mail: </b></p></td>
-            <td><p>{{member.email}}</p></td>
-          </tr>
-        </table>
-        {% if member.deactivate %}
-            <span class="label label-warning">Dezaktywacja!</span>
-        {% endif %}
-
-        {% with existing_user=member.member_nr|admin_exist %}
-            {% if existing_user %}
-                <span class="label label-info">Administrator</span>
-            {% else %}
-                <!-- User not found -->
+            <table>
+                <tr>
+                    <td><p class="tableCredential"><b>Funkcja:</b></p></td>
+                    <td><p>{{member.role}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
+                    <td><p>{{member.member_nr}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Płeć: </b></p></td>
+                    <td>
+                        {% if member.sex == 'male' %}<p>M</p>
+                        {% elif member.sex == 'female' %}<p>K</p>
+                        {% else %}<p>None</p>{% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
+                    <td><p>{{member.phone_number|phone_number}}</p></td>
+                </tr>
+                <tr>
+                    <td><p class="tableCredential"><b>e-mail: </b></p></td>
+                    <td><p>{{member.email}}</p></td>
+                </tr>
+            </table>
+            {% if member.deactivate %}
+                <span class="label label-warning">Dezaktywacja!</span>
             {% endif %}
-        {% endwith %}
 
+            {% with existing_user=member.member_nr|admin_exist %}
+                {% if existing_user %}
+                    <span class="label label-info">Administrator</span>
+                {% else %}
+                    <!-- User not found -->
+                {% endif %}
+            {% endwith %}
+        </div>
+        <br />
 
-        <p><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
-            Więcej informacji
-        </a></p>
-        <div class="date"><p>Data dodania: {{member.created_date}}</p></div>
-    </div>
-{{ forloop.counter }} {{ forloop.counter0 }} of {{ forloop.last|yesno:"total," }} {{ forloop.revcounter }}
+    <p><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+        Więcej informacji
+    </a></p>
+    <div class="date"><p>Data dodania: {{member.created_date}}</p></div>
+</div>
 {% endfor %}
+
+Ilość Członków w bazie: {{ members|length }}
 
 {% include 'TI_Management_app/pagination.html' with page=members %}
 

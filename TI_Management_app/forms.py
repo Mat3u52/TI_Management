@@ -36,6 +36,7 @@ from localflavor.pl.forms import PLPostalCodeField
 from datetime import datetime, date, timedelta
 
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
 from phone_field import PhoneField
 
 
@@ -47,10 +48,47 @@ def validate_phone_number(value):
     
 class MemberForm(forms.ModelForm):
 
+    forename = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Nr Członka'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Imię musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
+    )
+
+    surname = forms.CharField(
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwisko musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
+    )
+
+    birthplace = forms.CharField(
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Miejsce urodzenia musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
+    )
+
     phone_number = forms.CharField(
         widget=forms.TextInput(
             attrs={
-                'placeholder': '500 500 500',
+                'placeholder': '000 000 000',
                 'class': 'phone-number'
             }
         ),
@@ -74,21 +112,38 @@ class MemberForm(forms.ModelForm):
 
     member_nr = forms.CharField(
         validators=[
+            MinLengthValidator(
+                limit_value=6,
+                message="Numer Członka musi zawierać 6 znaków."
+            ),
             RegexValidator(
-                r'^\d{0,10}$',
+                regex=r'^\d{0,10}$',
                 message="To pole musi być liczbą."
             )
-        ]
+        ],
+        max_length=100
     )
 
     pin = forms.IntegerField(
-        required=True,
         validators=[
+            # MinLengthValidator(
+            #     limit_value=4,
+            #     message="PIN musi zawierać 4 znaki."
+            # ),
+            MinValueValidator(
+                limit_value=0,  # Minimum value allowed
+                message="PIN musi być dodatni."  # Customize as needed
+            ),
+            MaxValueValidator(
+                limit_value=9999,  # Maximum value allowed (adjust as necessary)
+                message="PIN max 9999."  # Customize as needed
+            ),
             RegexValidator(
                 r'^\d{0,8}$',
                 message="To pole musi być liczbą."
             )
-        ]
+        ],
+        required=True
     )
 
     image = forms.FileField(
@@ -101,14 +156,14 @@ class MemberForm(forms.ModelForm):
         required=False
     )
 
-    card = forms.CharField(
-        widget=forms.PasswordInput(
-            attrs={
-                'autocomplete': 'new-password'
-            }
-        ),
-        required=False
-    )
+    # card = forms.CharField(
+    #     widget=forms.PasswordInput(
+    #         attrs={
+    #             'autocomplete': 'new-password'
+    #         }
+    #     ),
+    #     required=False
+    # )
 
     recommendation = forms.BooleanField(
         widget=forms.CheckboxInput(
@@ -135,7 +190,14 @@ class MemberForm(forms.ModelForm):
         ),
         required=False
     )
+
     member_function = forms.CharField(
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Funkcja Członka musi zawierać co najmniej 2 znaki."
+            )
+        ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
@@ -145,9 +207,16 @@ class MemberForm(forms.ModelForm):
             }
         ),
         required=True,
-        max_length=250
+        max_length=150
     )
+
     member_occupation = forms.CharField(
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Stanowisko musi zawierać co najmniej 2 znaki."
+            ),
+        ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
@@ -157,7 +226,7 @@ class MemberForm(forms.ModelForm):
             }
         ),
         required=True,
-        max_length=250
+        max_length=150
     )
 
     class Meta:
@@ -182,7 +251,7 @@ class MemberForm(forms.ModelForm):
             'date_of_contract',
             'expiration_date_contract',
             'group',
-            'card',
+            # 'card',
             'recommendation',
             'recommended_member_nr',
             # 'recommended_by',
@@ -200,6 +269,9 @@ class MemberForm(forms.ModelForm):
             # 'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
             'expiration_date_contract': forms.TextInput(attrs={'type': 'date'}),
             # 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'sex': forms.Select(attrs={'class': 'form-control select'}),
+            'type_of_contract': forms.Select(attrs={'class': 'form-control select'}),
+            'group': forms.Select(attrs={'class': 'form-control select'}),
 
         }
 
@@ -208,12 +280,12 @@ class MemberForm(forms.ModelForm):
 
         self.fields['forename'].widget.attrs['placeholder'] = 'Imię'
         self.fields['surname'].widget.attrs['placeholder'] = 'Nazwisko'
-        self.fields['member_nr'].widget.attrs['placeholder'] = 'od 0 do 10 znaków'
+        self.fields['member_nr'].widget.attrs['placeholder'] = '6 znaków: 000000'
         eighteen_years_ago = date.today() - timedelta(days=18 * 365)
         eighteen_years_ago_str = eighteen_years_ago.strftime('%Y-%m-%d')
         self.fields['birthday'].initial = eighteen_years_ago_str
         self.fields['birthplace'].widget.attrs['placeholder'] = 'Miejsce urodzenia'
-        self.fields['pin'].widget.attrs['placeholder'] = 'od 0 do 8 znaków'
+        self.fields['pin'].widget.attrs['placeholder'] = '4 znaki: 0000'
         self.fields['email'].widget.attrs['placeholder'] = 'user@user.com'
         current_data = date.today()
         current_data_str = current_data.strftime('%Y-%m-%d')
@@ -226,17 +298,61 @@ class MemberForm(forms.ModelForm):
         three_year_later = date.today().replace(year=date.today().year + 3)
         three_year_later_str = three_year_later.strftime('%Y-%m-%d')
         self.fields['expiration_date_contract'].initial = three_year_later_str
-        self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
+        # self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
         self.fields['recommended_member_nr'].widget.attrs['placeholder'] = 'Nr Członka'
+        self.fields['type_of_contract'].required = True
 
-        # for field_name, field in self.fields.items():
-        #     self.fields[field_name].widget.attrs['placeholder'] = field.label
+    def clean(self):
+        cleaned_data = super().clean()
+        date_of_accession = cleaned_data.get("date_of_accession")
+        date_of_abandonment = cleaned_data.get("date_of_abandonment")
+        date_of_contract = cleaned_data.get("date_of_contract")
+        expiration_date_contract = cleaned_data.get("expiration_date_contract")
 
-    def clean_phone_number(self):
+        # Debugging output
+        print(f"Date of Accession: {date_of_accession}")
+        print(f"Date of Abandonment: {date_of_abandonment}")
+        print(f"Date of date_of_contract: {date_of_contract}")
+
+        if date_of_accession and date_of_abandonment:
+            if date_of_accession >= date_of_abandonment:
+                raise ValidationError("Data przystąpienia musi być wcześniejsza niż data rezygnacji.")
+
+        if date_of_accession and date_of_contract:
+            if date_of_accession < date_of_contract:
+                raise ValidationError("Data przystąpienia musi być późniejsza niż data zatrudnienia.")
+
+        if expiration_date_contract and date_of_contract:
+            if expiration_date_contract < date_of_contract:
+                raise ValidationError("Data rozwiązania umowy musi być późniejsza niż data zatrudnienia.")
+
         phone_number = self.cleaned_data.get('phone_number')
-        # Validate phone number using PhoneField's validator
         PhoneField().clean(phone_number, None)
-        return phone_number
+
+        return cleaned_data
+
+
+class MemberCardEditForm(forms.ModelForm):
+
+    card = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password'
+            }
+        ),
+        required=False
+    )
+
+    class Meta:
+        model = MembersZZTI
+        fields = [
+            'card'
+        ]
+
+    def __init__(self, *args, **kwargs):
+        super(MemberCardEditForm, self).__init__(*args, **kwargs)
+
+        self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
 
 
 class MemberEditForm(forms.ModelForm):
@@ -815,7 +931,7 @@ class RegisterReliefForm(forms.ModelForm):
         date_of_accident = cleaned_data.get('date_of_accident')
 
         if not date_of_accident:
-            raise forms.ValidationError("Podaj datę wypadku.")
+            raise forms.ValidationError("Podaj datę zdarzenia.")
 
         relief = cleaned_data.get('relief')
         if relief:
@@ -1203,6 +1319,10 @@ class KindOfFinanceExpenseForm(forms.ModelForm):
 
 class FileFinanceForm(forms.ModelForm):
 
+    # title_doc = forms.CharField(
+    #     required=True
+    # )
+
     member_nr = forms.CharField(
         required=False
     )
@@ -1220,6 +1340,7 @@ class FileFinanceForm(forms.ModelForm):
     class Meta:
         model = FileFinance
         fields = [
+            # 'title_doc',
             # 'title',
             'file',
             # 'type_of_document',

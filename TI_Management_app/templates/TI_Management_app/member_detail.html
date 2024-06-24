@@ -132,19 +132,21 @@
           <ul class="nav nav-list">
             <li class="nav-header" id="show">Karta HID:</li>
               <li id="obj1" style="display: none">
+                {% if not member.card %}
                 <p><a href="{% url 'TI_Management_app:member_card_edit' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                   Zmień
                 </a></p>
+                {% endif %}
                 <br />
                 <br />
                 <div class="notepad">
-                  <p>{{member.card}}</p>
+                  <p>{% if member.card %} dodano {% endif %}</p>
                 </div>
-                <div class="notepad"> Historia: </div>
+<!--                <div class="notepad"> Historia: </div>-->
                 {% for h in card_history_entries %}
                 <div class="notepad">
                   {% if h.history_object.card not in seen_cards %}
-                      {{h.history_object.card}}
+                      {{ h.history_object.card}}
                   {% endif %}
                     <table width="100%">
                       <tr>
@@ -156,7 +158,7 @@
                       <tr>
                         <td colspan="4">
                           <small>
-                            Karta HID: {{ h.history_object.card }}
+                            Karta HID: {% if h.history_object.card %} dodano {% endif %}
                           </small>
                           <br />
                         </td>

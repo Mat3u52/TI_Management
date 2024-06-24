@@ -224,7 +224,7 @@ class MembersZZTI(models.Model):
     email = models.EmailField(max_length=250, blank=False, null=False, unique=True, help_text='user@user.com')
     date_of_accession = models.DateTimeField(default=timezone.now, blank=False, null=False)
     date_of_abandonment = models.DateTimeField(default=None, blank=True, null=True)
-    type_of_contract = models.CharField(max_length=250, choices=CONTRACT_CHOICES, blank=True, null=True, default=None)
+    type_of_contract = models.CharField(max_length=250, choices=CONTRACT_CHOICES, blank=True, null=True, default='indefinite_period_of_time')
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
     expiration_date_contract = models.DateTimeField(default=None, blank=True, null=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
@@ -251,6 +251,9 @@ class MembersZZTI(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.forename}-{self.surname}-{self.member_nr}")
+        if self.card != '':
+            if MembersZZTI.objects.filter(card=self.card).exists():
+                raise ValidationError(f"Taka karta już istnieje w bazie.")
         super().save(*args, **kwargs)
 
 

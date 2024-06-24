@@ -55,7 +55,7 @@ urlpatterns = [
         name='member_edit'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-card/',
+        'TI_Management_app/members/<int:pk>/edit-card/',
         views.member_card_edit,
         name='member_card_edit'
     ),

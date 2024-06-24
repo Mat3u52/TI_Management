@@ -87,7 +87,7 @@ a:hover {
 
 h1, h2{
     font-family: Corbel, "Lucida Grande", "Lucida Sans Unicode", "Lucida Sans", "DejaVu Sans", "Bitstream Vera Sans", "Liberation Sans", Verdana, "Verdana Ref", sans-serif;
-    background: -webkit-linear-gradient(#eee, #000);
+    background: -webkit-linear-gradient(#bbb, #000);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
@@ -98,8 +98,31 @@ h1 a, h2 a {
 }
 
 input {
-    width: 90%;
+    min-width: 90%!important;
+    min-height: 35px;
 }
+
+
+.select-wrapper {
+  height: 60px;
+  overflow-y: visible;
+}
+
+.select {
+  width: 90%;
+  min-height: 45px;
+  border-radius: 4px;
+  padding: 10px;
+  box-sizing: border-box; /* Include padding and border in the element's total width and height */
+  appearance: none; /* Remove default styling for consistency across browsers */
+
+}
+
+.select:focus {
+  outline: none;
+}
+
+
 .horizontal-radio {
     display: inline-block;
     margin-right: 10px;
@@ -175,7 +198,7 @@ img {
 .flag-icon img {
     width: 25px;
     height: 24px;
-    margin-right: 1px;
+    margin-right: 15px;
     margin-bottom: 21px;
 }
 
@@ -194,11 +217,11 @@ img {
 }
 
 .ext-input .ext-input {
-    padding: 5px;
+    padding: 2px;
     border: 1px solid #ccc;
     border-radius: 4px;
     flex-grow: 1;
-    width: 40px;
+    width: 0px;
 }
 
 .notepadChart {

@@ -14,31 +14,57 @@
     <br />
     <form method="post" class="post-form" enctype="multipart/form-data" autocomplete="off">
         {% csrf_token %}
-           {% if form.errors %}
-                <p>{{form.errors}}</p>
-            {% endif %}
-<!--            {% if form_role.errors %}-->
-<!--                <p>{{form_role.errors}}</p>-->
-<!--            {% endif %}-->
-<!--            {% if form_occupation.errors %}-->
-<!--                <p>{{form_occupation.errors}}</p>-->
-<!--            {% endif %}-->
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.non_field_errors }}</p>
+            </div>
+        {% endif %}
         <table width="100%">
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Imię nowego Członka: </b></p></td>
-                <td width="70%"><div>{{form.forename}}</div></td>
+                <td width="70%">
+                    <div>
+                        <div {% if form.forename.errors %} class="hint" {% endif %}>
+                            {{form.forename}}
+                        </div>
+                        {% if form.forename.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.forename.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Nazwisko nowego Członka: </b></p></td>
-                <td width="70%"><div>{{form.surname}}</div></td>
+                <td width="70%">
+                    <div>
+                        <div {% if form.surname.errors %} class="hint" {% endif %}>
+                            {{form.surname}}
+                        </div>
+                        {% if form.surname.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.surname.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
+                </td>
             </tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Funkcja Członka: </b></p></td>
-<!--                <td><p>{{form.role}}</p></td>-->
                 <td width="70%">
                     <div>
-
-                        {{form.member_function}}
+<!--                        {{form.member_function}}-->
+                        <div>
+                            <div {% if form.member_function.errors %} class="hint" {% endif %}>
+                                {{form.member_function}}
+                            </div>
+                            {% if form.member_function.errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.member_function.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
                         <datalist id="roles_database">
                             {% for role in roles %}
                                 <option value="{{ role }}"></option>
@@ -50,52 +76,78 @@
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Numer uczestnika: </b></p></td>
                 <td width="70%">
-                    {% if form.member_nr.errors %}
-                        <p class="hint">{{form.member_nr}}</p>
-                        <p>{{form.member_nr.errors}}</p>
-                    {% else %}
-                        <p>{{form.member_nr}}</p>
-                    {% endif %}
+                    <div>
+                        <div {% if form.member_nr.errors %} class="hint" {% endif %}>
+                            {{form.member_nr}}
+                        </div>
+                        {% if form.member_nr.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.member_nr.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Płeć: </b></p></td>
                 <td width="70%">
-                    <p>{{form.sex}}</p>
+                    <div class="select-wrapper">
+                        {{form.sex}}
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Data urodzenia: </b></p></td>
                 <td width="70%">
-                    <p>{{form.birthday}}</p>
+                    <div>{{form.birthday}}</div>
                 </td>
             </tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
                 <td width="70%">
-                    <p>{{form.birthplace}}</p>
+                    <div>
+                        <div {% if form.birthplace.errors %} class="hint" {% endif %}>
+                            {{form.birthplace}}
+                        </div>
+                        {% if form.birthplace.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.birthplace.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>PP ID: </b></p></td>
                 <td width="70%">
-                    {% if form.pin.errors %}
-                        <p class="hint">{{form.pin}}</p>
-                        <p>{{form.pin.errors}}</p>
-                    {% else %}
-                        <p>{{form.pin}}</p>
-                    {% endif %}
+                    <div>
+                        <div {% if form.pin.errors %} class="hint" {% endif %}>
+                            {{form.pin}}
+                        </div>
+                        {% if form.pin.errors %}
+                            <div class="alert alert-danger">
+                                {{ form.pin.errors }}
+                            </div>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             <tr>
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Stanowisko: </b></p></td>
-<!--                <td width="70%">-->
-<!--                    <p>{{form.occupation}}</p>-->
-<!--                </td>-->
                 <td width="70%">
                     <div>
-                        {{form.member_occupation}}
+<!--                        {{form.member_occupation}}-->
+                        <div>
+                            <div {% if form.member_occupation.errors %} class="hint" {% endif %}>
+                                {{form.member_occupation}}
+                            </div>
+                            {% if form.member_occupation.errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.member_occupation.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
                         <datalist id="occupation_database">
                             {% for occupation in occupations %}
                                 <option value="{{ occupation }}"></option>
@@ -117,7 +169,9 @@
                                     {{ form.extension }}
                             </div>
                         </div>
-                        {{ form.phone_number.errors }}
+                        <div class="alert alert-danger">
+                            {{ form.phone_number.errors }}
+                        </div>
                     {% else %}
                         <div class="form-row">
                             <div class="input-group">
@@ -145,7 +199,12 @@
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
                 <td width="70%">
-                    <p>{{form.date_of_accession}}</p>
+                    <div>
+                        <p>{{form.date_of_accession}}</p>
+                        {% if form.date_of_accession.errors %}
+                            <div class="error">{{ form.date_of_accession.errors }}</div>
+                        {% endif %}
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -155,7 +214,7 @@
                 </td>
             </tr>
             <tr>
-                <td width="30%"><p><b>Data zatrudnienia: </b></p></td>
+                <td width="30%"><p class="tableCredential"><b>Data zatrudnienia: </b></p></td>
                 <td width="70%">
                     <p>{{form.date_of_contract}}</p>
                 </td>
@@ -163,7 +222,9 @@
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
                 <td width="70%">
-                    <p>{{form.type_of_contract}}</p>
+                    <div class="select-wrapper">
+                        {{form.type_of_contract}}
+                    </div>
                 </td>
             </tr>
             <tr>
@@ -175,19 +236,21 @@
             <tr>
                 <td width="30%"><p class="tableCredential"><b>Grupa: </b></p></td>
                 <td width="70%">
-                    <p>{{form.group}}</p>
+                    <div class="select-wrapper">
+                        {{form.group}}
+                    </div>
                 </td>
             </tr>
-            <tr>
-                <td width="30%"><p><b>Karta: </b></p></td>
-                <td width="70%">
-                    <p>{{form.card}}</p>
-                </td>
-            </tr>
+<!--            <tr>-->
+<!--                <td width="30%"><p class="tableCredential"><b>Karta: </b></p></td>-->
+<!--                <td width="70%">-->
+<!--                    <p>{{form.card}}</p>-->
+<!--                </td>-->
+<!--            </tr>-->
 
             <tr>
                 <td width="30%">
-                    <p><b>Rekomendacja? </b>{{ form.recommendation }}</p>
+                    <p class="tableCredential"><b>Rekomendacja? </b>{{ form.recommendation }}</p>
                 </td>
                 <td width="70%">
                     <div id="memberDiv" style="display: none;">
