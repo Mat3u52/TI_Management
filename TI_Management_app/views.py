@@ -311,16 +311,21 @@ def member_deactivate(request, pk):
             member.author = request.user
             member.date_of_abandonment = timezone.now()
             member.save()
-            messages.success(request, "Zaktualizowano!")
+            messages.success(request, "Członek został zdezaktywowany!")
 
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberDeactivateForm(instance=member)
-    return render(request, 'TI_Management_app/member_deactivate.html',
-                  {'form': form,
-                   'member': member,
-                   'member_loyalty_cards': member_loyalty_cards,
-                   'member_groups': member_groups})
+    return render(
+        request,
+        'TI_Management_app/members/member_deactivate.html',
+        {
+            'form': form,
+            'member': member,
+            'member_loyalty_cards': member_loyalty_cards,
+            'member_groups': member_groups
+        }
+    )
 
 
 def error_404_view(request, exception):

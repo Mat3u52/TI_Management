@@ -1,3 +1,5 @@
+import csv
+import datetime
 from django.contrib import admin
 from django.utils.html import format_html
 from .models import (
@@ -36,6 +38,7 @@ from .models import (
     FileFinance,
     BankStatement
 )
+from django.http import HttpResponse
 
 admin.site.site_header = 'Panel Administratora zzti LUMS'
 
@@ -50,6 +53,12 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Vote)
 # admin.site.register(Question)
 # admin.site.register(Answers)
+
+
+# def export_to_csv(modeladmin, request, queryset):
+#     opts = modeladmin.model._meta
+#     response = HttpResponse(content_type='text/csv')
+#     response['Con']
 
 
 @admin.register(DocumentsDatabaseCategory)

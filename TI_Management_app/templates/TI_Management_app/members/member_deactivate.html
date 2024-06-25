@@ -1,14 +1,17 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
-<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'TI_Management_app:member_deactivate' pk=member.pk %}"> / Dezaktywacja</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_deactivate' pk=member.pk %}"><b> / Dezaktywacja</b></a>
 {% endblock %}
 
 
 {% block content %}
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dezaktywacja Członka</h2>
+    <hr>
+    <br />
     <p>Czy na pewno chcesz {% if member.deactivate %} przywrócić {% else %} dezaktywować {% endif %}:
         {{member.forename}} {{member.surname}} - {{member.member_nr}}?
     </p>
@@ -20,7 +23,10 @@
                 <td><p>{{form.deactivate}}</p></td>
             </tr>
         </table>
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
         <br />
     </form>
     {% if member.deactivate %}
@@ -38,7 +44,6 @@
                 <p>- {{member_group.group}}</p>
             {% endfor %}
     {% endif %}
-
 </div>
 {% endblock %}
 

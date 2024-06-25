@@ -60,7 +60,7 @@ urlpatterns = [
         name='member_card_edit'
     ),
     path(
-        'TI_Management_app/<int:pk>/member-deactivate/',
+        'TI_Management_app/members/<int:pk>/member-deactivate/',
         views.member_deactivate,
         name='member_deactivate'
     ),

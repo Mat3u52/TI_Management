@@ -204,30 +204,52 @@
     });
 
     function fetchMemberDetails(memberNr) {
-        console.log('Fetching member details for: ', memberNr);
-        var xhr = new XMLHttpRequest();
-        xhr.open('GET', baseUrl + memberNr + '/', true);
-        xhr.setRequestHeader('Content-Type', 'application/json');
-        xhr.onreadystatechange = function () {
-            if (xhr.readyState === 4) {
-                if (xhr.status === 200) {
-                    console.log('Received member details: ', xhr.responseText);
-                    var memberDetails = JSON.parse(xhr.responseText);
-                    displayMemberDetails(memberDetails);
-                    document.getElementById('error').style.display = 'none';
-                } else if (xhr.status === 404) {
-                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
-                    document.getElementById('memberDetails').style.display = 'none';
-                    displayError('Taki Członek nie istnieje');
-                } else {
-                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);
-                    document.getElementById('memberDetails').style.display = 'none';
-                    displayError('Taki Członek nie istnieje lub jest dezaktywowany');
-                }
+    const xhr = new XMLHttpRequest();
+    xhr.open('GET', `/TI_Management_app/finance/get-member-details/${memberNr}/`, true);
+    xhr.setRequestHeader('X-Requested-With', 'XMLHttpRequest');
+    xhr.onreadystatechange = function () {
+        if (xhr.readyState === 4) {
+            if (xhr.status === 200) {
+                const memberDetails = JSON.parse(xhr.responseText);
+                console.log('Received member details: ', memberDetails);
+                displayMemberDetails(memberDetails);
+            } else if (xhr.status === 400) {
+                console.error('Invalid request: ', xhr.status, xhr.statusText);
+                displayError('Invalid request.');
+            } else {
+                console.error('Error fetching member details: ', xhr.status, xhr.statusText);
+                displayError('Error fetching member details.');
             }
-        };
-        xhr.send();
+        }
+    };
+    xhr.send();
     }
+
+<!--    function fetchMemberDetails(memberNr) {-->
+<!--        console.log('Fetching member details for: ', memberNr);-->
+<!--        var xhr = new XMLHttpRequest();-->
+<!--        xhr.open('GET', baseUrl + memberNr + '/', true);-->
+<!--        xhr.setRequestHeader('Content-Type', 'application/json');-->
+<!--        xhr.onreadystatechange = function () {-->
+<!--            if (xhr.readyState === 4) {-->
+<!--                if (xhr.status === 200) {-->
+<!--                    console.log('Received member details: ', xhr.responseText);-->
+<!--                    var memberDetails = JSON.parse(xhr.responseText);-->
+<!--                    displayMemberDetails(memberDetails);-->
+<!--                    document.getElementById('error').style.display = 'none';-->
+<!--                } else if (xhr.status === 404) {-->
+<!--                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);-->
+<!--                    document.getElementById('memberDetails').style.display = 'none';-->
+<!--                    displayError('Taki Członek nie istnieje');-->
+<!--                } else {-->
+<!--                    console.error('Error fetching member details: ', xhr.status, xhr.statusText);-->
+<!--                    document.getElementById('memberDetails').style.display = 'none';-->
+<!--                    displayError('Taki Członek nie istnieje lub jest dezaktywowany');-->
+<!--                }-->
+<!--            }-->
+<!--        };-->
+<!--        xhr.send();-->
+<!--    }-->
 
     function displayMemberDetails(details) {
         var memberDetailsDiv = document.getElementById('memberDetails');

@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
@@ -12,8 +13,11 @@
         <br />
         {% for member in members %}
             <div class="hero-unit">
-                <img src="{{ member.image.url }}" alt="image" width="100px">
-                <h2><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h2>
+<!--                <img src="{{ member.image.url }}" alt="image" width="100px">-->
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                    <img src="{% thumbnail member.image 100x0  quality=100 %}">
+                </a>
+                <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h3>
                 <p><b>Nr:</b> {{member.member_nr}} 	&#124;
                     <b>tel:</b> {{member.phone_number}} &#124;
                     <b>email:</b> {{member.email}}</p>

@@ -53,7 +53,8 @@ class MemberForm(forms.ModelForm):
             attrs={
                 'class': 'form-control me-2',
                 'type': 'text',
-                'aria-label': 'Nr Członka'
+                'aria-label': 'Imię',
+                'autofocus': 'autofocus'
             }
         ),
         validators=[
@@ -66,6 +67,13 @@ class MemberForm(forms.ModelForm):
     )
 
     surname = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Nazwisko'
+            }
+        ),
         validators=[
             MinLengthValidator(
                 limit_value=2,
@@ -76,6 +84,13 @@ class MemberForm(forms.ModelForm):
     )
 
     birthplace = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Miejsce urodzenia'
+            }
+        ),
         validators=[
             MinLengthValidator(
                 limit_value=2,
@@ -111,6 +126,13 @@ class MemberForm(forms.ModelForm):
     )
 
     member_nr = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Numer Członka'
+            }
+        ),
         validators=[
             MinLengthValidator(
                 limit_value=6,
@@ -125,18 +147,21 @@ class MemberForm(forms.ModelForm):
     )
 
     pin = forms.IntegerField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'aria-label': 'PIN'
+            }
+        ),
         validators=[
-            # MinLengthValidator(
-            #     limit_value=4,
-            #     message="PIN musi zawierać 4 znaki."
-            # ),
             MinValueValidator(
-                limit_value=0,  # Minimum value allowed
-                message="PIN musi być dodatni."  # Customize as needed
+                limit_value=0,
+                message="PIN musi być dodatni."
             ),
             MaxValueValidator(
-                limit_value=9999,  # Maximum value allowed (adjust as necessary)
-                message="PIN max 9999."  # Customize as needed
+                limit_value=9999,
+                message="PIN max 9999."
             ),
             RegexValidator(
                 r'^\d{0,8}$',
@@ -156,20 +181,11 @@ class MemberForm(forms.ModelForm):
         required=False
     )
 
-    # card = forms.CharField(
-    #     widget=forms.PasswordInput(
-    #         attrs={
-    #             'autocomplete': 'new-password'
-    #         }
-    #     ),
-    #     required=False
-    # )
-
     recommendation = forms.BooleanField(
         widget=forms.CheckboxInput(
             attrs={
                 'class': 'form-control me-2',
-                'style': 'min-width: 1%!important; min-height: 15px',
+                'style': 'min-width: 1%!important; min-height: 25px',
                 'aria-label': 'rekomendacja',
                 'id': 'recommendation',
             }
@@ -181,10 +197,9 @@ class MemberForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
-                'style': 'min-width: 50%!important; min-height: 15px',
                 'type': 'text',
                 'list': 'members',
-                'aria-label': 'Nr Członka',
+                'aria-label': 'Nr Członka rekomendowanego',
                 'name': 'recommended_member_nr',
             }
         ),
@@ -192,12 +207,6 @@ class MemberForm(forms.ModelForm):
     )
 
     member_function = forms.CharField(
-        validators=[
-            MinLengthValidator(
-                limit_value=2,
-                message="Funkcja Członka musi zawierać co najmniej 2 znaki."
-            )
-        ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
@@ -206,17 +215,17 @@ class MemberForm(forms.ModelForm):
                 'list': 'roles_database'
             }
         ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Funkcja Członka musi zawierać co najmniej 2 znaki."
+            )
+        ],
         required=True,
         max_length=150
     )
 
     member_occupation = forms.CharField(
-        validators=[
-            MinLengthValidator(
-                limit_value=2,
-                message="Stanowisko musi zawierać co najmniej 2 znaki."
-            ),
-        ],
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
@@ -225,6 +234,12 @@ class MemberForm(forms.ModelForm):
                 'list': 'occupation_database'
             }
         ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Stanowisko musi zawierać co najmniej 2 znaki."
+            ),
+        ],
         required=True,
         max_length=150
     )
@@ -236,8 +251,6 @@ class MemberForm(forms.ModelForm):
             'surname',
             'member_function',
             'member_occupation',
-            # 'role',
-            # 'occupation',
             'member_nr',
             'sex',
             'birthday',
@@ -251,10 +264,8 @@ class MemberForm(forms.ModelForm):
             'date_of_contract',
             'expiration_date_contract',
             'group',
-            # 'card',
             'recommendation',
             'recommended_member_nr',
-            # 'recommended_by',
             'image'
         ]
 
@@ -298,7 +309,6 @@ class MemberForm(forms.ModelForm):
         three_year_later = date.today().replace(year=date.today().year + 3)
         three_year_later_str = three_year_later.strftime('%Y-%m-%d')
         self.fields['expiration_date_contract'].initial = three_year_later_str
-        # self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
         self.fields['recommended_member_nr'].widget.attrs['placeholder'] = 'Nr Członka'
         self.fields['type_of_contract'].required = True
 
@@ -308,11 +318,6 @@ class MemberForm(forms.ModelForm):
         date_of_abandonment = cleaned_data.get("date_of_abandonment")
         date_of_contract = cleaned_data.get("date_of_contract")
         expiration_date_contract = cleaned_data.get("expiration_date_contract")
-
-        # Debugging output
-        print(f"Date of Accession: {date_of_accession}")
-        print(f"Date of Abandonment: {date_of_abandonment}")
-        print(f"Date of date_of_contract: {date_of_contract}")
 
         if date_of_accession and date_of_abandonment:
             if date_of_accession >= date_of_abandonment:
@@ -337,7 +342,9 @@ class MemberCardEditForm(forms.ModelForm):
     card = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
-                'autocomplete': 'new-password'
+                'autocomplete': 'new-password',
+                'autofocus': 'autofocus',
+                'placeholder': 'Przyłóż kartę do czytnika'
             }
         ),
         required=False
@@ -348,11 +355,6 @@ class MemberCardEditForm(forms.ModelForm):
         fields = [
             'card'
         ]
-
-    def __init__(self, *args, **kwargs):
-        super(MemberCardEditForm, self).__init__(*args, **kwargs)
-
-        self.fields['card'].widget.attrs['placeholder'] = 'Przyłóż kartę do czytnika'
 
 
 class MemberEditForm(forms.ModelForm):
@@ -442,13 +444,15 @@ class MemberDeactivateForm(forms.ModelForm):
 
 
 class MemberFunctionForm(forms.ModelForm):
+
     member_function = forms.CharField(
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
                 'placeholder': 'Funkcja',
                 'aria-label': 'Funkcja Członka',
-                'list': 'roles_database'
+                'list': 'roles_database',
+                'autofocus': 'autofocus'
             }
         ),
         required=True,
@@ -461,18 +465,15 @@ class MemberFunctionForm(forms.ModelForm):
 
 
 class MemberOccupationForm(forms.ModelForm):
-    # member_occupation = forms.CharField(
-    #     required=True,
-    #     max_length=250,
-    #     widget=forms.TextInput(attrs={'autofocus': True})
-    # )
+
     member_occupation = forms.CharField(
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
                 'placeholder': 'Stanowisko',
                 'aria-label': 'Stanowisko Członka',
-                'list': 'occupation_database'
+                'list': 'occupation_database',
+                'autofocus': 'autofocus',
             }
         ),
         required=True,
