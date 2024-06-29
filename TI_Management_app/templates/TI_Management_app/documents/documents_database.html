@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:documents_database' %}"> / Baza dokumentów</a>
@@ -58,7 +59,7 @@
             <p>
                 <a href="{{ document.file.url }}">
 <!--                    {{document.file|cut:'documentsDatabase/'}}-->
-                    {{document.file|filename'}}
+                    {{ document.file|filename }}
                 </a>
             </p>
             <div class="date">
