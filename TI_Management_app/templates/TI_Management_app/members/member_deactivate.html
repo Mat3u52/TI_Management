@@ -13,7 +13,7 @@
     <hr>
     <br />
     <p>Czy na pewno chcesz {% if member.deactivate %} przywrócić {% else %} dezaktywować {% endif %}:
-        {{member.forename}} {{member.surname}} - {{member.member_nr}}?
+        <b>{{member.forename}} {{member.surname}} - {{member.member_nr}}</b>?
     </p>
     <form method="post" class="post-form">
         {% csrf_token %}

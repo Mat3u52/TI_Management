@@ -1,25 +1,38 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Wyszukiwarka</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="#"><b> / Wyszukiwarka</b></a>
 {% endblock %}
 
 {% block content %}
     {% if searched %}
-        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <h2 class="fadeInUp-animation">Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <hr>
         <br />
+        <div class="hero-unit">
         {% for group in groups %}
-            <div class="hero-unit">
-                <h2><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">{{group.group_name}}</a></h2>
+            <div class="notepad">
+                <h3>
+                    <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
+                        {{group.group_name}}
+                    </a>
+                </h3>
 
-                <p><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
-                    Więcej informacji
-                </a></p>
+                <p>
+                    <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+                        Więcej informacji
+                    </a>
+                </p>
                 <div class="date"><p>Data dodania: {{ group.created_date }}</p></div>
             </div>
         {% endfor %}
+        </div>
     {% else %}
-        <h2>Please, insert the phrase into the search area.</h2>
+        <div class="hero-unit">
+            <h4>Proszę, wprowadź frazę w pole wyszukiwania</h4>
+            <br />
+        </div>
     {% endif %}
 {% endblock %}
 

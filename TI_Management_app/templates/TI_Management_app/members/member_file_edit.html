@@ -1,27 +1,42 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
-<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'TI_Management_app:member_file_edit' pk=member.pk %}"> / Dokumenty</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_file_edit' pk=member.pk %}"><b> / Dokumenty</b></a>
 {% endblock %}
 
 {% block content %}
 
-   <div class="hero-unit">
-        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
-        <p>Dokument</p>
-        <form method="post" class="post-form" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>{{form.title}}</p>
-            <label class="custom-file-upload">
-                Wybierz dokument
-                {{form.file}}
-            </label>
-            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
-            <br />
-        </form>
-    </div>
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dokumenty Członka </h2>
+    <hr>
+    <br />
+    <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+    <p><b>Dokument</b></p>
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div>
+            <div {% if form.title.errors %} class="hint" {% endif %}>
+                {{form.title}}
+            </div>
+            {% if form.title.errors %}
+                <div class="alert alert-danger">
+                    {{ form.title.errors }}
+                </div>
+            {% endif %}
+        </div>
+        <label class="custom-file-upload">
+            Wybierz dokument
+            {{form.file}}
+        </label>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 {% endblock %}
 

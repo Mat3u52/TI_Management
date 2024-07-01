@@ -1,71 +1,90 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="{% url 'TI_Management_app:group_notepad_edit' pk=group.pk pk1=notepad.pk %}"> / Aktualizacja komunikacji grupy</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / Grupa - {{group.group_name}}</b></a>
+<a href="{% url 'TI_Management_app:group_notepad_edit' pk=group.pk pk1=notepad.pk %}"><b> / Aktualizacja komunikacji grupy</b></a>
 {% endblock %}
 
 {% block content %}
-    <div class="hero-unit">
-        {% if form.errors %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacaj komunikacji grupy - {{group.group_name}}</h2>
+    <hr>
+    <br />
+    {% if form.errors %}
+        <div class="alert alert-danger">
             <p>{{form.errors}}</p>
-        {% endif %}
-        <h3>
-            <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
-                {{ group.group_name }}
-            </a>
-        </h3>
-        <p>
-            Komunikacja grupy {{ group.group_name }}
-        </p>
-        <form method="post" class="post-form" enctype="multipart/form-data">
-            {% csrf_token %}
+        </div>
+    {% endif %}
+    <h3>
+        <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
+            {{ group.group_name }}
+        </a>
+    </h3>
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
 
-            <table width="100%">
-                <tr>
-                    <td>Tytuł sprawy:
+        <table width="100%">
+            <tr>
+                <td>
+                    <b>Tytuł sprawy:</b>
                     {{ form.title }}
-                    </td>
-                </tr>
-                <tr>
-                    <td>Opis:<br/>
-                    {{ form.content }}</td>
-                </tr>
-                <tr>
-                    <td>Ważność:<br/>
-                    {{ form.importance }}</td>
-                </tr>
-                <tr>
-                    <td>Sposób zgłoszenia:<br/>
-                    {{ form.method }}</td>
-                </tr>
-                <tr>
-                    <td>Status:<br/>
-                    {{ form.status }}</td>
-                </tr>
-                <tr>
-                    <td>
-                        Odpowiedzialny:<br/>
-                        {{ form.responsible.as_hidden }}
-                        <input
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
-                            type="text"
-                            placeholder="{{ user.username }}"
-                            value="{{ user.username }}"
-                            aria-label="odpowiedzialny"
-                            name="responsible"
-                            disabled
-                        >
-                    </td>
-                </tr>
-            </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Opis:</b>
+                    <br/>
+                    {{ form.media }}
+                    {{ form.content }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Ważność:</b>
+                    <br/>
+                    {{ form.importance }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Sposób zgłoszenia:</b>
+                    <br/>
+                    {{ form.method }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Status:</b>
+                    <br/>
+                    {{ form.status }}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <b>Odpowiedzialny:</b>
+                    <br/>
+                    {{ form.responsible.as_hidden }}
+                    <input
+                        class="form-control me-2"
+                        style="min-width: 50%!important; min-height: 15px"
+                        type="text"
+                        placeholder="{{ user.username }}"
+                        value="{{ user.username }}"
+                        aria-label="odpowiedzialny"
+                        name="responsible"
+                        disabled>
+                </td>
+            </tr>
+        </table>
 
-            <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
-            <br />
-        </form>
-    </div>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        <br />
+        <br />
+    </form>
+</div>
 {% endblock %}
 
 {% block menu %}

@@ -1,23 +1,29 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:documents_database' %}"> / Baza dokumentów</a>
-<a href="{% url 'TI_Management_app:documents_database_category_edit' pk=category.pk %}"> / Aktualizuj kategorie</a>
+<a href="{% url 'TI_Management_app:documents_database' %}"><b> / Baza dokumentów</b></a>
+<a href="{% url 'TI_Management_app:documents_database_category_edit' pk=category.pk %}"><b> / Aktualizuj kategorie</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizuj kategorie - {{ category.title }}</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
-            <p>Kategoria:</p>
+        <p><b>Kategoria:</b></p>
         {{form.title}}
         {{form.responsible.as_hidden}}
 
-
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Aktualizuj
         </button>
@@ -28,7 +34,7 @@
 
 <div class="hero-unit">
     <p>
-        Historia:
+        <b>Historia:</b>
     </p>
     {% for h in category.history.all %}
         <div class="notepad">
@@ -46,9 +52,9 @@
                 </tr>
                 <tr>
                     <td colspan="4">
-                        Nazwa: {{ h.title }}
+                        <b>Nazwa:</b> {{ h.title }}
                     <br />
-                        Odpowiedzialny: {{ h.responsible }}
+                        <b>Odpowiedzialny:</b> {{ h.responsible }}
                     </td>
                 </tr>
             </table>

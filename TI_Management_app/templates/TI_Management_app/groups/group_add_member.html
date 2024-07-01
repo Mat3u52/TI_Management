@@ -1,20 +1,24 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="{% url 'TI_Management_app:group_add_member' pk=group.pk pk1=member.pk %}"> / Dodaj uczestnika</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / {{group.group_name}}</b></a>
+<a href="{% url 'TI_Management_app:group_add_member' pk=group.pk pk1=member.pk %}"><b> / Dodaj Członka</b></a>
 {% endblock %}
 
 {% block content %}
-    <div class="hero-unit">
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj Członka {{ member.forename }} {{ member.surname }} do grupy {{group.group_name}}</h2>
+    <hr>
+    <br />
+    <div class="notepad">
         <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><h3>{{group.group_name}}</h3></a>
         <form method="post" class="post-form">
             {% csrf_token %}
             {% if form.errors %}
                 <p>{{form.errors}}</p>
             {% endif %}
-            <p>Nowy uczestnik:</p>
+            <p><b>Nowy uczestnik:</b></p>
             {{ member.forename }} {{ member.surname }}
             {{form.group.as_hidden}}
             <br />
@@ -24,6 +28,7 @@
             <br />
         </form>
     </div>
+</div>
 {% endblock %}
 
 {% block menu %}

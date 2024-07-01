@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+        <div class="notepad">
+        <div class="notepad-head">
+            <h3>
+                {{ group_notepad_history_obj.title }}
+            </h3>
+        </div>
+        <div class="notepad-history-head">
+            <div class="notepad-status-left">
+                <p>
+<!--                    # {{ forloop.revcounter }}-->
+                </p>
+            </div>
+            <div class="notepad-status-right">
+                <p>
+                    Data: {{ group_notepad_history_obj.published_date }} Przez: {{ group_notepad_history_obj.responsible }}
+                </p>
+            </div>
+        </div>
+
+        <table width="100%">
+            <tr>
+                <td width="50%">
+                    <h5>
+                        Sposób zgłoszenia:
+                    </h5>
+                </td>
+                <td width="50%">
+                    {% if group_notepad_history_obj.method == 'personally' %} Osobiście
+                    {% elif group_notepad_history_obj.method == 'email' %} E-mail
+                    {% elif group_notepad_history_obj.method == 'telephone' %} Telefonicznie
+                    {% elif group_notepad_history_obj.method == 'zoom' %} ZOOM
+                    {% elif group_notepad_history_obj.method == 'whatsapp' %} WhatsApp
+                    {% elif group_notepad_history_obj.method == 'facebook' %} Facebook
+                    {% elif group_notepad_history_obj.method == 'other' %} Inny
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+                    <h5>
+                        Ważnośc:
+                    </h5>
+                </td>
+                <td width="50%">
+                    {% if group_notepad_history_obj.importance == 'low' %} Niski
+                    {% elif group_notepad_history_obj.importance == 'standard' %} Umiarkowany
+                    {% elif group_notepad_history_obj.importance == 'important' %} Ważny
+                    {% elif group_notepad_history_obj.importance == 'veryImportant' %} Bardzo ważny
+                    {% elif group_notepad_history_obj.importance == 'critical' %} Krytyczny
+                    {% elif group_notepad_history_obj.importance == 'none' %} Nie dotyczy
+                    {% else %} None
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2">
+                    <h5>
+                        Opis:
+                    </h5>
+                    {{ group_notepad_history_obj.content|safe }}
+                </td>
+            </tr>
+            <tr>
+                <td width="50%">
+                    <h5>
+                        Nadano status:
+                    </h5>
+                </td>
+                <td width="50%">
+                    {% if group_notepad_history_obj.status == 'ongoing' %}
+                        W trakcie
+                    {% elif group_notepad_history_obj.status == 'closed' %}
+                        Zamknięty
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+        </div>
+
+    </body>
+</html>

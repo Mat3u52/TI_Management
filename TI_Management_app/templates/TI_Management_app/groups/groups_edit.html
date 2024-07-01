@@ -1,28 +1,34 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="#"> / Modyfikuj Grupe</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / Grupa - {{group.group_name}}</b></a>
+<a href="{% url 'TI_Management_app:groups_edit' pk=group.pk %}"><b> / Modyfikuj Grupe</b></a>
 {% endblock %}
 
 {% block content %}
 
-    <div class="hero-unit">
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj Grupę</h2>
+    <hr>
+    <br />
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
                 <p>{{form.errors}}</p>
-            {% endif %}
-            <p>Modyfikuj grupę:</p>
-            {{form.group_name}}
+            </div>
+        {% endif %}
+        <p>Modyfikuj grupę:</p>
+        {{form.group_name}}
 
-
-            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
-            <br />
-            <br />
-        </form>
-    </div>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 {% endblock %}
 

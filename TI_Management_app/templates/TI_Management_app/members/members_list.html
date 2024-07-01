@@ -13,15 +13,15 @@
     <br />
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:member_search' %}">
         {% csrf_token %}
-        <input class="form-control me-2"
-               style="min-width: 100%!important; min-height: 35px"
-               type="search"
-               placeholder="Szukaj Członka"
-               aria-label="Search" name="searched">
-        <button class="btn btn-primary btn-large pull-right"
-                type="submit">
-            Szukaj
-        </button>
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Szukaj Członka"
+                aria-label="Search"
+                name="searched"
+                autofocus="autofocus">
+
         <table>
             <tr>
                 <td>
@@ -36,7 +36,13 @@
                 </td>
             </tr>
         </table>
+        <button
+                class="btn btn-primary btn-large pull-right"
+                type="submit">
+            Szukaj
+        </button>
     </form>
+    <br />
 </div>
 
 {% for member in members %}

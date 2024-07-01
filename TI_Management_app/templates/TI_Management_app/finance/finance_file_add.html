@@ -9,30 +9,38 @@
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodawanie dokumentu księgowego</h2>
+    <br />
+    <hr>
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form_kind_of_document.errors %}
-            {{form_kind_of_document.errors}}
+            <div class="alert alert-danger">
+                {{form_kind_of_document.errors}}
+            </div>
         {% endif %}
         {% if form_file_finance.errors %}
-            {{form_file_finance.errors}}
+            <div class="alert alert-danger">
+                {{form_file_finance.errors}}
+            </div>
         {% endif %}
         {% if form_kind_of_expense.errors %}
-            {{form_kind_of_expense.errors}}
+            <div class="alert alert-danger">
+                {{form_kind_of_expense.errors}}
+            </div>
         {% endif %}
-        <h2 class="fadeInUp-animation">Dodawanie dokumentu księgowego</h2>
-        <br />
 
         <p><b>Rodzaj dokumentu:</b></p>
-        <input
-                class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
-                type="text"
-                list="kind_of_finance_document"
-                placeholder="Rodaj dokumentu"
-                aria-label="Rodzaj dokumentu"
-                name="title_doc"
-                required />
+            {{ form_kind_of_document.title_doc }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="min-width: 50%!important; min-height: 15px"-->
+<!--                type="text"-->
+<!--                list="kind_of_finance_document"-->
+<!--                placeholder="Rodaj dokumentu"-->
+<!--                aria-label="Rodzaj dokumentu"-->
+<!--                name="title_doc"-->
+<!--                required />-->
         <datalist id="kind_of_finance_document">
             {% for document_kind in kind_of_finance_document %}
                 <option value="{{ document_kind.title_doc }}"></option>
@@ -270,6 +278,7 @@
         console.log('Displaying error: ', errorMessage);
     }
 </script>
+
 {% endblock %}
 
 {% block menu %}

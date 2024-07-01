@@ -1,49 +1,40 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
-<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
 {% endblock %}
 
 {% block content %}
 
-    <div class="hero-unit">
-      {% if member.created_date %}
-        <div style='display: block; float: right; margin-left: auto;'>
-          <div style="float: right; margin-left: auto;">
-            <img src="{{ member.image.url }}" alt="image" style="width: 250px;">
-          </div>
-          <br/>
+<div class="hero-unit">
+  <h2 class="fadeInUp-animation">{{member.forename}} {{member.surname}} - {{member.member_nr}}</h2>
+  <hr>
+  <br />
+  {% if member.created_date %}
+    <div style='display: block; float: right; margin-left: auto;'>
+      <div style="float: right; margin-left: auto;">
+        <a href="{{ member.image.url }}">
+          <img src="{% thumbnail member.image 250x0  quality=100 %}">
+        </a>
+<!--        <img src="{{ member.image.url }}" alt="image" style="width: 250px;">-->
+      </div>
+      <br/>
 
-          {% if member.deactivate %}
-            <span class="label label-warning pull-left">Dezaktywacja!</span>
-          {% endif %}
+      {% if member.deactivate %}
+        <span class="label label-warning pull-left">Dezaktywacja!</span>
+      {% endif %}
 
-          {% with existing_user=member.member_nr|admin_exist %}
-            {% if existing_user %}
-              <span class="label label-info pull-right">Administrator</span>
-            {% else %}
-              <!-- User not found -->
-            {% endif %}
-          {% endwith %}
-        </div>
-
-<!--        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 250px'>-->
-<!--      <div style='display: block; float: right; margin-left: auto;'>-->
-<!--        {% if member.deactivate %}-->
-<!--            <span class="label label-warning">Dezaktywacja!</span>-->
-<!--        {% endif %}-->
-
-<!--        {% with existing_user=member.member_nr|admin_exist %}-->
-<!--            {% if existing_user %}-->
-<!--                <span class="label label-info">Administrator</span>-->
-<!--            {% else %}-->
-<!--                &lt;!&ndash; User not found &ndash;&gt;-->
-<!--            {% endif %}-->
-<!--        {% endwith %}-->
-<!--          </div>-->
-
+      {% with existing_user=member.member_nr|admin_exist %}
+        {% if existing_user %}
+          <span class="label label-info pull-right">Administrator</span>
+        {% else %}
+          <!-- User not found -->
+        {% endif %}
+      {% endwith %}
+    </div>
         <table>
           <tr>
             <td><p class="tableCredential"><b>Uczestnik:</b></p></td>
@@ -83,7 +74,7 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-            <td><p>{{member.phone_number}}</p></td>
+            <td><p>{{member.phone_number|phone_number}}</p></td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>E-mail: </b></p></td>
@@ -140,9 +131,15 @@
                 <br />
                 <br />
                 <div class="notepad">
-                  <p>{% if member.card %} dodano {% endif %}</p>
+                  <p>
+                    <b>Status: </b>
+                    {% if member.card %}
+                    <span style="color: green"><b>dodano</b></span>
+                    {% else %}
+                    <span style="color: red"><b>brak</b></span>
+                    {% endif %}
+                  </p>
                 </div>
-<!--                <div class="notepad"> Historia: </div>-->
                 {% for h in card_history_entries %}
                 <div class="notepad">
                   {% if h.history_object.card not in seen_cards %}
@@ -158,7 +155,7 @@
                       <tr>
                         <td colspan="4">
                           <small>
-                            Karta HID: {% if h.history_object.card %} dodano {% endif %}
+                            Karta HID: {% if h.history_object.card %} dodano {% else %} brak {% endif %}
                           </small>
                           <br />
                         </td>
@@ -182,12 +179,11 @@
                 <div class="notepad">
                 <table width="100%">
                 {% for file in member.membersFile.all %}
-<!--                    <p><a href="{{ file.file.url }}">{{ file.title }}</a> - {{ file.created_date }}</p>-->
                   <tr>
                     <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
-                    <td><p class="str-file">{{ file.file|cut:'uploadsMember/' }}</p></td>
+<!--                    <td><p class="str-file">{{ file.file|cut:'uploadsMember/' }}</p></td>-->
+                    <td><p class="str-file">{{ file.file|filename }}</p></td>
                     <td><p class="str-file">{{ file.created_date }}</p></td>
-<!--                    <td><a href="{% url 'TI_Management_app:member_file_delete' pk=member.pk pk1=file.pk %}" class="date-file-delete">usuń</a></td>-->
                     <td><a href="{% url 'TI_Management_app:member_file_delete' pk=member.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a></td>
                   </tr>
 
@@ -443,7 +439,7 @@
                 {% for group in member.groupsMember.all %}
                   <div class="notepad">
                     <p>
-                      {{ group.group }}
+                      <b>{{ group.group }}</b>
                       <a href="{% url 'TI_Management_app:member_group_delete' pk=member.pk pk1=group.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
                     </p>
                   </div>
@@ -497,51 +493,17 @@
 
                         <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
 
-                        <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+
 
                       </div>
                     {% endif %}
                 {% endfor %}
-
-
-<!--                {% for note in member.notepad.all|dictsortreversed:"id"|slice:"1" %}-->
-<!--                    <div class="notepad">-->
-<!--                      <p><a href="{% url 'TI_Management_app:member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">-->
-<!--                        Aktualizuj-->
-<!--                      </a></p>-->
-<!--                      <br />-->
-<!--                      <br />-->
-<!--                      <p><b>Sprawa: </b><a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>-->
-
-<!--                      {% for note_date in member.notepad.all|slice:"1" %}-->
-<!--                        <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>-->
-<!--                      {% endfor %}-->
-
-<!--                      <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>-->
-<!--                        {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>-->
-<!--                        {% elif note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>-->
-<!--                        {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>-->
-<!--                        {% elif note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>-->
-<!--                        {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>-->
-<!--                        {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>-->
-<!--                        {% else %}<p><b>Ważność:</b> None</p>-->
-<!--                        {% endif %}-->
-<!--                      <p>-->
-<!--                        {% if note.status == 'ongoing' %}-->
-<!--                          <b>Status:</b> W trakcie</p>-->
-<!--                        {% elif note.status == '' %}-->
-<!--                          <b>Status:</b> Zamknięty</p>-->
-<!--                        {% endif %}-->
-
-<!--                      <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>-->
-
-<!--                      <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>-->
-<!--                    </div>-->
-<!--                  <br />-->
-<!--                {% empty %}-->
-<!--                  <p>Brak informacji</p>-->
-<!--                {% endfor %}-->
-
+                <br />
+                <p>
+                <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń całą komunikacje</a>
+                </p>
+                <br />
+                <br />
               </li>
           </ul>
         </div>
@@ -564,73 +526,74 @@
                       <tr>
                         <td colspan="4">
                           <small>
-                            {{ h.history_object.forename }} {{ h.history_object.surname }}
+                            <b>{{ h.history_object.forename }} {{ h.history_object.surname }}</b>
+                          </small>
+                          <hr>
+                          <br />
+                          <small>
+                            <b>Funkcja:</b> {{ h.history_object.role }}
                           </small>
                           <br />
                           <small>
-                            Funkcja: {{ h.history_object.role }}
+                            <b>Zawód:</b> {{ h.history_object.occupation}}
                           </small>
                           <br />
                           <small>
-                            Zawód: {{ h.history_object.occupation}}
+                            <b>Numer uczestnika:</b> {{ h.history_object.member_nr }}
                           </small>
                           <br />
                           <small>
-                            Numer uczestnika: {{ h.history_object.member_nr }}
-                          </small>
-                          <br />
-                          <small>
-                            Płeć: {{ h.history_object.sex }}
+                            <b>Płeć:</b> {{ h.history_object.sex }}
                           </small><br />
                           <small>
-                            Data urodzenia: {{ h.history_object.birthday }}
+                            <b>Data urodzenia:</b> {{ h.history_object.birthday }}
                           </small><br />
                           <small>
-                            Miejsce urodzenia: {{ h.history_object.birthplace }}
+                            <b>Miejsce urodzenia:</b> {{ h.history_object.birthplace }}
                           </small><br />
                           <small>
-                            PIN: {{ h.history_object.pin }}
+                            <b>PIN:</b> {{ h.history_object.pin }}
                           </small><br />
                           <small>
-                            Numer kontaktowy: {{ h.history_object.phone_number }}
+                            <b>Numer kontaktowy:</b> {{ h.history_object.phone_number }}
                           </small><br />
                           <small>
-                            E-mail: {{ h.history_object.email }}
+                            <b>e-mail:</b> {{ h.history_object.email }}
                           </small><br />
                           <small>
-                            Data przystąpienia: {{ h.history_object.date_of_accession }}
+                            <b>Data przystąpienia:</b> {{ h.history_object.date_of_accession }}
                           </small>
                           <br />
                           <small>
-                            Data wystąpienia: {{ h.history_object.date_of_abandonment }}
+                            <b>Data wystąpienia:</b> {{ h.history_object.date_of_abandonment }}
                           </small>
                           <br />
                           <small>
-                            Rodzaj umowy: {{ h.history_object.type_of_contract }}
+                            <b>Rodzaj umowy:</b> {{ h.history_object.type_of_contract }}
                           </small>
                           <br />
                           <small>
-                            Data zatrudnienia: {{ h.history_object.date_of_contract }}
+                            <b>Data zatrudnienia:</b> {{ h.history_object.date_of_contract }}
                           </small>
                           <br />
                           <small>
-                            Data rozwiązania umowy: {{ h.history_object.expiration_date_contract }}
+                            <b>Data rozwiązania umowy:</b> {{ h.history_object.expiration_date_contract }}
                           </small>
                           <br />
                           <small>
-                            Karta HID: {{ h.history_object.card }}
+                            <b>Karta HID:</b> {% if h.history_object.card %} dodano {% endif %}
                           </small>
                           <br />
                           <small>
-                            Grupa: {{ h.history_object.group }}
+                            <b>Grupa:</b> {{ h.history_object.group }}
                           </small>
                           <br />
                           <small>
-                            Zdjęcie: {{ h.history_object.image }}
+                            <b>Zdjęcie:</b> {{ h.history_object.image|filename }}
                           </small>
                           <br />
                           <small>
-                            Dezaktywacja: {{ h.history_object.deactivate }}
+                            <b>Dezaktywacja:</b> {{ h.history_object.deactivate }}
                           </small>
 
                         </td>

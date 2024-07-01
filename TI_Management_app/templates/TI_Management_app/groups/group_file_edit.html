@@ -1,27 +1,40 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="{% url 'TI_Management_app:group_file_edit' pk=group.pk %}"> / Pliki</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / Grupa - {{group.group_name}}</b></a>
+<a href="{% url 'TI_Management_app:group_file_edit' pk=group.pk %}"><b> / Pliki</b></a>
 {% endblock %}
 
 {% block content %}
 
-   <div class="hero-unit">
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dokumenty grupy - {{group.group_name}}</h2>
+    <hr>
+    <br />
+<!--    <div class="notepad">-->
         <h3><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">{{group.group_name}}</a></h3>
-        <p>Dokument</p>
+        <p><b>Dokument:</b></p>
         <form method="post" class="post-form" enctype="multipart/form-data">
             {% csrf_token %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <p>{{form.errors}}</p>
+                </div>
+            {% endif %}
             <p>{{form.title}}</p>
             <label class="custom-file-upload">
                 Wybierz dokument
                 {{form.file}}
             </label>
+            <br />
+            <br />
             <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
             <br />
+            <br />
         </form>
-    </div>
+<!--    </div>-->
+</div>
 
 {% endblock %}
 

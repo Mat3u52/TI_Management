@@ -1,29 +1,62 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load i18n %}
+{% load static %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
-<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=title %}"> / Historia Komunikacji</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=title %}"><b> / Historia Komunikacji</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Historia Komunikacji</h2>
+    <hr>
+    <br />
+    <div class="no-print">
     <h3>
         <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
-            {{member.forename}} {{member.surname}} {{member.member_nr}}
+            {{member.forename}} {{member.surname}} - {{member.member_nr}}
         </a>
     </h3>
-    <div class="no-print">
-        <p>
-            Historia komunikacji
-            <a href="{% url 'TI_Management_app:member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">
-                Wygeneruj PDF
-            </a>
-            <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
-                Drukuj
-            </button>
-        </p>
     </div>
+<!--    <div class="no-print">-->
+<!--        <p>-->
+<!--            Historia komunikacji-->
+<!--            <a href="{% url 'TI_Management_app:member_notepad_history_pdf' pk=member.pk title=title %}" class="btn btn-info btn-sm pull-right">-->
+<!--                Wygeneruj PDF-->
+<!--            </a>-->
+<!--            <button class="btn btn-info btn-sm pull-right" onclick="window.print()">-->
+<!--                Drukuj-->
+<!--            </button>-->
+<!--        </p>-->
+<!--    </div>-->
+    <div class="no-print">
+       <p>
+           Historia komunikacji:
+       </p>
+       <nav class="menu menu-1">
+          <ul>
+
+              <li>
+                  <a href="{% url 'TI_Management_app:member_notepad_history_pdf_advance' pk=member.pk title=title %}">
+                    Wygeneruj zaawansowany PDF
+                  </a>
+              </li>
+              <li>
+                  <a href="{% url 'TI_Management_app:member_notepad_history_pdf' pk=member.pk title=title %}">
+                    Wygeneruj podstawowy PDF
+                  </a>
+              </li>
+              <li>
+                  <a href="#" onclick="window.print()">
+                    Drukuj
+                  </a>
+              </li>
+          </ul>
+      </nav>
+   </div>
        {% for note in member_notepad_history_obj %}
             <div class="notepad">
                 <div class="notepad-head"><h3>{{ note.title }}</h3> </div>
@@ -66,7 +99,7 @@
                     <tr>
                         <td colspan="2">
                             <h5>Opis: </h5>
-                            {{ note.content }}
+                            {{ note.content|safe }}
                         </td>
                     </tr>
                     <tr>
@@ -83,14 +116,18 @@
                         <td><h5>Podpisano: </h5></td>
                         <td>{{ note.confirmed }}</td>
                     </tr>
+
                     <tr>
+
                         <td><h5>Plik: </h5></td>
                         <td>
+                            <div class="no-print">
                             {% if note.file %}
-                                <a href="{{ note.file.url }}">{{ note.file }}</a>
+                                <a href="{{ note.file.url }}">{{ note.file|filename }}</a>
                             {% else %}
                                 -
                             {% endif %}
+                            </div>
                         </td>
                     </tr>
                 </table>

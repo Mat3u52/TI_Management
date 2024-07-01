@@ -10,6 +10,7 @@
 {% block content %}
 <div class="hero-unit">
   <h2 class="fadeInUp-animation">Przegląd dokumentów finansowych</h2>
+    <hr>
     <br />
   {% if years %}
   {% for year, entries, finance_figure, scholarship_figure, relief_figure, total_expense, total_income, finance_quantity in years.object_list %}

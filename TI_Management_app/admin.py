@@ -55,10 +55,26 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Answers)
 
 
-# def export_to_csv(modeladmin, request, queryset):
-#     opts = modeladmin.model._meta
-#     response = HttpResponse(content_type='text/csv')
-#     response['Con']
+def export_to_csv(modeladmin, request, queryset):
+    opts = modeladmin.model._meta
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename={}.csv'.format(opts.verbose_name)
+    writer = csv.writer(response)
+
+    fields = [field for field in opts.get_fields() if not field.many_to_many and not field.one_to_many]
+    writer.writerow([field.verbose_name for field in fields])
+    for obj in queryset:
+        data_row = []
+        for field in fields:
+            value = getattr(obj, field.name)
+            if isinstance(value, datetime.datetime):
+                value = value.strftime('%d/%m/%Y')
+            data_row.append(value)
+        writer.writerow(data_row)
+    return response
+
+
+export_to_csv.short_description = 'Eksport do CSV'
 
 
 @admin.register(DocumentsDatabaseCategory)
@@ -87,6 +103,7 @@ class DocumentsDatabaseCategoryAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -120,6 +137,7 @@ class DocumentsDatabaseAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -147,6 +165,7 @@ class GroupsAdmin(admin.ModelAdmin):
     search_fields = (
         'group_name',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -174,6 +193,7 @@ class MemberFunctionAdmin(admin.ModelAdmin):
     search_fields = (
         'member_function',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -201,6 +221,7 @@ class MemberOccupationAdmin(admin.ModelAdmin):
     search_fields = (
         'member_occupation',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -230,6 +251,7 @@ class GroupsMemberAdmin(admin.ModelAdmin):
     search_fields = (
         'group',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -253,6 +275,7 @@ class CardsRFIDAdmin(admin.ModelAdmin):
     search_fields = (
         'serial_number',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -280,6 +303,7 @@ class CardsAdmin(admin.ModelAdmin):
     search_fields = (
         'card_name',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -338,6 +362,7 @@ class CardStatusAdmin(admin.ModelAdmin):
         'card_identity',
         'card_status'
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -423,6 +448,7 @@ class MembersZZTIAdmin(admin.ModelAdmin):
     search_fields = (
         'surname',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -454,6 +480,7 @@ class MembersFileAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -485,6 +512,7 @@ class GroupsFileAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -524,6 +552,7 @@ class GroupsNotepadAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -561,41 +590,8 @@ class NotepadAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
-
-
-# @admin.register(Application)
-# class ApplicationAdmin(admin.ModelAdmin):
-#
-#     def get_readonly_fields(self, request, obj=None):
-#         if obj:  # when editing an object
-#             return ['created_date']
-#         return self.readonly_fields
-#
-#     list_display = (
-#         'kind_of_application',
-#         'date_of_application',
-#         'date_of_payout',
-#         'member',
-#         'created_date',
-#         'slug',
-#         'author',
-#         'updated_date'
-#     )
-#     list_filter = (
-#         'kind_of_application',
-#         'date_of_application',
-#         'date_of_payout',
-#         'member',
-#         'created_date',
-#         'slug',
-#         'author',
-#         'updated_date'
-#     )
-#     search_fields = (
-#         'kind_of_application',
-#     )
-#     # date_hierarchy = 'created_date'
 
 
 @admin.register(Activities)
@@ -620,6 +616,7 @@ class CardsActivitiesAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -651,6 +648,7 @@ class CardsActivityStatusAdmin(admin.ModelAdmin):
     search_fields = (
         'activities',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -685,6 +683,7 @@ class TaskAdmin(admin.ModelAdmin):
     search_fields = (
         'task_name',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -713,6 +712,7 @@ class VoteAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -735,6 +735,7 @@ class QuestionsAdmin(admin.ModelAdmin):
     search_fields = (
         'question',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -759,6 +760,7 @@ class AnswersAdmin(admin.ModelAdmin):
     search_fields = (
         'answer',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -790,6 +792,7 @@ class OrderedCardDocumentAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -821,6 +824,7 @@ class ToBePickedUpCardDocumentAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -852,6 +856,7 @@ class ReliefAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -879,6 +884,7 @@ class RelationRegisterReliefAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
 
 
 @admin.register(RegisterRelief)
@@ -931,6 +937,7 @@ class RegisterReliefAdmin(admin.ModelAdmin):
     search_fields = (
         'relief',
     )
+    actions = [export_to_csv]
 
 
 @admin.register(SignatureRelief)
@@ -961,6 +968,7 @@ class SignatureReliefAdmin(admin.ModelAdmin):
     search_fields = (
         'register_relief',
     )
+    actions = [export_to_csv]
 
 
 @admin.register(FileRegisterRelief)
@@ -989,6 +997,7 @@ class FileRegisterReliefAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
 
 
 @admin.register(AverageSalary)
@@ -1017,6 +1026,7 @@ class AverageSalaryAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
 
 
 @admin.register(Scholarships)
@@ -1083,6 +1093,7 @@ class ScholarshipsAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
 
 
 @admin.register(KindOfFinanceDocument)
@@ -1109,6 +1120,7 @@ class KindOfFinanceDocumentAdmin(admin.ModelAdmin):
     search_fields = (
         'title_doc',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -1136,6 +1148,7 @@ class KindOfFinanceExpenseAdmin(admin.ModelAdmin):
     search_fields = (
         'title_expense',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -1183,6 +1196,7 @@ class FileFinanceAdmin(admin.ModelAdmin):
     search_fields = (
         'title',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'
 
 
@@ -1226,4 +1240,5 @@ class BankStatementAdmin(admin.ModelAdmin):
     search_fields = (
         'title_bank_statement',
     )
+    actions = [export_to_csv]
     # date_hierarchy = 'created_date'

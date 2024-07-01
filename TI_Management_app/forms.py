@@ -38,6 +38,7 @@ from datetime import datetime, date, timedelta
 from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
 from phone_field import PhoneField
+from django_ckeditor_5.widgets import CKEditor5Widget
 
 
 def validate_phone_number(value):
@@ -172,7 +173,7 @@ class MemberForm(forms.ModelForm):
     )
 
     image = forms.FileField(
-        label='Select a PDF file',
+        label='Select a jpeg file',
         widget=forms.FileInput(
             attrs={
                 'accept': 'image/jpeg,image/png'
@@ -270,19 +271,51 @@ class MemberForm(forms.ModelForm):
         ]
 
         widgets = {
-            'birthday': forms.DateInput(attrs={'type': 'date'}),
+            'birthday': forms.DateInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
             # 'birthday': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'date_of_accession': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_accession': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
             # 'date_of_accession': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'date_of_abandonment': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_abandonment': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
             # 'date_of_abandonment': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'date_of_contract': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_contract': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
             # 'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'expiration_date_contract': forms.TextInput(attrs={'type': 'date'}),
+            'expiration_date_contract': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
             # 'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'sex': forms.Select(attrs={'class': 'form-control select'}),
-            'type_of_contract': forms.Select(attrs={'class': 'form-control select'}),
-            'group': forms.Select(attrs={'class': 'form-control select'}),
+            'sex': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'type_of_contract': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'group': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
 
         }
 
@@ -331,8 +364,8 @@ class MemberForm(forms.ModelForm):
             if expiration_date_contract < date_of_contract:
                 raise ValidationError("Data rozwiązania umowy musi być późniejsza niż data zatrudnienia.")
 
-        phone_number = self.cleaned_data.get('phone_number')
-        PhoneField().clean(phone_number, None)
+        # phone_number = self.cleaned_data.get('phone_number')
+        # PhoneField().clean(phone_number, None)
 
         return cleaned_data
 
@@ -358,29 +391,138 @@ class MemberCardEditForm(forms.ModelForm):
 
 
 class MemberEditForm(forms.ModelForm):
-    phone_number = forms.CharField(
-        required=False,
-        validators=[RegexValidator(r'^\+?1?\d{9,15}$',
-                                   message="Wprowadź włąściwy numer telefonu.")]
+
+    forename = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Imię',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Imię musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
+    )
+
+    surname = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Nazwisko'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwisko musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
+    )
+
+    birthplace = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Miejsce urodzenia'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Miejsce urodzenia musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
     )
 
     member_nr = forms.CharField(
-        validators=[RegexValidator(r'^\d{0,10}$',
-                                   message="To pole musi być liczbą.")]
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Numer Członka'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=6,
+                message="Numer Członka musi zawierać 6 znaków."
+            ),
+            RegexValidator(
+                regex=r'^\d{0,10}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        max_length=100
     )
+
     pin = forms.IntegerField(
-        required=True,
-        validators=[RegexValidator(r'^\d{0,8}$',
-                                   message="To pole musi być liczbą.")]
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'aria-label': 'PIN'
+            }
+        ),
+        validators=[
+            MinValueValidator(
+                limit_value=0,
+                message="PIN musi być dodatni."
+            ),
+            MaxValueValidator(
+                limit_value=9999,
+                message="PIN max 9999."
+            ),
+            RegexValidator(
+                r'^\d{0,8}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        required=True
     )
+
+    phone_number = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '000 000 000',
+                'class': 'phone-number'
+            }
+        ),
+        label="Numer kontaktowy",
+        help_text='Numer telefonu',
+        required=False,
+        validators=[validate_phone_number]
+    )
+
+    extension = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'placeholder': '+48',
+                'class': 'ext-input',
+                'disabled': 'disabled'
+            }
+        ),
+        required=False,
+        initial='+48'
+    )
+
     image = forms.FileField(
-        label='Select a PDF file',
+        label='Select a jpeg file',
         widget=forms.FileInput(
             attrs={
                 'accept': 'image/jpeg,image/png'
             }
         ),
-        required=True
+        required=False
     )
 
     class Meta:
@@ -403,23 +545,120 @@ class MemberEditForm(forms.ModelForm):
             'date_of_contract',
             'expiration_date_contract',
             'group',
-            'card',
+            # 'card',
             'image'
         ]
 
         widgets = {
-                # 'birthday': forms.DateInput(attrs={'type': 'date'}),
-                'birthday': forms.TextInput(attrs={'type': 'datetime-local'}),
-                # 'date_of_accession': forms.TextInput(attrs={'type': 'date'}),
-                'date_of_accession': forms.TextInput(attrs={'type': 'datetime-local'}),
-                # 'date_of_abandonment': forms.TextInput(attrs={'type': 'date'}),
-                'date_of_abandonment': forms.TextInput(attrs={'type': 'datetime-local'}),
-                # 'date_of_contract': forms.TextInput(attrs={'type': 'date'}),
-                'date_of_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
-                # 'expiration_date_contract': forms.TextInput(attrs={'type': 'date'}),
-                'expiration_date_contract': forms.TextInput(attrs={'type': 'datetime-local'}),
+            # 'birthday': forms.DateInput(attrs={'type': 'date'}),
+            'birthday': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            # 'date_of_accession': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_accession': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            # 'date_of_abandonment': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_abandonment': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            # 'date_of_contract': forms.TextInput(attrs={'type': 'date'}),
+            'date_of_contract': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            # 'expiration_date_contract': forms.TextInput(attrs={'type': 'date'}),
+            'expiration_date_contract': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'sex': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'type_of_contract': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'group': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'role': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'occupation': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
 
         }
+
+    def __init__(self, *args, **kwargs):
+
+        super(MemberEditForm, self).__init__(*args, **kwargs)
+
+        self.fields['forename'].widget.attrs['placeholder'] = 'Imię'
+        self.fields['surname'].widget.attrs['placeholder'] = 'Nazwisko'
+        self.fields['member_nr'].widget.attrs['placeholder'] = '6 znaków: 000000'
+        eighteen_years_ago = date.today() - timedelta(days=18 * 365)
+        eighteen_years_ago_str = eighteen_years_ago.strftime('%Y-%m-%d')
+        self.fields['birthday'].initial = eighteen_years_ago_str
+        self.fields['birthplace'].widget.attrs['placeholder'] = 'Miejsce urodzenia'
+        self.fields['pin'].widget.attrs['placeholder'] = '4 znaki: 0000'
+        self.fields['email'].widget.attrs['placeholder'] = 'user@user.com'
+        current_data = date.today()
+        current_data_str = current_data.strftime('%Y-%m-%d')
+        self.fields['date_of_accession'].initial = current_data_str
+        one_year_later = date.today().replace(year=date.today().year + 1)
+        one_year_later_str = one_year_later.strftime('%Y-%m-%d')
+        self.fields['date_of_abandonment'].initial = one_year_later_str
+        today_str = date.today().strftime('%Y-%m-%d')
+        self.fields['date_of_contract'].initial = today_str
+        three_year_later = date.today().replace(year=date.today().year + 3)
+        three_year_later_str = three_year_later.strftime('%Y-%m-%d')
+        self.fields['expiration_date_contract'].initial = three_year_later_str
+        self.fields['type_of_contract'].required = True
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_of_accession = cleaned_data.get("date_of_accession")
+        date_of_abandonment = cleaned_data.get("date_of_abandonment")
+        date_of_contract = cleaned_data.get("date_of_contract")
+        expiration_date_contract = cleaned_data.get("expiration_date_contract")
+        pin = cleaned_data.get("pin")
+
+        if date_of_accession and date_of_abandonment:
+            if date_of_accession >= date_of_abandonment:
+                raise ValidationError("Data przystąpienia musi być wcześniejsza niż data rezygnacji.")
+
+        if date_of_accession and date_of_contract:
+            if date_of_accession < date_of_contract:
+                raise ValidationError("Data przystąpienia musi być późniejsza niż data zatrudnienia.")
+
+        if expiration_date_contract and date_of_contract:
+            if expiration_date_contract < date_of_contract:
+                raise ValidationError("Data rozwiązania umowy musi być późniejsza niż data zatrudnienia.")
+
+
+        # phone_number = self.cleaned_data.get('phone_number')
+        # PhoneField().clean(phone_number, None)
+
+        return cleaned_data
 
 
 class MemberEditReliefForm(forms.ModelForm):
@@ -486,37 +725,77 @@ class MemberOccupationForm(forms.ModelForm):
 
 
 class MemberFileForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa dokumentu',
+                'aria-label': 'Nazwa dokumentu',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa dokumentu musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
+    )
+
     class Meta:
         model = MembersFile
-        fields = ['title', 'file']
+        fields = [
+            'title',
+            'file'
+        ]
 
 
 class CardStatusForm(forms.ModelForm):
 
     card_start_pin = forms.CharField(
         validators=[
-            RegexValidator(r'^\d{0,10}$',
-                           message="To pole musi być liczbą.")],
-        required=False)
+            RegexValidator(
+                r'^\d{0,10}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        required=False
+    )
 
     responsible = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = CardStatus
-        fields = ['ordered_doc',
-                  'to_be_picked_up_doc',
-                  'card_start_pin',
-                  'card_identity',
-                  'card_status',
-                  'date_of_action',
-                  'file_name',
-                  'file',
-                  'file_date',
-                  'file_name_a',
-                  'file_a',
-                  'file_a_date',
-                  'responsible',
-                  'confirmed']
+        fields = [
+            'ordered_doc',
+            'to_be_picked_up_doc',
+            'card_start_pin',
+            'card_identity',
+            'card_status',
+            'date_of_action',
+            'file_name',
+            'file',
+            'file_date',
+            'file_name_a',
+            'file_a',
+            'file_a_date',
+            'responsible',
+            'confirmed'
+        ]
 
         widgets = {
             'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
@@ -581,9 +860,29 @@ class GroupsMemberForm(forms.ModelForm):
 
 
 class GroupNotepadForm(forms.ModelForm):
-    class Meta:
-        responsible = forms.CharField(widget=forms.HiddenInput())
 
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Tytuł',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100
+    )
+    responsible = forms.CharField(
+        widget=forms.HiddenInput()
+    )
+
+    class Meta:
         model = GroupsNotepad
         fields = [
             'title',
@@ -596,50 +895,173 @@ class GroupNotepadForm(forms.ModelForm):
         ]
 
         widgets = {
+            'content': CKEditor5Widget(
+                config_name='default'
+            ),
             'published_date': forms.TextInput(
                 attrs={
                     'type': 'datetime-local'
                 }
             ),
-            'content': forms.Textarea(
+            # 'content': forms.Textarea(
+            #     attrs={
+            #         'rows': 12,
+            #         'cols': 50
+            #     }
+            # ),
+            'importance': forms.Select(
                 attrs={
-                    'rows': 12,
-                    'cols': 50
+                    'class': 'form-control select'
                 }
             ),
+            'method': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'status': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            )
         }
 
 
 class NotepadMemberForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Tytuł sprawy',
+                'aria-label': 'Tytuł sprawy',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł sprawy musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+    # confirmed = forms.BooleanField(
+    #     widget=forms.CheckboxInput(
+    #         attrs={
+    #             'id': 'id_confirmed',
+    #             'class': 'my-checkbox-class'
+    #         }
+    #     )
+    # )
+
     class Meta:
         responsible = forms.CharField(widget=forms.HiddenInput())
 
         model = Notepad
-        fields = ['title', 'content', 'published_date', 'importance',
-                  'method', 'status', 'responsible', 'file', 'confirmed']
+        fields = [
+            'title',
+            'content',
+            'published_date',
+            'importance',
+            'method',
+            'status',
+            'responsible',
+            'file',
+            'confirmed'
+        ]
 
         widgets = {
-            'published_date': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'content': forms.Textarea(attrs={'rows': 12, 'cols': 50}),
+            'published_date': forms.TextInput(
+                attrs={'type': 'datetime-local'}
+            ),
+            # 'content': forms.Textarea(attrs={'rows': 12, 'cols': 50}),
+            'content': CKEditor5Widget(
+                config_name='default'
+            ),
+            'importance': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'method': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'status': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            )
         }
 
 
 class GroupsForm(forms.ModelForm):
+
+    group_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa Grupy',
+                'aria-label': 'Nazwa Grupy',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa grupy musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
     class Meta:
         model = Groups
-        fields = ['group_name',]
+        fields = [
+            'group_name'
+        ]
 
 
 class GroupsEditForm(forms.ModelForm):
+
+    group_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa Grupy',
+                'aria-label': 'Nazwa Grupy',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa grupy musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
     class Meta:
         model = Groups
-        fields = ['group_name',]
+        fields = ['group_name']
 
 
 class GroupAddMemberForm(forms.ModelForm):
     class Meta:
         model = GroupsMember
-        fields = ['member', 'group']
+        fields = [
+            'member',
+            'group'
+        ]
 
 
 class LoyaltyCardForm(forms.ModelForm):
@@ -791,7 +1213,12 @@ class GroupAddGenderForm(forms.Form):
         ('male', 'Mężczyzna'),
     )
     gender = forms.ChoiceField(
-        choices=SEX_CHOICES
+        choices=SEX_CHOICES,
+        widget=forms.Select(
+            attrs={
+                'class': 'form-control select'
+            }
+        )
     )
 
 
@@ -802,6 +1229,11 @@ class GroupAddRoleForm(forms.ModelForm):
             'role',
             'occupation',
         ]
+
+        widgets = {
+            'role': forms.Select(attrs={'class': 'form-control select'}),
+            'occupation': forms.Select(attrs={'class': 'form-control select'}),
+        }
 
 
 class ExportDataSeparatorGroupForm(forms.Form):
@@ -831,12 +1263,66 @@ class ExportDataSeparatorGroupForm(forms.Form):
 
 
 class GroupFileForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Tytuł dokumentu',
+                'aria-label': 'Tytuł dokumentu',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł dokumentu musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
+    file = forms.FileField(
+        label='Select a PDF file or JPEG',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf,image/jpeg,image/png'
+            }
+        ),
+        required=True
+    )
+
     class Meta:
         model = GroupsFile
-        fields = ['title', 'file']
+        fields = [
+            'title',
+            'file'
+        ]
 
 
 class DocumentsDatabaseForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Tytuł dokumentu',
+                'aria-label': 'Tytuł dokumentu',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł dokumentu musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
     file = forms.FileField(
         label='Select a PDF file',
         widget=forms.FileInput(
@@ -855,9 +1341,37 @@ class DocumentsDatabaseForm(forms.ModelForm):
             'file',
             'responsible'
         ]
+        widgets = {
+            'category': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            )
+        }
 
 
 class DocumentsDatabaseCategoryForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa kategorii',
+                'aria-label': 'Nazwa kategorii',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa kategorii musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
     class Meta:
         model = DocumentsDatabaseCategory
         fields = [
@@ -1306,6 +1820,21 @@ class ScholarshipsEditForm(forms.ModelForm):
 
 
 class KindOfFinanceDocumentForm(forms.ModelForm):
+
+    title_doc = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Rodaj dokumentu',
+                'aria-label': 'Rodaj dokumentu',
+                'list': 'kind_of_finance_document',
+                'autofocus': 'autofocus'
+            }
+        ),
+        required=True,
+        max_length=250
+    )
+
     class Meta:
         model = KindOfFinanceDocument
         fields = ['title_doc']
@@ -1356,7 +1885,14 @@ class FileFinanceForm(forms.ModelForm):
             'description'
         ]
         widgets = {
-            'payment_date': forms.DateInput(attrs={'type': 'date'})
+            'payment_date': forms.DateInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'description': CKEditor5Widget(
+                config_name='default'
+            )
         }
 
     def __init__(self, *args, **kwargs):

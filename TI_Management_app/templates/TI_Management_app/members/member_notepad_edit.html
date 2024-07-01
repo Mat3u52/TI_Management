@@ -1,82 +1,72 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / Grupa - {{group.group_name}}</b></a>
-<a href="{% url 'TI_Management_app:group_notepad_add' pk=group.pk %}"><b> / Dodaj komunikację do grupy</b></a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_notepad_edit' pk=member.pk pk1=notepad.pk %}"><b> / Aktualizuj komunikację</b></a>
 {% endblock %}
 
 {% block content %}
-<div class="hero-unit">
-    <h2 class="fadeInUp-animation">Dodawanie komunikacji z grupą - {{group.group_name}}</h2>
-    <hr>
-    <br />
-    {% if form.errors %}
-        <div class="alert alert-danger">
-            <p>{{form.errors}}</p>
-        </div>
-    {% endif %}
-    <h3><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">{{ group.group_name }}</a></h3>
 
+<div class="hero-unit">
+<h2 class="fadeInUp-animation">Aktualizacja komunikacji</h2>
+<hr>
+<br />
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <p>{{form.errors}}</p>
+    </div>
+{% endif %}
+
+    <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+    <p>Komunikacja</p>
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
-
         <table width="100%">
             <tr>
                 <td>
                     <b>Tytuł sprawy:</b>
-                    <div>
-                        <div {% if form.title.errors %} class="hint" {% endif %}>
-                            {{form.title}}
-                        </div>
-                        {% if form.title.errors %}
-                            <div class="alert alert-danger">
-                                {{ form.title.errors }}
-                            </div>
-                        {% endif %}
-                    </div>
+                        {{ form.title }}
                 </td>
             </tr>
             <tr>
                 <td>
                     <b>Opis:</b>
                     <br/>
-                    {{ form.media }}
-                    {{ form.content }}
+                        {{ form.media }}
+                        {{ form.content }}
                 </td>
             </tr>
+<!--                <tr>-->
+<!--                    <td>Data zgłoszenia:-->
+<!--                    {{ form.published_date }}</td>-->
+<!--                </tr>-->
             <tr>
                 <td>
                     <b>Ważność:</b>
                     <br/>
-                    <div class="select-wrapper">
                         {{ form.importance }}
-                    </div>
                 </td>
             </tr>
             <tr>
                 <td>
                     <b>Sposób zgłoszenia:</b>
                     <br/>
-                    <div class="select-wrapper">
                         {{ form.method }}
-                    </div>
                 </td>
             </tr>
             <tr>
                 <td>
                     <b>Status:</b>
-                    <br />
-                    <div class="select-wrapper">
+                    <br/>
                         {{ form.status }}
-                    </div>
                 </td>
             </tr>
             <tr>
                 <td>
                     <b>Odpowiedzialny:</b>
-                    <br/>
-                    {{ form.responsible.as_hidden }}
+                    <br />
+                        {{ form.responsible.as_hidden }}
                     <input
                         class="form-control me-2"
                         style="min-width: 50%!important; min-height: 15px"
@@ -89,17 +79,32 @@
                     >
                 </td>
             </tr>
+            <tr>
+                <td class="tableCredential">
+                    <label class="custom-file-upload-mod">
+                        <b>Dodaj plik:</b>
+                        {{ form.file }}
+                    </label>
+                </td>
+
+            </tr>
+            <tr>
+                <td>
+                    <br />
+                    <b>Potwierdzenie zgłoszenia:</b>
+                        {{form.confirmed}}
+                </td>
+            </tr>
         </table>
         <br />
         <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
         <br />
         <br />
     </form>
 </div>
 
 {% endblock %}
-
 {% block menu %}
-    {% include 'TI_Management_app/menu.html' with active_tab='groups' %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
 {% endblock %}

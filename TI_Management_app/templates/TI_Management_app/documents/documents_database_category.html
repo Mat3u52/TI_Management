@@ -1,20 +1,27 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:documents_database' %}"> / Baza dokumentów</a>
-<a href="{% url 'TI_Management_app:documents_database_category' %}"> / Kategorie</a>
+<a href="{% url 'TI_Management_app:documents_database' %}"><b> / Baza dokumentów</b></a>
+<a href="{% url 'TI_Management_app:documents_database_category' %}"><b> / Kategorie</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj kategorie do bazy dokumentów</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
-            <p>Dodaj kategorie:</p>
+        <p><b>Dodaj kategorie:</b></p>
         {{form.title}}
         {{form.responsible.as_hidden}}
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
         <br />
         <br />

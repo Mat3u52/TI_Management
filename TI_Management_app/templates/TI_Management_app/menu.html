@@ -33,6 +33,7 @@
             <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;grupę</b>
         </a>
     </li>
+    <hr>
     <li class="{% if active_tab == 'loyalty_card' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:loyalty_card_list' %}"><h4><b>Karty&nbsp;Lojalnościowe</b></h4></a>
     </li>
@@ -41,7 +42,7 @@
             <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;kartę&nbsp;lojalnościową</b>
         </a>
     </li>
-
+    <hr>
     <li class="{% if active_tab == 'finance_list' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:finance_list' %}"><h4><b>Finanse</b></h4></a>
     </li>
@@ -84,7 +85,7 @@
     <li class="{% if active_tab == 'relief_confirmed_list' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:relief_confirmed_list' %}">&#160;&#160;&#160;&#160;&#8728;&nbsp;lista&nbsp;udzielonych&nbsp;zapomóg</a>
     </li>
-
+    <hr>
     <li class="{% if active_tab == 'documents_database' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:documents_database' %}"><h4><b>Baza&nbsp;Dokumentów</b></h4></a>
     </li>

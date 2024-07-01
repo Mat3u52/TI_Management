@@ -20,7 +20,7 @@ urlpatterns = [
         name='member_export_csv'
     ),
     path(
-        'TI_Management_app/<int:pk>/',
+        'TI_Management_app/members/<int:pk>/',
         views.member_detail,
         name='member_detail'
     ),
@@ -50,7 +50,7 @@ urlpatterns = [
         name='member_occupation_edit'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit/',
+        'TI_Management_app/members/<int:pk>/edit/',
         views.member_edit,
         name='member_edit'
     ),
@@ -65,7 +65,7 @@ urlpatterns = [
         name='member_deactivate'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-file/',
+        'TI_Management_app/members/<int:pk>/edit-file/',
         views.member_file_edit,
         name='member_file_edit'
     ),
@@ -95,37 +95,42 @@ urlpatterns = [
         name='member_loyalty_card_delete'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-group-add/<int:pk1>/',
+        'TI_Management_app/members/<int:pk>/edit-member-group-add/<int:pk1>/',
         views.member_group_add,
         name='member_group_add'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-group-delete/<int:pk1>/',
+        'TI_Management_app/members/<int:pk>/edit-group-delete/<int:pk1>/',
         views.member_group_delete,
         name='member_group_delete'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-notepad-add/',
+        'TI_Management_app/members/<int:pk>/edit-member-notepad-add/',
         views.member_notepad_add,
         name='member_notepad_add'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-notepad-edit/<int:pk1>/',
+        'TI_Management_app/members/<int:pk>/edit-member-notepad-edit/<int:pk1>/',
         views.member_notepad_edit,
         name='member_notepad_edit'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-notepad-history/<str:title>/',
+        'TI_Management_app/members/<int:pk>/edit-member-notepad-history/<str:title>/',
         views.member_notepad_history,
         name='member_notepad_history'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-notepad-history-pdf/<str:title>/',
+        'TI_Management_app/members/<int:pk>/edit-member-notepad-history-pdf-advance/<str:title>/',
+        views.member_notepad_history_pdf_advance,
+        name='member_notepad_history_pdf_advance'
+    ),
+    path(
+        'TI_Management_app/members/<int:pk>/edit-member-notepad-history-pdf/<str:title>/',
         views.member_notepad_history_pdf,
         name='member_notepad_history_pdf'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-member-notepad-delete-all/',
+        'TI_Management_app/members/<int:pk>/edit-member-notepad-delete-all/',
         views.member_notepad_delete_all,
         name='member_notepad_delete_all'
     ),
@@ -135,77 +140,87 @@ urlpatterns = [
         name='member_search'
     ),
     path(
-        'TI_Management_app/groups/',
+        'TI_Management_app/groups/groups-list/',
         views.groups_list,
         name='groups_list'
     ),
     path(
-        'TI_Management_app/group-detail/<int:pk>/',
+        'TI_Management_app/groups/group-detail/<int:pk>/',
         views.group_detail,
         name='group_detail'
     ),
     path(
-        'TI_Management_app/group-detail/<int:pk>/group-notepad-add/',
+        'TI_Management_app/groups/group-detail/<int:pk>/group-notepad-add/',
         views.group_notepad_add,
         name='group_notepad_add'
     ),
     path(
-        'TI_Management_app/group-detail/<int:pk>/group-notepad-edit/<int:pk1>/',
+        'TI_Management_app/groups/group-detail/<int:pk>/group-notepad-edit/<int:pk1>/',
         views.group_notepad_edit,
         name='group_notepad_edit'
     ),
     path(
-        'TI_Management_app/<int:pk>/group-notepad-history/<int:pk1>/',
+        'TI_Management_app/groups/<int:pk>/group-notepad-history/<int:pk1>/',
         views.group_notepad_history,
         name='group_notepad_history'
     ),
     path(
-        'TI_Management_app/<int:pk>/group-notepad-history-pdf/<int:pk1>/',
+        'TI_Management_app/groups/<int:pk>/group-notepad-history-pdf-advance/<int:pk1>/',
+        views.group_notepad_history_pdf_advance,
+        name='group_notepad_history_pdf_advance'
+    ),
+    path(
+        'TI_Management_app/groups/<int:pk>/group-notepad-history-pdf-one-advance/<int:pk1>/<int:pk2>/',
+        views.group_notepad_history_pdf_one_advance,
+        name='group_notepad_history_pdf_one_advance'
+    ),
+    path(
+        'TI_Management_app/groups/<int:pk>/group-notepad-history-pdf/<int:pk1>/',
         views.group_notepad_history_pdf,
         name='group_notepad_history_pdf'
     ),
     path(
-        'TI_Management_app/group-detail/<int:pk>/edit-file/',
+        'TI_Management_app/groups/group-detail/<int:pk>/edit-file/',
         views.group_file_edit,
         name='group_file_edit'
     ),
     path(
-        'TI_Management_app/group-detail/<int:pk>/delete-file/<int:pk1>/',
+        'TI_Management_app/groups/group-detail/<int:pk>/delete-file/<int:pk1>/',
         views.group_file_delete,
         name='group_file_delete'
     ),
     path(
-        'TI_Management_app/group-member-search/<int:pk>/',
+        'TI_Management_app/groups/group-member-search/<int:pk>/',
         views.group_member_search,
         name='group_member_search'
     ),
     path(
-        'TI_Management_app/groups-add/',
+        'TI_Management_app/groups/groups-add/',
         views.groups_add,
         name='groups_add'
     ),
     path(
-        'TI_Management_app/group-edit/<int:pk>/',
+        'TI_Management_app/groups/group-edit/<int:pk>/',
         views.groups_edit,
         name='groups_edit'
     ),
     path(
-        'TI_Management_app/group-add-member/<int:pk>/<int:pk1>/',
+        'TI_Management_app/groups/group-add-member/<int:pk>/<int:pk1>/',
         views.group_add_member,
         name='group_add_member'
     ),
     path(
-        'TI_Management_app/group-delete/<int:pk>/',
+        'TI_Management_app/groups/group-delete/<int:pk>/',
         views.group_delete_all,
         name='group_delete_all'
     ),
     path(
-        'TI_Management_app/group-detail/<int:pk>/group-delete-member/<int:pk1>/',
+        'TI_Management_app/groups/group-detail/<int:pk>/group-delete-member/<int:pk1>/',
         views.group_delete_member,
         name='group_delete_member'
     ),
     path(
-        'TI_Management_app/group-search/',
+        'TI_Management_app/groups/group-search/',
         views.group_search,
         name='group_search'
     ),
@@ -280,37 +295,37 @@ urlpatterns = [
         name='loyalty_card_search'
     ),
     path(
-        'TI_Management_app/documents-database/',
+        'TI_Management_app/documents/documents-database/',
         views.documents_database,
         name='documents_database'
     ),
     path(
-        'TI_Management_app/documents-database-edit/<int:pk>/',
+        'TI_Management_app/documents/documents-database-edit/<int:pk>/',
         views.documents_database_edit,
         name='documents_database_edit'
     ),
     path(
-        'TI_Management_app/documents-database-delete/<int:pk>/',
+        'TI_Management_app/documents/documents-database-delete/<int:pk>/',
         views.documents_database_delete,
         name='documents_database_delete'
     ),
     path(
-        'TI_Management_app/documents-database-search/',
+        'TI_Management_app/documents/documents-database-search/',
         views.documents_database_search,
         name='documents_database_search'
     ),
     path(
-        'TI_Management_app/documents-database-category/',
+        'TI_Management_app/documents/documents-database-category/',
         views.documents_database_category,
         name='documents_database_category'
     ),
     path(
-        'TI_Management_app/documents-database-category-edit/<int:pk>/',
+        'TI_Management_app/documents/documents-database-category-edit/<int:pk>/',
         views.documents_database_category_edit,
         name='documents_database_category_edit'
     ),
     path(
-        'TI_Management_app/documents-database-category-delete/<int:pk>/',
+        'TI_Management_app/documents/documents-database-category-delete/<int:pk>/',
         views.documents_database_category_delete,
         name='documents_database_category_delete'
     ),

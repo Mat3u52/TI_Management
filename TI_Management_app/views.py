@@ -112,31 +112,26 @@ import pytz
 from decimal import Decimal
 from django.db.models import Sum, Case, When, DecimalField, OuterRef, Subquery, Max
 from .common.decorators import ajax_required
-# from django.db import IntegrityError
+from django.db.models import Count
+import bleach
 
+from django.template.loader import render_to_string
+import weasyprint
+# import logging
 
-# class Image(TemplateView):
-#     form = MemberForm
-#     template_name = 'TI_Management_app/image.html'
-#
-#     def member(self, request, *args, **kwargs):
-#         form = MemberForm(request.POST, request.FILES)
-#         if form.is_valid():
-#             obj = form.save()
-#             return HttpResponseRedirect(reverse_lazy('image_display', kwargs={'pk': obj.id}))
-#
-#         context = self.get_context_data(form=form)
-#         return self.render_to_response(context)
-#
-#     def get(self, request, *args, **kwargs):
-#         return self.member(request, *args, **kwargs)
-#
-#
-# class ImageDisplay(DetailView):
-#     model = MembersZZTI
-#     template_name = 'TI_Management_app/image_display.html'
-#     context_object_name = 'image'
+ALLOWED_TAGS = list(bleach.sanitizer.ALLOWED_TAGS) + [
+    'p', 'br', 'div', 'span', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'figure', 'table', 'tbody', 'tr', 'td'
+]
 
+ALLOWED_ATTRIBUTES = {
+    **bleach.sanitizer.ALLOWED_ATTRIBUTES,
+    'img': ['src', 'alt'],
+    'a': ['href', 'title'],
+    'span': ['style'],
+    'div': ['style'],
+    'td': ['colspan', 'rowspan'],
+    'th': ['colspan', 'rowspan']
+}
 
 @login_required
 def members_list(request):
@@ -273,7 +268,7 @@ def member_detail(request, pk):
 
     return render(
         request,
-        'TI_Management_app/member_detail.html',
+        'TI_Management_app/members/member_detail.html',
         {
             'member': member,
             'accessible_ids': accessible_ids,
@@ -426,8 +421,6 @@ def member_new(request):
     )
 
 
-
-
 @login_required
 def member_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
@@ -442,10 +435,15 @@ def member_edit(request, pk):
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberEditForm(instance=member)
-        # birthday = member.birthday
-        # form = MemberForm(instance=member, initial={'birthday': birthday})
-    return render(request, 'TI_Management_app/member_edit.html', {'form': form,
-                                                                  'member': member})
+
+    return render(
+        request,
+        'TI_Management_app/members/member_edit.html',
+        {
+            'form': form,
+            'member': member
+        }
+    )
 
 
 @login_required
@@ -608,11 +606,14 @@ def member_file_edit(request, pk):
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = MemberFileForm()
-    return render(request, 'TI_Management_app/member_file_edit.html',
-                  {
-                      'form': form,
-                      'member': member}
-                  )
+    return render(
+        request,
+        'TI_Management_app/members/member_file_edit.html',
+        {
+            'form': form,
+            'member': member
+        }
+    )
 
 
 @login_required
@@ -1261,9 +1262,10 @@ def member_loyalty_card_delete(request, pk, pk1):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
-# @login_required
+@login_required
 def groups_list(request):
-    groups_obj = Groups.objects.all()
+    # groups_obj = Groups.objects.all()
+    groups_obj = Groups.objects.annotate(member_count=Count('groupsGroup')).order_by('-created_date')
 
     paginator = Paginator(groups_obj, 5)
     page = request.GET.get('page')
@@ -1274,10 +1276,14 @@ def groups_list(request):
     except EmptyPage:
         groups = paginator.page(paginator.num_pages)
 
-    return render(request,
-                  'TI_Management_app/groups_list.html',
-                  {'page': page,
-                   'groups': groups})
+    return render(
+        request,
+        'TI_Management_app/groups/groups_list.html',
+        {
+            'page': page,
+            'groups': groups
+        }
+    )
 
 
 @login_required
@@ -1294,17 +1300,23 @@ def group_member_search(request, pk):
         # members_without_group = MembersZZTI.objects.filter(groupsMember__isnull=True)
         members_without_group = group_members.exclude(groupsMember__group__pk=pk)
 
-        return render(request,
-                      'TI_Management_app/group_member_search.html',
-                      {'searched': searched,
-                       'group_members': group_members,
-                       'group_available': group_available,
-                       'group_validator': group_validator,
-                       'members_without_group': members_without_group})
+        return render(
+            request,
+            'TI_Management_app/groups/group_member_search.html',
+            {
+                'searched': searched,
+                'group_members': group_members,
+                'group_available': group_available,
+                'group_validator': group_validator,
+                'members_without_group': members_without_group
+            }
+        )
     else:
-        return render(request,
-                      'TI_Management_app/group_member_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/groups/group_member_search.html',
+            {}
+        )
 
 
 @login_required
@@ -1315,11 +1327,17 @@ def groups_add(request):
             group = form.save(commit=False)
             group.author = request.user
             group.save()
-            messages.success(request, f"Dodano nową grupe {group.group_name}!")
+            messages.success(request, f"Dodano nową grupę: {group.group_name}!")
             return redirect('TI_Management_app:groups_list')
     else:
         form = GroupsForm()
-    return render(request, 'TI_Management_app/groups_add.html', {'form': form})
+    return render(
+        request,
+        'TI_Management_app/groups/groups_add.html',
+        {
+            'form': form
+        }
+    )
 
 
 @login_required
@@ -1331,13 +1349,18 @@ def groups_edit(request, pk):
             group = form.save(commit=False)
             group.author = request.user
             group.save()
-            messages.success(request, f"Zaktualizowano grupe {group.group_name}!")
+            messages.success(request, f"Zaktualizowano grupę {group.group_name}!")
             return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupsEditForm(instance=group)
-    return render(request, 'TI_Management_app/groups_edit.html',
-                  {'form': form,
-                   'group': group})
+    return render(
+        request,
+        'TI_Management_app/groups/groups_edit.html',
+        {
+            'form': form,
+            'group': group
+        }
+    )
 
 
 @login_required
@@ -1419,12 +1442,16 @@ def group_detail(request, pk):
     else:
         form_export = ExportDataSeparatorGroupForm()
 
-    return render(request, 'TI_Management_app/group_detail.html',
-                  {'group': group,
-                   'form_gender': form_gender,
-                   'form_role': form_role,
-                   # 'form_occupation': form_occupation,
-                   'form_export': form_export})
+    return render(
+        request,
+        'TI_Management_app/groups/group_detail.html',
+        {
+            'group': group,
+            'form_gender': form_gender,
+            'form_role': form_role,
+            'form_export': form_export
+        }
+    )
 
 
 @login_required
@@ -1441,10 +1468,14 @@ def group_file_edit(request, pk):
             return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupFileForm()
-    return render(request, 'TI_Management_app/group_file_edit.html',
-                  {
-                      'form': form,
-                      'group': group})
+    return render(
+        request,
+        'TI_Management_app/groups/group_file_edit.html',
+        {
+            'form': form,
+            'group': group
+        }
+    )
 
 
 @login_required
@@ -1465,8 +1496,11 @@ def group_notepad_add(request, pk):
     if request.method == "POST":
         form = GroupNotepadForm(request.POST)
         if form.is_valid():
+            content = form.cleaned_data['content']
+            sanitized_content = bleach.clean(content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
             group_notepad = form.save(commit=False)
             group_notepad.author = request.user
+            group_notepad.content = sanitized_content
             group_notepad.group = group
             group_notepad.published_date = timezone.now()
             group_notepad.save()
@@ -1477,7 +1511,7 @@ def group_notepad_add(request, pk):
         form = GroupNotepadForm(initial={'responsible': username})
     return render(
         request,
-        'TI_Management_app/group_notepad_add.html',
+        'TI_Management_app/groups/group_notepad_add.html',
         {
             'form': form,
             'group': group
@@ -1489,11 +1523,15 @@ def group_notepad_add(request, pk):
 def group_notepad_edit(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     notepad = get_object_or_404(GroupsNotepad, pk=pk1)
+
     if request.method == "POST":
         form = GroupNotepadForm(request.POST, instance=notepad)
         if form.is_valid():
+            content = form.cleaned_data['content']
+            sanitized_content = bleach.clean(content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
             group_notepad = form.save(commit=False)
             group_notepad.author = request.user
+            group_notepad.content = sanitized_content
             group_notepad.group = group
             group_notepad.published_date = timezone.now()
             group_notepad.save()
@@ -1503,7 +1541,7 @@ def group_notepad_edit(request, pk, pk1):
         form = GroupNotepadForm(instance=notepad)
     return render(
         request,
-        'TI_Management_app/group_notepad_edit.html',
+        'TI_Management_app/groups/group_notepad_edit.html',
         {
             'form': form,
             'group': group,
@@ -1520,13 +1558,61 @@ def group_notepad_history(request, pk, pk1):
 
     return render(
         request,
-        'TI_Management_app/group_notepad_history.html',
+        'TI_Management_app/groups/group_notepad_history.html',
         {
             'group': group,
             'group_notepad_history_obj': group_notepad_history_obj,
             'notepad': notepad
         }
     )
+
+
+@login_required
+def group_notepad_history_pdf_advance(request, pk, pk1):
+    group = get_object_or_404(Groups, pk=pk)
+    notepad = get_object_or_404(GroupsNotepad, pk=pk1)
+    group_notepad_history_obj = notepad.history.order_by('-published_date')
+
+    html = render_to_string(
+        'TI_Management_app/groups/group_notepad_history_pdf_advance.html',
+        {
+            'group_notepad_history_obj': group_notepad_history_obj,
+            'group': group,
+            'notepad': notepad
+        }
+    )
+    response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'filename="notepad_{}.pdf"'.format(group_notepad_history_obj.id)
+    response['Content-Disposition'] = f'filename="notepad_{pk1}.pdf"'
+    weasyprint.HTML(string=html).write_pdf(
+        response,
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
+    )
+    return response
+
+
+@login_required
+def group_notepad_history_pdf_one_advance(request, pk, pk1, pk2):
+    group = get_object_or_404(Groups, pk=pk)
+    notepad = get_object_or_404(GroupsNotepad, pk=pk1)
+    group_notepad_history_obj = get_object_or_404(notepad.history, pk=pk2)
+
+    html = render_to_string(
+        'TI_Management_app/groups/group_notepad_history_pdf_one_advance.html',
+        {
+            'group_notepad_history_obj': group_notepad_history_obj,
+            'group': group,
+            'notepad': notepad
+        }
+    )
+    response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'filename="notepad_{}.pdf"'.format(group_notepad_history_obj.id)
+    response['Content-Disposition'] = f'filename="notepad_{pk1}.pdf"'
+    weasyprint.HTML(string=html).write_pdf(
+        response,
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
+    )
+    return response
 
 
 @login_required
@@ -1602,18 +1688,25 @@ def group_notepad_history_pdf(request, pk, pk1):
     )
 
 
+@login_required
 def group_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        groups = Groups.objects.filter(Q(group_name__contains=searched))
-        return render(request,
-                      'TI_Management_app/group_search.html',
-                      {'searched': searched,
-                       'groups': groups})
+        groups = Groups.objects.filter(Q(group_name__contains=searched.capitalize()))
+        return render(
+            request,
+            'TI_Management_app/groups/group_search.html',
+            {
+                'searched': searched,
+                'groups': groups
+            }
+        )
     else:
-        return render(request,
-                      'TI_Management_app/group_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/groups/group_search.html',
+            {}
+        )
 
 
 @login_required
@@ -1632,12 +1725,15 @@ def member_group_add(request, pk, pk1):
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = GroupsMemberForm()
-    return render(request, 'TI_Management_app/member_group_add.html',
-                  {
-                      'form': form,
-                      'member': member,
-                      'group': group}
-                  )
+    return render(
+        request,
+        'TI_Management_app/members/member_group_add.html',
+        {
+            'form': form,
+            'member': member,
+            'group': group
+        }
+    )
 
 
 @login_required
@@ -1652,12 +1748,19 @@ def group_add_member(request, pk, pk1):
             group_member.group = group
             group_member.member = member
             group_member.save()
-            messages.success(request, f"Dodano nowego uczestnika do grupy{group_member.member}!")
+            messages.success(request, f"Dodano nowego uczestnika do grupy {group.group_name}!")
             return redirect('TI_Management_app:group_detail', pk=group.pk)
     else:
         form = GroupAddMemberForm(initial={'group': group})
-    return render(request, 'TI_Management_app/group_add_member.html',
-                  {'form': form, 'group': group, 'member': member})
+    return render(
+        request,
+        'TI_Management_app/groups/group_add_member.html',
+        {
+            'form': form,
+            'group': group,
+            'member': member
+        }
+    )
 
 
 @login_required
@@ -1692,8 +1795,11 @@ def member_notepad_add(request, pk):
     if request.method == "POST":
         form = NotepadMemberForm(request.POST, request.FILES)
         if form.is_valid():
+            content = form.cleaned_data['content']
+            sanitized_content = bleach.clean(content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
             notepad = form.save(commit=False)
             notepad.author = request.user
+            notepad.content = sanitized_content
             notepad.member = member
             notepad.published_date = timezone.now()
             notepad.save()
@@ -1702,11 +1808,14 @@ def member_notepad_add(request, pk):
     else:
         username = request.user.username
         form = NotepadMemberForm(initial={'responsible': username})
-    return render(request, 'TI_Management_app/member_notepad_add.html',
-                  {
-                      'form': form,
-                      'member': member}
-                  )
+    return render(
+        request,
+        'TI_Management_app/members/member_notepad_add.html',
+        {
+            'form': form,
+            'member': member
+        }
+    )
 
 
 @login_required
@@ -1716,8 +1825,11 @@ def member_notepad_edit(request, pk, pk1):
     if request.method == "POST":
         form = NotepadMemberForm(request.POST, request.FILES)
         if form.is_valid():
+            content = form.cleaned_data['content']
+            sanitized_content = bleach.clean(content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
             notepad = form.save(commit=False)
             notepad.author = request.user
+            notepad.content = sanitized_content
             notepad.member = member
             notepad.published_date = timezone.now()
             notepad.save()
@@ -1725,12 +1837,15 @@ def member_notepad_edit(request, pk, pk1):
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = NotepadMemberForm(instance=notepad)
-    return render(request, 'TI_Management_app/member_notepad_edit.html',
-                  {
-                      'form': form,
-                      'member': member,
-                      'notepad': notepad}
-                  )
+    return render(
+        request,
+        'TI_Management_app/members/member_notepad_edit.html',
+        {
+            'form': form,
+            'member': member,
+            'notepad': notepad
+        }
+    )
 
 
 @login_required
@@ -1741,10 +1856,41 @@ def member_notepad_history(request, pk, title):
         Q(title__contains=title)
     ).order_by('-published_date'))
 
-    return render(request, 'TI_Management_app/member_notepad_history.html',
-                  {'member': member,
-                   'member_notepad_history_obj': member_notepad_history_obj,
-                   'title': title})
+    return render(
+        request,
+        'TI_Management_app/members/member_notepad_history.html',
+        {
+            'member': member,
+            'member_notepad_history_obj': member_notepad_history_obj,
+            'title': title
+        }
+    )
+
+
+@login_required
+def member_notepad_history_pdf_advance(request, pk, title):
+    member = MembersZZTI.objects.get(id=pk)
+    member_notepad_history_obj = member.notepad.filter(
+        Q(published_date__lte=timezone.now()) &
+        Q(title__contains=title)
+    ).order_by('-published_date')
+
+    html = render_to_string(
+        'TI_Management_app/members/member_notepad_history_pdf_advance.html',
+        {
+            'member_notepad_history_obj': member_notepad_history_obj,
+            'member': member,
+            # 'notepad': notepad
+        }
+    )
+    response = HttpResponse(content_type='application/pdf')
+    # response['Content-Disposition'] = 'filename="notepad_{}.pdf"'.format(group_notepad_history_obj.id)
+    response['Content-Disposition'] = f'filename="member_notepad_{pk}.pdf"'
+    weasyprint.HTML(string=html).write_pdf(
+        response,
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
+    )
+    return response
 
 
 @login_required
@@ -1863,7 +2009,7 @@ def documents_database_category(request):
         )
     return render(
         request,
-        'TI_Management_app/documents_database_category.html',
+        'TI_Management_app/documents/documents_database_category.html',
         {
             'form': form,
             'categories': categories
@@ -1893,7 +2039,7 @@ def documents_database_category_edit(request, pk):
         )
     return render(
         request,
-        'TI_Management_app/documents_database_category_edit.html',
+        'TI_Management_app/documents/documents_database_category_edit.html',
         {
             'form': form,
             'category': category
@@ -1940,7 +2086,7 @@ def documents_database(request):
         )
     return render(
         request,
-        'TI_Management_app/documents_database.html',
+        'TI_Management_app/documents/documents_database.html',
         {
             'form': form,
             'documents': documents
@@ -1970,7 +2116,7 @@ def documents_database_edit(request, pk):
         )
     return render(
         request,
-        'TI_Management_app/documents_database_edit.html',
+        'TI_Management_app/documents/documents_database_edit.html',
         {
             'form': form,
             'document': document
@@ -1983,13 +2129,13 @@ def documents_database_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
         documents = DocumentsDatabase.objects.filter(
-            Q(title__contains=searched) |
-            Q(file__contains=searched) |
-            Q(category__title__contains=searched)
+            Q(title__contains=searched.capitalize()) |
+            Q(file__contains=searched.capitalize()) |
+            Q(category__title__contains=searched.capitalize())
         )
         return render(
             request,
-            'TI_Management_app/documents_database_search.html',
+            'TI_Management_app/documents/documents_database_search.html',
             {
                 'searched': searched,
                 'documents': documents
@@ -1998,7 +2144,7 @@ def documents_database_search(request):
     else:
         return render(
             request,
-            'TI_Management_app/documents_database_search.html',
+            'TI_Management_app/documents/documents_database_search.html',
             {}
         )
 
@@ -2772,6 +2918,8 @@ def finance_file_add(request):
             member_nr = form_file_finance.cleaned_data['member_nr']
             psychologist = form_file_finance.cleaned_data['psychologist']
             title = f"{document_title} - {expense_title}"
+            description = form_file_finance.cleaned_data['description']
+            sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
 
             if not KindOfFinanceDocument.objects.filter(title_doc=document_title).exists():
                 finance_document_kind = form_kind_of_document.save(commit=False)
@@ -2788,6 +2936,7 @@ def finance_file_add(request):
             finance_file = form_file_finance.save(commit=False)
             finance_file.author = request.user
             finance_file.title = title
+            finance_file.description = sanitized_description
             # finance_file.type_of_document = KindOfFinanceDocument.objects.get(title_doc=document_title)
             finance_file.type_of_document = KindOfFinanceDocument.objects.filter(title_doc=document_title).latest('id')
             # finance_file.expense_name = KindOfFinanceExpense.objects.get(title_expense=expense_title)

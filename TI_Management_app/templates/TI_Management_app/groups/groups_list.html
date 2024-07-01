@@ -1,30 +1,52 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-<form class="d-flex" method=POST action="{% url 'TI_Management_app:group_search' %}">
+    <h2 class="fadeInUp-animation">Grupy</h2>
+    <hr>
+    <br />
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:group_search' %}">
         {% csrf_token %}
-        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-        type="search" placeholder="Szukaj Grupy" aria-label="Search" name="searched">
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Szukaj Grupy"
+                aria-label="Search"
+                name="searched"
+                autofocus="autofocus">
+        <br />
+        <br />
         <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
-</form>
+        <br />
+    </form>
 </div>
-{% for group in groups %}
-    <div class="hero-unit">
-        <h2><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
-            {{group.group_name}}
-        </a></h2>
 
-        <p><a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
-            Więcej informacji
-        </a></p>
+{% for group in groups %}
+<div class="hero-unit">
+    <h3>
+        <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
+            {{group.group_name}}
+        </a>
+    </h3>
+    <hr>
+    <div class="notepad">
+        <p><b>Ilość uczestników:</b> {{ group.member_count }}</p>
+
+        <p>
+            <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}" class="btn btn-primary btn-large pull-right">
+                Więcej informacji
+            </a>
+        </p>
         <div class="date"><p>Data dodania: {{group.created_date}}</p></div>
     </div>
+</div>
 {% endfor %}
+
 
 {% include 'TI_Management_app/pagination.html' with page=groups %}
 

@@ -251,9 +251,9 @@ class MembersZZTI(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.forename}-{self.surname}-{self.member_nr}")
-        if self.card != '':
-            if MembersZZTI.objects.filter(card=self.card).exists():
-                raise ValidationError(f"Taka karta już istnieje w bazie.")
+        # if self.card != '':
+        #     if MembersZZTI.objects.filter(card=self.card).exists():
+        #         raise ValidationError(f"Taka karta już istnieje w bazie.")
         super().save(*args, **kwargs)
 
 
@@ -358,7 +358,8 @@ class GroupsNotepad(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroupsNotepad')
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, related_name='groupsNotepad', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
-    content = models.TextField(null=True, blank=True, default=None)
+    # content = models.TextField(null=True, blank=True, default=None)
+    content = CKEditor5Field(null=True, blank=True)
     published_date = models.DateTimeField(blank=True, null=True)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
     method = models.CharField(max_length=250, choices=METHOD_CHOICES, default=None)
@@ -374,7 +375,7 @@ class GroupsNotepad(models.Model):
 
     def __str__(self):
         return (f"{self.title} "
-                f"{self.content} "
+                # f"{self.content} "
                 f"{self.importance} "
                 f"{self.status} "
                 f"{self.method} "
@@ -417,7 +418,8 @@ class Notepad(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorNotepad')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='notepad', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
-    content = models.TextField(null=True, blank=True, default=None)
+    # content = models.TextField(null=True, blank=True, default=None)
+    content = CKEditor5Field(null=True, blank=True)
     published_date = models.DateTimeField(blank=True, null=True)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
     method = models.CharField(max_length=250, choices=METHOD_CHOICES, default=None)
@@ -434,7 +436,7 @@ class Notepad(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return f"{self.title} {self.content} {self.importance} {self.status} {self.method} {self.file}"
+        return f"{self.title} {self.importance} {self.status} {self.method} {self.file}"
 
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -1,107 +1,128 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load i18n %}
+{% load static %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
-<a href="{% url 'TI_Management_app:group_notepad_history' pk=group.pk pk1=notepad.pk %}"> / Aktualizacja komunikacji grupy</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / Grupa - {{group.group_name}}</b></a>
+<a href="{% url 'TI_Management_app:group_notepad_history' pk=group.pk pk1=notepad.pk %}"><b> / Komunikacja grupy</b></a>
 {% endblock %}
 
 {% block content %}
-   <div class="hero-unit">
-       <h3>
-               <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
-                   {{group.group_name}}
-               </a>
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Komunikacja grupy - {{group.group_name}}</h2>
+    <hr>
+    <br />
+    <div class="no-print">
+        <h3>
+            <a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
+                {{group.group_name}}
+            </a>
+        </h3>
+    </div>
+   <div class="no-print">
+       <p>
+           Historia komunikacji:
+       </p>
+       <nav class="menu menu-1">
+          <ul>
 
-       </h3>
-       <div class="no-print">
-           <p>
-               Historia komunikacji
-               <a href="{% url 'TI_Management_app:group_notepad_history_pdf' pk=group.pk pk1=notepad.pk %}" class="btn btn-info btn-sm pull-right">
-                   Wygeneruj PDF
-               </a>
-               <button class="btn btn-info btn-sm pull-right" onclick="window.print()">
-                   Drukuj
-               </button>
-           </p>
-       </div>
-       {% for note in group_notepad_history_obj %}
-            <div class="notepad">
-                <div class="notepad-head">
-                    <h3>
-                        {{ note.title }}
-                    </h3>
+              <li>
+                  <a href="{% url 'TI_Management_app:group_notepad_history_pdf_advance' pk=group.pk pk1=notepad.pk %}">
+                    Wygeneruj zaawansowany PDF
+                  </a>
+              </li>
+              <li>
+                  <a href="{% url 'TI_Management_app:group_notepad_history_pdf' pk=group.pk pk1=notepad.pk %}">
+                    Wygeneruj podstawowy PDF
+                  </a>
+              </li>
+              <li>
+                  <a href="#" onclick="window.print()">
+                    Drukuj
+                  </a>
+              </li>
+          </ul>
+      </nav>
+   </div>
+   {% for note in group_notepad_history_obj %}
+        <div class="notepad">
+            <div class="notepad-head">
+                <h3>
+                    {{ note.title }}
+                </h3>
+            </div>
+            <div class="notepad-history-head">
+                <div class="notepad-status-left">
+                    <p>
+                        # {{ forloop.revcounter }}
+                    </p>
                 </div>
-                <div class="notepad-history-head">
-                    <div class="notepad-status-left">
-                        <p>
-                            # {{ forloop.revcounter }}
-                        </p>
-                    </div>
-                    <div class="notepad-status-right">
-                        <p>
-                            Data: {{ note.published_date }} Przez: {{ note.responsible }}
-                        </p>
-                    </div>
+                <div class="notepad-status-right">
+                    <p>
+                        Data: {{ note.published_date }} Przez: {{ note.responsible }}
+                    </p>
                 </div>
+            </div>
 
-                <table>
-                    <tr>
-                        <td>
-                            <h5>
-                                Sposób zgłoszenia:
-                            </h5>
-                        </td>
-                        <td>
-                            {% if note.method == 'personally' %} Osobiście
-                            {% elif note.method == 'email' %} E-mail
-                            {% elif note.method == 'telephone' %} Telefonicznie
-                            {% elif note.method == 'zoom' %} ZOOM
-                            {% elif note.method == 'whatsapp' %} WhatsApp
-                            {% elif note.method == 'facebook' %} Facebook
-                            {% elif note.method == 'other' %} Inny
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <h5>
-                                Ważnośc:
-                            </h5>
-                        </td>
-                        <td>
-                            {% if note.importance == 'low' %} Niski
-                            {% elif note.importance == 'standard' %} Umiarkowany
-                            {% elif note.importance == 'important' %} Ważny
-                            {% elif note.importance == 'veryImportant' %} Bardzo ważny
-                            {% elif note.importance == 'critical' %} Krytyczny
-                            {% elif note.importance == 'none' %} Nie dotyczy
-                            {% else %} None
-                            {% endif %}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td colspan="2">
-                            <h5>
-                                Opis:
-                            </h5>
-                            {{ note.content|safe }}
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <h5>
-                                Nadano status:
-                            </h5>
-                        </td>
-                        <td>
-                            {% if note.status == 'ongoing' %}
-                                W trakcie
-                            {% elif note.status == 'closed' %}
-                                Zamknięty
-                            {% endif %}
-                        </td>
-                    </tr>
+            <table width="100%">
+                <tr>
+                    <td width="50%">
+                        <h5>
+                            Sposób zgłoszenia:
+                        </h5>
+                    </td>
+                    <td width="50%">
+                        {% if note.method == 'personally' %} Osobiście
+                        {% elif note.method == 'email' %} E-mail
+                        {% elif note.method == 'telephone' %} Telefonicznie
+                        {% elif note.method == 'zoom' %} ZOOM
+                        {% elif note.method == 'whatsapp' %} WhatsApp
+                        {% elif note.method == 'facebook' %} Facebook
+                        {% elif note.method == 'other' %} Inny
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h5>
+                            Ważnośc:
+                        </h5>
+                    </td>
+                    <td>
+                        {% if note.importance == 'low' %} Niski
+                        {% elif note.importance == 'standard' %} Umiarkowany
+                        {% elif note.importance == 'important' %} Ważny
+                        {% elif note.importance == 'veryImportant' %} Bardzo ważny
+                        {% elif note.importance == 'critical' %} Krytyczny
+                        {% elif note.importance == 'none' %} Nie dotyczy
+                        {% else %} None
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h5>
+                            Opis:
+                        </h5>
+                        {{ note.content|safe }}
+                    </td>
+                </tr>
+                <tr>
+                    <td>
+                        <h5>
+                            Nadano status:
+                        </h5>
+                    </td>
+                    <td>
+                        {% if note.status == 'ongoing' %}
+                            W trakcie
+                        {% elif note.status == 'closed' %}
+                            Zamknięty
+                        {% endif %}
+                    </td>
+                </tr>
 <!--                    <tr>-->
 <!--                        <td>-->
 <!--                            <h5>-->
@@ -112,11 +133,18 @@
 <!--                            {{ note.confirmed }}-->
 <!--                        </td>-->
 <!--                    </tr>-->
-                </table>
+            </table>
+            <div class="no-print">
+            <br />
+            <a href="{% url 'TI_Management_app:group_notepad_history_pdf_one_advance' pk=group.pk pk1=notepad.pk pk2=note.pk %}" class="btn btn-info btn-sm pull-right">
+                Eksport PDF
+            </a>
+            <br />
             </div>
-       {% endfor %}
+        </div>
+   {% endfor %}
 
-   </div>
+</div>
 {% endblock %}
 
 {% block menu %}

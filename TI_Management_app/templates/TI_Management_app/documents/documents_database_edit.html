@@ -1,27 +1,36 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:documents_database' %}"> / Baza dokumentów</a>
-<a href="{% url 'TI_Management_app:documents_database_edit' pk=document.pk %}"> / Aktualizuj dokument</a>
+<a href="{% url 'TI_Management_app:documents_database' %}"><b> / Baza dokumentów</b></a>
+<a href="{% url 'TI_Management_app:documents_database_edit' pk=document.pk %}"><b> / Aktualizuj dokument</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizuj dokumentu - {{ document.title }}</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
-            <p>Dokument:</p>
+            <p><b>Dokument:</b></p>
         {{form.category}}
         {{form.title}}
         {{form.responsible.as_hidden}}
-
+        <br />
+        <br />
         <label class="custom-file-upload-mod">
             {{form.file|cut:'documentsDatabase/'}}
         </label>
 
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Aktualizuj
         </button>
@@ -53,12 +62,10 @@
                 </tr>
                 <tr>
                     <td colspan="4">
-                        Ketegoria: {{ h.category }}
+                        <b>Ketegoria:</b> {{ h.category }}
                     <br />
-                        Tytuł:
-                        <b>
+                        <b>Tytuł:</b>
                             {{ h.title }}
-                        </b>
                     <br />
                         {% if h.file %}
                             <a href="../../media/{{ h.file|escape }}">

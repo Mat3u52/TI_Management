@@ -1,18 +1,32 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_list' %}"> / Grupy </a>
-<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"> / {{group.group_name}}</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:group_detail' pk=group.pk %}"><b> / Grupa - {{group.group_name}}</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Grupa - {{group.group_name}}</h2>
+    <hr>
+    <br />
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:group_member_search' pk=group.pk %}">
         {% csrf_token %}
-        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-        type="search" placeholder="Szukaj uczestnika do grupy {{group.group_name}}" aria-label="Search" name="searched">
-        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj uczestnika do grupy</button>
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Szukaj nowego Członka do grupy {{group.group_name}}"
+                aria-label="Search Członka"
+                name="searched"
+                autofocus="autofocus">
+        <br />
+        <br />
+        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj Członka do grupy - {{ group.group_name }}</button>
+        <br />
+        <br />
     </form>
 </div>
 
@@ -27,7 +41,10 @@
                     <br/>
                     <form method="post" action="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
                         {% csrf_token %}
-                        <p>{{form_gender.gender}} - Płeć</p>
+                        <p><b>Płeć:</b></p>
+                        <div class="select-wrapper">
+                            {{form_gender.gender}}
+                        </div>
                         <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj</button>
                     </form>
                 </div>
@@ -35,15 +52,22 @@
                 <br/>
                 <form method="post" action="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
                     {% csrf_token %}
-                    <p>{{form_role.role}} - Funkcja</p>
+                    <p><b>Funkcja:</b></p>
+                    <div class="select-wrapper">
+                        {{form_role.role}}
+                    </div>
                     <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj</button>
+
                 </form>
                 </div>
                 <div class="notepad">
                     <br />
                     <form method="post" action="{% url 'TI_Management_app:group_detail' pk=group.pk %}">
                         {% csrf_token %}
-                        <p>{{form_role.occupation}} - Zawód</p>
+                        <p><b>Zawód:</b></p>
+                        <div class="select-wrapper">
+                            {{form_role.occupation}}
+                        </div>
                         <button class="btn btn-primary btn-sm pull-right" type="submit">Dodaj</button>
                     </form>
                 </div>
@@ -53,7 +77,9 @@
 </div>
 
 <div class="hero-unit">
-    <h3><a href="{% url 'TI_Management_app:groups_edit' pk=group.pk %}">{{group.group_name}}</a></h3>
+    <h3>
+        <a href="{% url 'TI_Management_app:groups_edit' pk=group.pk %}">{{group.group_name}}</a>
+    </h3>
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
             <li class="nav-header" id="showGroupMembers">
@@ -65,13 +91,13 @@
                     {% csrf_token %}
                     {% for radio in form_export.separator %}
                         <label class="horizontal-radio">
-                            {{ radio.tag }} {{ radio.choice_label }}
+                            {{ radio.tag }} <b>{{ radio.choice_label }}</b>
                         </label>
                     {% endfor %}
                     <br />
                     {% for radio in form_export.data %}
                         <label class="horizontal-radio">
-                            {{ radio.tag }} {{ radio.choice_label }}
+                            {{ radio.tag }} <b>{{ radio.choice_label }}</b>
                         </label>
                     {% endfor %}
                     <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
@@ -128,13 +154,8 @@
 
             {% for group_note in group.groupsNotepad.all %}
                 <div class="notepad">
-                    <p>
-                        <a href="{% url 'TI_Management_app:group_notepad_edit' pk=group.pk pk1=group_note.pk %}" class="btn btn-primary btn-large pull-right">
-                            Aktualizuj
-                        </a>
-                    </p>
-                    <br />
-                    <br />
+                    <h3>{{ group_note.title }}</h3>
+                    <hr>
                     <p>
                         <b>
                             Sprawa:
@@ -166,6 +187,13 @@
                         {% endif %}
 
                     <p><b>Odpowiedzialny:</b> {{ group_note.responsible }}</p>
+                    <br />
+                    <p>
+                        <a href="{% url 'TI_Management_app:group_notepad_edit' pk=group.pk pk1=group_note.pk %}" class="btn btn-primary btn-large pull-right">
+                            Aktualizuj
+                        </a>
+                    </p>
+                    <br />
                 </div>
             {% endfor %}
 
@@ -175,7 +203,7 @@
                     {% for file in group.groupsFile.all %}
                         <tr>
                             <td><a href="{{ file.file.url }}">{{ file.title }}</a></td>
-                            <td><p class="str-file">{{ file.file|cut:'uploadsGroup/' }}</p></td>
+                            <td><p class="str-file">{{ file.file|filename }}</p></td>
                             <td><p class="str-file">{{ file.created_date }}</p></td>
                             <td>
                                 <a href="{% url 'TI_Management_app:group_file_delete' pk=group.pk pk1=file.pk %}" class="btn btn-danger btn-sm pull-right">

@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 {% load thumbnail %}
 
 {% block breadcrumbs %}
@@ -11,23 +12,30 @@
         <h2 class="fadeInUp-animation">Szukasz: <span class="search-style">{{ searched }}</span></h2>
         <hr>
         <br />
+        <div class="hero-unit">
         {% for member in members %}
-            <div class="hero-unit">
-<!--                <img src="{{ member.image.url }}" alt="image" width="100px">-->
+            <div class="notepad">
                 <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                     <img src="{% thumbnail member.image 100x0  quality=100 %}">
                 </a>
-                <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}}</a></h3>
+                <h3>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                        {{member.forename}} {{member.surname}}
+                    </a>
+                </h3>
                 <p><b>Nr:</b> {{member.member_nr}} 	&#124;
-                    <b>tel:</b> {{member.phone_number}} &#124;
-                    <b>email:</b> {{member.email}}</p>
-
-                <p><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
-                    Więcej informacji
-                </a></p>
+                <b>tel:</b> {{member.phone_number|phone_number}} &#124;
+                <b>email:</b> {{member.email}}</p>
+                <br />
+                <p>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
+                        Więcej informacji
+                    </a>
+                </p>
                 <div class="date"><p>Data dodania: {{ member.created_date }}</p></div>
             </div>
         {% endfor %}
+        </div>
     {% else %}
         <div class="hero-unit">
             <h4>Proszę, wprowadź frazę w pole wyszukiwania</h4>

@@ -1,29 +1,34 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:members_list' %}"> / Baza Członków </a>
-<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'TI_Management_app:member_group_add' pk=member.pk pk1=group.pk %}"> / Dodaj grupę</a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_group_add' pk=member.pk pk1=group.pk %}"><b> / Dodaj Członka do grupy</b></a>
 {% endblock %}
 
 {% block content %}
 
-    <div class="hero-unit">
-
-        {% if form.errors %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj Członka {{member.forename}} {{member.surname}} - {{member.member_nr}} do grupy {{group.group_name}}</h2>
+    <hr>
+    <br />
+    {% if form.errors %}
+        <div class="alert alert-danger">
             <p>{{form.errors}}</p>
-        {% endif %}
+        </div>
+    {% endif %}
+    <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+    <p><b>Grupa:</b></p>
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        <p>{{group.group_name}}{{form.member.as_hidden}}</p>
 
-        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
-        <p>Grupa:</p>
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            <p>{{group.group_name}}{{form.member.as_hidden}}</p>
-
-            <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj grupę</button>
-            <br />
-        </form>
-    </div>
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj Członka do grupy {{group.group_name}}</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 {% endblock %}
 

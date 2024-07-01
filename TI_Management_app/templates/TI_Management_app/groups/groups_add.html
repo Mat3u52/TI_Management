@@ -1,25 +1,33 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:groups_add' %}"> / Dodaj Grupe</a>
+<a href="{% url 'TI_Management_app:groups_list' %}"><b> / Grupy </b></a>
+<a href="{% url 'TI_Management_app:groups_add' %}"><b> / Dodaj Grupę</b></a>
 {% endblock %}
 
 {% block content %}
 
-    <div class="hero-unit">
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj Grupę</h2>
+    <hr>
+    <br />
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
                 <p>{{form.errors}}</p>
-            {% endif %}
-            <p>Dodaj grupę:</p>
-            {{form.group_name}}
+            </div>
+        {% endif %}
+        <p><b>Grupa:</b></p>
+        {{form.group_name}}
 
-            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
-            <br />
-            <br />
-        </form>
-    </div>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 {% endblock %}
 

@@ -1,10 +1,97 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load static %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
 
-</body>
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+       {% for note in group_notepad_history_obj %}
+            <div class="notepad">
+            <div class="notepad-head">
+                <h3>
+                    {{ note.title }}
+                </h3>
+            </div>
+            <div class="notepad-history-head">
+                <div class="notepad-status-left">
+                    <p>
+                        # {{ forloop.revcounter }}
+                    </p>
+                </div>
+                <div class="notepad-status-right">
+                    <p>
+                        Data: {{ note.published_date }} Przez: {{ note.responsible }}
+                    </p>
+                </div>
+            </div>
+
+            <table width="100%">
+                <tr>
+                    <td width="50%">
+                        <h5>
+                            Sposób zgłoszenia:
+                        </h5>
+                    </td>
+                    <td width="50%">
+                        {% if note.method == 'personally' %} Osobiście
+                        {% elif note.method == 'email' %} E-mail
+                        {% elif note.method == 'telephone' %} Telefonicznie
+                        {% elif note.method == 'zoom' %} ZOOM
+                        {% elif note.method == 'whatsapp' %} WhatsApp
+                        {% elif note.method == 'facebook' %} Facebook
+                        {% elif note.method == 'other' %} Inny
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%">
+                        <h5>
+                            Ważnośc:
+                        </h5>
+                    </td>
+                    <td width="50%">
+                        {% if note.importance == 'low' %} Niski
+                        {% elif note.importance == 'standard' %} Umiarkowany
+                        {% elif note.importance == 'important' %} Ważny
+                        {% elif note.importance == 'veryImportant' %} Bardzo ważny
+                        {% elif note.importance == 'critical' %} Krytyczny
+                        {% elif note.importance == 'none' %} Nie dotyczy
+                        {% else %} None
+                        {% endif %}
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <h5>
+                            Opis:
+                        </h5>
+                        {{ note.content|safe }}
+                    </td>
+                </tr>
+                <tr>
+                    <td width="50%">
+                        <h5>
+                            Nadano status:
+                        </h5>
+                    </td>
+                    <td width="50%">
+                        {% if note.status == 'ongoing' %}
+                            W trakcie
+                        {% elif note.status == 'closed' %}
+                            Zamknięty
+                        {% endif %}
+                    </td>
+                </tr>
+            </table>
+            </div>
+       {% endfor %}
+
+    </body>
 </html>
