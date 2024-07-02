@@ -10,8 +10,8 @@
 
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">Dodawanie dokumentu księgowego</h2>
-    <br />
     <hr>
+    <br />
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form_kind_of_document.errors %}
@@ -47,63 +47,73 @@
             {% endfor %}
         </datalist>
         <br />
-        <hr>
+        <br />
+<!--        <hr>-->
         <p><b>Dodaj dokument:</b></p>
             <label class="file">
                 {{form_file_finance.file}}
             </label>
+<!--        <br />-->
+<!--        <hr>-->
         <br />
-        <hr>
-
+        <br />
         <p><b>Kwota:</b></p>
-        <input
-                class="form-control me-2"
-                style="max-width: 25%!important; min-height: 15px"
-                type="number"
-                placeholder="0.00"
-                aria-label="Kwota"
-                name="figure"
-                min="0"
-                step="0.01"
-                required /> zł
+            {{ form_file_finance.figure }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="max-width: 25%!important; min-height: 15px"-->
+<!--                type="number"-->
+<!--                placeholder="0.00"-->
+<!--                aria-label="Kwota"-->
+<!--                name="figure"-->
+<!--                min="0"-->
+<!--                step="0.01"-->
+<!--                required /> zł-->
         <br />
-        <hr>
+        <br />
+<!--        <hr>-->
         <p><b>Pozycji na wyciągu:</b></p>
-        <input
-                class="form-control me-2"
-                style="max-width: 25%!important; min-height: 15px"
-                type="number"
-                placeholder="1"
-                value="1"
-                aria-label="Pozycji na wyciągu"
-                name="quantity"
-                min="1"
-                step="1"
-                required />
+            {{ form_file_finance.quantity }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="max-width: 25%!important; min-height: 15px"-->
+<!--                type="number"-->
+<!--                placeholder="1"-->
+<!--                value="1"-->
+<!--                aria-label="Pozycji na wyciągu"-->
+<!--                name="quantity"-->
+<!--                min="1"-->
+<!--                step="1"-->
+<!--                required />-->
         <br />
-        <hr>
+        <br />
+<!--        <hr>-->
         <p><b>Data:</b></p>
-        <input
-                class="form-control me-2"
-                style="max-width: 50%!important; min-height: 15px"
-                type="date"
-                name="payment_date"
-                required />
+            {{ form_file_finance.payment_date }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="max-width: 50%!important; min-height: 15px"-->
+<!--                type="date"-->
+<!--                name="payment_date"-->
+<!--                required />-->
         <br />
-        <hr>
+        <br />
+<!--        <hr>-->
         <p><b>Dokument bez uchwały:</b></p>
-        <input
-                class="form-control me-2"
-                style="min-width: 1%!important; min-height: 15px"
-                type="checkbox"
-                aria-label="Dokument bez uchwały"
-                name="resolution_requirement"
-                id="documentRequirement" />
+            {{ form_file_finance.resolution_requirement }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="min-width: 1%!important; min-height: 15px"-->
+<!--                type="checkbox"-->
+<!--                aria-label="Dokument bez uchwały"-->
+<!--                name="resolution_requirement"-->
+<!--                id="documentRequirement" />-->
         <br />
-        <hr>
+        <br />
+<!--        <hr>-->
         <p><b>Przypnij uchwałę:</b></p>
 
-        <select name="resolution" id="resolution">
+        <select name="resolution" id="resolution" style="width: 90%; height: 40px; overflow-y: visible;">
             <optgroup label="Kategoria uchwały">
                 <option value="none">Brak</option>
             {% for doc in doc_database %}
@@ -112,44 +122,52 @@
             </optgroup>
         </select>
 <!--        {{ form_file_finance.resolution }}-->
+<!--        <br />-->
+<!--        <hr>-->
         <br />
-        <hr>
+        <br />
         <p><b>Nazwa wydatku:</b></p>
-        <input
-                class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
-                type="text"
-                list="expense_database"
-                placeholder="Nazwa wydatku"
-                aria-label="Nazwa wydatku"
-                name="title_expense"
-                required />
+            {{ form_kind_of_expense.title_expense }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="min-width: 50%!important; min-height: 15px"-->
+<!--                type="text"-->
+<!--                list="expense_database"-->
+<!--                placeholder="Nazwa wydatku"-->
+<!--                aria-label="Nazwa wydatku"-->
+<!--                name="title_expense"-->
+<!--                required />-->
         <datalist id="expense_database">
         {% for expense in expense_names %}
             <option value="{{ expense }}"></option>
         {% endfor %}
         </datalist>
+<!--        <br />-->
+<!--        <hr>-->
         <br />
-        <hr>
+        <br />
         <p><b>Pomoc psychologa?</b></p>
-        <input
-                class="form-control me-2"
-                style="min-width: 1%!important; min-height: 15px"
-                type="checkbox"
-                aria-label="Pomoc psychologa"
-                name="psychologist"
-                id="PsychologistHelp" />
+            {{ form_file_finance.psychologist }}
+<!--        <input-->
+<!--                class="form-control me-2"-->
+<!--                style="min-width: 1%!important; min-height: 15px"-->
+<!--                type="checkbox"-->
+<!--                aria-label="Pomoc psychologa"-->
+<!--                name="psychologist"-->
+<!--                id="PsychologistHelp" />-->
+        <br />
         <br />
         <div id="memberDiv" style="display: none;">
             <br />
-            <input
-                class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
-                type="text"
-                list="members"
-                placeholder="Nr Członka"
-                aria-label="Nr Członka"
-                name="member_nr" />
+            {{ form_file_finance.member_nr }}
+<!--            <input-->
+<!--                class="form-control me-2"-->
+<!--                style="min-width: 50%!important; min-height: 15px"-->
+<!--                type="text"-->
+<!--                list="members"-->
+<!--                placeholder="Nr Członka"-->
+<!--                aria-label="Nr Członka"-->
+<!--                name="member_nr" />-->
             <datalist id="members">
                 {% for member in members %}
                 <option value="{{ member.member_nr }}"></option>
@@ -158,7 +176,8 @@
             <div id="memberDetails" style="display: none;"></div>
             <div id="error" style="color: red; display: none;"></div>
         </div>
-        <hr>
+<!--        <hr>-->
+        <br />
         <br />
         <p><b>Opis:</b></p>
             {{ form_file_finance.media }}
@@ -171,7 +190,7 @@
 
 <!--        </textarea>-->
         <br />
-        <hr>
+<!--        <hr>-->
 
 
         <button type="submit" class="btn btn-primary btn-large pull-right">

@@ -2,13 +2,16 @@
 
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
-<a href="{% url 'TI_Management_app:scholarships_list' %}"> / Stypendia</a>
-<a href="{% url 'TI_Management_app:scholarships_average_salary_add' %}"> / Przeciętne wynagrodzenie</a>
+<a href="{% url 'TI_Management_app:scholarships_list' %}"><b> / Stypendia</b></a>
+<a href="{% url 'TI_Management_app:scholarships_average_salary_add' %}"><b> / Przeciętne wynagrodzenie</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Przeciętne wynagrodzenie</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
@@ -16,16 +19,17 @@
         {% endif %}
         <input
                 class="form-control me-2"
-                style="min-width: 50%!important; min-height: 15px"
+                style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                 type="text"
-                placeholder="Nazwa"
+                placeholder="Nazwa - 0 kwartał 0000 r."
                 aria-label="Nazwa"
                 name="title"
+                autofocus="autofocus"
                 required>
 
         <input
                 class="form-control me-2"
-                style="max-width:50%; min-height: 15px"
+                style="max-width:50%; width: 90%; height: 40px; overflow-y: visible;"
                 type="number"
                 step="0.01"
                 placeholder="Przeciętne wynagrodzenie"
@@ -33,7 +37,8 @@
                 name="salary"
                 required> zł
 
-
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz
         </button>

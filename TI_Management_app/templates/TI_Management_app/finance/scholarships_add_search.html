@@ -1,27 +1,35 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
-<a href="{% url 'TI_Management_app:scholarships_list' %}"> / Stypendia</a>
-<a href="{% url 'TI_Management_app:scholarships_add_search' %}"> / Dodaj stypendium</a>
+<a href="{% url 'TI_Management_app:scholarships_list' %}"><b> / Stypendia</b></a>
+<a href="{% url 'TI_Management_app:scholarships_add_search' %}"><b> / Dodaj stypendium</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj Stypendium</h2>
+    <hr>
+    <br />
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:scholarships_add_search' %}">
         {% csrf_token %}
         {% if flag is True %}
             <input class="form-control me-2"
-               style="min-width: 100%!important; min-height: 35px"
-               type="search"
-               placeholder="Dodaj Uczestnika"
-               aria-label="Search"
-               name="searched">
-
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Dodaj Uczestnika"
+                aria-label="Search"
+                name="searched"
+                autofocus="autofocus">
+            <br />
+            <br />
             <button class="btn btn-primary btn-large pull-right" type="submit">
                 Szukaj
             </button>
+            <br />
         {% else %}
             <p>Proszę, dodaj najpierw średnie wynagrodzenie przed dodaniem stypendium.</p>
         {% endif %}
@@ -29,16 +37,22 @@
     </form>
 </div>
     {% if searched %}
-        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <h3>Szukasz: <span class="search-style">{{ searched }}</span></h3>
         <br />
         {% for member in members %}
             <div class="hero-unit">
-                <img src="{{ member.image.url }}" alt="image" width="100px">
-                <h2>
+                <h3>
                     <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                         {{member.forename}} {{member.surname}}
                     </a>
-                </h2>
+                </h3>
+                <hr>
+                <div class="notepad">
+<!--                <img src="{{ member.image.url }}" alt="image" width="100px">-->
+                    <a href="{{ member.image.url }}">
+                        <img src="{% thumbnail member.image 150x0  quality=100 %}">
+                    </a>
+
                 <p>
                     <b>
                         Nr:
@@ -47,7 +61,7 @@
                     <b>
                         tel:
                     </b>
-                    {{member.phone_number}} &#124;
+                    {{member.phone_number|phone_number}} &#124;
                     <b>
                         email:
                     </b>
@@ -76,7 +90,8 @@
                 <br />
 
 
-
+                </div>
+                <br />
                 <p>
                     <a href="{% url 'TI_Management_app:scholarships_add' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                         Dalej

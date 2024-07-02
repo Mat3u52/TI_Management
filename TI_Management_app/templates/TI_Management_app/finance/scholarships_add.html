@@ -3,13 +3,16 @@
 
 {% block breadcrumbs %}
 <a href="#"> / Finanse</a>
-<a href="{% url 'TI_Management_app:scholarships_list' %}"> / Stypendia</a>
-<a href="{% url 'TI_Management_app:scholarships_add'  pk=member.pk %}"> / Dodaj Stypendium</a>
+<a href="{% url 'TI_Management_app:scholarships_list' %}"><b> / Stypendia</b></a>
+<a href="{% url 'TI_Management_app:scholarships_add'  pk=member.pk %}"><b> / Dodaj Stypendium</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodaj Stypendium</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}

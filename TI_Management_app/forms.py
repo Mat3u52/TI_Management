@@ -1842,6 +1842,19 @@ class KindOfFinanceDocumentForm(forms.ModelForm):
 
 class KindOfFinanceExpenseForm(forms.ModelForm):
 
+    title_expense = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Nazwa wydatku',
+                'aria-label': 'Nazwa wydatku',
+                'list': 'expense_database'
+            }
+        ),
+        required=True,
+        max_length=250
+    )
+
     class Meta:
         model = KindOfFinanceExpense
         fields = ['title_expense']
@@ -1849,12 +1862,80 @@ class KindOfFinanceExpenseForm(forms.ModelForm):
 
 class FileFinanceForm(forms.ModelForm):
 
-    # title_doc = forms.CharField(
-    #     required=True
-    # )
+    figure = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-control me-2',
+                # 'style': 'max-width: 25%!important; min-height: 15px',
+                'placeholder': '0.00 zł',
+                'aria-label': 'Kwota',
+                'min': '0',
+                'step': '0.01',
+                'required': 'required',
+            }
+        ),
+        min_value=0,
+        decimal_places=2,
+        required=True,
+        label='',
+    )
+
+    quantity = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-control me-2',
+                # 'style': 'max-width: 25%!important; min-height: 15px',
+                'placeholder': '1',
+                'value': '1',
+                'aria-label': 'Pozycji na wyciągu',
+                'min': '0',
+                'step': '1',
+                'required': 'required',
+            }
+        ),
+        min_value=0,
+        decimal_places=1,
+        required=True,
+        label='',
+    )
+
+    resolution_requirement = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'form-control me-2',
+                # 'style': 'min-width: 1%!important; min-height: 15px',
+                'aria-label': 'Dokument bez uchwały',
+                'id': 'documentRequirement'
+            }
+        ),
+        label='',
+        required=False
+    )
+
+    psychologist = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'form-control me-2',
+                # 'style': 'min-width: 1%!important; min-height: 15px',
+                'aria-label': 'Pomoc psychologa',
+                'id': 'PsychologistHelp'
+            }
+        ),
+        label='',
+        required=False
+    )
 
     member_nr = forms.CharField(
-        required=False
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Nr Członka',
+                'aria-label': 'Nr Członka',
+                'list': 'members'
+            }
+        ),
+        required=False,
+        max_length=250
     )
 
     file = forms.FileField(
@@ -1892,6 +1973,11 @@ class FileFinanceForm(forms.ModelForm):
             ),
             'description': CKEditor5Widget(
                 config_name='default'
+            ),
+            'resolution': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
             )
         }
 
