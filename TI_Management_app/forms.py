@@ -1381,21 +1381,72 @@ class DocumentsDatabaseCategoryForm(forms.ModelForm):
 
 
 class ReliefFigureForm(forms.ModelForm):
+
     title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa',
+                'aria-label': 'Nazwa',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=100,
         required=True
     )
-    figure = forms.FloatField(
-        required=True,
+
+    figure = forms.DecimalField(
         widget=forms.NumberInput(
-            attrs={'step': "0.01"}
-        )
-    )
-    grace = forms.IntegerField(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': '0.00 zł',
+                'aria-label': 'Kwota',
+                'min': '0',
+                'step': '0.01',
+                'required': 'required',
+            }
+        ),
+        min_value=0,
+        decimal_places=2,
         required=True,
-        widget=forms.NumberInput(
-            attrs={'step': "1"}
-        )
+        label='',
     )
+
+    # figure = forms.FloatField(
+    #     required=True,
+    #     widget=forms.NumberInput(
+    #         attrs={'step': "0.01"}
+    #     )
+    # )
+    grace = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': '0 M',
+                'aria-label': 'Karencja',
+                'min': '0',
+                'step': '1',
+                'required': 'required',
+            }
+        ),
+        min_value=0,
+        decimal_places=1,
+        required=True,
+        label='',
+    )
+    # grace = forms.IntegerField(
+    #     required=True,
+    #     widget=forms.NumberInput(
+    #         attrs={'step': "1"}
+    #     )
+    # )
 
     class Meta:
         model = Relief
