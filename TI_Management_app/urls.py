@@ -330,52 +330,52 @@ urlpatterns = [
         name='documents_database_category_delete'
     ),
     path(
-        'TI_Management_app/finance-list/',
+        'TI_Management_app/finance/finance-list/',
         views.finance_list,
         name='finance_list'
     ),
     path(
-        'TI_Management_app/relife-figure-add/',
+        'TI_Management_app/finance/relife-figure-add/',
         views.relief_figure_add,
         name='relief_figure_add'
     ),
     path(
-        'TI_Management_app/relife-figure-edit/<int:pk>/',
+        'TI_Management_app/finance/relife-figure-edit/<int:pk>/',
         views.relief_figure_edit,
         name='relief_figure_edit'
     ),
     path(
-        'TI_Management_app/relife-figure-delete/<int:pk>/',
+        'TI_Management_app/finance/relife-figure-delete/<int:pk>/',
         views.relief_figure_delete,
         name='relief_figure_delete'
     ),
     path(
-        'TI_Management_app/relation-register-relief-add/',
+        'TI_Management_app/finance/relation-register-relief-add/',
         views.relation_register_relief_add,
         name='relation_register_relief_add'
     ),
     path(
-        'TI_Management_app/relation-register-relief-edit/<int:pk>/',
+        'TI_Management_app/finance/relation-register-relief-edit/<int:pk>/',
         views.relation_register_relief_edit,
         name='relation_register_relief_edit'
     ),
     path(
-        'TI_Management_app/relation-register-relief-delete/<int:pk>/',
+        'TI_Management_app/finance/relation-register-relief-delete/<int:pk>/',
         views.relation_register_relief_delete,
         name='relation_register_relief_delete'
     ),
     path(
-        'TI_Management_app/register-relief-step-one/',
+        'TI_Management_app/finance/register-relief-step-one/',
         views.register_relief_step_one,
         name='register_relief_step_one'
     ),
     path(
-        'TI_Management_app/register-relief-step-one-search/',
+        'TI_Management_app/finance/register-relief-step-one-search/',
         views.register_relief_step_one_search,
         name='register_relief_step_one_search'
     ),
     path(
-        'TI_Management_app/finance/register-relief-step-one/<int:pk>/',
+        'TI_Management_app/finance/register-relief-step-two/<int:pk>/',
         views.register_relief_step_two,
         name='register_relief_step_two'
     ),
@@ -478,11 +478,11 @@ urlpatterns = [
         views.finance_reporting_doc,
         name='finance_reporting_doc'
     ),
-    path(
-        'TI_Management_app/finance/finance-list/',
-        views.finance_list,
-        name='finance_list'
-    ),
+    # path(
+    #     'TI_Management_app/finance/finance-list/',
+    #     views.finance_list,
+    #     name='finance_list'
+    # ),
     path(
         'TI_Management_app/finance/finance-detail/<int:year>/<int:month>/',
         views.finance_detail,
