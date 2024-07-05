@@ -118,6 +118,11 @@ import bleach
 from django.template.loader import render_to_string
 import weasyprint
 # import logging
+from django.views.decorators.cache import cache_page
+from django.utils.decorators import method_decorator
+import redis
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+
 
 ALLOWED_TAGS = list(bleach.sanitizer.ALLOWED_TAGS) + [
     'p', 'br', 'div', 'span', 'strong', 'em', 'u', 'ol', 'ul', 'li', 'img', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'figure', 'table', 'tbody', 'tr', 'td'
@@ -133,6 +138,8 @@ ALLOWED_ATTRIBUTES = {
     'th': ['colspan', 'rowspan']
 }
 
+
+@cache_page(60*15)
 @login_required
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
@@ -156,6 +163,7 @@ def members_list(request):
     )
 
 
+@cache_page(60*15)
 @login_required
 def members_table_list(request):
     order_by = request.GET.get('order_by', '-forename')
@@ -266,6 +274,8 @@ def member_detail(request, pk):
             note_entries.append(entry)
             seen_note.add(entry.title)
 
+    total_views = r.incr(f'member:{member.id}:views')
+
     return render(
         request,
         'TI_Management_app/members/member_detail.html',
@@ -280,7 +290,8 @@ def member_detail(request, pk):
             'card_history_entries': card_history_entries,
             'seen_cards': seen_cards,
             'note_entries': note_entries,
-            'seen_note': seen_note
+            'seen_note': seen_note,
+            'total_views': total_views
         }
     )
 
@@ -627,6 +638,8 @@ def member_file_delete(request, pk, pk1):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
+@cache_page(60*15)
+@login_required
 def loyalty_card_list(request):
     loyalty_card_obj = Cards.objects.all()
 
@@ -644,7 +657,7 @@ def loyalty_card_list(request):
                   {'page': page,
                    'loyalty_card': loyalty_card})
 
-
+@login_required()
 def loyalty_card_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -1261,7 +1274,7 @@ def member_loyalty_card_delete(request, pk, pk1):
     member_loyalty_card.delete()
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
-
+@cache_page(60*15)
 @login_required
 def groups_list(request):
     # groups_obj = Groups.objects.all()
@@ -2330,8 +2343,11 @@ def register_relief_step_two(request, pk):
     if request.method == "POST":
         form = MemberEditReliefForm(request.POST, instance=member)
         if form.is_valid():
+            city = form.cleaned_data['city']
+
             address_member = form.save(commit=False)
             address_member.author = request.user
+            address_member.city = city.title()
             address_member.save()
             messages.success(
                 request,
@@ -2340,7 +2356,6 @@ def register_relief_step_two(request, pk):
             return redirect('TI_Management_app:register_relief_step_three', pk=member.pk)
     else:
         form = MemberEditReliefForm(instance=member)
-        # form = MemberEditReliefForm()
     return render(
         request,
         'TI_Management_app/finance/register_relief_step_two.html',
@@ -2382,8 +2397,12 @@ def register_relief_step_three(request, pk):
     if request.method == "POST":
         form = RegisterReliefForm(request.POST)
         if form.is_valid():
+            reason = form.cleaned_data['reason']
+
+            sanitized_description = bleach.clean(reason, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
             register_relife = form.save(commit=False)
             register_relife.author = request.user
+            register_relife.reason = sanitized_description
             register_relife.member = member
             register_relife.save()
             messages.success(request, "2/4 - Walidacja karencji przebiegła pomyślnie!")
@@ -2478,7 +2497,7 @@ def register_relief_valid(request, pk):
         }
     )
 
-
+@cache_page(60*15)
 @login_required
 def relief_status_list(request):
     relief_list = RegisterRelief.objects.filter(complete=True).order_by('-created_date')
@@ -2596,7 +2615,7 @@ def relief_status_to_be_signed(request, pk):
         }
     )
 
-
+@cache_page(60*15)
 @login_required
 def relief_confirmed_list(request):
     relief_list = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-created_date')
