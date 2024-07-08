@@ -1,7 +1,7 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
 <a href="{% url 'TI_Management_app:scholarships_list' %}"><b> / Stypendia</b></a>
 <a href="{% url 'TI_Management_app:scholarships_average_salary_add' %}"><b> / Przeciętne wynagrodzenie</b></a>
 {% endblock %}
@@ -15,7 +15,9 @@
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-        <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
         <input
                 class="form-control me-2"

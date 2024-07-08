@@ -1,24 +1,46 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"> / Podpisywanie zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"> / {{ relief_to_be_signed.relief.title }}</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"><b> / Podpisywanie zapomogi</b></a>
+<a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=relief_to_be_signed.pk %}"><b> / {{ relief_to_be_signed.relief.title }}</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">{{ relief_to_be_signed.relief.title }}</h2>
+    <hr>
+    <br />
+    <div class="no-print">
+    <nav class="menu menu-1">
+      <ul>
+          <li>
+              <a href="{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}">
+                Wygeneruj PDF
+              </a>
+          </li>
+          <li>
+              <a href="#" onclick="window.print()">
+                Drukuj
+              </a>
+          </li>
+      </ul>
+    </nav>
+    </div>
     <div class="notepad">
         <div class="no-print">
-            <img
-                src="{{ relief_to_be_signed.member.image.url }}"
-                alt="image"
-                style='display: block; float: right; margin-left: auto; width: 150px;'>
-            <button class="btn btn-info btn-sm pull-left" onclick="window.print()">
-                Drukuj
-            </button>
+<!--            <img-->
+<!--                src="{{ relief_to_be_signed.member.image.url }}"-->
+<!--                alt="image"-->
+<!--                style='display: block; float: right; margin-left: auto; width: 150px;'>-->
+            <img src="{% thumbnail relief_to_be_signed.member.image 150x0  quality=100 %}" style='display: block; float: right; margin-left: auto;'>
+<!--            <button class="btn btn-info btn-sm pull-left" onclick="window.print()">-->
+<!--                Drukuj-->
+<!--            </button>-->
             <br />
             <br />
             <br />
@@ -182,7 +204,7 @@
                 </td>
                 <td>
                     <p>
-                        {{one_registered_relife.reason}}
+                        {{relief_to_be_signed.reason|safe}}
                     </p>
                 </td>
             </tr>
@@ -258,7 +280,7 @@
                             <div style="float:left">
                                 <p>{{file.title}}&nbsp;</p>
                             </div>
-                            <div style="float:left">
+                            <div style="float:right">
                                 <div class="no-print">
                                     <a href="{{ file.file.url }}">
                                         <button class="btn btn-info btn-sm pull-right">
@@ -356,13 +378,17 @@
 
 
         </table>
+        <br />
+        <br />
         <div class="no-print">
         {% if relief_to_be_signed.payment_confirmation is False %}
         {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 3 %}
             <form method="post" class="post-form">
                 {% csrf_token %}
                 {% if form_confirmation.errors %}
-                    <p>{{form_confirmation.errors}}</p>
+                    <div class="alert alert-danger">
+                        <p>{{form_confirmation.errors}}</p>
+                    </div>
                 {% endif %}
                 {{form_confirmation.payment_confirmation}}
 
@@ -392,25 +418,28 @@
         <br />
     </div>
     {% if relief_to_be_signed.registerReliefSignatureRelief.count < 3 %}
-    <div class="no-print">
-    <div class="notepad">
-        <H4>Dodaj Podpis:</H4>
+        <div class="no-print">
+        <div class="notepad">
+            <H4>Dodaj Podpis:</H4>
 
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
-                <p>{{form.errors}}</p>
-            {% endif %}
-            {{form.card}}
+            <form method="post" class="post-form">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <p>{{form.errors}}</p>
+                    </div>
+                {% endif %}
+                {{form.card}}
+                <br />
+                <br />
+                <button type="submit" class="btn btn-primary btn-large pull-right">
+                    Zapisz
+                </button>
+                <br />
+            </form>
 
-            <button type="submit" class="btn btn-primary btn-large pull-right">
-                Zapisz
-            </button>
-            <br />
-        </form>
-
-    </div>
-    </div>
+        </div>
+        </div>
     {% endif %}
 
 </div>

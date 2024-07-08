@@ -1,91 +1,115 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_one' %}"> / Rejestrowanie zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_two' pk=member.pk %}"> / Krok [1/4]</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_one' %}"><b> / Rejestrowanie zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_two' pk=member.pk %}"><b> / Krok [1/4]</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Krok 1 / 4</h2>
+    <hr>
+    <br />
     <div class="notepad">
         <h4>Krok 1/4 - Adres:</h4>
         <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
 
         <table width="100%">
             <tr>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
-                            type="text"
-                            placeholder="Ulica"
-                            value="{{ member.street }}"
-                            aria-label="Ulica"
-                            name="street"
-                            required
-                            autofocus>
+                    {{ form.city }}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; min-height: 15px"-->
+<!--                            type="text"-->
+<!--                            placeholder="Miasto"-->
+<!--                            {% if member.city is not None %}-->
+<!--                                value="{{ member.city }}"-->
+<!--                            {% endif %}-->
+<!--                            aria-label="Miasto"-->
+<!--                            name="city"-->
+<!--                            required>-->
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
-                            type="text"
-                            placeholder="Miasto"
-                            value="{{ member.city }}"
-                            aria-label="Miasto"
-                            name="city"
-                            required>
+                    {{ form.street }}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; min-height: 15px"-->
+<!--                            type="text"-->
+<!--                            placeholder="Ulica"-->
+<!--                            {% if member.street is not None %}-->
+<!--                                value="{{ member.street }}"-->
+<!--                            {% endif %}-->
+<!--                            aria-label="Ulica"-->
+<!--                            name="street"-->
+<!--                            required-->
+<!--                            autofocus>-->
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
-                            type="text"
-                            placeholder="Kod pocztowy"
-                            value="{{ member.postcode }}"
-                            aria-label="Kod pocztowy"
-                            name="postcode"
-                            required>
+                    {{form.postcode}}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; min-height: 15px"-->
+<!--                            type="text"-->
+<!--                            placeholder="Kod pocztowy"-->
+<!--                            {% if member.postcode is not None %}-->
+<!--                                value="{{ member.postcode }}"-->
+<!--                            {% endif %}-->
+<!--                            aria-label="Kod pocztowy"-->
+<!--                            name="postcode"-->
+<!--                            required>-->
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
-                            type="text"
-                            placeholder="Numer domu"
-                            value="{{ member.house_number }}"
-                            aria-label="Numer domu"
-                            name="house_number"
-                            required>
+                    {{ form.house_number }}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; min-height: 15px"-->
+<!--                            type="text"-->
+<!--                            placeholder="Numer domu"-->
+<!--                            {% if member.house_number is not None %}-->
+<!--                                value="{{ member.house_number }}"-->
+<!--                            {% endif %}-->
+<!--                            aria-label="Numer domu"-->
+<!--                            name="house_number"-->
+<!--                            required>-->
                 </td>
             </tr>
             <tr>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
-                            type="text"
-                            placeholder="Numer mieszkania"
-                            value="{{ member.float_number }}"
-                            aria-label="Numer mieszkania"
-                            name="float_number"
-                            >
+                    {{ form.float_number }}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; min-height: 15px"-->
+<!--                            type="text"-->
+<!--                            placeholder="Numer mieszkania"-->
+<!--                            {% if member.float_number is not None %}-->
+<!--                                value="{{ member.float_number }}"-->
+<!--                            {% endif %}-->
+<!--                            aria-label="Numer mieszkania"-->
+<!--                            name="float_number"-->
+<!--                            >-->
                 </td>
             </tr>
         </table>
+            <br />
+            <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             2/4 Dalej
         </button>
@@ -93,8 +117,10 @@
         </form>
     </div>
     <div class="notepad">
-        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
-
+<!--        <img src="{{ member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>-->
+        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+            <img src="{% thumbnail member.image 150x0  quality=100 %}" style='display: block; float: right; margin-left: auto;'>
+        </a>
         <table>
             <tr>
                 <td>
@@ -119,9 +145,11 @@
                   </p>
               </td>
                 <td>
-                    <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
-                        {{member.forename}} {{member.surname}}
-                    </a>
+                    <p class="tableCredential">
+                        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                            {{member.forename}} {{member.surname}}
+                        </a>
+                    </p>
                 </td>
           </tr>
         </table>

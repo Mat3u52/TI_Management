@@ -83,7 +83,7 @@ from django.views.generic import TemplateView
 from django.views.generic import CreateView
 from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.hashers import make_password
+from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
@@ -139,7 +139,6 @@ ALLOWED_ATTRIBUTES = {
 }
 
 
-@cache_page(60*15)
 @login_required
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
@@ -163,7 +162,6 @@ def members_list(request):
     )
 
 
-@cache_page(60*15)
 @login_required
 def members_table_list(request):
     order_by = request.GET.get('order_by', '-forename')
@@ -296,6 +294,7 @@ def member_detail(request, pk):
     )
 
 
+@cache_page(60*15)
 @login_required
 def member_deactivate(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
@@ -337,6 +336,7 @@ def member_deactivate(request, pk):
 def error_404_view(request, exception):
     data = {"name": "TI_Management"}
     return render(request, 'TI_Management_app/404.html', data)
+
 
 
 @login_required
@@ -552,7 +552,7 @@ def member_occupation_edit(request, pk):
         }
     )
 
-
+@cache_page(60*15)
 @login_required
 def member_card_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
@@ -638,7 +638,6 @@ def member_file_delete(request, pk, pk1):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
-@cache_page(60*15)
 @login_required
 def loyalty_card_list(request):
     loyalty_card_obj = Cards.objects.all()
@@ -656,6 +655,7 @@ def loyalty_card_list(request):
                   'TI_Management_app/loyalty_card_list.html',
                   {'page': page,
                    'loyalty_card': loyalty_card})
+
 
 @login_required()
 def loyalty_card_search(request):
@@ -1274,7 +1274,7 @@ def member_loyalty_card_delete(request, pk, pk1):
     member_loyalty_card.delete()
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
-@cache_page(60*15)
+
 @login_required
 def groups_list(request):
     # groups_obj = Groups.objects.all()
@@ -2344,10 +2344,12 @@ def register_relief_step_two(request, pk):
         form = MemberEditReliefForm(request.POST, instance=member)
         if form.is_valid():
             city = form.cleaned_data['city']
+            street = form.cleaned_data['street']
 
             address_member = form.save(commit=False)
             address_member.author = request.user
             address_member.city = city.title()
+            address_member.street = street.title()
             address_member.save()
             messages.success(
                 request,
@@ -2453,6 +2455,42 @@ def register_relief_step_four(request, pk):
     )
 
 
+# @login_required
+# def register_relief_step_five(request, pk):
+#     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+#     member = one_registered_relife.member
+#
+#     if request.method == "POST":
+#         form = CardRegisterReliefForm(request.POST, instance=member)
+#         # form = CardRegisterReliefForm(request.POST)
+#
+#         if form.is_valid():
+#             # if member.card is form.cleaned_data['card']:
+#             if RegisterRelief.objects.filter(member__card=form.cleaned_data['card']).exists():
+#
+#                 member_card = str(member.card)
+#
+#                 is_correct = check_password(form.cleaned_data['card'], member_card)
+#
+#                 # if form.cleaned_data['card'] == one_registered_relife.member.card:
+#                 if is_correct:
+#                     one_registered_relife.complete = True
+#                     one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
+#                     one_registered_relife.save()
+#
+#                     messages.success(request, "4/4 - Podpisano!")
+#                     return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
+#     else:
+#         # form = CardRegisterReliefForm(instance=member)
+#         form = CardRegisterReliefForm()
+#     return render(
+#         request,
+#         'TI_Management_app/finance/register_relief_step_five.html',
+#         {
+#             'form': form,
+#             'one_registered_relife': one_registered_relife
+#         }
+#     )
 @login_required
 def register_relief_step_five(request, pk):
     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
@@ -2460,21 +2498,27 @@ def register_relief_step_five(request, pk):
 
     if request.method == "POST":
         form = CardRegisterReliefForm(request.POST, instance=member)
-        # form = CardRegisterReliefForm(request.POST)
 
         if form.is_valid():
-            # if member.card is form.cleaned_data['card']:
-            if RegisterRelief.objects.filter(member__card=form.cleaned_data['card']).exists():
-                if form.cleaned_data['card'] == one_registered_relife.member.card:
-                    one_registered_relife.complete = True
-                    one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
-                    one_registered_relife.save()
+            # Verify if the card is already registered to a member
+            # if RegisterRelief.objects.filter(member__card=form.cleaned_data['card']).exists():
+            member_card = str(member.card)
 
-                    messages.success(request, "4/4 - Podpisano!")
-                    return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
+            # Check if the provided card matches the stored card
+            is_correct = check_password(form.cleaned_data['card'], member_card)
+
+            if is_correct:
+                one_registered_relife.complete = True
+                one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
+                one_registered_relife.save()
+
+                messages.success(request, "4/4 - Podpisano!")
+                return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
+            # else:
+            #     form.add_error('card', 'Karta nie jest zarejestrowana dla żadnego członka.')
     else:
-        # form = CardRegisterReliefForm(instance=member)
         form = CardRegisterReliefForm()
+
     return render(
         request,
         'TI_Management_app/finance/register_relief_step_five.html',
@@ -2497,7 +2541,7 @@ def register_relief_valid(request, pk):
         }
     )
 
-@cache_page(60*15)
+
 @login_required
 def relief_status_list(request):
     relief_list = RegisterRelief.objects.filter(complete=True).order_by('-created_date')
@@ -2552,6 +2596,68 @@ def relief_status_list_search(request):
         )
 
 
+# @login_required
+# def relief_status_to_be_signed(request, pk):
+#     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
+#
+#     if request.method == "POST":
+#         form = SignatureReliefForm(relief_to_be_signed, request.POST)
+#         form_confirmation = PaymentConfirmationReliefForm(request.POST)
+#         if form.is_valid():
+#             card = form.cleaned_data['card']
+#             member = MembersZZTI.objects.filter(card=card).first()
+#             if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
+#                 existing_signature = relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
+#
+#                 if not existing_signature:
+#
+#                     signature = SignatureRelief.objects.create(
+#                         author=request.user,
+#                         member=member,
+#                         register_relief=relief_to_be_signed,
+#                         signature=True
+#                     )
+#                     signature.save()
+#
+#                     messages.success(
+#                         request,
+#                         f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
+#                     )
+#                     return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+#
+#         if form_confirmation.is_valid():
+#             confirmation = form_confirmation.cleaned_data['payment_confirmation']
+#             if confirmation is True:
+#
+#                 relief_to_be_signed.agreement = True
+#                 relief_to_be_signed.payment_confirmation = True
+#                 relief_to_be_signed.date_of_payment_confirmation = timezone.now()
+#                 relief_to_be_signed.save()
+#
+#                 messages.success(
+#                     request,
+#                     f"Potwierdzenie wypłaty"
+#                 )
+#                 return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
+#             else:
+#                 messages.error(
+#                     request,
+#                     "Error!"
+#                 )
+#
+#     else:
+#         form = SignatureReliefForm(relief_to_be_signed)
+#         form_confirmation = PaymentConfirmationReliefForm()
+#
+#     return render(
+#         request,
+#         'TI_Management_app/finance/relief_status_to_be_signed.html',
+#         {
+#             'form': form,
+#             'form_confirmation': form_confirmation,
+#             'relief_to_be_signed': relief_to_be_signed
+#         }
+#     )
 @login_required
 def relief_status_to_be_signed(request, pk):
     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
@@ -2561,12 +2667,16 @@ def relief_status_to_be_signed(request, pk):
         form_confirmation = PaymentConfirmationReliefForm(request.POST)
         if form.is_valid():
             card = form.cleaned_data['card']
-            member = MembersZZTI.objects.filter(card=card).first()
+            member = None
+            for potential_member in MembersZZTI.objects.all():
+                if check_password(card, potential_member.card):
+                    member = potential_member
+                    break
+
             if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
                 existing_signature = relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
 
                 if not existing_signature:
-
                     signature = SignatureRelief.objects.create(
                         author=request.user,
                         member=member,
@@ -2584,7 +2694,6 @@ def relief_status_to_be_signed(request, pk):
         if form_confirmation.is_valid():
             confirmation = form_confirmation.cleaned_data['payment_confirmation']
             if confirmation is True:
-
                 relief_to_be_signed.agreement = True
                 relief_to_be_signed.payment_confirmation = True
                 relief_to_be_signed.date_of_payment_confirmation = timezone.now()
@@ -2615,7 +2724,26 @@ def relief_status_to_be_signed(request, pk):
         }
     )
 
-@cache_page(60*15)
+
+@login_required
+def relief_status_to_be_signed_pdf_advance(request, pk):
+    relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
+
+    html = render_to_string(
+        'TI_Management_app/finance/relief_status_to_be_signed_pdf_advance.html',
+        {
+            'relief_to_be_signed': relief_to_be_signed,
+        }
+    )
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="relief_{pk}.pdf"'
+    weasyprint.HTML(string=html).write_pdf(
+        response,
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
+    )
+    return response
+
+
 @login_required
 def relief_confirmed_list(request):
     relief_list = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-created_date')

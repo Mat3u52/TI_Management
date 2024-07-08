@@ -1,27 +1,35 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_one' %}"> / Rejestrowanie zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_two' pk=one_registered_relife.member.pk %}"> / Krok [1/4]</a>
-<a href="{% url 'TI_Management_app:register_relief_step_three' pk=one_registered_relife.member.pk %}"> / Krok [2/4]</a>
-<a href="{% url 'TI_Management_app:register_relief_step_four' pk=one_registered_relife.pk %}"> / Krok [3/4]</a>
-<a href="{% url 'TI_Management_app:register_relief_step_five' pk=one_registered_relife.pk %}"> / Krok [4/4]</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_one' %}"><b> / Rejestrowanie zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_two' pk=one_registered_relife.member.pk %}"><b> / Krok [1/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_three' pk=one_registered_relife.member.pk %}"><b> / Krok [2/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_four' pk=one_registered_relife.pk %}"><b> / Krok [3/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_five' pk=one_registered_relife.pk %}"><b> / Krok [4/4]</b></a>
 {% endblock %}
 
 {% block content %}
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Krok 4 / 4</h2>
+    <hr>
+    <br />
     <div class="notepad">
         <h4>Krok 4/4 - Podpis Wnioskującego:</h4>
         <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
         {{form.card}}
-
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Zapisz
         </button>
@@ -30,8 +38,10 @@
     </div>
 
     <div class="notepad">
-        <img src="{{ one_registered_relife.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>
-
+<!--        <img src="{{ one_registered_relife.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>-->
+        <a href="{% url 'TI_Management_app:member_detail' pk=one_registered_relife.member.pk %}">
+            <img src="{% thumbnail one_registered_relife.member.image 150x0  quality=100 %}" style='display: block; float: right; margin-left: auto;'>
+        </a>
         <table style="margin-left: auto; margin-right: auto;">
             <tr>
                 <td>
@@ -56,9 +66,11 @@
                     </p>
                 </td>
                 <td>
-                    <a href="{% url 'TI_Management_app:member_detail' pk=one_registered_relife.member.pk %}">
-                        {{one_registered_relife.member.forename}} {{one_registered_relife.member.surname}}
-                    </a>
+                    <p>
+                        <a href="{% url 'TI_Management_app:member_detail' pk=one_registered_relife.member.pk %}">
+                            {{one_registered_relife.member.forename}} {{one_registered_relife.member.surname}}
+                        </a>
+                    </p>
                 </td>
             </tr>
             <tr>
@@ -176,7 +188,7 @@
                 </td>
                 <td>
                     <p>
-                        {{one_registered_relife.reason}}
+                        {{one_registered_relife.reason|safe}}
                     </p>
                 </td>
             </tr>

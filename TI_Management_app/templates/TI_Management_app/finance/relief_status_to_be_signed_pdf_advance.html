@@ -1,10 +1,331 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
+{% load static %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+    <div class="notepad">
+        <table style="margin-left: auto; margin-right: auto;">
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nr Uczestnika:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.member.member_nr}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Imię i nazwisko:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <div>
+                        <div style="float:left">
+                            <p>
+                                {{relief_to_be_signed.member.forename}} {{relief_to_be_signed.member.surname}} &nbsp;
+                            </p>
+                        </div>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Adres:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        ul. {{relief_to_be_signed.member.street}}
+                        {{relief_to_be_signed.member.house_number}}
+                        {% if not relief_to_be_signed.member.float_number|default_if_none:"--" %}
+                            m. {{relief_to_be_signed.member.float_number}}
+                        {% endif %}
+                        {{relief_to_be_signed.member.postcode}}
+                        {{relief_to_be_signed.member.city}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data wypełnienia wniosku:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.date_of_completing_the_application}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data wpłynięcia wniosku:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.date_of_receipt_the_application}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data zdarzenia, którego dotyczy wniosek:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.date_of_accident}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Rodzaj zapomogi:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.relief.title}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Imię osoby powiązanej z wnioskiem:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.associate_forename}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nazwisko osoby powiązanej z wnioskiem:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.associate_surname}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Uzasadnienie:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.reason|safe}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Relacja:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.relation}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Kwota:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.relief.figure}} zł
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Nr konta:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.account_number}}
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Karencja:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.relief.grace}} miesiąc/e
+
+                        <span style="color: green"><b>&#9745;</b></span>
+                    </p>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Dokumenty:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    {% for file in relief_to_be_signed.registerReliefFileRegisterRelief.all  %}
+                        <div>
+                            <div style="float:left">
+                                <p>{{file.title}}&nbsp;</p>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Podpis Wnioskującego:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {% if relief_to_be_signed.complete is True %}
+                            {{relief_to_be_signed.member.forename}}
+                            {{relief_to_be_signed.member.surname}}
+                            {{relief_to_be_signed.member.member_nr}}
+                            Data: {{relief_to_be_signed.date_of_signed_by_the_applicant}}
+                            <span style="color: green"><b>&#9745;</b></span>
+                        {% else %}
+                            {{relief_to_be_signed.complete}}
+                        {% endif %}
+                    </p>
+                </td>
+            </tr>
+
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Data wprowadzenia:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.created_date}}
+                        przez: {{relief_to_be_signed.author}}
+                        {{relief_to_be_signed.author.first_name}}
+                        {{relief_to_be_signed.author.last_name}}
+                    </p>
+                </td>
+            </tr>
+
+
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Podpisy Członków Zarządu:
+                        </b><br />
+                            {{relief_to_be_signed.registerReliefSignatureRelief.count}} / 3
+                    </p>
+                </td>
+                <td>
+                    {% for signature in  relief_to_be_signed.registerReliefSignatureRelief.all %}
+                        <p>
+                            {{ signature.member.forename }}
+                            {{ signature.member.surname }}
+                            {{ signature.member.member_nr }}
+                            Dnia: {{ signature.member.created_date }} <span style="color: green"><b>&#9745;</b></span>
+                        </p>
+                    {% endfor %}
+                </td>
+            </tr>
+
+            {% if relief_to_be_signed.payment_confirmation is True %}
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Potwierdzenie wypłaty:
+                        </b><br />
+                    </p>
+                </td>
+                <td>
+                    <p>
+                        {{relief_to_be_signed.author.first_name}}
+                        {{relief_to_be_signed.author.last_name}}
+                        {{relief_to_be_signed.author}}
+                        Data: {{relief_to_be_signed.date_of_payment_confirmation}} <span style="color: green"><b>&#9745;</b></span>
+                    </p>
+                </td>
+            </tr>
+            {% endif %}
+
+
+        </table>
+    </div>
+
+    </body>
 </html>

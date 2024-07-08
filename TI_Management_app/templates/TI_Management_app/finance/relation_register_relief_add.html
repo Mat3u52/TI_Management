@@ -1,33 +1,40 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relation_register_relief_add' %}"> / Wprowadzanie relacji</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:relation_register_relief_add' %}"><b> / Wprowadzanie relacji</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Wprowadzanie relacji</h2>
+    <hr>
+    <br />
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-        <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
         <table width="100%">
             <tr>
                 <td>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="text"
                             placeholder="Relacja"
                             aria-label="Relacja"
                             name="title"
-                            required
-                            autofocus>
+                            autofocus="autofocus"
+                            required>
                 </td>
             </tr>
         </table>
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Dodaj
         </button>
@@ -36,7 +43,7 @@
 </div>
 
 <div class="hero-unit">
-    <H2>Relacje:</H2>
+    <H3>Relacje:</H3>
     <br />
     {% for relation in all_relation_register_relief %}
         <div class="notepad">

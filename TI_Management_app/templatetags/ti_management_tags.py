@@ -15,8 +15,7 @@ def admin_exist(member_nr):
 
 
 @register.filter(name='show_timestamp')
-# def show_timestamp(timestamp):
-def show_timestamp():
+def show_timestamp(timestamp):
     current_time = datetime.utcnow()
     timestamp = int(current_time.timestamp())
     return timestamp

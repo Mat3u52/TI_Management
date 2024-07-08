@@ -418,6 +418,11 @@ urlpatterns = [
         name='relief_status_to_be_signed'
     ),
     path(
+        'TI_Management_app/finance/relief-status-to-be-signed-pdf-advance/<int:pk>/',
+        views.relief_status_to_be_signed_pdf_advance,
+        name='relief_status_to_be_signed_pdf_advance'
+    ),
+    path(
         'TI_Management_app/finance/relief-confirmed-list/',
         views.relief_confirmed_list,
         name='relief_confirmed_list'

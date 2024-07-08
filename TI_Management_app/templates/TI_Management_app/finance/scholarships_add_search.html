@@ -3,7 +3,7 @@
 {% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
 <a href="{% url 'TI_Management_app:scholarships_list' %}"><b> / Stypendia</b></a>
 <a href="{% url 'TI_Management_app:scholarships_add_search' %}"><b> / Dodaj stypendium</b></a>
 {% endblock %}

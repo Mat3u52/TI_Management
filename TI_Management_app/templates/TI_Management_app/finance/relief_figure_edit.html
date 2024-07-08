@@ -1,53 +1,61 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_figure_add' %}"> / Wprowadzanie kwót zapomóg</a>
-<a href="{% url 'TI_Management_app:relief_figure_edit' pk=one_relief.pk %}"> / Aktualizacja kwót zapomóg</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:relief_figure_add' %}"><b> / Wprowadzanie kwót zapomóg</b></a>
+<a href="{% url 'TI_Management_app:relief_figure_edit' pk=one_relief.pk %}"><b> / Aktualizacja kwót zapomóg</b></a>
 {% endblock %}
 
 {% block content %}
 
 
 <div class="hero-unit">
-    <H2>Aktualizacja kwót zapomóg</H2>
+    <h2 class="fadeInUp-animation">Aktualizacja kwót zapomóg</h2>
+    <hr>
     <br />
+
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-        <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
         <table width="100%">
             <tr>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="min-width: 80%!important; min-height: 15px"
-                            type="text"
-                            placeholder="{{ one_relief.title }}"
-                            value="{{ one_relief.title }}"
-                            aria-label="Nazwa"
-                            name="title"
-                            required>
+                    {{ form.title }}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 90%!important; width: 40%; height: 40px; overflow-y: visible;"-->
+<!--                            type="text"-->
+<!--                            placeholder="{{ one_relief.title }}"-->
+<!--                            value="{{ one_relief.title }}"-->
+<!--                            aria-label="Nazwa"-->
+<!--                            name="title"-->
+<!--                            required>-->
                 </td>
                 <td>
-                    {{form.figure}}zł
+                    {{form.figure}}
                 </td>
                 <td>
-                    <input
-                            class="form-control me-2"
-                            style="max-width:95px; min-height: 15px"
-                            type="number"
-                            step="1"
-                            placeholder="{{ one_relife.grace }}"
-                            value="{{ one_relief.grace }}"
-                            aria-label="Karencja"
-                            name="grace"
-                            required>m
+                    {{ form.grace }}
+<!--                    <input-->
+<!--                            class="form-control me-2"-->
+<!--                            style="max-width:95px; width: 20%; height: 40px; overflow-y: visible;"-->
+<!--                            type="number"-->
+<!--                            step="1"-->
+<!--                            placeholder="{{ one_relife.grace }}"-->
+<!--                            value="{{ one_relief.grace }}"-->
+<!--                            aria-label="Karencja"-->
+<!--                            name="grace"-->
+<!--                            required>m-->
                 </td>
             </tr>
         </table>
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             Aktualizuj
         </button>
@@ -79,14 +87,12 @@
                 <tr>
                     <td colspan="4">
                     <br />
-                        Tytuł:
-                        <b>
+                        <b>Tytuł:</b>
                             {{ h.title }}
-                        </b>
                     <br />
-                        Kwota: {{ h.figure }} zł
+                        <b>Kwota:</b> {{ h.figure }} zł
                     <br />
-                        Karencja w miesiącach: {{ h.grace }}
+                        <b>Karencja w miesiącach:</b> {{ h.grace }}
                     <br />
                     </td>
                 </tr>

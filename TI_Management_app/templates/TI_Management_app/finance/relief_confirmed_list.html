@@ -1,24 +1,34 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_confirmed_list' %}"> / Lista udzielonych zapomóg</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:relief_confirmed_list' %}"><b> / Lista udzielonych zapomóg</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Lista udzielonych zapomóg</h2>
+    <hr>
+    <br />
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:relief_confirmed_list_search' %}">
         {% csrf_token %}
-        <input class="form-control me-2"
-               style="min-width: 100%!important; min-height: 35px"
-               type="search"
-               placeholder="Szukaj"
-               aria-label="Search" name="searched">
-        <button class="btn btn-primary btn-large pull-right"
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; width: 90%; height: 40px; overflow-y: visible;"
+                type="search"
+                placeholder="Szukaj"
+                aria-label="Search"
+                name="searched"
+                autofocus="autofocus">
+        <br />
+        <br />
+        <button
+                class="btn btn-primary btn-large pull-right"
                 type="submit">
             Szukaj
         </button>
+        <br />
     </form>
 </div>
 

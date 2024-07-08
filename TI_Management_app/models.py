@@ -258,9 +258,18 @@ class MembersZZTI(models.Model):
 
 
 class Vote(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
+    VOTE_TYPE_CHOICES = (
+        ('open', 'Jawne'),
+        ('confidential', 'Tajne')
+    )
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVote')
     title = models.CharField(max_length=250, null=False, blank=False)
-    description = models.TextField(null=True, blank=True, default=None)
+    description = CKEditor5Field(null=True, blank=True)
+    vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
+    electoral_voting = models.BooleanField(default=False)
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)
     importance = models.BooleanField(default=False)
@@ -270,11 +279,16 @@ class Vote(models.Model):
     questions = models.ManyToManyField(Questions, related_name='voteQuestion')
     members = models.ManyToManyField(MembersZZTI, related_name='voteMember')
 
+    class Meta:
+        verbose_name_plural = 'Głosowanie'
+
     def __str__(self):
         return self.title
 
-    class Meta:
-        verbose_name_plural = 'Głosowanie'
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 
 class MembersFile(models.Model):
@@ -418,7 +432,6 @@ class Notepad(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorNotepad')
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='notepad', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
-    # content = models.TextField(null=True, blank=True, default=None)
     content = CKEditor5Field(null=True, blank=True)
     published_date = models.DateTimeField(blank=True, null=True)
     importance = models.CharField(max_length=250, choices=IMPORTANCE_CHOICES, default=None)
@@ -677,6 +690,7 @@ class RegisterRelief(models.Model):
     agreement = models.BooleanField(default=False)  # min 3 signed
     payment_confirmation = models.BooleanField(default=False)  # min 3 signed
     date_of_payment_confirmation = models.DateTimeField(blank=True, null=True)
+    # reason = models.TextField(null=True, blank=True, default=None)
     reason = models.TextField(null=True, blank=True, default=None)
 
     history = HistoricalRecords()

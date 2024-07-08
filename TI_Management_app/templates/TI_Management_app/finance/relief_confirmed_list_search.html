@@ -1,19 +1,26 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="{% url 'TI_Management_app:relief_status_list' %}"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:relief_confirmed_list' %}"> / Lista udzielonych zapomóg</a>
-<a href="#"> / Wyszukiwarka</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:relief_confirmed_list' %}"><b> / Lista udzielonych zapomóg</b></a>
+<a href="#"><b> / Wyszukiwarka</b></a>
 {% endblock %}
 
 {% block content %}
     {% if searched %}
-        <h2>Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <h2 class="fadeInUp-animation">Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <hr>
         <br />
+        <div class="hero-unit">
         {% for member in members %}
-            <div class="hero-unit">
-                <img src="{{ member.member.image.url }}" alt="image" width="100px">
+            <div class="notepad">
+<!--                <img src="{{ member.member.image.url }}" alt="image" width="100px">-->
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                    <img src="{% thumbnail member.member.image 100x0  quality=100 %}">
+                </a>
                 <h2>
                     <a href="{% url 'TI_Management_app:member_detail' pk=member.member.pk %}">
                         {{member.member.forename}} {{member.member.surname}}
@@ -27,13 +34,12 @@
                     <b>
                         tel:
                     </b>
-                    {{member.member.phone_number}} &#124;
+                    {{member.member.phone_number|phone_number}} &#124;
                     <b>
                         email:
                     </b>
                     {{member.member.email}}
                 </p>
-
                 <p>
                     <a href="{% url 'TI_Management_app:relief_status_to_be_signed' pk=member.pk %}" class="btn btn-primary btn-large pull-right">
                     Wyświetl szczegóły
@@ -42,6 +48,7 @@
                 <div class="date"><p>Data dodania: {{ member.member.created_date }}</p></div>
             </div>
         {% endfor %}
+        </div>
     {% else %}
         <h2>Please, insert the phrase into the search area.</h2>
     {% endif %}

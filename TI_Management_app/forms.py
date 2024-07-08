@@ -1,4 +1,5 @@
 import re
+import hashlib
 from django import forms
 from django.core.validators import RegexValidator
 from .models import (
@@ -39,6 +40,8 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
 from phone_field import PhoneField
 from django_ckeditor_5.widgets import CKEditor5Widget
+from django.contrib.auth.hashers import make_password, check_password
+# from django.contrib.auth.hashers import check_password
 
 
 def validate_phone_number(value):
@@ -662,7 +665,83 @@ class MemberEditForm(forms.ModelForm):
 
 
 class MemberEditReliefForm(forms.ModelForm):
-    postcode = PLPostalCodeField()
+    # postcode = PLPostalCodeField()
+    # postcode = PLPostalCodeField(
+    #     widget=forms.TextInput(
+    #         attrs={
+    #             'class': 'form-control me-2',
+    #             'style': 'min-width: 50%!important; min-height: 15px',
+    #             'type': 'text',
+    #             'placeholder': 'Kod pocztowy',
+    #             'aria-label': 'Kod pocztowy',
+    #             'required': 'required'
+    #         }
+    #     )
+    # )
+    city = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control me-2',
+            # 'style': 'min-width: 50%!important; min-height: 15px',
+            'type': 'text',
+            'placeholder': 'Miasto',
+            'aria-label': 'Miasto',
+            'required': 'required',
+            'autofocus': 'autofocus'
+        }),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Miasto musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150
+    )
+    street = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control me-2',
+            # 'style': 'min-width: 50%!important; min-height: 15px',
+            'type': 'text',
+            'placeholder': 'Ulica',
+            'aria-label': 'Ulica',
+            'required': 'required'
+        }),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Ulica musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150
+    )
+    postcode = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control me-2',
+            # 'style': 'min-width: 50%!important; min-height: 15px',
+            'type': 'text',
+            'placeholder': 'Kod pocztowy',
+            'aria-label': 'Kod pocztowy',
+            'required': 'required'
+        })
+    )
+    house_number = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control me-2',
+            # 'style': 'min-width: 50%!important; min-height: 15px',
+            'type': 'text',
+            'placeholder': 'Numer domu',
+            'aria-label': 'Numer domu',
+            'required': 'required'
+        })
+    )
+    float_number = forms.CharField(
+        widget=forms.TextInput(attrs={
+            'class': 'form-control me-2',
+            # 'style': 'min-width: 50%!important; min-height: 15px',
+            'type': 'number',
+            'placeholder': 'Numer mieszkania',
+            'aria-label': 'Numer mieszkania'
+        })
+    )
 
     class Meta:
         model = MembersZZTI
@@ -1487,9 +1566,24 @@ class RegisterReliefForm(forms.ModelForm):
             'reason'
         ]
         widgets = {
-            'date_of_completing_the_application': forms.DateInput(attrs={'type': 'date'}),
-            'date_of_receipt_the_application': forms.TextInput(attrs={'type': 'date'}),
-            'date_of_accident': forms.TextInput(attrs={'type': 'date'})
+            'date_of_completing_the_application': forms.DateInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'date_of_receipt_the_application': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'date_of_accident': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'reason': CKEditor5Widget(
+                config_name='default'
+            ),
         }
 
     def clean(self):
@@ -1540,22 +1634,75 @@ class MultipleFileField(forms.FileField):
 
 class FileRegisterReliefForm(forms.ModelForm):
     file = MultipleFileField(label='Select files', required=True)
+    # file = MultipleFileField(
+    #     label='Select files',
+    #     widget=forms.FileInput(
+    #         attrs={
+    #             'accept': 'application/pdf,image/jpeg,image/png'
+    #         }
+    #     ),
+    #     required=True
+    # )
 
     class Meta:
         model = FileRegisterRelief
         fields = ['file']
 
 
+# class CardRegisterReliefForm(forms.Form):
+#     # card = forms.CharField(
+#     #     required=True,
+#     #     max_length=250,
+#     #     widget=forms.TextInput(attrs={'autofocus': True})
+#     # )
+#     card = forms.CharField(
+#         widget=forms.PasswordInput(
+#             attrs={
+#                 'autocomplete': 'new-password',
+#                 'autofocus': 'autofocus',
+#                 'placeholder': 'Przyłóż kartę do czytnika'
+#             }
+#         ),
+#         required=True
+#     )
+#
+#     class Meta:
+#         model = MembersZZTI
+#         fields = ['card']
+#
+#     def __init__(self, *args, **kwargs):
+#         self.instance = kwargs.pop('instance', None)
+#         super(CardRegisterReliefForm, self).__init__(*args, **kwargs)
+#         if self.instance:
+#             self.fields['card'].initial = self.instance.card
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         card = cleaned_data.get('card')
+#
+#         instance = self.instance
+#
+#         is_correct = check_password(card, instance)
+#
+#         # if form.cleaned_data['card'] == one_registered_relife.member.card:
+#         # if is_correct:
+#
+#         # if instance and instance.card != card:
+#         if instance and is_correct:
+#             raise forms.ValidationError("Niepoprawny podpis.")
+#
+#         return cleaned_data
 class CardRegisterReliefForm(forms.Form):
     card = forms.CharField(
-        required=True,
-        max_length=250,
-        widget=forms.TextInput(attrs={'autofocus': True})
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'autofocus': 'autofocus',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        required=True
     )
-
-    class Meta:
-        model = MembersZZTI
-        fields = ['card']
 
     def __init__(self, *args, **kwargs):
         self.instance = kwargs.pop('instance', None)
@@ -1567,19 +1714,60 @@ class CardRegisterReliefForm(forms.Form):
         cleaned_data = super().clean()
         card = cleaned_data.get('card')
 
-        instance = self.instance
-
-        if instance and instance.card != card:
-            raise forms.ValidationError("Niepoprawny podpis.")
+        if self.instance:
+            is_correct = check_password(card, self.instance.card)
+            if not is_correct:
+                raise forms.ValidationError("Niepoprawny podpis.")
 
         return cleaned_data
 
 
+# class SignatureReliefForm(forms.Form):
+#
+#     card = forms.CharField(
+#         widget=forms.PasswordInput(
+#             attrs={
+#                 'autocomplete': 'new-password',
+#                 'autofocus': 'autofocus',
+#                 'placeholder': 'Przyłóż kartę do czytnika'
+#             }
+#         ),
+#         required=True
+#     )
+#
+#     def __init__(self, relief_to_be_signed, *args, **kwargs):
+#         self.relief_to_be_signed = relief_to_be_signed
+#         super(SignatureReliefForm, self).__init__(*args, **kwargs)
+#
+#     def clean_card(self):
+#         card = self.cleaned_data['card']
+#         if not MembersZZTI.objects.filter(card=card).exists():
+#             raise forms.ValidationError("Taki Członek nie istnieje!")
+#
+#
+#
+#         if MembersZZTI.objects.filter(card=card).exists():
+#             member = MembersZZTI.objects.get(card=card)
+#             if User.objects.filter(username=member.member_nr).exists():
+#                 existing_user = User.objects.filter(username=member.member_nr).first()
+#                 if not existing_user.is_active:
+#                     raise forms.ValidationError(f"Członek nie jest aktywny!")
+#
+#         existing_signature = self.relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
+#         if existing_signature:
+#             raise forms.ValidationError("Podpis już istnieje.")
+#
+#         return card
 class SignatureReliefForm(forms.Form):
     card = forms.CharField(
-        required=True,
-        max_length=250,
-        widget=forms.TextInput(attrs={'autofocus': True})
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'autofocus': 'autofocus',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        required=True
     )
 
     def __init__(self, relief_to_be_signed, *args, **kwargs):
@@ -1588,16 +1776,27 @@ class SignatureReliefForm(forms.Form):
 
     def clean_card(self):
         card = self.cleaned_data['card']
-        if not MembersZZTI.objects.filter(card=card).exists():
-            raise forms.ValidationError("Taki Członek nie istnieje!")
-        if MembersZZTI.objects.filter(card=card).exists():
-            member = MembersZZTI.objects.get(card=card)
-            if User.objects.filter(username=member.member_nr).exists():
-                existing_user = User.objects.filter(username=member.member_nr).first()
-                if not existing_user.is_active:
-                    raise forms.ValidationError(f"Członek nie jest aktywny!")
 
-        existing_signature = self.relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
+        # Retrieve all members to check card hashes
+        members = MembersZZTI.objects.all()
+        matched_member = None
+
+        for member in members:
+            if check_password(card, member.card):
+                matched_member = member
+                break
+
+        if not matched_member:
+            raise forms.ValidationError("Taki Członek nie istnieje!")
+
+        if User.objects.filter(username=matched_member.member_nr).exists():
+            existing_user = User.objects.filter(username=matched_member.member_nr).first()
+            if not existing_user.is_active:
+                raise forms.ValidationError("Członek nie jest aktywny!")
+        else:
+            raise forms.ValidationError("Nie jesteś administratorem!")
+
+        existing_signature = self.relief_to_be_signed.registerReliefSignatureRelief.filter(member=matched_member).exists()
         if existing_signature:
             raise forms.ValidationError("Podpis już istnieje.")
 

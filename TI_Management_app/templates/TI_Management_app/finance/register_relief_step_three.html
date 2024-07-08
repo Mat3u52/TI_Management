@@ -1,11 +1,13 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="#"> / Finanse</a>
-<a href="#"> / Zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_one' %}"> / Rejestrowanie zapomogi</a>
-<a href="{% url 'TI_Management_app:register_relief_step_two' pk=member.pk %}"> / Krok [1/4]</a>
-<a href="{% url 'TI_Management_app:register_relief_step_three' pk=member.pk %}"> / Krok [2/4]</a>
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_one' %}"><b> / Rejestrowanie zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_two' pk=member.pk %}"><b> / Krok [1/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_three' pk=member.pk %}"><b> / Krok [2/4]</b></a>
 {% endblock %}
 
 {% block content %}
@@ -35,12 +37,18 @@
 
 
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Krok 2 / 4</h2>
+    <hr>
+    <br />
     <div class="notepad">
-        <h4>Krok 2/4 - Adres:</h4>
+        <h4>Krok 2/4 - wniosek:</h4>
+        <br />
         <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
 
         <table width="100%">
@@ -51,7 +59,7 @@
                     </p>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="date"
                             name="date_of_completing_the_application"
                             required
@@ -65,7 +73,7 @@
                     </p>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="date"
                             name="date_of_receipt_the_application"
                             required>
@@ -78,7 +86,7 @@
                     </p>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="date"
                             name="date_of_accident"
                             required>
@@ -91,7 +99,7 @@
                     </p>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="text"
                             placeholder="Imię"
                             aria-label="Imię osoby powiązanej z wnioskiem"
@@ -106,7 +114,7 @@
                     </p>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="text"
                             placeholder="Nazwisko"
                             aria-label="Nazwisko osoby powiązanej z wnioskiem"
@@ -119,19 +127,21 @@
                     <p>
                         Uzasadnienie:
                     </p>
-                    <textarea
-                            class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 150px"
-                            placeholder="Uzasadnienie"
-                            aria-label="Uzasadnienie"
-                            name="reason"></textarea>
+                    {{ form.media }}
+                    {{ form.reason }}
+<!--                    <textarea-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"-->
+<!--                            placeholder="Uzasadnienie"-->
+<!--                            aria-label="Uzasadnienie"-->
+<!--                            name="reason"></textarea>-->
                 </td>
             </tr>
         </table>
         <p>
             Zapomoga:
         </p>
-        <select id="relief_select" class="form-select" name="relief">
+        <select id="relief_select" class="form-select select-wrapper" style="width: 90%" name="relief">
             <option value="">Wybierz zapomogę</option>
 
                 {% for relief in all_relief %}
@@ -146,7 +156,7 @@
         <p>
             Relacja:
         </p>
-        <select class="form-select" name="relation">
+        <select class="form-select select-wrapper" style="width: 90%" name="relation">
             <option value="">Wybierz relacje</option>
                 {% for relation in all_relation %}
                     <option value="{{ relation.id }}">{{ relation.title }}</option>
@@ -158,14 +168,15 @@
              </p>
                     <input
                             class="form-control me-2"
-                            style="min-width: 50%!important; min-height: 15px"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
                             type="number"
                             placeholder="Nr konta"
                             aria-label="Nr konta"
                             name="account_number"
                             required>
         </div>
-
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">
             3/4 Dalej
         </button>
@@ -199,9 +210,11 @@
                     </p>
                 </td>
                 <td>
-                    <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
-                        {{member.forename}} {{member.surname}}
-                    </a>
+                    <p>
+                        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                            {{member.forename}} {{member.surname}}
+                        </a>
+                    </p>
                 </td>
             </tr>
             <tr>
