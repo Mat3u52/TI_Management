@@ -110,35 +110,6 @@ class Cards(models.Model):
         super().save(*args, **kwargs)
 
 
-class Answers(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
-    answer = models.CharField(max_length=250, blank=False, default=None, unique=True)
-    status = models.BooleanField(default=False)
-    status_description = models.BooleanField(default=False)
-    # description = models.TextField(null=True, blank=True, default=None)
-    # status_description = models.BooleanField()
-
-    def __str__(self):
-        return self.answer
-
-    class Meta:
-        verbose_name_plural = 'Odpowiedzi'
-
-
-class Questions(models.Model):
-    created_date = models.DateTimeField(default=timezone.now)
-    question = models.CharField(max_length=250, blank=False, default=None, unique=True)
-    # answer = models.ForeignKey(Answers, on_delete=models.CASCADE, related_name='question', null=True, blank=True)
-
-    answer = models.ManyToManyField(Answers)
-
-    def __str__(self):
-        return self.question
-
-    class Meta:
-        verbose_name_plural = 'Pytania'
-
-
 class DocumentsDatabaseCategory(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -262,6 +233,10 @@ class Vote(models.Model):
         ('open', 'Jawne'),
         ('confidential', 'Tajne')
     )
+    VOTE_METHOD_CHOICES = (
+        ('lums_voting_station', 'LUMS Vouting Station'),
+        ('lums_online', 'LUMS Online')
+    )
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
@@ -269,18 +244,25 @@ class Vote(models.Model):
     title = models.CharField(max_length=250, null=False, blank=False)
     description = CKEditor5Field(null=True, blank=True)
     vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
-    electoral_voting = models.BooleanField(default=False)
+    vote_method = models.CharField(max_length=250, choices=VOTE_METHOD_CHOICES, default=None)
+    # electoral_voting = models.BooleanField(default=False)
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)
     importance = models.BooleanField(default=False)
-    # questions = models.ForeignKey(Questions, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    # question = models.ManyToManyField(Questions)
 
-    questions = models.ManyToManyField(Questions, related_name='voteQuestion')
     members = models.ManyToManyField(MembersZZTI, related_name='voteMember')
+
+    history = HistoricalRecords()
 
     class Meta:
         verbose_name_plural = 'Głosowanie'
+        """"
+        This feature is disabled for MySQL DB
+        origin = ['-created_date']
+        indexes = [
+            models.Index(fields=['-created_date'])
+        ]
+        """
 
     def __str__(self):
         return self.title
@@ -289,6 +271,49 @@ class Vote(models.Model):
         if not self.slug:
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
+
+
+class Poll(models.Model):
+    # created_date = models.DateTimeField(default=timezone.now)
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorPoll')
+    vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='votePoll')
+    question = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    description = CKEditor5Field(null=True, blank=True)
+    number_of_responses = models.IntegerField(null=True, blank=True, default=0)
+
+    history = HistoricalRecords()
+
+    class Meta:
+        verbose_name_plural = 'Pytania'
+
+    def __str__(self):
+        return self.question
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.question)
+        super().save(*args, **kwargs)
+
+
+class Choice(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorChoice')
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, null=True, related_name='pollChoice')
+    answer = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    correct = models.BooleanField(default=False)
+    # status = models.BooleanField(default=False)
+    # status_description = models.BooleanField(default=False)
+
+    def __str__(self):
+        return self.answer
+
+    class Meta:
+        verbose_name_plural = 'Odpowiedzi'
 
 
 class MembersFile(models.Model):

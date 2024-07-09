@@ -16,8 +16,8 @@ from .models import (
     Activities,
     ActivityStatus,
     Vote,
-    Questions,
-    Answers,
+    Poll,
+    Choice,
     OrderedCardDocument,
     ToBePickedUpCardDocument,
     MemberFunction,
@@ -51,8 +51,8 @@ admin.site.site_header = 'Panel Administratora zzti LUMS'
 # admin.site.register(Application)
 # admin.site.register(Task)
 # admin.site.register(Vote)
-# admin.site.register(Question)
-# admin.site.register(Answers)
+# admin.site.register(Poll)
+# admin.site.register(Choice)
 
 
 def export_to_csv(modeladmin, request, queryset):
@@ -696,18 +696,32 @@ class VoteAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
     list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
         'title',
         'description',
+        'vote_type',
+        'vote_method',
         'date_start',
         'date_end',
-        'importance',
+        'importance'
+        # 'members'
     )
     list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
         'title',
         'description',
+        'vote_type',
+        'vote_method',
         'date_start',
         'date_end',
-        'importance',
+        'importance'
+        # 'members'
     )
     search_fields = (
         'title',
@@ -716,8 +730,8 @@ class VoteAdmin(admin.ModelAdmin):
     # date_hierarchy = 'created_date'
 
 
-@admin.register(Questions)
-class QuestionsAdmin(admin.ModelAdmin):
+@admin.register(Poll)
+class PollAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
         if obj:  # when editing an object
@@ -725,12 +739,24 @@ class QuestionsAdmin(admin.ModelAdmin):
         return self.readonly_fields
 
     list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'vote',
         'question',
-        'id',
+        'description',
+        'number_of_responses'
     )
     list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'vote',
         'question',
-        'id',
+        'description',
+        'number_of_responses'
     )
     search_fields = (
         'question',
@@ -739,26 +765,34 @@ class QuestionsAdmin(admin.ModelAdmin):
     # date_hierarchy = 'created_date'
 
 
-@admin.register(Answers)
-class AnswersAdmin(admin.ModelAdmin):
+@admin.register(Choice)
+class ChoiceAdmin(admin.ModelAdmin):
 
     def get_readonly_fields(self, request, obj=None):
-        if obj:
+        if obj:  # when editing an object
             return ['created_date']
         return self.readonly_fields
 
     list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'poll',
         'answer',
-        'status',
-        'status_description',
+        'correct'
     )
     list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'poll',
         'answer',
-        'status',
-        'status_description',
+        'correct'
     )
     search_fields = (
-        'answer',
+        'poll',
     )
     actions = [export_to_csv]
     # date_hierarchy = 'created_date'
