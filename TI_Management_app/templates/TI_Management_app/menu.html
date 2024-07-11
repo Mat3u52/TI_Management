@@ -43,6 +43,25 @@
         </a>
     </li>
     <hr>
+    <li class="{% if active_tab == 'voting_list' %} active {% endif %}">
+        <a href="#"><h4><b>Głosowania</b></h4></a>
+    </li>
+    <li class="{% if active_tab == 'voting_add' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:voting_add' %}">
+            <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;nowe&nbsp;głosowanie</b>
+        </a>
+    </li>
+    <li class="{% if active_tab == 'voting_report' %} active {% endif %}">
+        <a href="#">
+            <b>&#160;&#160;&#8226;&nbsp;raportowanie</b>
+        </a>
+    </li>
+    <li class="{% if active_tab == 'voting_import' %} active {% endif %}">
+        <a href="#">
+            <b>&#160;&#160;&#8226;&nbsp;importuj&nbsp;dane&nbsp;ze&nbsp;stacji&nbsp;głosowania</b>
+        </a>
+    </li>
+    <hr>
     <li class="{% if active_tab == 'finance_list' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:finance_list' %}"><h4><b>Finanse</b></h4></a>
     </li>

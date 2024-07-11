@@ -75,7 +75,8 @@ from .forms import (
     KindOfFinanceExpenseForm,
     FileFinanceForm,
     BankStatementForm,
-    MemberCardEditForm
+    MemberCardEditForm,
+    VotingAddForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -3482,5 +3483,36 @@ def finance_file_edit(request, pk):
             'expense_names': expense_names,
             'members': members,
             'formatted_payment_date': formatted_payment_date
+        }
+    )
+
+
+# @cache_page(60*15)
+@login_required
+def voting_add(request):
+    members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
+
+    if request.method == "POST":
+        form = VotingAddForm(request.POST)
+        if form.is_valid():
+
+            description = form.cleaned_data['description']
+
+            sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+
+            voting = form.save(commit=False)
+            voting.author = request.user
+            voting.description = sanitized_description
+            voting.save()
+            messages.success(request, f"Dodano {voting.title}!")
+            return redirect('TI_Management_app:voting_add')
+    else:
+        form = VotingAddForm()
+    return render(
+        request,
+        'TI_Management_app/voting/voting_add.html',
+        {
+            'form': form,
+            'members': members
         }
     )

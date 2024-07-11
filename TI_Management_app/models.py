@@ -229,22 +229,35 @@ class MembersZZTI(models.Model):
 
 
 class Vote(models.Model):
-    VOTE_TYPE_CHOICES = (
-        ('open', 'Jawne'),
-        ('confidential', 'Tajne')
-    )
-    VOTE_METHOD_CHOICES = (
-        ('lums_voting_station', 'LUMS Vouting Station'),
-        ('lums_online', 'LUMS Online')
-    )
+    class VoteTypeChoices(models.TextChoices):
+        OPEN_VOTING = 'open', 'Jawne'
+        CONFIDENTIAL_VOTING = 'confidential', 'Tajne'
+
+    class VoteMethodChoices(models.TextChoices):
+        OFFLINE_VOTING = 'lums_voting_station', 'LUMS Voting Station'
+        ONLINE_VOTING = 'lums_online', 'LUMS Online'
+
+    # VOTE_TYPE_CHOICES = (
+    #     ('open', 'Jawne'),
+    #     ('confidential', 'Tajne')
+    # )
+
+    # VOTE_METHOD_CHOICES = (
+    #     ('lums_voting_station', 'LUMS Vouting Station'),
+    #     ('lums_online', 'LUMS Online')
+    # )
+
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVote')
     title = models.CharField(max_length=250, null=False, blank=False)
     description = CKEditor5Field(null=True, blank=True)
-    vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
-    vote_method = models.CharField(max_length=250, choices=VOTE_METHOD_CHOICES, default=None)
+    # vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
+    vote_type = models.CharField(max_length=100, choices=VoteTypeChoices.choices, default=VoteTypeChoices.OPEN_VOTING)
+
+    # vote_method = models.CharField(max_length=250, choices=VOTE_METHOD_CHOICES, default=None)
+    vote_method = models.CharField(max_length=100, choices=VoteMethodChoices.choices, default=VoteMethodChoices.OFFLINE_VOTING)
     # electoral_voting = models.BooleanField(default=False)
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)

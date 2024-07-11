@@ -503,5 +503,10 @@ urlpatterns = [
         views.finance_file_edit,
         name='finance_file_edit'
     ),
+    path(
+        'TI_Management_app/voting/voting-add/',
+        views.voting_add,
+        name='voting_add'
+    ),
 ]
 

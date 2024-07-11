@@ -101,7 +101,16 @@ input {
     min-width: 90%!important;
     min-height: 35px;
 }
-
+input[type="checkbox"] {
+    min-width: 50% !important; /* Adjust width as needed */
+    min-height: 35px; /* Adjust height as needed */
+    /* Add any other styles specific to checkboxes */
+}
+input[type="radio"] {
+    min-width: 50% !important; /* Adjust width as needed */
+    min-height: 35px; /* Adjust height as needed */
+    /* Add any other styles specific to checkboxes */
+}
 
 .select-wrapper {
   height: 60px;

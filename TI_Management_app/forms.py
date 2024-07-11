@@ -1,5 +1,4 @@
 import re
-import hashlib
 from django import forms
 from django.core.validators import RegexValidator
 from .models import (
@@ -28,7 +27,8 @@ from .models import (
     KindOfFinanceDocument,
     KindOfFinanceExpense,
     FileFinance,
-    BankStatement
+    BankStatement,
+    Vote
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -1649,49 +1649,6 @@ class FileRegisterReliefForm(forms.ModelForm):
         fields = ['file']
 
 
-# class CardRegisterReliefForm(forms.Form):
-#     # card = forms.CharField(
-#     #     required=True,
-#     #     max_length=250,
-#     #     widget=forms.TextInput(attrs={'autofocus': True})
-#     # )
-#     card = forms.CharField(
-#         widget=forms.PasswordInput(
-#             attrs={
-#                 'autocomplete': 'new-password',
-#                 'autofocus': 'autofocus',
-#                 'placeholder': 'Przyłóż kartę do czytnika'
-#             }
-#         ),
-#         required=True
-#     )
-#
-#     class Meta:
-#         model = MembersZZTI
-#         fields = ['card']
-#
-#     def __init__(self, *args, **kwargs):
-#         self.instance = kwargs.pop('instance', None)
-#         super(CardRegisterReliefForm, self).__init__(*args, **kwargs)
-#         if self.instance:
-#             self.fields['card'].initial = self.instance.card
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         card = cleaned_data.get('card')
-#
-#         instance = self.instance
-#
-#         is_correct = check_password(card, instance)
-#
-#         # if form.cleaned_data['card'] == one_registered_relife.member.card:
-#         # if is_correct:
-#
-#         # if instance and instance.card != card:
-#         if instance and is_correct:
-#             raise forms.ValidationError("Niepoprawny podpis.")
-#
-#         return cleaned_data
 class CardRegisterReliefForm(forms.Form):
     card = forms.CharField(
         widget=forms.PasswordInput(
@@ -1722,42 +1679,6 @@ class CardRegisterReliefForm(forms.Form):
         return cleaned_data
 
 
-# class SignatureReliefForm(forms.Form):
-#
-#     card = forms.CharField(
-#         widget=forms.PasswordInput(
-#             attrs={
-#                 'autocomplete': 'new-password',
-#                 'autofocus': 'autofocus',
-#                 'placeholder': 'Przyłóż kartę do czytnika'
-#             }
-#         ),
-#         required=True
-#     )
-#
-#     def __init__(self, relief_to_be_signed, *args, **kwargs):
-#         self.relief_to_be_signed = relief_to_be_signed
-#         super(SignatureReliefForm, self).__init__(*args, **kwargs)
-#
-#     def clean_card(self):
-#         card = self.cleaned_data['card']
-#         if not MembersZZTI.objects.filter(card=card).exists():
-#             raise forms.ValidationError("Taki Członek nie istnieje!")
-#
-#
-#
-#         if MembersZZTI.objects.filter(card=card).exists():
-#             member = MembersZZTI.objects.get(card=card)
-#             if User.objects.filter(username=member.member_nr).exists():
-#                 existing_user = User.objects.filter(username=member.member_nr).first()
-#                 if not existing_user.is_active:
-#                     raise forms.ValidationError(f"Członek nie jest aktywny!")
-#
-#         existing_signature = self.relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
-#         if existing_signature:
-#             raise forms.ValidationError("Podpis już istnieje.")
-#
-#         return card
 class SignatureReliefForm(forms.Form):
     card = forms.CharField(
         widget=forms.PasswordInput(
@@ -2280,3 +2201,84 @@ class BankStatementForm(forms.ModelForm):
             'final_balance',
             'income_bank_statement'
         ]
+
+
+class VotingAddForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Tytuł',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tutuł musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
+    participants = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Członek',
+                'aria-label': 'Członek',
+                'list': 'participants_database'
+            }
+        ),
+        required=True,
+        max_length=250
+    )
+    participants_all = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='Wszyscy Członkowie'
+    )
+    participants_group = forms.ModelMultipleChoiceField(
+        queryset=Groups.objects.all(),  # Replace with your queryset
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                'class': 'form-check-input'
+            }
+        ),
+        label=' '
+    )
+
+    class Meta:
+        model = Vote
+        fields = [
+            'title',
+            'description',
+            'vote_type',
+            'vote_method',
+            'participants',
+            'participants_all',
+            'participants_group'
+        ]
+        widgets = {
+            'description': CKEditor5Widget(
+                config_name='default'
+            ),
+            # 'vote_type': forms.Select(
+            #     attrs={
+            #         'class': 'form-control select'
+            #     }
+            # ),
+            'vote_type': forms.RadioSelect(
+                attrs={
+                    'class': 'form-check-input'
+                }
+            ),
+            'vote_method': forms.CheckboxSelectMultiple(
+                attrs={
+                    'class': 'form-check-input'
+                }
+            )
+        }

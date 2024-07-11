@@ -1,10 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="#"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_add' %}"><b> / Dodawanie głosowania</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Nowe głosowanie</h2>
+    <hr>
+    <br />
+<!--    <div class="notepad">-->
+        <form method="post" class="post-form">
+            {% csrf_token %}
+            {% if form.errors %}
+                <p>{{form.errors}}</p>
+            {% endif %}
+
+            <p><b>Tytuł głosowania:</b></p>
+            {{ form.title }}
+            <br />
+            <br />
+            <p><b>Instrukcja lub dodatkowa informacja do głosowania:</b></p>
+            {{ form.media }}
+            {{ form.description }}
+            <br />
+            <br />
+            <p><b>Rodzaj głosowania:</b></p>
+                {{ form.vote_type }}
+            <br />
+            <br />
+
+            <p><b>Grupa docelowa:</b></p>
+            <p>
+                {{ form.participants_all.label_tag }}
+                {{ form.participants_all }}
+            </p>
+
+            {{ form.participants }}
+            <datalist id="participants_database">
+                {% for member in members %}
+                    <option value="{{ member.forename }} {{ member.surname }}"></option>
+                {% endfor %}
+            </datalist>
+
+            <p><b>Grupy:</b></p>
+            {{ form.participants_group }}
+<!--            <div style=" width: 60%; display: inline-block; text-align: center;">-->
+<!--                {{ form.participants_group.label_tag }}-->
+
+                <label for="{{ form.participants_group.id_for_label }}">
+                    {{ form.participants_group.label }}
+                </label>
+<!--            </div>-->
+
+
+
+            <br />
+            <br />
+            <p><b>Typ głosowania:</b></p>
+<!--            <div style=" width: 90%; display: inline-block; text-align: center;">-->
+                {{form.vote_method}}
+                <label for="{{ form.vote_method.id_for_label }}">
+                    {{ form.vote_method.label }}
+                </label>
+<!--</div>-->
+            <br />
+            <br />
+            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
+            <br />
+        </form>
+<!--    </div>-->
+</div>
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_add' %}
+{% endblock %}
