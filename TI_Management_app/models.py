@@ -233,20 +233,6 @@ class Vote(models.Model):
         OPEN_VOTING = 'open', 'Jawne'
         CONFIDENTIAL_VOTING = 'confidential', 'Tajne'
 
-    class VoteMethodChoices(models.TextChoices):
-        OFFLINE_VOTING = 'lums_voting_station', 'LUMS Voting Station'
-        ONLINE_VOTING = 'lums_online', 'LUMS Online'
-
-    # VOTE_TYPE_CHOICES = (
-    #     ('open', 'Jawne'),
-    #     ('confidential', 'Tajne')
-    # )
-
-    # VOTE_METHOD_CHOICES = (
-    #     ('lums_voting_station', 'LUMS Vouting Station'),
-    #     ('lums_online', 'LUMS Online')
-    # )
-
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
@@ -255,10 +241,9 @@ class Vote(models.Model):
     description = CKEditor5Field(null=True, blank=True)
     # vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
     vote_type = models.CharField(max_length=100, choices=VoteTypeChoices.choices, default=VoteTypeChoices.OPEN_VOTING)
+    vote_method_online = models.BooleanField(default=False)
+    vote_method_offline = models.BooleanField(default=False)
 
-    # vote_method = models.CharField(max_length=250, choices=VOTE_METHOD_CHOICES, default=None)
-    vote_method = models.CharField(max_length=100, choices=VoteMethodChoices.choices, default=VoteMethodChoices.OFFLINE_VOTING)
-    # electoral_voting = models.BooleanField(default=False)
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)
     importance = models.BooleanField(default=False)
@@ -266,6 +251,8 @@ class Vote(models.Model):
     members = models.ManyToManyField(MembersZZTI, related_name='voteMember')
 
     history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Głosowanie'
@@ -286,6 +273,20 @@ class Vote(models.Model):
         super().save(*args, **kwargs)
 
 
+# class VoteMethod(models.Model):
+#
+#     class VoteMethodChoices(models.TextChoices):
+#         OFFLINE_VOTING = 'lums_voting_station', 'LUMS Voting Station'
+#         ONLINE_VOTING = 'lums_online', 'LUMS Online'
+#
+#     method = models.CharField(max_length=100, unique=True, choices=VoteMethodChoices.choices)
+#
+#     objects = models.Manager()  # default manager
+#
+#     def __str__(self):
+#         return self.get_method_display()
+
+
 class Poll(models.Model):
     # created_date = models.DateTimeField(default=timezone.now)
     created_date = models.DateTimeField(auto_now_add=True)
@@ -298,6 +299,8 @@ class Poll(models.Model):
     number_of_responses = models.IntegerField(null=True, blank=True, default=0)
 
     history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Pytania'

@@ -3497,14 +3497,22 @@ def voting_add(request):
         if form.is_valid():
 
             description = form.cleaned_data['description']
-
             sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
 
-            voting = form.save(commit=False)
-            voting.author = request.user
-            voting.description = sanitized_description
-            voting.save()
-            messages.success(request, f"Dodano {voting.title}!")
+            participants_all = form.cleaned_data['participants_all']
+            vote_method_online = form.cleaned_data['vote_method_online']
+            vote_method_offline = form.cleaned_data['vote_method_offline']
+            if participants_all:
+                for member in set(members):
+                    print(member.member_nr)
+            if vote_method_online:
+                print("online - true")
+
+            # voting = form.save(commit=False)
+            # voting.author = request.user
+            # voting.description = sanitized_description
+            # voting.save()
+            # messages.success(request, f"Dodano {voting.title}!")
             return redirect('TI_Management_app:voting_add')
     else:
         form = VotingAddForm()

@@ -34,8 +34,9 @@
 
             <p><b>Grupa docelowa:</b></p>
             <p>
-                {{ form.participants_all.label_tag }}
+<!--                {{ form.participants_all.label_tag }}-->
                 {{ form.participants_all }}
+                {{ form.participants_all.label }}
             </p>
 
             {{ form.participants }}
@@ -45,7 +46,7 @@
                 {% endfor %}
             </datalist>
 
-            <p><b>Grupy:</b></p>
+            <p>Grupy:</p>
             {{ form.participants_group }}
 <!--            <div style=" width: 60%; display: inline-block; text-align: center;">-->
 <!--                {{ form.participants_group.label_tag }}-->
@@ -60,20 +61,23 @@
             <br />
             <br />
             <p><b>Typ głosowania:</b></p>
-<!--            <div style=" width: 90%; display: inline-block; text-align: center;">-->
-                {{form.vote_method}}
-                <label for="{{ form.vote_method.id_for_label }}">
-                    {{ form.vote_method.label }}
-                </label>
-<!--</div>-->
+                {{form.vote_method_online}}
+                {{form.vote_method_online.label}}
+                {{form.vote_method_offline}}
+                {{form.vote_method_offline.label}}
             <br />
             <br />
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
             <br />
             <br />
+
         </form>
 <!--    </div>-->
 </div>
+
+
+
+
 {% endblock %}
 
 {% block menu %}

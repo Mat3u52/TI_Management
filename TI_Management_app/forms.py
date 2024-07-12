@@ -2233,14 +2233,16 @@ class VotingAddForm(forms.ModelForm):
                 'list': 'participants_database'
             }
         ),
-        required=True,
+        required=False,
         max_length=250
     )
+
     participants_all = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(),
         label='Wszyscy Członkowie'
     )
+
     participants_group = forms.ModelMultipleChoiceField(
         queryset=Groups.objects.all(),  # Replace with your queryset
         widget=forms.CheckboxSelectMultiple(
@@ -2248,7 +2250,20 @@ class VotingAddForm(forms.ModelForm):
                 'class': 'form-check-input'
             }
         ),
-        label=' '
+        label=' ',
+        required=False
+    )
+
+    vote_method_online = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='LUMS Online'
+    )
+
+    vote_method_offline = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='LUMS Voting Station'
     )
 
     class Meta:
@@ -2257,7 +2272,8 @@ class VotingAddForm(forms.ModelForm):
             'title',
             'description',
             'vote_type',
-            'vote_method',
+            'vote_method_online',
+            'vote_method_offline',
             'participants',
             'participants_all',
             'participants_group'
@@ -2272,11 +2288,6 @@ class VotingAddForm(forms.ModelForm):
             #     }
             # ),
             'vote_type': forms.RadioSelect(
-                attrs={
-                    'class': 'form-check-input'
-                }
-            ),
-            'vote_method': forms.CheckboxSelectMultiple(
                 attrs={
                     'class': 'form-check-input'
                 }

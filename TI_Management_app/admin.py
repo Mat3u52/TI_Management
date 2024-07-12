@@ -703,7 +703,8 @@ class VoteAdmin(admin.ModelAdmin):
         'title',
         'description',
         'vote_type',
-        'vote_method',
+        'vote_method_online',
+        'vote_method_offline',
         'date_start',
         'date_end',
         'importance'
@@ -717,7 +718,8 @@ class VoteAdmin(admin.ModelAdmin):
         'title',
         'description',
         'vote_type',
-        'vote_method',
+        'vote_method_online',
+        'vote_method_offline',
         'date_start',
         'date_end',
         'importance'
