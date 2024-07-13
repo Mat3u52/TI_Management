@@ -272,6 +272,10 @@ class Vote(models.Model):
             self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
+    @staticmethod
+    def get_absolute_url(self):
+        return reverse('TI_Management_app:voting_add')
+
 
 # class VoteMethod(models.Model):
 #

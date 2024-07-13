@@ -3502,15 +3502,36 @@ def voting_add(request):
             participants_all = form.cleaned_data['participants_all']
             vote_method_online = form.cleaned_data['vote_method_online']
             vote_method_offline = form.cleaned_data['vote_method_offline']
-            if participants_all:
-                for member in set(members):
-                    print(member.member_nr)
-            if vote_method_online:
-                print("online - true")
+            participants_group = form.cleaned_data['participants_group']
+            participants = request.POST.getlist('participants')
 
             # voting = form.save(commit=False)
             # voting.author = request.user
             # voting.description = sanitized_description
+            # voting.save()
+
+            if participants_all:
+                for member in set(members):
+                    print(member.member_nr)
+                    # voting.members.add(member)
+            else:
+                members_set = set()
+                for group in participants_group:
+                    print(group)
+                    group_members = GroupsMember.objects.filter(group=group)
+                    for group_member in group_members:
+                        print(group_member.member.member_nr)
+                        members_set.add(group_member.member.member_nr)
+                        # voting.members.add(group_member.member)
+                for participant in participants:
+                    members_set.add(participant)
+
+                print(members_set)
+
+            if vote_method_online:
+                print("online - true")
+
+
             # voting.save()
             # messages.success(request, f"Dodano {voting.title}!")
             return redirect('TI_Management_app:voting_add')

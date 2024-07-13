@@ -2230,7 +2230,8 @@ class VotingAddForm(forms.ModelForm):
                 'class': 'form-control me-2',
                 'placeholder': 'Członek',
                 'aria-label': 'Członek',
-                'list': 'participants_database'
+                'list': 'participants_database',
+                # 'id': 'field1'
             }
         ),
         required=False,
