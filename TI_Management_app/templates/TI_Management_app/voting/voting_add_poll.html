@@ -1,10 +1,130 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+
+{% block breadcrumbs %}
+<a href="#"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_add_poll' pk=voting.pk %}"><b> / Dodawanie głosowania [ 2 / 3 ]</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Nowe głosowanie - {{ voting.title }}</h2>
+    <hr>
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
+        {% if form_choice.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form_choice.errors }}</p>
+            </div>
+        {% endif %}
+
+        <p><b>Ptanie lub polecenie:</b></p>
+        {{ form.question }}
+        <br /><br />
+
+        <p><b>Instrukcja lub dodatkowa informacja do pytania:</b></p>
+        {{ form.media }}
+        {{ form.description }}
+        <br /><br />
+
+        <p><b>Możliwe odpowiedzi:</b></p>
+
+        <div id="inputContainer">
+            <div class="inputGroup">
+                <label for="answer_0">Odpowiedź 1:</label>
+<!--                <input type="text" id="answer_0" name="answer_0" placeholder="Odpowiedź">-->
+                {{ form_choice.answer }}
+                <label for="correct_0">Poprawna odpowiedź:</label>
+                <input type="checkbox" id="correct_0" name="correct_0">
+            </div>
+        </div>
+        <br />
+        <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
+
+        <br />
+        <br />
+
+        <p><b>Ilość możliwych odpowiedzi:</b></p>
+        <p>
+            {{ form.number_of_responses }}
+        </p>
+
+        <br />
+        <br />
+
+        <p><b>Koniec:</b></p>
+        <p>
+            {{ form.finish }}
+        </p>
+
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        let fieldCount = 1;
+
+        function updateNumberOfResponses() {
+            const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="correct_"]');
+            const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+            document.querySelector('input[name="number_of_responses"]').value = checkedCount;
+        }
+
+        document.getElementById('addButton').addEventListener('click', function() {
+            const newInputGroup = document.createElement('div');
+            newInputGroup.classList.add('inputGroup');
+
+            const newLabel = document.createElement('label');
+            newLabel.setAttribute('for', `answer_${fieldCount}`);
+            newLabel.textContent = `Odpowiedź ${fieldCount + 1}:`;
+
+            const newInput = document.createElement('input');
+            newInput.setAttribute('type', 'text');
+            newInput.setAttribute('id', `answer_${fieldCount}`);
+            newInput.setAttribute('name', `answer_${fieldCount}`);
+            newInput.setAttribute('placeholder', `Odpoweidź`);
+            newInput.setAttribute('autofocus', `autofocus`);
+
+            const newCheckboxLabel = document.createElement('label');
+            newCheckboxLabel.setAttribute('for', `correct_${fieldCount}`);
+            newCheckboxLabel.textContent = 'Poprawna odpowiedź';
+
+            const newCheckbox = document.createElement('input');
+            newCheckbox.setAttribute('type', 'checkbox');
+            newCheckbox.setAttribute('id', `correct_${fieldCount}`);
+            newCheckbox.setAttribute('name', `correct_${fieldCount}`);
+
+            newCheckbox.addEventListener('change', updateNumberOfResponses);
+
+            newInputGroup.appendChild(newLabel);
+            newInputGroup.appendChild(newInput);
+            newInputGroup.appendChild(newCheckboxLabel);
+            newInputGroup.appendChild(newCheckbox);
+            document.getElementById('inputContainer').appendChild(newInputGroup);
+
+            newInput.focus();
+
+            fieldCount++;
+        });
+
+        document.getElementById('correct_0').addEventListener('change', updateNumberOfResponses);
+    });
+</script>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_add' %}
+{% endblock %}

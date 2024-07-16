@@ -26,7 +26,9 @@ from .models import (
     KindOfFinanceDocument,
     FileFinance,
     KindOfFinanceExpense,
-    BankStatement
+    BankStatement,
+    Vote,
+    Choice
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -76,7 +78,9 @@ from .forms import (
     FileFinanceForm,
     BankStatementForm,
     MemberCardEditForm,
-    VotingAddForm
+    VotingAddForm,
+    VotingAddPollForm,
+    VotingAddChoiceForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -3487,7 +3491,7 @@ def finance_file_edit(request, pk):
     )
 
 
-# @cache_page(60*15)
+@cache_page(60*15)
 @login_required
 def voting_add(request):
     members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
@@ -3500,40 +3504,53 @@ def voting_add(request):
             sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
 
             participants_all = form.cleaned_data['participants_all']
-            vote_method_online = form.cleaned_data['vote_method_online']
-            vote_method_offline = form.cleaned_data['vote_method_offline']
+            # vote_method_online = form.cleaned_data['vote_method_online']
+            # vote_method_offline = form.cleaned_data['vote_method_offline']
             participants_group = form.cleaned_data['participants_group']
             participants = request.POST.getlist('participants')
 
-            # voting = form.save(commit=False)
-            # voting.author = request.user
-            # voting.description = sanitized_description
-            # voting.save()
+            voting = form.save(commit=False)
+            voting.author = request.user
+            voting.description = sanitized_description
+            voting.save()
 
             if participants_all:
                 for member in set(members):
                     print(member.member_nr)
-                    # voting.members.add(member)
+                    voting.members.add(member)
+                voting.save()
             else:
                 members_set = set()
-                for group in participants_group:
-                    print(group)
-                    group_members = GroupsMember.objects.filter(group=group)
-                    for group_member in group_members:
-                        print(group_member.member.member_nr)
-                        members_set.add(group_member.member.member_nr)
-                        # voting.members.add(group_member.member)
+
+                if participants_group:
+                    for group in participants_group:
+                        print(group)
+                        group_members = GroupsMember.objects.filter(group=group)
+                        for group_member in group_members:
+                            print(group_member.member.member_nr)
+                            members_set.add(group_member.member)
+
+                # if participants:
+                #     for participant in participants:
+                #         members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False, member_nr=participant)
+                #         members_set.add(members)
                 for participant in participants:
-                    members_set.add(participant)
+                    try:
+                        participant_member = MembersZZTI.objects.get(member_nr=participant)
+                        members_set.add(participant_member)
+                    except MembersZZTI.DoesNotExist:
+                        print(f"Participant with member_nr {participant} does not exist")
+
+                for member_set in members_set:
+                    voting.members.add(member_set)
 
                 print(members_set)
+                voting.save()
 
-            if vote_method_online:
-                print("online - true")
+            # if vote_method_online:
+            #     print("online - true")
 
-
-            # voting.save()
-            # messages.success(request, f"Dodano {voting.title}!")
+            messages.success(request, f"Dodano {voting.title}!")
             return redirect('TI_Management_app:voting_add')
     else:
         form = VotingAddForm()
@@ -3545,3 +3562,98 @@ def voting_add(request):
             'members': members
         }
     )
+
+
+# @cache_page(60*15)
+@login_required
+def voting_add_poll(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+
+    if request.method == "POST":
+        form = VotingAddPollForm(request.POST)
+        form_choice = VotingAddChoiceForm(request.POST)
+        if all([form.is_valid(), form_choice.is_valid()]):
+            finish = form.cleaned_data['finish']
+
+            description = form.cleaned_data['description']
+            sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+
+            # poll = form.save(commit=False)
+            # poll.author = request.user
+            # poll.vote = voting
+            # poll.description = sanitized_description
+            # poll.save()
+
+            answers = request.POST.getlist('answer')
+            print(answers)
+
+            # choice = form_choice.save(commit=False)
+            # choice.author = request.user
+            # choice.poll = poll.id
+            #
+            # choice.save()
+
+            if finish:
+                messages.success(request, f"Podsumowanie")
+                return redirect('TI_Management_app:voting_add_duration', pk=voting.pk)
+            else:
+                # messages.success(request, f"Dodano {poll.question}!")
+                return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
+    else:
+        form = VotingAddPollForm()
+        form_choice = VotingAddChoiceForm()
+    return render(
+        request,
+        'TI_Management_app/voting/voting_add_poll.html',
+        {
+            'form': form,
+            'form_choice': form_choice,
+            'voting': voting
+        }
+    )
+
+
+@login_required
+def voting_list(request):
+    vote_obj = Vote.objects.all().order_by('-created_date')
+    votes_without_date_start = Vote.objects.filter(date_start__isnull=True)
+
+    paginator = Paginator(vote_obj, 50)
+    page = request.GET.get('page')
+    try:
+        voting = paginator.page(page)
+    except PageNotAnInteger:
+        voting = paginator.page(1)
+    except EmptyPage:
+        voting = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_list.html',
+        {
+            'page': page,
+            'voting': voting,
+            'votes_without_date_start': votes_without_date_start
+        }
+    )
+
+
+@login_required
+def voting_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        voting = Vote.objects.filter(Q(title__icontains=searched))
+        return render(
+            request,
+            'TI_Management_app/voting/voting_search.html',
+            {
+                'searched': searched,
+                'voting': voting
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/voting/voting_search.html',
+            {}
+        )

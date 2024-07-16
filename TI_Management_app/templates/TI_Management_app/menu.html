@@ -44,7 +44,7 @@
     </li>
     <hr>
     <li class="{% if active_tab == 'voting_list' %} active {% endif %}">
-        <a href="#"><h4><b>Głosowania</b></h4></a>
+        <a href="{% url 'TI_Management_app:voting_list' %}"><h4><b>Głosowania</b></h4></a>
     </li>
     <li class="{% if active_tab == 'voting_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:voting_add' %}">

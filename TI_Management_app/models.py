@@ -329,11 +329,18 @@ class Choice(models.Model):
     # status = models.BooleanField(default=False)
     # status_description = models.BooleanField(default=False)
 
-    def __str__(self):
-        return self.answer
+    objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Odpowiedzi'
+
+    def __str__(self):
+        return self.answer
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.answer)
+        super().save(*args, **kwargs)
 
 
 class MembersFile(models.Model):

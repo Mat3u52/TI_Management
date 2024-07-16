@@ -28,7 +28,9 @@ from .models import (
     KindOfFinanceExpense,
     FileFinance,
     BankStatement,
-    Vote
+    Vote,
+    Poll,
+    Choice
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -2230,8 +2232,7 @@ class VotingAddForm(forms.ModelForm):
                 'class': 'form-control me-2',
                 'placeholder': 'Członek',
                 'aria-label': 'Członek',
-                'list': 'participants_database',
-                # 'id': 'field1'
+                'list': 'participants_database'
             }
         ),
         required=False,
@@ -2294,3 +2295,103 @@ class VotingAddForm(forms.ModelForm):
                 }
             )
         }
+
+
+class VotingAddPollForm(forms.ModelForm):
+
+    question = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Pytanie',
+                'aria-label': 'Pytanie',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Pytanie musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
+    number_of_responses = forms.DecimalField(
+        widget=forms.NumberInput(
+            attrs={
+                'class': 'form-control me-2',
+                # 'style': 'max-width: 25%!important; min-height: 15px',
+                'placeholder': '1',
+                'value': '1',
+                'aria-label': 'Ilość możliwych odpowiedzi',
+                'min': '0',
+                'step': '1',
+                'required': 'required',
+            }
+        ),
+        min_value=0,
+        decimal_places=0,
+        required=True,
+        label='',
+    )
+
+    finish = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='Koniec'
+    )
+
+    class Meta:
+        model = Poll
+        fields = [
+            'question',
+            'description',
+            'number_of_responses',
+            'finish'
+        ]
+
+        widgets = {
+            'description': CKEditor5Widget(
+                config_name='default'
+            )
+        }
+
+
+class VotingAddChoiceForm(forms.ModelForm):
+
+    answer = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Odpowiedź',
+                'aria-label': 'Odpowiedź',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Odpowiedź musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
+    correct = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='Poprawna odpowiedź'
+    )
+
+    class Meta:
+        model = Choice
+        fields = [
+            'answer',
+            'correct'
+        ]
+

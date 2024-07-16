@@ -89,7 +89,7 @@
                                 {% if finance_file_details.file %}
                                     <a href="{{ finance_file_details.file.url }}" target="_blank">
                                         <b>
-                                            {{ finance_file_details.file }}
+                                            {{ finance_file_details.file|filename }}
                                         </b>
                                     </a>
                                 {% endif %}
