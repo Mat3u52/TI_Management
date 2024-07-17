@@ -3574,30 +3574,34 @@ def voting_add_poll(request, pk):
         form_choice = VotingAddChoiceForm(request.POST)
         if all([form.is_valid(), form_choice.is_valid()]):
             finish = form.cleaned_data['finish']
-
             description = form.cleaned_data['description']
             sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
 
-            # poll = form.save(commit=False)
-            # poll.author = request.user
-            # poll.vote = voting
-            # poll.description = sanitized_description
-            # poll.save()
+            poll = form.save(commit=False)
+            poll.author = request.user
+            poll.vote = voting
+            poll.description = sanitized_description
+            poll.save()
 
-            answers = request.POST.getlist('answer')
+            answers = []
+            correct_choices = []
+            for key in request.POST:
+                if key.startswith('answer_'):
+                    answer_index = key.split('_')[1]
+                    answers.append(request.POST[key])
+                    correct_choices.append(request.POST.get(f'correct_{answer_index}') == 'on')
+
             print(answers)
+            print(correct_choices)
 
-            # choice = form_choice.save(commit=False)
-            # choice.author = request.user
-            # choice.poll = poll.id
-            #
-            # choice.save()
+            for answer, is_correct in zip(answers, correct_choices):
+                choice = Choice(author=request.user, poll=poll.id, answer=answer, correct=is_correct)
+                choice.save()
 
             if finish:
-                messages.success(request, f"Podsumowanie")
+                messages.success(request, "Podsumowanie")
                 return redirect('TI_Management_app:voting_add_duration', pk=voting.pk)
             else:
-                # messages.success(request, f"Dodano {poll.question}!")
                 return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
     else:
         form = VotingAddPollForm()
@@ -3611,6 +3615,67 @@ def voting_add_poll(request, pk):
             'voting': voting
         }
     )
+
+
+# @login_required
+# def voting_add_poll(request, pk):
+#     voting = get_object_or_404(Vote, pk=pk)
+#
+#     if request.method == "POST":
+#         form = VotingAddPollForm(request.POST)
+#         form_choice = VotingAddChoiceForm(request.POST)
+#         if all([form.is_valid(), form_choice.is_valid()]):
+#             finish = form.cleaned_data['finish']
+#
+#             description = form.cleaned_data['description']
+#             sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+#
+#             # poll = form.save(commit=False)
+#             # poll.author = request.user
+#             # poll.vote = voting
+#             # poll.description = sanitized_description
+#             # poll.save()
+#
+#             # answers = request.POST.getlist('answer')
+#             # correct_choices = request.POST.getlist('correct')
+#             # print(answers)
+#             # print(correct_choices)
+#             answers = []
+#             correct_choices = []
+#
+#             for key in request.POST:
+#                 if key.startswith('answer_'):
+#                     answer_index = key.split('_')[1]
+#                     answers.append(request.POST[key])
+#                     correct_choices.append(request.POST.get(f'correct_{answer_index}') == 'on')
+#
+#             print(answers)  # This will print the list of answers
+#             print(correct_choices)  # This will print the list of correct choices as booleans
+#
+#             # choice = form_choice.save(commit=False)
+#             # choice.author = request.user
+#             # choice.poll = poll.id
+#             #
+#             # choice.save()
+#
+#             if finish:
+#                 messages.success(request, f"Podsumowanie")
+#                 return redirect('TI_Management_app:voting_add_duration', pk=voting.pk)
+#             else:
+#                 # messages.success(request, f"Dodano {poll.question}!")
+#                 return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
+#     else:
+#         form = VotingAddPollForm()
+#         form_choice = VotingAddChoiceForm()
+#     return render(
+#         request,
+#         'TI_Management_app/voting/voting_add_poll.html',
+#         {
+#             'form': form,
+#             'form_choice': form_choice,
+#             'voting': voting
+#         }
+#     )
 
 
 @login_required

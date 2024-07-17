@@ -2319,17 +2319,36 @@ class VotingAddPollForm(forms.ModelForm):
         max_length=250
     )
 
+    # number_of_responses = forms.DecimalField(
+    #     widget=forms.NumberInput(
+    #         attrs={
+    #             'class': 'form-control me-2',
+    #             # 'style': 'max-width: 25%!important; min-height: 15px',
+    #             'placeholder': '1',
+    #             'value': '1',
+    #             'aria-label': 'Ilość możliwych odpowiedzi',
+    #             'min': '0',
+    #             'step': '1',
+    #             'id': 'number_of_responses',
+    #             'required': 'required',
+    #         }
+    #     ),
+    #     min_value=0,
+    #     decimal_places=0,
+    #     required=True,
+    #     label='',
+    # )
     number_of_responses = forms.DecimalField(
         widget=forms.NumberInput(
             attrs={
                 'class': 'form-control me-2',
-                # 'style': 'max-width: 25%!important; min-height: 15px',
-                'placeholder': '1',
-                'value': '1',
+                'placeholder': '0',
+                'value': '0',
                 'aria-label': 'Ilość możliwych odpowiedzi',
                 'min': '0',
                 'step': '1',
                 'required': 'required',
+                'readonly': 'readonly'
             }
         ),
         min_value=0,
@@ -2360,13 +2379,14 @@ class VotingAddPollForm(forms.ModelForm):
         }
 
 
-class VotingAddChoiceForm(forms.ModelForm):
+class VotingAddChoiceForm(forms.Form):
 
-    answer = forms.CharField(
+    answer_0 = forms.CharField(
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
                 'type': 'text',
+                'id': 'answer_0',
                 'placeholder': 'Odpowiedź',
                 'aria-label': 'Odpowiedź',
                 'autofocus': 'autofocus'
@@ -2382,16 +2402,16 @@ class VotingAddChoiceForm(forms.ModelForm):
         max_length=250
     )
 
-    correct = forms.BooleanField(
+    correct_0 = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(),
         label='Poprawna odpowiedź'
     )
 
-    class Meta:
-        model = Choice
-        fields = [
-            'answer',
-            'correct'
-        ]
+    # class Meta:
+    #     model = Choice
+    #     fields = [
+    #         'answer_0',
+    #         'correct_0'
+    #     ]
 

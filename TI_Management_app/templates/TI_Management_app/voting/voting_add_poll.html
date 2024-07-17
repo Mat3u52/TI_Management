@@ -25,7 +25,7 @@
             </div>
         {% endif %}
 
-        <p><b>Ptanie lub polecenie:</b></p>
+        <p><b>Pytanie lub polecenie:</b></p>
         {{ form.question }}
         <br /><br />
 
@@ -39,10 +39,9 @@
         <div id="inputContainer">
             <div class="inputGroup">
                 <label for="answer_0">Odpowiedź 1:</label>
-<!--                <input type="text" id="answer_0" name="answer_0" placeholder="Odpowiedź">-->
-                {{ form_choice.answer }}
+                {{ form_choice.answer_0 }}
                 <label for="correct_0">Poprawna odpowiedź:</label>
-                <input type="checkbox" id="correct_0" name="correct_0">
+                {{ form_choice.correct_0 }}
             </div>
         </div>
         <br />
@@ -54,7 +53,10 @@
         <p><b>Ilość możliwych odpowiedzi:</b></p>
         <p>
             {{ form.number_of_responses }}
+<!--            <input type="text" name="number_of_responses" id="number_of_responses" value="0" readonly>-->
         </p>
+
+<!--        <input type="hidden" name="number_of_responses" value="1">-->
 
         <br />
         <br />
@@ -80,6 +82,7 @@
             const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="correct_"]');
             const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
             document.querySelector('input[name="number_of_responses"]').value = checkedCount;
+<!--            document.getElementById('number_of_responses').value = checkedCount;-->
         }
 
         document.getElementById('addButton').addEventListener('click', function() {
@@ -94,8 +97,7 @@
             newInput.setAttribute('type', 'text');
             newInput.setAttribute('id', `answer_${fieldCount}`);
             newInput.setAttribute('name', `answer_${fieldCount}`);
-            newInput.setAttribute('placeholder', `Odpoweidź`);
-            newInput.setAttribute('autofocus', `autofocus`);
+            newInput.setAttribute('placeholder', `Odpowiedź`);
 
             const newCheckboxLabel = document.createElement('label');
             newCheckboxLabel.setAttribute('for', `correct_${fieldCount}`);
@@ -128,3 +130,5 @@
 {% block menu %}
 {% include 'TI_Management_app/menu.html' with active_tab='voting_add' %}
 {% endblock %}
+
+
