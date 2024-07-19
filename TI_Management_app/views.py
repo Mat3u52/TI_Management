@@ -28,7 +28,8 @@ from .models import (
     KindOfFinanceExpense,
     BankStatement,
     Vote,
-    Choice
+    Choice,
+    Poll
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -80,7 +81,8 @@ from .forms import (
     MemberCardEditForm,
     VotingAddForm,
     VotingAddPollForm,
-    VotingAddChoiceForm
+    VotingAddChoiceForm,
+    VotingAddRecapForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic import DetailView
@@ -3516,7 +3518,7 @@ def voting_add(request):
 
             if participants_all:
                 for member in set(members):
-                    print(member.member_nr)
+                    # print(member.member_nr)
                     voting.members.add(member)
                 voting.save()
             else:
@@ -3524,10 +3526,10 @@ def voting_add(request):
 
                 if participants_group:
                     for group in participants_group:
-                        print(group)
+                        # print(group)
                         group_members = GroupsMember.objects.filter(group=group)
                         for group_member in group_members:
-                            print(group_member.member.member_nr)
+                            # print(group_member.member.member_nr)
                             members_set.add(group_member.member)
 
                 # if participants:
@@ -3544,14 +3546,14 @@ def voting_add(request):
                 for member_set in members_set:
                     voting.members.add(member_set)
 
-                print(members_set)
+                # print(members_set)
                 voting.save()
 
             # if vote_method_online:
             #     print("online - true")
 
-            messages.success(request, f"Dodano {voting.title}!")
-            return redirect('TI_Management_app:voting_add')
+            messages.success(request, f"Dodano głosowanie - {voting.title}!")
+            return redirect('TI_Management_app:voting_add_poll')
     else:
         form = VotingAddForm()
     return render(
@@ -3568,6 +3570,7 @@ def voting_add(request):
 @login_required
 def voting_add_poll(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
+    poll_exist = voting.votePoll.exists()
 
     if request.method == "POST":
         form = VotingAddPollForm(request.POST)
@@ -3591,17 +3594,18 @@ def voting_add_poll(request, pk):
                     answers.append(request.POST[key])
                     correct_choices.append(request.POST.get(f'correct_{answer_index}') == 'on')
 
-            print(answers)
-            print(correct_choices)
+            # print(answers)
+            # print(correct_choices)
 
             for answer, is_correct in zip(answers, correct_choices):
-                choice = Choice(author=request.user, poll=poll.id, answer=answer, correct=is_correct)
+                choice = Choice(author=request.user, poll=poll, answer=answer, correct=is_correct)
                 choice.save()
 
             if finish:
                 messages.success(request, "Podsumowanie")
-                return redirect('TI_Management_app:voting_add_duration', pk=voting.pk)
+                return redirect('TI_Management_app:voting_add_recap', pk=voting.pk)
             else:
+                messages.success(request, f"Dodano pytanie / polecenie {poll.question}")
                 return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
     else:
         form = VotingAddPollForm()
@@ -3612,7 +3616,8 @@ def voting_add_poll(request, pk):
         {
             'form': form,
             'form_choice': form_choice,
-            'voting': voting
+            'voting': voting,
+            'poll_exist': poll_exist
         }
     )
 
@@ -3678,10 +3683,38 @@ def voting_add_poll(request, pk):
 #     )
 
 
+# @cache_page(60*15)
+@login_required
+def voting_add_recap(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+
+    if request.method == "POST":
+        form = VotingAddRecapForm(request.POST, instance=voting)
+        if form.is_valid():
+            poll = form.save(commit=False)
+            poll.author = request.user
+            # poll.vote = voting
+            poll.save()
+
+            messages.success(request, f"Głosowanie dodane i rozpocznie się {poll.date_start}")
+            return redirect('TI_Management_app:voting_list')
+    else:
+        form = VotingAddRecapForm()
+    return render(
+        request,
+        'TI_Management_app/voting/voting_add_recap.html',
+        {
+            'form': form,
+            'voting': voting
+        }
+    )
+
+
 @login_required
 def voting_list(request):
     vote_obj = Vote.objects.all().order_by('-created_date')
     votes_without_date_start = Vote.objects.filter(date_start__isnull=True)
+    votes_with_date_start = Vote.objects.filter(date_start__isnull=False)
 
     paginator = Paginator(vote_obj, 50)
     page = request.GET.get('page')
@@ -3698,7 +3731,8 @@ def voting_list(request):
         {
             'page': page,
             'voting': voting,
-            'votes_without_date_start': votes_without_date_start
+            'votes_without_date_start': votes_without_date_start,
+            'votes_with_date_start': votes_with_date_start
         }
     )
 

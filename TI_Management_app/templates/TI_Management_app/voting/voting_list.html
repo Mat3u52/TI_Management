@@ -26,9 +26,39 @@
     </form>
 </div>
 
+<div class="hero-unit">
+    <p><b>Aktywne głosowania:</b></p>
+    <br />
+{% for vote in votes_with_date_start %}
+    <h3>
+        <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}">
+            {{vote.title}}
+        </a>
+    </h3>
+    <hr>
+    <div class="notepad">
+        <p><b>Ilość uczestników:</b> {{ vote.members.count }}</p>
+        <p><b>Uczestnicy:</b></p>
+            <ul>
+                {% for member in vote.members.all %}
+                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
+                {% endfor %}
+            </ul>
+
+        <p>
+            <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
+                Więcej informacji
+            </a>
+        </p>
+        <div class="date"><p>Data dodania: {{vote.created_date}} przez: {{ vote.author }}</p></div>
+    </div>
+
+{% endfor %}
+</div>
+
 
 <div class="hero-unit">
-    <p><b>Niedokończony proces karty głosowań:</b></p>
+    <p><b>Niedokończone procesy kart głosowań:</b></p>
     <br />
 {% for vote in votes_without_date_start %}
     <h3>

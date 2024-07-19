@@ -2342,17 +2342,19 @@ class VotingAddPollForm(forms.ModelForm):
         widget=forms.NumberInput(
             attrs={
                 'class': 'form-control me-2',
-                'placeholder': '0',
-                'value': '0',
+                'placeholder': '1',
+                'value': '1',
                 'aria-label': 'Ilość możliwych odpowiedzi',
                 'min': '0',
                 'step': '1',
+                'id': 'number_of_responses',
                 'required': 'required',
                 'readonly': 'readonly'
             }
         ),
         min_value=0,
         decimal_places=0,
+        initial=1,
         required=True,
         label='',
     )
@@ -2404,14 +2406,55 @@ class VotingAddChoiceForm(forms.Form):
 
     correct_0 = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(),
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'correct'
+            }
+        ),
         label='Poprawna odpowiedź'
     )
 
-    # class Meta:
-    #     model = Choice
-    #     fields = [
-    #         'answer_0',
-    #         'correct_0'
-    #     ]
 
+class VotingAddRecapForm(forms.ModelForm):
+
+    importance = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'form-control me-2',
+                'aria-label': 'Wysoki priorytet'
+            }
+        ),
+        label='',
+        required=False
+    )
+
+    class Meta:
+        model = Vote
+        fields = [
+            'date_start',
+            'date_end',
+            'importance'
+        ]
+        widgets = {
+            'date_start': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'date_end': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_start = cleaned_data.get("date_start")
+        date_end = cleaned_data.get("date_end")
+
+        if date_start and date_end:
+            if date_start > date_end:
+                raise ValidationError("Data rozpoczęcia musi być wcześniejsza niż data zakończenia.")
+
+        return cleaned_data

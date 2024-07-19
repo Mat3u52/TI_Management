@@ -1,10 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_add_recap' pk=voting.pk %}"><b> / Dodawanie głosowania [ 3 / 3 ]</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
+    <hr>
+    <br />
+    <p><b>Temat głosowania:</b></p>
+    <p><em><small>{{ voting.description|safe }}</small></em></p>
+    <br />
+
+    <p><b>Wprowadzone pytania / odpowiedzi:</b></p>
+    {% for poll in voting.votePoll.all %}
+        <div class="notepad">
+            <p><b>{{ poll.question }}</b></p>
+            <p><em><small>{{ poll.description|safe }}</small></em></p>
+            <ul>
+                {% for choice in poll.pollChoice.all %}
+                    <li>
+                        {% if choice.correct %}
+                            <span style="color:green">{{ choice.answer }}</span>
+                        {% else %}
+                            {{ choice.answer }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <br />
+            <p><b>Ilość dopuszczalnych wyborów:</b> {{ poll.number_of_responses }}</p>
+
+        </div>
+    {% endfor %}
+
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
+
+        <p><b>Początek głosowania:</b></p>
+            {{ form.date_start }}
+        <br />
+        <br />
+        <p><b>Koniec głosowania:</b></p>
+            {{ form.date_end }}
+        <br />
+        <br />
+        <p><b>Obligatoryjny:</b></p>
+            {{ form.importance }}
+
+
+
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_add' %}
+{% endblock %}
+
+

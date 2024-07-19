@@ -514,6 +514,11 @@ urlpatterns = [
         name='voting_add_poll'
     ),
     path(
+        'TI_Management_app/voting/voting-add-recap/<int:pk>/',
+        views.voting_add_recap,
+        name='voting_add_recap'
+    ),
+    path(
         'TI_Management_app/voting/voting-list/',
         views.voting_list,
         name='voting_list'

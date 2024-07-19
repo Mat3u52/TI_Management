@@ -14,6 +14,7 @@
   <hr>
   <br />
   {% if member.created_date %}
+  <div class="notepad">
     <div style='display: block; float: right; margin-left: auto;'>
       <div style="float: right; margin-left: auto;">
         <a href="{{ member.image.url }}">
@@ -105,6 +106,8 @@
             <td><p>{{member.expiration_date_contract}}</p></td>
           </tr>
         </table>
+  </div>
+  <br />
 
         <a href="{% url 'TI_Management_app:member_edit' pk=member.pk %}">
           <button type="submit" class="btn btn-primary btn-large pull-left">Aktualizuj</button>

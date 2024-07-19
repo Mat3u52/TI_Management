@@ -244,8 +244,8 @@ class Vote(models.Model):
     vote_method_online = models.BooleanField(default=False)
     vote_method_offline = models.BooleanField(default=False)
 
-    date_start = models.DateTimeField(default=None, blank=True, null=True)
-    date_end = models.DateTimeField(default=None, blank=True, null=True)
+    date_start = models.DateTimeField(blank=False)
+    date_end = models.DateTimeField(blank=False)
     importance = models.BooleanField(default=False)
 
     members = models.ManyToManyField(MembersZZTI, related_name='voteMember')

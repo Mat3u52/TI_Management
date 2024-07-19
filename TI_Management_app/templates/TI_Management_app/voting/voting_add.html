@@ -2,7 +2,7 @@
 {% load ti_management_tags %}
 
 {% block breadcrumbs %}
-<a href="#"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
 <a href="{% url 'TI_Management_app:voting_add' %}"><b> / Dodawanie głosowania [ 1 / 3 ]</b></a>
 {% endblock %}
 
