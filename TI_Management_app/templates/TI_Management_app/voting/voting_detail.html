@@ -1,10 +1,96 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_detail' voting.pk %}"><b> / {{ voting.title|truncatewords:20 }} </b></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
+    <hr>
+    <br />
+    <div class="notepad">
+        <p><b>Opis:</b></p>
+        <em>{{ voting.description|safe }}</em>
+
+        <p><b>Ilość uczestników:</b> {{ voting.members.count }}</p>
+        <p><b>Uczestnicy:</b></p>
+            <ul>
+                {% for member in voting.members.all %}
+                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
+                {% endfor %}
+            </ul>
+        <br />
+        <p><b>Start:</b> {{voting.date_start}} </p>
+        <p><b>Koniec:</b> {{voting.date_end}} </p>
+        <br />
+        <p><b>Karta głosowania:</b></p>
+        <br />
+        {% for poll in voting.votePoll.all %}
+        <h4>{{ poll.question }}</h4>
+            <hr>
+            <em><small>{{ poll.description|safe }}</small></em>
+            <ul>
+                {% for choice in poll.pollChoice.all %}
+                    <li>
+                        {% if choice.correct %}
+                            <span style="color:green">{{ choice.answer }}</span>
+                        {% else %}
+                            {{ choice.answer }}
+                        {% endif %}
+                    </li>
+                {% endfor %}
+            </ul>
+            <p style="text-align: right; margin-left: auto;"><small>Ilość dopuszczalnych wyborów:</small> {{ poll.number_of_responses }}</p>
+
+            <br />
+        {% endfor %}
+
+        <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
+    </div>
+    <div id="countdown"></div>
+</div>
+
+<script>
+// Set the date we're counting down to
+<!--const countdownDate = new Date("December 31, 2024 23:59:59").getTime();-->
+const countdownDate = new Date("{{ voting.date_end|date:'Y-m-d H:i:s' }}").getTime();
+
+// Update the countdown every 1 second
+const countdownFunction = setInterval(() => {
+    // Get today's date and time
+    const now = new Date().getTime();
+
+    // Find the distance between now and the countdown date
+    const distance = countdownDate - now;
+
+    // Time calculations for days, hours, minutes, and seconds
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    // Display the result in the element with id="countdown"
+    document.getElementById("countdown").innerHTML = `
+        ${days}d ${hours}h ${minutes}m ${seconds}s
+    `;
+
+    // If the countdown is finished, display a message
+    if (distance < 0) {
+        clearInterval(countdownFunction);
+        document.getElementById("countdown").innerHTML = "EXPIRED";
+    }
+}, 1000);
+</script>
+
+
+
+{% include 'TI_Management_app/pagination.html' with page=voting %}
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_list' %}
+{% endblock %}

@@ -31,22 +31,35 @@
     <br />
 {% for vote in votes_with_date_start %}
     <h3>
-        <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}">
+        <a href="{% url 'TI_Management_app:voting_detail' pk=vote.pk %}">
             {{vote.title}}
         </a>
     </h3>
     <hr>
     <div class="notepad">
         <p><b>Ilość uczestników:</b> {{ vote.members.count }}</p>
+        <p><b>Opis:</b></p>
+        <em>{{ vote.description|safe }}</em>
         <p><b>Uczestnicy:</b></p>
             <ul>
                 {% for member in vote.members.all %}
                     <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
                 {% endfor %}
             </ul>
+<!--        <div class="well sidebar-nav">-->
+<!--          <ul class="nav nav-list">-->
+<!--            <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>-->
+<!--              <li id="objCardsLoyality" style="display: none">-->
+<!--              </li>-->
+<!--          </ul>-->
+<!--        </div>-->
+
+        <br />
+        <p><b>Start:</b> {{vote.date_start}} </p>
+        <p><b>Koniec:</b> {{vote.date_end}} </p>
 
         <p>
-            <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
+            <a href="{% url 'TI_Management_app:voting_detail' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
                 Więcej informacji
             </a>
         </p>

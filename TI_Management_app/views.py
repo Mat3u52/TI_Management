@@ -3553,7 +3553,7 @@ def voting_add(request):
             #     print("online - true")
 
             messages.success(request, f"Dodano głosowanie - {voting.title}!")
-            return redirect('TI_Management_app:voting_add_poll')
+            return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
     else:
         form = VotingAddForm()
     return render(
@@ -3756,3 +3756,16 @@ def voting_search(request):
             'TI_Management_app/voting/voting_search.html',
             {}
         )
+
+
+@login_required
+def voting_detail(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_detail.html',
+        {
+            'voting': voting
+        }
+    )

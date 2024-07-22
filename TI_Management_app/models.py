@@ -298,7 +298,7 @@ class Poll(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorPoll')
     vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='votePoll')
-    question = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    question = models.CharField(max_length=250, blank=False, default=None)
     description = CKEditor5Field(null=True, blank=True)
     number_of_responses = models.IntegerField(null=True, blank=True, default=0)
 
@@ -324,7 +324,7 @@ class Choice(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorChoice')
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, null=True, related_name='pollChoice')
-    answer = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    answer = models.CharField(max_length=250, blank=False, default=None)
     correct = models.BooleanField(default=False)
     # status = models.BooleanField(default=False)
     # status_description = models.BooleanField(default=False)
