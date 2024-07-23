@@ -3493,7 +3493,7 @@ def finance_file_edit(request, pk):
     )
 
 
-@cache_page(60*15)
+# @cache_page(60*15)
 @login_required
 def voting_add(request):
     members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
