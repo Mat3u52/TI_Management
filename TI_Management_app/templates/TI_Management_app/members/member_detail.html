@@ -404,7 +404,7 @@
 
                 {% for vote_member in member.voteMember.all %}
                     <div class="notepad">
-                      <p><b>{{ vote_member.title }}</b> : {{ vote_member.description|truncatewords:100 }}</p>
+                      <p><b>{{ vote_member.title }}</b><em><small> {{ vote_member.description|safe|truncatewords:100 }}</small></em></p>
                       {% if vote_member.importance is True %}
                         <p><b>Rodzaj: </b> Niejawne</p>
                       {% else %}

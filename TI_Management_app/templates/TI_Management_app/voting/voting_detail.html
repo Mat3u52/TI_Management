@@ -19,12 +19,24 @@
         <p><b>Uczestnicy:</b></p>
             <ul>
                 {% for member in voting.members.all %}
-                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
+                    <li>
+                        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                            {{ member.forename }} {{ member.surname }} - {{ member.member_nr }}
+                        </a>
+                    </li>
                 {% endfor %}
             </ul>
         <br />
         <p><b>Start:</b> {{voting.date_start}} </p>
         <p><b>Koniec:</b> {{voting.date_end}} </p>
+        <div id="countdown"></div>
+        <br />
+        <p>
+            <a href="{% url 'TI_Management_app:voting_edit' pk=voting.pk %}" class="btn btn-primary btn-large pull-right">
+                Aktualizuj
+            </a>
+        </p>
+        <br />
         <br />
         <p><b>Karta głosowania:</b></p>
         <br />
@@ -50,44 +62,45 @@
 
         <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
     </div>
-    <div id="countdown"></div>
 </div>
 
 <script>
-// Set the date we're counting down to
-<!--const countdownDate = new Date("December 31, 2024 23:59:59").getTime();-->
-const countdownDate = new Date("{{ voting.date_end|date:'Y-m-d H:i:s' }}").getTime();
+const dateStart = new Date("{{ voting.date_start|date:'Y-m-d H:i:s' }}").getTime();
+const dateEnd = new Date("{{ voting.date_end|date:'Y-m-d H:i:s' }}").getTime();
 
-// Update the countdown every 1 second
-const countdownFunction = setInterval(() => {
-    // Get today's date and time
+function updateCountdown(targetDate, message) {
     const now = new Date().getTime();
+    const distance = targetDate - now;
 
-    // Find the distance between now and the countdown date
-    const distance = countdownDate - now;
+    if (distance < 0) {
+        return false;
+    }
 
-    // Time calculations for days, hours, minutes, and seconds
     const days = Math.floor(distance / (1000 * 60 * 60 * 24));
     const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
     const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
     const seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
-    // Display the result in the element with id="countdown"
-    document.getElementById("countdown").innerHTML = `
-        ${days}d ${hours}h ${minutes}m ${seconds}s
-    `;
+    document.getElementById("countdown").innerHTML = `${message} ${days}d ${hours}h ${minutes}m ${seconds}s`;
 
-    // If the countdown is finished, display a message
-    if (distance < 0) {
-        clearInterval(countdownFunction);
-        document.getElementById("countdown").innerHTML = "EXPIRED";
+    return true;
+}
+
+function countdown() {
+    let countdownActive = updateCountdown(dateStart, "<b>Rozpoczęcie głosowania:</b>");
+
+    if (!countdownActive) {
+        countdownActive = updateCountdown(dateEnd, "<b>Zakończenie głosowania:</b>");
     }
-}, 1000);
+
+    if (!countdownActive) {
+        document.getElementById("countdown").innerHTML = "Głosowanie zakończone";
+    }
+}
+
+// Update the countdown every second
+setInterval(countdown, 1000);
 </script>
-
-
-
-{% include 'TI_Management_app/pagination.html' with page=voting %}
 
 {% endblock %}
 

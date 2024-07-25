@@ -40,19 +40,12 @@
         <p><b>Ilość uczestników:</b> {{ vote.members.count }}</p>
         <p><b>Opis:</b></p>
         <em>{{ vote.description|safe }}</em>
-        <p><b>Uczestnicy:</b></p>
-            <ul>
-                {% for member in vote.members.all %}
-                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
-                {% endfor %}
-            </ul>
-<!--        <div class="well sidebar-nav">-->
-<!--          <ul class="nav nav-list">-->
-<!--            <li class="nav-header" id="showCardsLoyality">Karty lojalnościowe:</li>-->
-<!--              <li id="objCardsLoyality" style="display: none">-->
-<!--              </li>-->
-<!--          </ul>-->
-<!--        </div>-->
+<!--        <p><b>Uczestnicy:</b></p>-->
+<!--            <ul>-->
+<!--                {% for member in vote.members.all %}-->
+<!--                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
 
         <br />
         <p><b>Start:</b> {{vote.date_start}} </p>
@@ -65,6 +58,7 @@
         </p>
         <div class="date"><p>Data dodania: {{vote.created_date}} przez: {{ vote.author }}</p></div>
     </div>
+    <br />
 
 {% endfor %}
 </div>

@@ -3493,7 +3493,7 @@ def finance_file_edit(request, pk):
     )
 
 
-# @cache_page(60*15)
+@cache_page(60*15)
 @login_required
 def voting_add(request):
     members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
@@ -3566,7 +3566,7 @@ def voting_add(request):
     )
 
 
-# @cache_page(60*15)
+@cache_page(60*15)
 @login_required
 def voting_add_poll(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
@@ -3620,67 +3620,6 @@ def voting_add_poll(request, pk):
             'poll_exist': poll_exist
         }
     )
-
-
-# @login_required
-# def voting_add_poll(request, pk):
-#     voting = get_object_or_404(Vote, pk=pk)
-#
-#     if request.method == "POST":
-#         form = VotingAddPollForm(request.POST)
-#         form_choice = VotingAddChoiceForm(request.POST)
-#         if all([form.is_valid(), form_choice.is_valid()]):
-#             finish = form.cleaned_data['finish']
-#
-#             description = form.cleaned_data['description']
-#             sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
-#
-#             # poll = form.save(commit=False)
-#             # poll.author = request.user
-#             # poll.vote = voting
-#             # poll.description = sanitized_description
-#             # poll.save()
-#
-#             # answers = request.POST.getlist('answer')
-#             # correct_choices = request.POST.getlist('correct')
-#             # print(answers)
-#             # print(correct_choices)
-#             answers = []
-#             correct_choices = []
-#
-#             for key in request.POST:
-#                 if key.startswith('answer_'):
-#                     answer_index = key.split('_')[1]
-#                     answers.append(request.POST[key])
-#                     correct_choices.append(request.POST.get(f'correct_{answer_index}') == 'on')
-#
-#             print(answers)  # This will print the list of answers
-#             print(correct_choices)  # This will print the list of correct choices as booleans
-#
-#             # choice = form_choice.save(commit=False)
-#             # choice.author = request.user
-#             # choice.poll = poll.id
-#             #
-#             # choice.save()
-#
-#             if finish:
-#                 messages.success(request, f"Podsumowanie")
-#                 return redirect('TI_Management_app:voting_add_duration', pk=voting.pk)
-#             else:
-#                 # messages.success(request, f"Dodano {poll.question}!")
-#                 return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
-#     else:
-#         form = VotingAddPollForm()
-#         form_choice = VotingAddChoiceForm()
-#     return render(
-#         request,
-#         'TI_Management_app/voting/voting_add_poll.html',
-#         {
-#             'form': form,
-#             'form_choice': form_choice,
-#             'voting': voting
-#         }
-#     )
 
 
 # @cache_page(60*15)
@@ -3767,5 +3706,138 @@ def voting_detail(request, pk):
         'TI_Management_app/voting/voting_detail.html',
         {
             'voting': voting
+        }
+    )
+
+
+@login_required
+def voting_edit(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+    members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
+
+    if request.method == "POST":
+        form = VotingAddForm(request.POST, instance=voting)
+        form_duration = VotingAddRecapForm(request.POST, instance=voting)
+        if all([form.is_valid(), form_duration.is_valid()]):
+
+            description = form.cleaned_data['description']
+            sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+
+            participants_all = form.cleaned_data['participants_all']
+            participants_group = form.cleaned_data['participants_group']
+            participants = request.POST.getlist('participants')
+
+            voting = form.save(commit=False)
+            voting.author = request.user
+            voting.description = sanitized_description
+            voting.save()
+
+            if participants_all:
+                for member in set(members):
+                    voting.members.add(member)
+                voting.save()
+            else:
+                members_set = set()
+
+                if participants_group:
+                    for group in participants_group:
+                        group_members = GroupsMember.objects.filter(group=group)
+                        for group_member in group_members:
+                            members_set.add(group_member.member)
+
+                for participant in participants:
+                    try:
+                        participant_member = MembersZZTI.objects.get(member_nr=participant)
+                        members_set.add(participant_member)
+                    except MembersZZTI.DoesNotExist:
+                        print(f"Participant with member_nr {participant} does not exist")
+
+                for member_set in members_set:
+                    voting.members.add(member_set)
+
+                voting.save()
+
+                duration = form_duration.save(commit=False)
+                duration.save()
+
+            messages.success(request, f"Zaktualizowano głosowanie! - {voting.title}")
+            return redirect('TI_Management_app:voting_detail', pk=voting.pk)
+    else:
+        form = VotingAddForm(instance=voting)
+        form_duration = VotingAddRecapForm(instance=voting)
+    return render(
+        request,
+        'TI_Management_app/voting/voting_edit.html',
+        {
+            'form': form,
+            'form_duration': form_duration,
+            'members': members,
+            'voting': voting
+        }
+    )
+
+
+@login_required
+def remove_member_from_vote(request, vote_pk, member_pk):
+    vote_instance = get_object_or_404(Vote, pk=vote_pk)
+    member_instance = get_object_or_404(MembersZZTI, pk=member_pk)
+
+    vote_instance.members.remove(member_instance)
+
+    return redirect('TI_Management_app:voting_edit', pk=vote_pk)
+
+
+@login_required
+def voting_edit_poll(request, pk, poll_pk):
+    voting = get_object_or_404(Vote, pk=pk)
+    poll = get_object_or_404(Poll, pk=poll_pk)
+    poll_exist = voting.votePoll.exists()
+
+    if request.method == "POST":
+        form = VotingAddPollForm(request.POST, instance=poll)
+        form_choice = VotingAddChoiceForm(request.POST)
+        if all([form.is_valid(), form_choice.is_valid()]):
+            finish = form.cleaned_data['finish']
+            description = form.cleaned_data['description']
+            sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+
+            poll = form.save(commit=False)
+            poll.author = request.user
+            poll.vote = voting
+            poll.description = sanitized_description
+            poll.save()
+
+            answers = []
+            correct_choices = []
+            for key in request.POST:
+                if key.startswith('answer_'):
+                    answer_index = key.split('_')[1]
+                    answers.append(request.POST[key])
+                    correct_choices.append(request.POST.get(f'correct_{answer_index}') == 'on')
+
+            # print(answers)
+            # print(correct_choices)
+
+            for answer, is_correct in zip(answers, correct_choices):
+                choice = Choice(author=request.user, poll=poll, answer=answer, correct=is_correct)
+                choice.save()
+
+            if finish:
+                messages.success(request, "Podsumowanie")
+                return redirect('TI_Management_app:voting_add_recap', pk=voting.pk)
+            else:
+                messages.success(request, f"Dodano pytanie / polecenie {poll.question}")
+                return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
+    else:
+        form = VotingAddPollForm(instance=poll)
+        form_choice = VotingAddChoiceForm()
+    return render(
+        request,
+        'TI_Management_app/voting/voting_add_poll.html',
+        {
+            'form': form,
+            'form_choice': form_choice,
+            'voting': voting,
+            'poll_exist': poll_exist
         }
     )

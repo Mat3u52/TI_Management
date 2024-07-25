@@ -1,10 +1,169 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_detail' voting.pk %}"><b> / {{ voting.title|truncatewords:20 }} </b></a>
+<a href="{% url 'TI_Management_app:voting_edit' voting.pk %}"><b> / Aktualizacja - {{ voting.title|truncatewords:20 }} </b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja - {{ voting.title|truncatewords:20 }} </h2>
+    <hr>
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
+        {% if form_duration.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form_duration.errors }}</p>
+            </div>
+        {% endif %}
+
+        <p><b>Tytuł głosowania:</b></p>
+        {{ form.title }}
+        <br /><br />
+
+        <p><b>Instrukcja lub dodatkowa informacja do głosowania:</b></p>
+        {{ form.media }}
+        {{ form.description }}
+        <br /><br />
+
+        <p><b>Rodzaj głosowania:</b></p>
+        {{ form.vote_type }}
+        <br /><br />
+        
+        <p><b>Uczestnicy:</b></p>
+            <ul>
+                {% for member in voting.members.all %}
+                    <li>
+                        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                            {{ member.forename }} {{ member.surname }} - {{ member.member_nr }}
+                        </a>
+                        <a href="{% url 'TI_Management_app:remove_member_from_vote' vote_pk=voting.pk member_pk=member.pk %}"
+                           class="btn btn-danger btn-small pull-right">
+                            usuń
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+        <br />
+        <p>
+            {{ form.participants_all }}
+            {{ form.participants_all.label }}
+        </p>
+
+        <div id="participants-section">
+            <div id="inputContainer">
+                <div class="inputGroup">
+                    <label for="participants_0">Uczestnik 1:</label>
+                    {{ form.participants }}
+<!--                    <input type="text" id="participants_0" name="participants">-->
+                    <datalist id="participants_database">
+                        {% for member in members %}
+                            <option value="{{ member.member_nr }}">{{ member.forename }} {{ member.surname }}</option>
+<!--                            <option value="{{ member }}">{{ member.forename }} {{ member.surname }}</option>-->
+                        {% endfor %}
+                    </datalist>
+                </div>
+            </div>
+            <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
+        </div>
+        <br />
+        <br />
+
+        <div id="groups-section">
+            <p>Grupy:</p>
+            {{ form.participants_group }}
+            <label for="{{ form.participants_group.id_for_label }}">
+                {{ form.participants_group.label }}
+            </label>
+        </div>
+
+        <br />
+        <br />
+
+        <p><b>Typ głosowania:</b></p>
+        {{ form.vote_method_online }}
+        {{ form.vote_method_online.label }}
+        {{ form.vote_method_offline }}
+        {{ form.vote_method_offline.label }}
+        <br />
+        <br />
+
+        <p><b>Początek głosowania:</b></p>
+            {{ form_duration.date_start }}
+        <br />
+        <br />
+        <p><b>Koniec głosowania:</b></p>
+            {{ form_duration.date_end }}
+        <br />
+        <br />
+        <p><b>Obligatoryjny:</b></p>
+            {{ form_duration.importance }}
+        <br />
+        <br />
+
+
+        <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var checkbox = document.getElementById('{{ form.participants_all.id_for_label }}');
+        var participantsSection = document.getElementById('participants-section');
+        var groupsSection = document.getElementById('groups-section');
+
+        function toggleVisibility() {
+            if (checkbox.checked) {
+                participantsSection.style.display = 'none';
+                groupsSection.style.display = 'none';
+            } else {
+                participantsSection.style.display = 'block';
+                groupsSection.style.display = 'block';
+            }
+        }
+
+        checkbox.addEventListener('change', toggleVisibility);
+        toggleVisibility();
+
+        let fieldCount = 1;
+
+        document.getElementById('addButton').addEventListener('click', function() {
+            const newInputGroup = document.createElement('div');
+            newInputGroup.classList.add('inputGroup');
+
+            const newLabel = document.createElement('label');
+            newLabel.setAttribute('for', `participants_${fieldCount}`);
+            newLabel.textContent = `Uczestnik ${fieldCount + 1}:`;
+
+            const newInput = document.createElement('input');
+            newInput.setAttribute('type', 'text');
+            newInput.setAttribute('id', `participants_${fieldCount}`);
+            newInput.setAttribute('name', 'participants');
+            newInput.setAttribute('list', 'participants_database');
+
+            newInputGroup.appendChild(newLabel);
+            newInputGroup.appendChild(newInput);
+            document.getElementById('inputContainer').appendChild(newInputGroup);
+
+            fieldCount++;
+        });
+    });
+</script>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_list' %}
+{% endblock %}
