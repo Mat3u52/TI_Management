@@ -707,7 +707,8 @@ class VoteAdmin(admin.ModelAdmin):
         'vote_method_offline',
         'date_start',
         'date_end',
-        'importance'
+        'importance',
+        'date_accede'
         # 'members'
     )
     list_filter = (
@@ -722,7 +723,8 @@ class VoteAdmin(admin.ModelAdmin):
         'vote_method_offline',
         'date_start',
         'date_end',
-        'importance'
+        'importance',
+        'date_accede'
         # 'members'
     )
     search_fields = (

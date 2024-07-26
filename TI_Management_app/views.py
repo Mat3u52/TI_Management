@@ -150,6 +150,14 @@ ALLOWED_ATTRIBUTES = {
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
 
+    for member in members_obj:
+        if member.date_of_abandonment:
+            if member.date_of_abandonment < timezone.now():
+                member.deactivate = True
+                member.save()
+
+
+
     paginator = Paginator(members_obj, 50)
     page = request.GET.get('page')
     try:
@@ -3493,7 +3501,7 @@ def finance_file_edit(request, pk):
     )
 
 
-@cache_page(60*15)
+# @cache_page(60*15)
 @login_required
 def voting_add(request):
     members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
@@ -3532,10 +3540,6 @@ def voting_add(request):
                             # print(group_member.member.member_nr)
                             members_set.add(group_member.member)
 
-                # if participants:
-                #     for participant in participants:
-                #         members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False, member_nr=participant)
-                #         members_set.add(members)
                 for participant in participants:
                     try:
                         participant_member = MembersZZTI.objects.get(member_nr=participant)
@@ -3546,11 +3550,7 @@ def voting_add(request):
                 for member_set in members_set:
                     voting.members.add(member_set)
 
-                # print(members_set)
                 voting.save()
-
-            # if vote_method_online:
-            #     print("online - true")
 
             messages.success(request, f"Dodano głosowanie - {voting.title}!")
             return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
@@ -3566,7 +3566,6 @@ def voting_add(request):
     )
 
 
-@cache_page(60*15)
 @login_required
 def voting_add_poll(request, pk):
     voting = get_object_or_404(Vote, pk=pk)

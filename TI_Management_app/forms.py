@@ -2207,6 +2207,11 @@ class BankStatementForm(forms.ModelForm):
 
 class VotingAddForm(forms.ModelForm):
 
+    PERIOD_CHOICES = [
+        ('from', 'od'),
+        ('to', 'do')
+    ]
+
     title = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -2268,6 +2273,16 @@ class VotingAddForm(forms.ModelForm):
         label='LUMS Voting Station'
     )
 
+    period = forms.ChoiceField(
+        required=False,
+        choices=PERIOD_CHOICES,
+        widget=forms.RadioSelect(
+            attrs={
+                'class': 'form-check-inline'
+            }
+        )
+    )
+
     class Meta:
         model = Vote
         fields = [
@@ -2278,7 +2293,8 @@ class VotingAddForm(forms.ModelForm):
             'vote_method_offline',
             'participants',
             'participants_all',
-            'participants_group'
+            'participants_group',
+            'date_accede'
         ]
         widgets = {
             'description': CKEditor5Widget(
@@ -2293,8 +2309,63 @@ class VotingAddForm(forms.ModelForm):
                 attrs={
                     'class': 'form-check-input'
                 }
-            )
+            ),
+            'date_accede': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
         }
+
+    def clean_participants(self):
+        participants = self.cleaned_data.get('participants', '')
+        if participants:
+            participants_list = [p.strip() for p in participants.split(',') if p.strip()]
+            invalid_participants = []
+            for participant in participants_list:
+                try:
+                    MembersZZTI.objects.get(member_nr=participant)
+                except MembersZZTI.DoesNotExist:
+                    invalid_participants.append(participant)
+
+            if invalid_participants:
+                raise ValidationError(f"Participants with member_nr {', '.join(invalid_participants)} do not exist.")
+
+        return participants
+
+    def clean_date_accede(self):
+        date_accede = self.cleaned_data.get("date_accede")
+        participants = self.cleaned_data.get('participants', '')
+        if participants and date_accede:
+            participants_list = [p.strip() for p in participants.split(',') if p.strip()]
+            for participant in participants_list:
+                try:
+                    member = MembersZZTI.objects.get(member_nr=participant)
+                    if date_accede > member.date_of_accession:
+                        raise ValidationError(
+                            f"Data akcesji nie może być późniejsza niż data przystąpienia dla członka: {member.forename} {member.surname}."
+                        )
+                except MembersZZTI.DoesNotExist:
+                    pass  # Already handled in clean_participants
+        return date_accede
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_accede = cleaned_data.get("date_accede")
+        participants = cleaned_data.getlist('participants')
+
+        for participant in participants:
+            try:
+                participant_member = MembersZZTI.objects.get(member_nr=participant)
+                if date_accede:
+                    if date_accede > participant_member.date_of_accession:
+                        raise ValidationError(
+                            f"Data akcesji nie może być późniejsza niż data przystąpienia dla członka: {participant_member.forename} {participant_member.surname}.")
+
+            except MembersZZTI.DoesNotExist:
+                print(f"Participant with member_nr {participant} does not exist")
+
+        return cleaned_data
 
 
 class VotingAddPollForm(forms.ModelForm):

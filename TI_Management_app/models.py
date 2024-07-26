@@ -243,6 +243,7 @@ class Vote(models.Model):
     vote_type = models.CharField(max_length=100, choices=VoteTypeChoices.choices, default=VoteTypeChoices.OPEN_VOTING)
     vote_method_online = models.BooleanField(default=False)
     vote_method_offline = models.BooleanField(default=False)
+    date_accede = models.DateTimeField(default=None, blank=True, null=True)
 
     date_start = models.DateTimeField(default=None, blank=True, null=True)
     date_end = models.DateTimeField(default=None, blank=True, null=True)
