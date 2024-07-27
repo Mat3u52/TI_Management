@@ -2208,9 +2208,19 @@ class BankStatementForm(forms.ModelForm):
 class VotingAddForm(forms.ModelForm):
 
     PERIOD_CHOICES = [
-        ('from', 'od'),
-        ('to', 'do')
+        ('from', 'Od'),
+        ('to', 'Do')
     ]
+
+    period = forms.ChoiceField(
+        required=False,
+        choices=PERIOD_CHOICES,
+        widget=forms.RadioSelect(
+            attrs={
+                'class': 'form-check-inline'
+            }
+        )
+    )
 
     title = forms.CharField(
         widget=forms.TextInput(
@@ -2273,16 +2283,6 @@ class VotingAddForm(forms.ModelForm):
         label='LUMS Voting Station'
     )
 
-    period = forms.ChoiceField(
-        required=False,
-        choices=PERIOD_CHOICES,
-        widget=forms.RadioSelect(
-            attrs={
-                'class': 'form-check-inline'
-            }
-        )
-    )
-
     class Meta:
         model = Vote
         fields = [
@@ -2317,6 +2317,47 @@ class VotingAddForm(forms.ModelForm):
             ),
         }
 
+    def clean_date_accede(self):
+        date_accede = self.cleaned_data.get("date_accede")
+        participants = self.cleaned_data.get('participants', '')
+        period = self.cleaned_data.get("period")
+
+        print(f"Received period: {period}")
+        print(f"Received date_accede: {date_accede}")
+        print(f"Received participants: {participants}")
+
+        if participants and date_accede:
+            if isinstance(date_accede, datetime):
+                date_accede_obj = date_accede.date()
+            else:
+                try:
+                    date_accede_obj = datetime.strptime(date_accede, '%Y-%m-%d').date()
+                except ValueError:
+                    raise ValidationError("Invalid date format. Please use YYYY-MM-DD.")
+
+            participants_list = [p.strip() for p in participants.split(',') if p.strip()]
+            for participant in participants_list:
+                try:
+                    member = MembersZZTI.objects.get(member_nr=participant)
+                    print(f"Checking member: {member}")
+
+                    if period is None:
+                        print(f"Checking period condition: {period}")
+                        if isinstance(member.date_of_accession, datetime):
+                            member_date_of_accession = member.date_of_accession.date()
+                        else:
+                            member_date_of_accession = member.date_of_accession
+
+                        print(f"Comparing dates: {date_accede_obj} > {member_date_of_accession}")
+
+                        if date_accede_obj > member_date_of_accession:
+                            raise ValidationError(
+                                f"Data akcesji ({date_accede_obj}) nie może być późniejsza niż data przystąpienia ({member_date_of_accession}) dla członka: {member.forename} {member.surname}."
+                            )
+                except MembersZZTI.DoesNotExist:
+                    print(f"Member not found: {participant}")
+        return date_accede
+
     def clean_participants(self):
         participants = self.cleaned_data.get('participants', '')
         if participants:
@@ -2329,43 +2370,32 @@ class VotingAddForm(forms.ModelForm):
                     invalid_participants.append(participant)
 
             if invalid_participants:
-                raise ValidationError(f"Participants with member_nr {', '.join(invalid_participants)} do not exist.")
+                raise ValidationError(f"Członek / Członkowie {', '.join(invalid_participants)} nie istnieje w bazie.")
 
         return participants
 
-    def clean_date_accede(self):
-        date_accede = self.cleaned_data.get("date_accede")
-        participants = self.cleaned_data.get('participants', '')
-        if participants and date_accede:
-            participants_list = [p.strip() for p in participants.split(',') if p.strip()]
-            for participant in participants_list:
-                try:
-                    member = MembersZZTI.objects.get(member_nr=participant)
-                    if date_accede > member.date_of_accession:
-                        raise ValidationError(
-                            f"Data akcesji nie może być późniejsza niż data przystąpienia dla członka: {member.forename} {member.surname}."
-                        )
-                except MembersZZTI.DoesNotExist:
-                    pass  # Already handled in clean_participants
-        return date_accede
-
-    def clean(self):
-        cleaned_data = super().clean()
-        date_accede = cleaned_data.get("date_accede")
-        participants = cleaned_data.getlist('participants')
-
-        for participant in participants:
-            try:
-                participant_member = MembersZZTI.objects.get(member_nr=participant)
-                if date_accede:
-                    if date_accede > participant_member.date_of_accession:
-                        raise ValidationError(
-                            f"Data akcesji nie może być późniejsza niż data przystąpienia dla członka: {participant_member.forename} {participant_member.surname}.")
-
-            except MembersZZTI.DoesNotExist:
-                print(f"Participant with member_nr {participant} does not exist")
-
-        return cleaned_data
+    # def clean_date_accede(self):
+    #     date_accede = self.cleaned_data.get("date_accede")
+    #     participants = self.cleaned_data.get('participants', '')
+    #     period = self.cleaned_data.get("period")
+    #
+    #     print(f"{period}")
+    #
+    #     if participants and date_accede:
+    #         participants_list = [p.strip() for p in participants.split(',') if p.strip()]
+    #         for participant in participants_list:
+    #             try:
+    #                 member = MembersZZTI.objects.get(member_nr=participant)
+    #                 if period == 'from' and date_accede:
+    #                     print(f"{period}")
+    #                     date_accede_obj = datetime.strptime(date_accede, '%Y-%m-%d').date()
+    #                     if date_accede_obj > member.date_of_accession:
+    #                         raise ValidationError(
+    #                             f"Data akcesji nie może być późniejsza niż data przystąpienia dla członka: {member.forename} {member.surname}."
+    #                         )
+    #             except MembersZZTI.DoesNotExist:
+    #                 pass
+    #     return date_accede
 
 
 class VotingAddPollForm(forms.ModelForm):

@@ -3519,16 +3519,29 @@ def voting_add(request):
             participants_group = form.cleaned_data['participants_group']
             participants = request.POST.getlist('participants')
 
+            period = form.cleaned_data['period']
+            date_accede = form.cleaned_data['date_accede']
+            print(f"Received period views: {period}")
+
             voting = form.save(commit=False)
             voting.author = request.user
             voting.description = sanitized_description
             voting.save()
 
             if participants_all:
-                for member in set(members):
-                    # print(member.member_nr)
-                    voting.members.add(member)
-                voting.save()
+                if period and date_accede:
+                    members_to_add = set()
+                    date_accede = datetime.strptime(date_accede, '%Y-%m-%d').date()
+                    if period == 'from':
+                        members_to_add = {member for member in members if member.date_of_accession > date_accede}
+                    voting.members.set(members_to_add)
+                    voting.save()
+                else:
+                    for member in set(members):
+                        # print(member.member_nr)
+                        voting.members.add(member)
+                    voting.save()
+
             else:
                 members_set = set()
 

@@ -35,11 +35,10 @@
 
         <p><b>Grupa docelowa:</b></p>
 
-        <div id="period">
         <p>Tylko Członkowie:</p>
             {{ form.period }}
             {{ form.date_accede }}
-        </div>
+
 
 
         <div id="participants-section">
@@ -99,11 +98,9 @@
             if (checkbox.checked) {
                 participantsSection.style.display = 'none';
                 groupsSection.style.display = 'none';
-                period.style.display = 'none';
             } else {
                 participantsSection.style.display = 'block';
                 groupsSection.style.display = 'block';
-                period.style.display = 'block';
             }
         }
 
