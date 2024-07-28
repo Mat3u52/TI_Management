@@ -3507,7 +3507,7 @@ def voting_add(request):
     members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
 
     if request.method == "POST":
-        form = VotingAddForm(request.POST)
+        form = VotingAddForm(request.POST or None)
         if form.is_valid():
 
             description = form.cleaned_data['description']
@@ -3528,30 +3528,84 @@ def voting_add(request):
             voting.description = sanitized_description
             voting.save()
 
+            # if participants_all:
+            #     if period and date_accede:
+            #         members_to_add = set()
+            #         date_accede = datetime.strptime(date_accede, '%Y-%m-%d').date()
+            #         if isinstance(date_accede, datetime):
+            #             date_accede = date_accede.date()
+            #
+            #         if period == 'from':
+            #             members_to_add = members.filter(date_of_accession__gt=date_accede)
+            #         elif period == 'to':
+            #             members_to_add = members.filter(date_of_accession__lt=date_accede)
+            #         else:
+            #             members_to_add = members.filter(date_of_accession=date_accede)
+            #         # if period == 'from':
+            #         #     members_to_add = {member for member in members if member.date_of_accession > date_accede}
+            #         # elif period == 'to':
+            #         #     members_to_add = {member for member in members if member.date_of_accession < date_accede}
+            #         # else:
+            #         #     members_to_add = {member for member in members if member.date_of_accession == date_accede}
+            #
+            #         voting.members.set(members_to_add)
+            #         voting.save()
+            #     else:
+            #         for member in set(members):
+            #             # print(member.member_nr)
+            #             voting.members.add(member)
+            #         voting.save()
             if participants_all:
+                members_to_add = set()
                 if period and date_accede:
-                    members_to_add = set()
-                    date_accede = datetime.strptime(date_accede, '%Y-%m-%d').date()
+                    if isinstance(date_accede, datetime):
+                        date_accede = date_accede.date()
+
                     if period == 'from':
-                        members_to_add = {member for member in members if member.date_of_accession > date_accede}
-                    voting.members.set(members_to_add)
-                    voting.save()
+                        members_to_add = members.filter(date_of_accession__gt=date_accede)
+                    elif period == 'to':
+                        members_to_add = members.filter(date_of_accession__lt=date_accede)
+                    else:
+                        members_to_add = members.filter(date_of_accession=date_accede)
                 else:
-                    for member in set(members):
-                        # print(member.member_nr)
-                        voting.members.add(member)
-                    voting.save()
+                    members_to_add = members
+
+                voting.members.set(members_to_add)
+                voting.save()
 
             else:
                 members_set = set()
 
                 if participants_group:
-                    for group in participants_group:
-                        # print(group)
-                        group_members = GroupsMember.objects.filter(group=group)
-                        for group_member in group_members:
-                            # print(group_member.member.member_nr)
-                            members_set.add(group_member.member)
+
+                    if period and date_accede:
+                        if isinstance(date_accede, datetime):
+                            date_accede = date_accede.date()
+
+                        if period == 'from':
+                            for group in participants_group:
+                                group_members = GroupsMember.objects.filter(group=group, date_of_accession__gt=date_accede)
+                                for group_member in group_members:
+                                    members_set.add(group_member.member)
+
+                        elif period == 'to':
+                            for group in participants_group:
+                                group_members = GroupsMember.objects.filter(group=group, date_of_accession__lt=date_accede)
+                                for group_member in group_members:
+                                    members_set.add(group_member.member)
+                        else:
+                            for group in participants_group:
+                                group_members = GroupsMember.objects.filter(group=group, date_of_accession=date_accede)
+                                for group_member in group_members:
+                                    members_set.add(group_member.member)
+                                 
+                    else:
+
+                        for group in participants_group:
+                            # print(group)
+                            group_members = GroupsMember.objects.filter(group=group)
+                            for group_member in group_members:
+                                members_set.add(group_member.member)
 
                 for participant in participants:
                     try:

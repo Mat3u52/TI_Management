@@ -77,6 +77,16 @@
     <h3>{{ voting.title }}</h3>
     <hr>
     <br />
+
+    <p><b>Ilość uczestników:</b> {{ voting.members.count }}</p>
+        <p><b>Uczestnicy:</b></p>
+            <ul>
+                {% for member in voting.members.all %}
+                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
+                {% endfor %}
+            </ul>
+    <br />
+
     {% for poll in voting.votePoll.all %}
         <div class="notepad">
             <p><b>{{ poll.question }}</b></p>

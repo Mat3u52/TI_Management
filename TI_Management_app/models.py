@@ -233,6 +233,11 @@ class Vote(models.Model):
         OPEN_VOTING = 'open', 'Jawne'
         CONFIDENTIAL_VOTING = 'confidential', 'Tajne'
 
+    class PeriodChoices(models.TextChoices):
+        FROM_PERIOD = 'from', 'Od'
+        TO_PERIOD = 'to', 'Do'
+        NO_PERIOD = 'no', 'Brak'
+
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
@@ -241,6 +246,7 @@ class Vote(models.Model):
     description = CKEditor5Field(null=True, blank=True)
     # vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
     vote_type = models.CharField(max_length=100, choices=VoteTypeChoices.choices, default=VoteTypeChoices.OPEN_VOTING)
+    period = models.CharField(max_length=100, choices=PeriodChoices.choices, default=PeriodChoices.NO_PERIOD)
     vote_method_online = models.BooleanField(default=False)
     vote_method_offline = models.BooleanField(default=False)
     date_accede = models.DateTimeField(default=None, blank=True, null=True)
