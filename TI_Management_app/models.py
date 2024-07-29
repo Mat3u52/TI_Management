@@ -199,7 +199,7 @@ class MembersZZTI(models.Model):
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
     expiration_date_contract = models.DateTimeField(default=None, blank=True, null=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    card = models.CharField(max_length=250, blank=True, null=True, default='', unique=True)
+    card = models.CharField(max_length=250, blank=True, null=True, default='')  # , unique=True
     image = models.ImageField(null=True, blank=True, upload_to='images/%Y/%m/%d/%H%M%S/', default='images/NoImage.png')
     deactivate = models.BooleanField(default=False)
     recommended_by = models.CharField(max_length=250, blank=True, null=True, default=None)

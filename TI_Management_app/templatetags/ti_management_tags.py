@@ -98,3 +98,15 @@ def phone_number_format(value):
         return f'(+48) {value[0:3]}-{value[3:6]}-{value[6:9]}'
     else:
         return value  # Return original value if not 10 characters (no formatting)
+
+
+@register.filter(name='member_img_exist')
+def member_img_exist(member_nr):
+    try:
+        member = MembersZZTI.objects.get(member_nr=member_nr)
+        if member.image:
+            return member.image
+        else:
+            return ''  # No image found, return an empty string or a default path if desired
+    except MembersZZTI.DoesNotExist:
+        return ''  # Member does not exist, return an empty string or a default path if desired

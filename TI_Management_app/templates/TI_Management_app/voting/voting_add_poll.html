@@ -1,5 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
@@ -40,6 +41,15 @@
             <div class="inputGroup">
                 <label for="answer_0">Odpowiedź 1:</label>
                 {{ form_choice.answer_0 }}
+
+
+                <datalist id="answer_database">
+                    {% for member in members %}
+                        <option value="{{ member.member_nr }}">{{ member.forename }} {{ member.surname }}</option>
+                    {% endfor %}
+                </datalist>
+
+
                 <label for="correct_0">Poprawna odpowiedź:</label>
                 {{ form_choice.correct_0 }}
             </div>
@@ -91,13 +101,18 @@
         <div class="notepad">
             <p><b>{{ poll.question }}</b></p>
             <p><em><small>{{ poll.description|safe }}</small></em></p>
-            <ul>
+            <ul style="list-style-type: none;">
                 {% for choice in poll.pollChoice.all %}
                     <li>
                         {% if choice.correct %}
                             <span style="color:green">{{ choice.answer }}</span>
                         {% else %}
                             {{ choice.answer }}
+                            {% with choice.answer|member_img_exist as image_url %}
+                                {% if image_url %}
+                                    <img src="{% thumbnail image_url 150x0  quality=100 %}">
+                                {% endif %}
+                            {% endwith %}
                         {% endif %}
                     </li>
                 {% endfor %}
@@ -143,6 +158,7 @@ document.addEventListener('DOMContentLoaded', function () {
         newInput.setAttribute('id', `answer_${fieldCount}`);
         newInput.setAttribute('name', `answer_${fieldCount}`);
         newInput.setAttribute('placeholder', `Odpowiedź`);
+        newInput.setAttribute('list', 'answer_database');
         newInput.classList.add('form-control', 'me-2');
 
         const newCheckboxLabel = document.createElement('label');

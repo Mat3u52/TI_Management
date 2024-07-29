@@ -394,6 +394,14 @@ class MemberCardEditForm(forms.ModelForm):
             'card'
         ]
 
+    def clean_card(self):
+        card = self.cleaned_data.get('card')
+        if card:
+            # Exclude the current instance from the check (if it exists)
+            if MembersZZTI.objects.filter(card=card).exclude(id=self.instance.id).exists():
+                raise ValidationError(f"Karta jest już przypisana do innego Członka.")
+        return card
+
 
 class MemberEditForm(forms.ModelForm):
 
@@ -2525,6 +2533,21 @@ class VotingAddPollForm(forms.ModelForm):
 
 class VotingAddChoiceForm(forms.Form):
 
+    # participants = forms.CharField(
+    #     widget=forms.TextInput(
+    #         attrs={
+    #             'class': 'form-control me-2',
+    #             'placeholder': 'Członek',
+    #             'aria-label': 'Członek',
+    #             'list': 'participants_database'
+    #         }
+    #     ),
+    #     required=False,
+    #     max_length=250
+    # )
+
+
+
     answer_0 = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -2533,6 +2556,7 @@ class VotingAddChoiceForm(forms.Form):
                 'id': 'answer_0',
                 'placeholder': 'Odpowiedź',
                 'aria-label': 'Odpowiedź',
+                'list': 'answer_database',
                 'autofocus': 'autofocus'
             }
         ),

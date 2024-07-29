@@ -567,6 +567,7 @@ def member_occupation_edit(request, pk):
         }
     )
 
+
 @cache_page(60*15)
 @login_required
 def member_card_edit(request, pk):
@@ -3504,7 +3505,8 @@ def finance_file_edit(request, pk):
 # @cache_page(60*15)
 @login_required
 def voting_add(request):
-    members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
+    # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
+    members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
 
     if request.method == "POST":
         form = VotingAddForm(request.POST or None)
@@ -3637,6 +3639,7 @@ def voting_add(request):
 def voting_add_poll(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     poll_exist = voting.votePoll.exists()
+    members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
 
     if request.method == "POST":
         form = VotingAddPollForm(request.POST)
@@ -3683,7 +3686,8 @@ def voting_add_poll(request, pk):
             'form': form,
             'form_choice': form_choice,
             'voting': voting,
-            'poll_exist': poll_exist
+            'poll_exist': poll_exist,
+            'members': members
         }
     )
 
@@ -3779,7 +3783,8 @@ def voting_detail(request, pk):
 @login_required
 def voting_edit(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
-    members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
+    # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
+    members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
 
     if request.method == "POST":
         form = VotingAddForm(request.POST, instance=voting)
