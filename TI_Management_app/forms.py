@@ -1174,12 +1174,25 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
     )
     card_start_pin = forms.CharField(
         validators=[
-            RegexValidator(r'^\d{0,10}$',
-                           message="To pole musi być liczbą.")],
+            RegexValidator(
+                regex=r'^\d{0,10}$',
+                message="To pole musi być liczbą.")],
         required=False
     )
 
-    responsible = forms.CharField(widget=forms.HiddenInput())
+    responsible = forms.CharField(
+        widget=forms.HiddenInput()
+    )
+
+    confirmed_hid = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        required=False
+    )
 
     class Meta:
         model = CardStatus
@@ -1196,13 +1209,70 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
             'file_a',
             'file_a_date',
             'responsible',
-            'confirmed'
+            'confirmed',
+            'confirmed_hid'
         ]
 
         widgets = {
-            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'file_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'file_a_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'card_status': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
         }
+
+    # def clean(self):
+    #     cleaned_data = super().clean()
+    #     card = cleaned_data.get('confirmed_hid')
+    #     # member = cleaned_data.get('member')
+    #
+    #     if card:
+    #         # Check if the card exists in the Cards model
+    #         if not MembersZZTI.objects.filter(card=card).exists():
+    #             raise ValidationError(f"Karta nie istnieje.")
+    #
+    #         # Exclude the current instance from the check if it's an update
+    #         existing_member = MembersZZTI.objects.filter(card=card).exclude(id=self.instance.id).first()
+    #         if existing_member:
+    #             raise ValidationError(
+    #                 f"Karta jest przypisana do innego Członka (ID: {existing_member.id}).")
+    #
+    #     return cleaned_data
+    def clean(self):
+        cleaned_data = super().clean()
+        card = cleaned_data.get('confirmed_hid')
+
+        if card:
+            try:
+                # Retrieve the member object with the corresponding hashed card
+                member_with_card = MembersZZTI.objects.filter(card=card).first()
+                if not member_with_card:
+                    raise ValidationError("Karta nie istnieje.")
+
+                # Check if the entered card matches the stored hashed card
+                if not check_password(card, member_with_card.card):
+                    raise ValidationError("Podana karta nie jest prawidłowa.")
+
+                # Exclude the current instance from the check if it's an update
+                existing_member = MembersZZTI.objects.filter(card=member_with_card.card).exclude(
+                    id=self.instance.id).first()
+                if existing_member:
+                    raise ValidationError(f"Karta jest przypisana do innego Członka (ID: {existing_member.id}).")
+
+            except MembersZZTI.DoesNotExist:
+                raise ValidationError("Wystąpił problem podczas weryfikacji karty. Spróbuj ponownie.")
+
+        return cleaned_data
 
 
 class LoyaltyCardsAddMemberFileOrderForm(forms.ModelForm):
@@ -2469,25 +2539,6 @@ class VotingAddPollForm(forms.ModelForm):
         max_length=250
     )
 
-    # number_of_responses = forms.DecimalField(
-    #     widget=forms.NumberInput(
-    #         attrs={
-    #             'class': 'form-control me-2',
-    #             # 'style': 'max-width: 25%!important; min-height: 15px',
-    #             'placeholder': '1',
-    #             'value': '1',
-    #             'aria-label': 'Ilość możliwych odpowiedzi',
-    #             'min': '0',
-    #             'step': '1',
-    #             'id': 'number_of_responses',
-    #             'required': 'required',
-    #         }
-    #     ),
-    #     min_value=0,
-    #     decimal_places=0,
-    #     required=True,
-    #     label='',
-    # )
     number_of_responses = forms.DecimalField(
         widget=forms.NumberInput(
             attrs={
@@ -2532,21 +2583,6 @@ class VotingAddPollForm(forms.ModelForm):
 
 
 class VotingAddChoiceForm(forms.Form):
-
-    # participants = forms.CharField(
-    #     widget=forms.TextInput(
-    #         attrs={
-    #             'class': 'form-control me-2',
-    #             'placeholder': 'Członek',
-    #             'aria-label': 'Członek',
-    #             'list': 'participants_database'
-    #         }
-    #     ),
-    #     required=False,
-    #     max_length=250
-    # )
-
-
 
     answer_0 = forms.CharField(
         widget=forms.TextInput(

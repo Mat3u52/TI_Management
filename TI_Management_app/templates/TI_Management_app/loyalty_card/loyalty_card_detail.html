@@ -1,22 +1,38 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"><b> / {{loyalty_card.card_name}}</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Karta: {{loyalty_card.card_name}}</h2>
+    <hr>
+    <br />
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:loyalty_card_member_search' pk=loyalty_card.pk %}">
         {% csrf_token %}
-        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-        type="search" placeholder="Dodaj nowego uczestnika" aria-label="Search" name="searched">
-        <button class="btn btn-primary btn-large pull-right" type="submit">Sprawdź czy uczestnik istnieje</button>
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Dodaj nowego uczestnika"
+                aria-label="Search"
+                name="searched">
+        <br />
+        <br />
+        <button class="btn btn-primary btn-large pull-right" type="submit">Dodaj</button>
+        <br />
+        <br />
     </form>
 </div>
 
 <div class="hero-unit">
-    <h2><a href="{% url 'TI_Management_app:loyalty_card_edit' pk=loyalty_card.pk %}">{{loyalty_card.card_name}}</a></h2>
+    <h3>
+        <a href="{% url 'TI_Management_app:loyalty_card_edit' pk=loyalty_card.pk %}">
+            {{loyalty_card.card_name}}
+        </a>
+    </h3>
 
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
@@ -71,20 +87,28 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='active' %}">
                         {% csrf_token %}
-
+                        <p>Separator:</p>
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
+                        <hr />
+                        <p>Kolumny:</p>
                         {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
                         {{form.start_date}}
+                        <p>Do:</p>
                         {{form.end_date}}
+                        <br />
+                        <br />
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -120,20 +144,28 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toBePickedUp' %}">
                         {% csrf_token %}
-
+                        <p>Separator:</p>
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
+                        <hr>
+                        <p>Kolumny:</p>
                         {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
                         {{form.start_date}}
+                        <p>Do:</p>
                         {{form.end_date}}
+                        <br />
+                        <br />
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -175,19 +207,28 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
                         {% csrf_token %}
+                        <p>Separator:</p>
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
+                        <hr>
+                        <p>Kolumny:</p>
                         {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
                         {{form.start_date}}
+                        <p>Do:</p>
                         {{form.end_date}}
+                        <br />
+                        <br />
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -229,19 +270,28 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toOrder'%}">
                         {% csrf_token %}
+                        <p>Separator:</p>
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
+                        <hr>
+                        <p>Kolumny:</p>
                         {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
                         {{form.start_date}}
+                        <p>Do:</p>
                         {{form.end_date}}
+                        <br />
+                        <br />
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>
@@ -442,19 +492,28 @@
                 <div class="notepad">
                     <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='deactivated' %}">
                         {% csrf_token %}
+                        <p>Separator:</p>
                         {% for radio in form.separator %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
                         <br />
+                        <hr>
+                        <p>Kolumny:</p>
                         {% for radio in form.data %}
                             <label class="horizontal-radio">
                                 {{ radio.tag }} {{ radio.choice_label }}
                             </label>
                         {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
                         {{form.start_date}}
+                        <p>Do:</p>
                         {{form.end_date}}
+                        <br />
+                        <br />
                         <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
                     </form>
                 </div>

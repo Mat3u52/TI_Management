@@ -656,7 +656,8 @@ def member_file_delete(request, pk, pk1):
 
 @login_required
 def loyalty_card_list(request):
-    loyalty_card_obj = Cards.objects.all()
+    loyalty_card_obj = Cards.objects.annotate(member_count=Count('loyaltyCardStatus')).order_by('-created_date')
+    # loyalty_card_obj = Cards.objects.all()
 
     paginator = Paginator(loyalty_card_obj, 5)
     page = request.GET.get('page')
@@ -667,25 +668,35 @@ def loyalty_card_list(request):
     except EmptyPage:
         loyalty_card = paginator.page(paginator.num_pages)
 
-    return render(request,
-                  'TI_Management_app/loyalty_card_list.html',
-                  {'page': page,
-                   'loyalty_card': loyalty_card})
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_card_list.html',
+        {
+            'page': page,
+            'loyalty_card': loyalty_card
+        }
+    )
 
 
-@login_required()
+@login_required
 def loyalty_card_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        loyalty_card = Cards.objects.filter(Q(card_name__contains=searched))
-        return render(request,
-                      'TI_Management_app/loyalty_card_search.html',
-                      {'searched': searched,
-                       'loyalty_card': loyalty_card})
+        loyalty_card = Cards.objects.filter(Q(card_name__icontains=searched))
+        return render(
+            request,
+            'TI_Management_app/loyalty_card/loyalty_card_search.html',
+            {
+                'searched': searched,
+                'loyalty_card': loyalty_card
+            }
+        )
     else:
-        return render(request,
-                      'TI_Management_app/loyalty_card_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/loyalty_card/loyalty_card_search.html',
+            {}
+        )
 
 
 @login_required
@@ -712,7 +723,7 @@ def loyalty_card_member_search(request, pk):
 
         return render(
             request,
-            'TI_Management_app/loyalty_card_member_search.html',
+            'TI_Management_app/loyalty_card/loyalty_card_member_search.html',
             {
                 'searched': searched,
                 'loyalty_card_member': loyalty_card_member,
@@ -722,9 +733,11 @@ def loyalty_card_member_search(request, pk):
             }
         )
     else:
-        return render(request,
-                      'TI_Management_app/loyalty_card_member_search.html',
-                      {})
+        return render(
+            request,
+            'TI_Management_app/loyalty_card/loyalty_card_member_search.html',
+            {}
+        )
 
 
 @login_required
@@ -983,13 +996,18 @@ def loyalty_card_detail(request, pk, category):
     else:
         form = ExportDataToTXTForm()
 
-    return render(request, 'TI_Management_app/loyalty_card_detail.html',
-                  {'loyalty_card': loyalty_card,
-                   'status_card_file': status_card_file,
-                   'status_card_file_a': status_card_file_a,
-                   'ordered_card_file': ordered_card_file,
-                   'to_be_picked_up_doc_card_file': to_be_picked_up_doc_card_file,
-                   'form': form})
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_card_detail.html',
+        {
+            'loyalty_card': loyalty_card,
+            'status_card_file': status_card_file,
+            'status_card_file_a': status_card_file_a,
+            'ordered_card_file': ordered_card_file,
+            'to_be_picked_up_doc_card_file': to_be_picked_up_doc_card_file,
+            'form': form
+        }
+    )
 
 
 @login_required
@@ -1004,8 +1022,13 @@ def loyalty_card_add(request):
             return redirect('TI_Management_app:loyalty_card_list')
     else:
         form = LoyaltyCardForm()
-    return render(request, 'TI_Management_app/loyalty_card_add.html',
-                  {'form': form})
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_card_add.html',
+        {
+            'form': form
+        }
+    )
 
 
 @login_required
@@ -1021,37 +1044,56 @@ def loyalty_card_edit(request, pk):
             return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         form = LoyaltyCardForm(instance=loyalty_card)
-    return render(request, 'TI_Management_app/loyalty_card_edit.html',
-                  {'form': form})
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_card_edit.html',
+        {
+            'form': form,
+            'loyalty_card': loyalty_card
+        }
+    )
 
 
 @login_required
 def loyalty_card_add_member(request, pk, pk1):
-    # TODO: confirmation by tapping the card to the reader
     loyalty_card = get_object_or_404(Cards, pk=pk)
     loyalty_card_member_add = get_object_or_404(MembersZZTI, pk=pk1)
     loyalty_card_validator = CardStatus.objects.all()
     if request.method == "POST":
         form = LoyaltyCardAddMemberForm(request.POST)
         if form.is_valid():
+
+            confirmed_hid = form.cleaned_data['confirmed_hid']
+
             loyalty_card_member = form.save(commit=False)
             loyalty_card_member.author = request.user
             loyalty_card_member.card = loyalty_card
             loyalty_card_member.member = loyalty_card_member_add
             loyalty_card_member.date_of_action = timezone.now()
+            if confirmed_hid:
+                loyalty_card_member.confirmed = True
             loyalty_card_member.save()
-            messages.success(request, "Dodano nowego uczestnika!")
+            messages.success(request, "Dodano nowego Uczestnika!")
             return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
-        form = LoyaltyCardAddMemberForm(initial={'card': loyalty_card,
-                                                 'member': loyalty_card_member_add,
-                                                 'responsible': username})
-    return render(request, 'TI_Management_app/loyalty_card_add_member.html',
-                  {'form': form,
-                   'loyalty_card': loyalty_card,
-                   'loyalty_card_member_add': loyalty_card_member_add,
-                   'loyalty_card_validator': loyalty_card_validator})
+        form = LoyaltyCardAddMemberForm(
+            initial={
+                'card': loyalty_card,
+                'member': loyalty_card_member_add,
+                'responsible': username
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_card_add_member.html',
+        {
+            'form': form,
+            'loyalty_card': loyalty_card,
+            'loyalty_card_member_add': loyalty_card_member_add,
+            'loyalty_card_validator': loyalty_card_validator
+        }
+    )
 
 
 @login_required
@@ -3863,6 +3905,8 @@ def voting_edit_poll(request, pk, poll_pk):
     voting = get_object_or_404(Vote, pk=pk)
     poll = get_object_or_404(Poll, pk=poll_pk)
     poll_exist = voting.votePoll.exists()
+    members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
+    # choice = get_object_or_404(Choice, pk=choice_pk)
 
     if request.method == "POST":
         form = VotingAddPollForm(request.POST, instance=poll)
@@ -3893,22 +3937,28 @@ def voting_edit_poll(request, pk, poll_pk):
                 choice = Choice(author=request.user, poll=poll, answer=answer, correct=is_correct)
                 choice.save()
 
-            if finish:
-                messages.success(request, "Podsumowanie")
-                return redirect('TI_Management_app:voting_add_recap', pk=voting.pk)
-            else:
-                messages.success(request, f"Dodano pytanie / polecenie {poll.question}")
-                return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)
+            messages.success(request, "Podsumowanie")
+            return redirect('TI_Management_app:voting_add_recap', pk=voting.pk)
     else:
         form = VotingAddPollForm(instance=poll)
         form_choice = VotingAddChoiceForm()
     return render(
         request,
-        'TI_Management_app/voting/voting_add_poll.html',
+        'TI_Management_app/voting/voting_edit_poll.html',
         {
             'form': form,
             'form_choice': form_choice,
             'voting': voting,
-            'poll_exist': poll_exist
+            'poll_exist': poll_exist,
+            'poll': poll,
+            'members': members
         }
     )
+
+
+@login_required
+def remove_choice_from_poll(request, pk, vote_pk, poll_pk):
+    choice = get_object_or_404(Choice, pk=pk)
+    choice.delete()
+    return redirect('TI_Management_app:voting_edit_poll', pk=vote_pk, poll_pk=poll_pk)
+

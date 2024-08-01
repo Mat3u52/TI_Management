@@ -1,27 +1,31 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:loyalty_card_add' %}"> / Dodaj kartę lojalnościową</a>
+<a href="{% url 'TI_Management_app:loyalty_card_add' %}"><b> / Dodaj kartę lojalnościową</b></a>
 {% endblock %}
 
 {% block content %}
 
-    <div class="hero-unit">
-        <form method="post" class="post-form">
-            {% csrf_token %}
-            {% if form.errors %}
-                <p>{{form.errors}}</p>
-            {% endif %}
-            <p>Dodaj kartę lojalnościową:</p>
-            {{form.card_name}}
-            {{form.created_date}}
+<div class="hero-unit">
+<h2 class="fadeInUp-animation">Dodawanie karty lojalnościowej</h2>
+<hr>
+<br />
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <p>{{form.errors}}</p>
+        {% endif %}
+        <p>Dodaj kartę lojalnościową:</p>
+        {{form.card_name}}
+        {{form.created_date}}
 
-
-            <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
-            <br />
-            <br />
-        </form>
-    </div>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
 
 {% endblock %}
 

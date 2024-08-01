@@ -101,22 +101,32 @@
         <div class="notepad">
             <p><b>{{ poll.question }}</b></p>
             <p><em><small>{{ poll.description|safe }}</small></em></p>
-            <ul style="list-style-type: none;">
+            <hr>
+            <table>
                 {% for choice in poll.pollChoice.all %}
-                    <li>
                         {% if choice.correct %}
-                            <span style="color:green">{{ choice.answer }}</span>
+                            <tr>
+                                <td>
+                                    <span style="color:green">{{ choice.answer }}</span>
+                                </td>
+                            </tr>
                         {% else %}
-                            {{ choice.answer }}
-                            {% with choice.answer|member_img_exist as image_url %}
-                                {% if image_url %}
-                                    <img src="{% thumbnail image_url 150x0  quality=100 %}">
-                                {% endif %}
-                            {% endwith %}
+                            <tr>
+                                <td>
+                                    {{ choice.answer }}
+                                    {% if choice.answer|member_full_name_exist %}
+                                        {{ choice.answer|member_full_name_exist }}
+                                    {% endif %}
+                                    {% with choice.answer|member_img_exist as image_url %}
+                                        {% if image_url %}
+                                            <img src="{% thumbnail image_url 150x0  quality=100 %}">
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                            </tr>
                         {% endif %}
-                    </li>
                 {% endfor %}
-            </ul>
+            </table>
         </div>
     {% empty %}
         <div class="notepad">
@@ -142,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function () {
     function updateNumberOfResponses() {
         const checkboxes = document.querySelectorAll('input[type="checkbox"].correct');
         const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
-        document.getElementById('number_of_responses').value = checkedCount || 1;  // Default to 1 if no checkboxes are checked
+        document.getElementById('number_of_responses').value = checkedCount || 1;
     }
 
     document.getElementById('addButton').addEventListener('click', function() {
@@ -191,139 +201,6 @@ document.addEventListener('DOMContentLoaded', function () {
     updateNumberOfResponses();
 });
 </script>
-
-<!--<script>-->
-<!--document.addEventListener('DOMContentLoaded', function () {-->
-<!--    console.log("JavaScript loaded");-->
-<!--    let fieldCount = 1;-->
-
-<!--    function updateNumberOfResponses() {-->
-<!--        const checkboxes = document.querySelectorAll('input[type="checkbox"].correct');-->
-<!--        const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;-->
-<!--        document.getElementById('number_of_responses').value = checkedCount;-->
-<!--    }-->
-
-<!--    document.getElementById('addButton').addEventListener('click', function() {-->
-<!--        const newInputGroup = document.createElement('div');-->
-<!--        newInputGroup.classList.add('inputGroup');-->
-
-<!--        const newLabel = document.createElement('label');-->
-<!--        newLabel.setAttribute('for', `answer_${fieldCount}`);-->
-<!--        newLabel.textContent = `Odpowiedź ${fieldCount + 1}:`;-->
-
-<!--        const newInput = document.createElement('input');-->
-<!--        newInput.setAttribute('type', 'text');-->
-<!--        newInput.setAttribute('id', `answer_${fieldCount}`);-->
-<!--        newInput.setAttribute('name', `answer_${fieldCount}`);-->
-<!--        newInput.setAttribute('placeholder', `Odpowiedź`);-->
-<!--        newInput.classList.add('form-control', 'me-2');-->
-
-<!--        const newCheckboxLabel = document.createElement('label');-->
-<!--        newCheckboxLabel.setAttribute('for', `correct_${fieldCount}`);-->
-<!--        newCheckboxLabel.textContent = 'Poprawna odpowiedź';-->
-
-<!--        const newCheckbox = document.createElement('input');-->
-<!--        newCheckbox.setAttribute('type', 'checkbox');-->
-<!--        newCheckbox.setAttribute('id', `correct_${fieldCount}`);-->
-<!--        newCheckbox.setAttribute('name', `correct_${fieldCount}`);-->
-<!--        newCheckbox.classList.add('correct');-->
-
-<!--        newCheckbox.addEventListener('change', updateNumberOfResponses);-->
-
-<!--        newInputGroup.appendChild(newLabel);-->
-<!--        newInputGroup.appendChild(newInput);-->
-<!--        newInputGroup.appendChild(newCheckboxLabel);-->
-<!--        newInputGroup.appendChild(newCheckbox);-->
-<!--        document.getElementById('inputContainer').appendChild(newInputGroup);-->
-
-<!--        newInput.focus();-->
-
-<!--        fieldCount++;-->
-<!--    });-->
-
-<!--    document.querySelectorAll('input[type="checkbox"].correct').forEach(checkbox => {-->
-<!--        checkbox.addEventListener('change', updateNumberOfResponses);-->
-<!--    });-->
-
-<!--    updateNumberOfResponses();-->
-<!--});-->
-<!--</script>-->
-
-<!--<script>-->
-<!--document.addEventListener('DOMContentLoaded', (event) => {-->
-<!--    console.log("JavaScript loaded");  // Add this line to check if the script is running-->
-<!--    function updateResponseCount() {-->
-<!--        // Count the number of checked checkboxes-->
-<!--        const checkedCheckboxes = document.querySelectorAll('input[type="checkbox"].correct:checked');-->
-<!--        const numberOfResponsesField = document.getElementById('number_of_responses');-->
-
-<!--        // Update the number_of_responses field-->
-<!--        numberOfResponsesField.value = checkedCheckboxes.length;-->
-<!--    }-->
-
-<!--    // Attach event listeners to all checkboxes with the class 'correct'-->
-<!--    const correctCheckboxes = document.querySelectorAll('input[type="checkbox"].correct');-->
-<!--    correctCheckboxes.forEach((checkbox) => {-->
-<!--        checkbox.addEventListener('change', updateResponseCount);-->
-<!--    });-->
-
-<!--    // Initial count on page load-->
-<!--    updateResponseCount();-->
-<!--});-->
-<!--</script>-->
-
-<!--<script>-->
-<!--    document.addEventListener('DOMContentLoaded', function () {-->
-<!--        let fieldCount = 1;-->
-
-
-<!--        function updateNumberOfResponses() {-->
-<!--            const checkboxes = document.querySelectorAll('input[type="checkbox"][name^="correct_"]');-->
-<!--            const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;-->
-<!--&lt;!&ndash;            document.querySelector('input[name="number_of_responses"]').value = checkedCount;&ndash;&gt;-->
-<!--            document.getElementById('number_of_responses').value = checkedCount;-->
-<!--        }-->
-
-
-<!--        document.getElementById('addButton').addEventListener('click', function() {-->
-<!--            const newInputGroup = document.createElement('div');-->
-<!--            newInputGroup.classList.add('inputGroup');-->
-
-<!--            const newLabel = document.createElement('label');-->
-<!--            newLabel.setAttribute('for', `answer_${fieldCount}`);-->
-<!--            newLabel.textContent = `Odpowiedź ${fieldCount + 1}:`;-->
-
-<!--            const newInput = document.createElement('input');-->
-<!--            newInput.setAttribute('type', 'text');-->
-<!--            newInput.setAttribute('id', `answer_${fieldCount}`);-->
-<!--            newInput.setAttribute('name', `answer_${fieldCount}`);-->
-<!--            newInput.setAttribute('placeholder', `Odpowiedź`);-->
-
-<!--            const newCheckboxLabel = document.createElement('label');-->
-<!--            newCheckboxLabel.setAttribute('for', `correct_${fieldCount}`);-->
-<!--            newCheckboxLabel.textContent = 'Poprawna odpowiedź';-->
-
-<!--            const newCheckbox = document.createElement('input');-->
-<!--            newCheckbox.setAttribute('type', 'checkbox');-->
-<!--            newCheckbox.setAttribute('id', `correct_${fieldCount}`);-->
-<!--            newCheckbox.setAttribute('name', `correct_${fieldCount}`);-->
-
-<!--            newCheckbox.addEventListener('change', updateNumberOfResponses);-->
-
-<!--            newInputGroup.appendChild(newLabel);-->
-<!--            newInputGroup.appendChild(newInput);-->
-<!--            newInputGroup.appendChild(newCheckboxLabel);-->
-<!--            newInputGroup.appendChild(newCheckbox);-->
-<!--            document.getElementById('inputContainer').appendChild(newInputGroup);-->
-
-<!--            newInput.focus();-->
-
-<!--            fieldCount++;-->
-<!--        });-->
-
-<!--        document.getElementById('correct_0').addEventListener('change', updateNumberOfResponses);-->
-<!--    });-->
-<!--</script>-->
 
 {% endblock %}
 

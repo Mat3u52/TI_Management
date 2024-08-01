@@ -225,27 +225,27 @@ urlpatterns = [
         name='group_search'
     ),
     path(
-        'TI_Management_app/loyalty-cards-list/',
+        'TI_Management_app/loyalty-card/loyalty-cards-list/',
         views.loyalty_card_list,
         name='loyalty_card_list'
     ),
     path(
-        'TI_Management_app/loyalty-cards-detail/<int:pk>/<str:category>/',
+        'TI_Management_app/loyalty-card/loyalty-cards-detail/<int:pk>/<str:category>/',
         views.loyalty_card_detail,
         name='loyalty_card_detail'
     ),
     path(
-        'TI_Management_app/loyalty/cards/add/',
+        'TI_Management_app/loyalty-card/loyalty-cards-add/',
         views.loyalty_card_add,
         name='loyalty_card_add'
     ),
     path(
-        'TI_Management_app/loyalty-cards-edit/<int:pk>/',
+        'TI_Management_app/loyalty-card/loyalty-cards-edit/<int:pk>/',
         views.loyalty_card_edit,
         name='loyalty_card_edit'
     ),
     path(
-        'TI_Management_app/loyalty-cards-add-member/<int:pk>/<int:pk1>/',
+        'TI_Management_app/loyalty-card/loyalty-cards-add-member/<int:pk>/<int:pk1>/',
         views.loyalty_card_add_member,
         name='loyalty_card_add_member'
     ),
@@ -285,12 +285,12 @@ urlpatterns = [
         name='loyalty_card_member_file_to_be_picked_up_search'
     ),
     path(
-        'TI_Management_app/loyalty-cards-member-search/<int:pk>/',
+        'TI_Management_app/loyalty-card/loyalty-cards-member-search/<int:pk>/',
         views.loyalty_card_member_search,
         name='loyalty_card_member_search'
     ),
     path(
-        'TI_Management_app/loyalty-cards-search/',
+        'TI_Management_app/loyalty-card/loyalty-cards-search/',
         views.loyalty_card_search,
         name='loyalty_card_search'
     ),
@@ -529,9 +529,14 @@ urlpatterns = [
         name='voting_edit'
     ),
     path(
-        'TI_Management_app/voting/voting-edit-poll/<int:pk>/<int:poll_pk/',
+        'TI_Management_app/voting/voting-edit-poll/<int:pk>/<int:poll_pk>/',
         views.voting_edit_poll,
         name='voting_edit_poll'
+    ),
+    path(
+        'TI_Management_app/voting/remove-choice-from-poll/<int:pk>/<int:vote_pk>/<int:poll_pk>/',
+        views.remove_choice_from_poll,
+        name='remove_choice_from_poll'
     ),
     path(
         'TI_Management_app/voting/remove-member-from-vote/<int:vote_pk>/<int:member_pk>/',

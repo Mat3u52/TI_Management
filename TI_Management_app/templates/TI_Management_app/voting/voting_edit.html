@@ -4,7 +4,7 @@
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
 <a href="{% url 'TI_Management_app:voting_detail' voting.pk %}"><b> / {{ voting.title|truncatewords:20 }} </b></a>
-<a href="{% url 'TI_Management_app:voting_edit' voting.pk %}"><b> / Aktualizacja - {{ voting.title|truncatewords:20 }} </b></a>
+<a href="{% url 'TI_Management_app:voting_edit' voting.pk %}"><b> / Aktualizacja </b></a>
 {% endblock %}
 
 {% block content %}
@@ -151,6 +151,7 @@
             newInput.setAttribute('type', 'text');
             newInput.setAttribute('id', `participants_${fieldCount}`);
             newInput.setAttribute('name', 'participants');
+            newInput.setAttribute('placeholder', `Członek`);
             newInput.setAttribute('list', 'participants_database');
 
             newInputGroup.appendChild(newLabel);

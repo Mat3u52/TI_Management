@@ -1,28 +1,35 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}} </a>
-<a href="#"> / Wyszukiwarka nowego uczestnika</a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"><b> / {{loyalty_card.card_name}} </b></a>
+<a href="#"><b> / Wyszukiwarka nowego uczestnika</b></a>
 {% endblock %}
 
 {% block content %}
     {% if searched %}
-    <h2>
+    <h2 class="fadeInUp-animation">
         Szukasz uczestnika dla karty {{loyalty_card.card_name}}:
         <span class="search-style">
             {{ searched }}
         </span>
     </h2>
+    <hr>
     <br />
+    <div class="hero-unit">
     {% for member in members_in_validator %}
-        <div class="hero-unit">
-            <img src="{{ member.image.url }}" alt="image" width="100px">
-            <h2>
+        <div class="notepad">
+<!--            <img src="{{ member.image.url }}" alt="image" width="100px">-->
+            <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                <img src="{% thumbnail member.image 100x0  quality=100 %}">
+            </a>
+            <h3>
                 <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
                     {{member.forename}} {{member.surname}}
                 </a>
-            </h2>
+            </h3>
                 <p>
                     <b>
                         Nr:
@@ -31,7 +38,7 @@
                     <b>
                         tel:
                     </b>
-                    {{member.phone_number}} &#124;
+                    {{member.phone_number|phone_number}} &#124;
                     <b>
                         email:
                     </b>
@@ -47,7 +54,7 @@
                         {% endif %}
                     {% endif %}
                 {% endfor %}
-
+                <br />
                 <p>
                     <a href="{% url 'TI_Management_app:loyalty_card_add_member' pk=loyalty_card.pk pk1=member.pk %}" class="btn btn-primary btn-large pull-right">
                         Dodaj nowego uczestnika do karty {{loyalty_card.card_name}}
@@ -58,9 +65,12 @@
             </div>
 
         {% endfor %}
-
+    </div>
     {% else %}
-        <h2>Please, insert the phrase into the search area.</h2>
+        <div class="hero-unit">
+            <h4>Proszę, wprowadź frazę w pole wyszukiwania</h4>
+            <br />
+        </div>
     {% endif %}
 {% endblock %}
 

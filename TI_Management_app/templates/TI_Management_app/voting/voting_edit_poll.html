@@ -1,10 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_edit_poll' pk=voting.pk poll_pk=poll.pk %}"><b> / Aktualizacja głosowania </b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja głosowania - {{ voting.title }}</h2>
+    <hr>
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
+        {% if form_choice.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form_choice.errors }}</p>
+            </div>
+        {% endif %}
+
+        <p><b>Pytanie lub polecenie:</b></p>
+        {{ form.question }}
+        <br /><br />
+
+        <p><b>Instrukcja lub dodatkowa informacja do pytania:</b></p>
+        {{ form.media }}
+        {{ form.description }}
+        <br /><br />
+        <table width="100%">
+            {% for choice in poll.pollChoice.all %}
+                    {% if choice.correct %}
+                        <tr>
+                            <td>
+                                <span style="color:green">{{ choice.answer }}</span>
+                                <a href="{% url 'TI_Management_app:remove_choice_from_poll' pk=choice.pk vote_pk=voting.pk poll_pk=poll.pk %}"
+                                    class="btn btn-danger btn-small pull-right">
+                                    usuń
+                                </a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>
+                                {{ choice.answer }}
+                                {% if choice.answer|member_full_name_exist %}
+                                    {{ choice.answer|member_full_name_exist }}
+                                {% endif %}
+                                {% with choice.answer|member_img_exist as image_url %}
+                                    {% if image_url %}
+                                        <img src="{% thumbnail image_url 150x0  quality=100 %}">
+                                    {% endif %}
+                                {% endwith %}
+                                <a href="{% url 'TI_Management_app:remove_choice_from_poll' pk=choice.pk vote_pk=voting.pk poll_pk=poll.pk %}"
+                                    class="btn btn-danger btn-small pull-right">
+                                    usuń
+                                </a>
+                            </td>
+                        </tr>
+                    {% endif %}
+            {% endfor %}
+        </table>
+        <br />
+
+        <p><b>Możliwe odpowiedzi:</b></p>
+
+        <div id="inputContainer">
+            <div class="inputGroup">
+                <label for="answer_0">Odpowiedź 1:</label>
+                {{ form_choice.answer_0 }}
+
+
+                <datalist id="answer_database">
+                    {% for member in members %}
+                        <option value="{{ member.member_nr }}">{{ member.forename }} {{ member.surname }}</option>
+                    {% endfor %}
+                </datalist>
+
+
+                <label for="correct_0">Poprawna odpowiedź:</label>
+                {{ form_choice.correct_0 }}
+            </div>
+        </div>
+        <br />
+        <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
+
+        <br />
+        <br />
+
+        <p><b>Ilość możliwych odpowiedzi:</b></p>
+        <p>
+            {{ form.number_of_responses }}
+        </p>
+
+        <br />
+        <br />
+
+<!--        <p><b>Koniec:</b></p>-->
+        <p>
+            {{ form.finish.as_hidden }}
+        </p>
+
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    console.log("JavaScript loaded");
+    let fieldCount = 1;
+
+    function updateNumberOfResponses() {
+        const checkboxes = document.querySelectorAll('input[type="checkbox"].correct');
+        const checkedCount = Array.from(checkboxes).filter(checkbox => checkbox.checked).length;
+        document.getElementById('number_of_responses').value = checkedCount || 1;  // Default to 1 if no checkboxes are checked
+    }
+
+    document.getElementById('addButton').addEventListener('click', function() {
+        const newInputGroup = document.createElement('div');
+        newInputGroup.classList.add('inputGroup');
+
+        const newLabel = document.createElement('label');
+        newLabel.setAttribute('for', `answer_${fieldCount}`);
+        newLabel.textContent = `Odpowiedź ${fieldCount + 1}:`;
+
+        const newInput = document.createElement('input');
+        newInput.setAttribute('type', 'text');
+        newInput.setAttribute('id', `answer_${fieldCount}`);
+        newInput.setAttribute('name', `answer_${fieldCount}`);
+        newInput.setAttribute('placeholder', `Odpowiedź`);
+        newInput.setAttribute('list', 'answer_database');
+        newInput.classList.add('form-control', 'me-2');
+
+        const newCheckboxLabel = document.createElement('label');
+        newCheckboxLabel.setAttribute('for', `correct_${fieldCount}`);
+        newCheckboxLabel.textContent = 'Poprawna odpowiedź';
+
+        const newCheckbox = document.createElement('input');
+        newCheckbox.setAttribute('type', 'checkbox');
+        newCheckbox.setAttribute('id', `correct_${fieldCount}`);
+        newCheckbox.setAttribute('name', `correct_${fieldCount}`);
+        newCheckbox.classList.add('correct');
+
+        newCheckbox.addEventListener('change', updateNumberOfResponses);
+
+        newInputGroup.appendChild(newLabel);
+        newInputGroup.appendChild(newInput);
+        newInputGroup.appendChild(newCheckboxLabel);
+        newInputGroup.appendChild(newCheckbox);
+        document.getElementById('inputContainer').appendChild(newInputGroup);
+
+        newInput.focus();
+
+        fieldCount++;
+    });
+
+    document.querySelectorAll('input[type="checkbox"].correct').forEach(checkbox => {
+        checkbox.addEventListener('change', updateNumberOfResponses);
+    });
+
+    updateNumberOfResponses();
+});
+</script>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_add' %}
+{% endblock %}
+
+

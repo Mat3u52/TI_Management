@@ -1,4 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
@@ -31,32 +33,75 @@
         <p><b>Koniec:</b> {{voting.date_end}} </p>
         <div id="countdown"></div>
         <br />
+        <div id="actualization" style="display: none">
         <p>
             <a href="{% url 'TI_Management_app:voting_edit' pk=voting.pk %}" class="btn btn-primary btn-large pull-right">
                 Aktualizuj
             </a>
         </p>
+        </div>
+        <div id="start" style="display: none">
+            <p>
+                <a href="#" class="btn btn-success btn-large pull-right">
+                    Rozpocznij Głosowanie
+                </a>
+            </p>
+        </div>
         <br />
         <br />
         <p><b>Karta głosowania:</b></p>
         <br />
         {% for poll in voting.votePoll.all %}
         <h4>{{ poll.question }}</h4>
-            <hr>
             <em><small>{{ poll.description|safe }}</small></em>
-            <ul>
-                {% for choice in poll.pollChoice.all %}
-                    <li>
-                        {% if choice.correct %}
-                            <span style="color:green">{{ choice.answer }}</span>
-                        {% else %}
-                            {{ choice.answer }}
-                        {% endif %}
-                    </li>
-                {% endfor %}
-            </ul>
-            <p style="text-align: right; margin-left: auto;"><small>Ilość dopuszczalnych wyborów:</small> {{ poll.number_of_responses }}</p>
+        <hr>
+        <table>
+            {% for choice in poll.pollChoice.all %}
+                    {% if choice.correct %}
+                        <tr>
+                            <td>
+                                <span style="color:green">{{ choice.answer }}</span>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td>
+                                {{ choice.answer }}
+                                {% if choice.answer|member_full_name_exist %}
+                                    {{ choice.answer|member_full_name_exist }}
+                                {% endif %}
+                                {% with choice.answer|member_img_exist as image_url %}
+                                    {% if image_url %}
+                                        <img src="{% thumbnail image_url 150x0  quality=100 %}">
+                                    {% endif %}
+                                {% endwith %}
+                            </td>
+                        </tr>
+                    {% endif %}
+            {% endfor %}
+        </table>
+<!--            <ul>-->
+<!--                {% for choice in poll.pollChoice.all %}-->
+<!--                    <li>-->
+<!--                        {% if choice.correct %}-->
+<!--                            <span style="color:green">{{ choice.answer }}</span>-->
+<!--                        {% else %}-->
+<!--                            {{ choice.answer }}-->
+<!--                        {% endif %}-->
+<!--                    </li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
+        <p style="text-align: right; margin-left: auto;"><small>Ilość dopuszczalnych wyborów:</small> {{ poll.number_of_responses }}</p>
+        <div id="actualizationPoll">
+            <p>
+                <a href="{% url 'TI_Management_app:voting_edit_poll' pk=voting.pk poll_pk=poll.pk %}" class="btn btn-primary btn-large pull-right">
+                    Aktualizuj pytanie
+                </a>
+            </p>
+        </div>
 
+            <br />
+            <br />
             <br />
         {% endfor %}
 
@@ -67,6 +112,7 @@
 <script>
 const dateStart = new Date("{{ voting.date_start|date:'Y-m-d H:i:s' }}").getTime();
 const dateEnd = new Date("{{ voting.date_end|date:'Y-m-d H:i:s' }}").getTime();
+
 
 function updateCountdown(targetDate, message) {
     const now = new Date().getTime();
@@ -87,14 +133,24 @@ function updateCountdown(targetDate, message) {
 }
 
 function countdown() {
+
     let countdownActive = updateCountdown(dateStart, "<b>Rozpoczęcie głosowania:</b>");
+    start.style.display = 'none';
+    actualization.style.display = 'block';
+    actualizationPoll.style.display = 'block';
 
     if (!countdownActive) {
+        actualization.style.display = 'none';
+        actualizationPoll.style.display = 'none';
+        start.style.display = 'block';
         countdownActive = updateCountdown(dateEnd, "<b>Zakończenie głosowania:</b>");
     }
 
     if (!countdownActive) {
         document.getElementById("countdown").innerHTML = "Głosowanie zakończone";
+        actualization.style.display = 'none';
+        actualizationPoll.style.display = 'none';
+        start.style.display = 'none';
     }
 }
 

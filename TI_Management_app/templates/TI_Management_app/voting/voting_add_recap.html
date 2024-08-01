@@ -1,5 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
+{% load thumbnail %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
@@ -20,17 +21,43 @@
         <div class="notepad">
             <p><b>{{ poll.question }}</b></p>
             <p><em><small>{{ poll.description|safe }}</small></em></p>
-            <ul>
+            <hr>
+            <table>
                 {% for choice in poll.pollChoice.all %}
-                    <li>
                         {% if choice.correct %}
-                            <span style="color:green">{{ choice.answer }}</span>
+                            <tr>
+                                <td>
+                                    <span style="color:green">{{ choice.answer }}</span>
+                                </td>
+                            </tr>
                         {% else %}
-                            {{ choice.answer }}
+                            <tr>
+                                <td>
+                                    {{ choice.answer }}
+                                    {% if choice.answer|member_full_name_exist %}
+                                        {{ choice.answer|member_full_name_exist }}
+                                    {% endif %}
+                                    {% with choice.answer|member_img_exist as image_url %}
+                                        {% if image_url %}
+                                            <img src="{% thumbnail image_url 150x0  quality=100 %}">
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                            </tr>
                         {% endif %}
-                    </li>
                 {% endfor %}
-            </ul>
+            </table>
+<!--            <ul>-->
+<!--                {% for choice in poll.pollChoice.all %}-->
+<!--                    <li>-->
+<!--                        {% if choice.correct %}-->
+<!--                            <span style="color:green">{{ choice.answer }}</span>-->
+<!--                        {% else %}-->
+<!--                            {{ choice.answer }}-->
+<!--                        {% endif %}-->
+<!--                    </li>-->
+<!--                {% endfor %}-->
+<!--            </ul>-->
             <br />
             <p><b>Ilość dopuszczalnych wyborów:</b> {{ poll.number_of_responses }}</p>
 

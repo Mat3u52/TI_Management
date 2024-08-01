@@ -110,3 +110,15 @@ def member_img_exist(member_nr):
             return ''  # No image found, return an empty string or a default path if desired
     except MembersZZTI.DoesNotExist:
         return ''  # Member does not exist, return an empty string or a default path if desired
+
+
+@register.filter(name='member_full_name_exist')
+def member_full_name_exist(member_nr):
+    try:
+        member = MembersZZTI.objects.get(member_nr=member_nr)
+        if member.forename and member.surname:
+            return f"{member.forename} {member.surname}"
+        else:
+            return ''
+    except MembersZZTI.DoesNotExist:
+        return ''

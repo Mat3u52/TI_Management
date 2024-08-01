@@ -1,28 +1,50 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
 {% endblock %}
 
 {% block content %}
+
 <div class="hero-unit">
+<h2 class="fadeInUp-animation">Karty Lojalnościowe</h2>
+<hr>
+<br />
 <form class="d-flex" method=POST action="{% url 'TI_Management_app:loyalty_card_search' %}">
-        {% csrf_token %}
-        <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
-        type="search" placeholder="Szukaj katry lojalnościowej" aria-label="Search" name="searched">
+    {% csrf_token %}
+    <input
+            class="form-control me-2"
+            style="min-width: 100%!important; min-height: 35px"
+            type="search"
+            placeholder="Szukaj katry lojalnościowej"
+            aria-label="Search"
+            name="searched">
+    <br />
+    <br />
         <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
+    <br />
 </form>
 </div>
+
 {% for card in loyalty_card %}
     <div class="hero-unit">
-        <h2><a href="{% url 'TI_Management_app:loyalty_card_detail' pk=card.pk category='none' %}">
-            {{card.card_name}}
-        </a></h2>
+        <h3>
+            <a href="{% url 'TI_Management_app:loyalty_card_detail' pk=card.pk category='none' %}">
+                {{card.card_name}}
+            </a>
+        </h3>
+        <hr>
+        <div class="notepad">
+        <p><b>Ilość uczestników:</b> {{ card.member_count }}</p>
+        <p>
+            <a href="{% url 'TI_Management_app:loyalty_card_detail' pk=card.pk category='none' %}" class="btn btn-primary btn-large pull-right">
+                Więcej informacji
+            </a>
+        </p>
 
-        <p><a href="{% url 'TI_Management_app:loyalty_card_detail' pk=card.pk category='none' %}" class="btn btn-primary btn-large pull-right">
-            Więcej informacji
-        </a></p>
         <div class="date"><p>Data dodania: {{card.created_date}}</p></div>
+
+        </div>
     </div>
 {% endfor %}
 
