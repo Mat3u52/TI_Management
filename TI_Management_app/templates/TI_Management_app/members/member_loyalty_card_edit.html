@@ -3,21 +3,34 @@
 
 {% block breadcrumbs %}
 
-<a href="{% url 'TI_Management_app:members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>
-<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"> / {{member.forename}} {{member.surname}} {{member.member_nr}}</a>
-<a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"> / Modyfikuj Kartę Lojalnościową</a>
+<!--<a href="{% url 'TI_Management_app:members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>-->
+<!--<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>-->
+<!--<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} {{member.member_nr}}</b></a>-->
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
+<!--<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=member_loyalty_card.pk category='none' %}"><b> / {{member_loyalty_card.card_name}}</b></a>-->
+<a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"><b> / Aktualizacja</b></a>
 {% endblock %}
 
 {% block content %}
 
     <div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja karty: {{member_loyalty_card.card}} - {{member.forename}} {{member.surname}}</h2>
+    <hr>
+    <br />
 
         {% if form.errors %}
-            <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
 
-        <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
-        <p>Karty Lojalnościowe</p>
+        <h3>
+            <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                {{member.forename}} {{member.surname}} - {{member.member_nr}}
+            </a>
+        </h3>
+        <br />
+
         <form method="post" class="post-form" enctype="multipart/form-data">
 <!--            {{ form.as_p }}-->
             {% csrf_token %}
@@ -27,32 +40,28 @@
 <!--            <p>{{form.date_of_action}}</p>-->
             <table width="100%">
                 <tr>
-                    <td>Rodzaj karty: </td>
+                    <td><b>Rodzaj karty: </b></td>
                     <td>{{member_loyalty_card.card}}{{form.card.as_hidden}}</td>
                 </tr>
                 <tr>
-                    <td>Numer karty: </td>
+                    <td><b>Numer karty: </b></td>
 <!--                    <td>{{form.card_identity}}</td>-->
 
                     <td>
                         {{member_loyalty_card.card_identity}}
-                        <a href="{% url 'TI_Management_app:member_loyalty_card_id_edit' pk=member_loyalty_card.member.pk pk1=member_loyalty_card.pk %}">aktualizuj</a>
-<!--                        {% if form.card_identity.errors %}-->
-<!--                            <p class="hint">{{form.card_identity}}</p>-->
-<!--                            <p>{{form.card_identity.errors}}</p>-->
-<!--                        {% else %}-->
-<!--                            <p>{{form.card_identity}}</p>-->
-<!--                        {% endif %}-->
+                        <a href="{% url 'TI_Management_app:member_loyalty_card_id_edit' pk=member.pk pk1=member_loyalty_card.pk %}">
+                            - aktualizuj numer karty lojalnościowej
+                        </a>
                     </td>
 
 
                 </tr>
                 <tr>
-                    <td>Startowy PIN: </td>
+                    <td><b>Startowy PIN: </b></td>
                     <td>{{form.card_start_pin}}</td>
                 </tr>
                 <tr>
-                    <td>Status karty: </td>
+                    <td><b>Status karty: </b></td>
                     <td>{{form.card_status}}</td>
                 </tr>
 <!--                <tr>-->
@@ -60,7 +69,7 @@
 <!--                    <td>{{form.date_of_action}}</td>-->
 <!--                </tr>-->
                 <tr>
-                    <td>Potwierdzenie odbioru: </td>
+                    <td><b>Potwierdzenie odbioru: </b></td>
                     <td>{{form.confirmed}}</td>
                 </tr>
                 <tr>
@@ -68,13 +77,19 @@
                     <td>{{form.responsible}}</td>
                 </tr>
             </table>
+            <br />
+            {{form.member.as_hidden}}
+            {{form.confirmed_hid}}
+            <br />
+            <br />
             <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+            <br />
             <br />
             <br />
 <!--        </form>-->
 
         <div class="notepad">
-        <p>Historia:</p>
+        <p><b>Historia:</b></p>
             <table width="100%">
             {% for h in member_loyalty_card.history.all %}
                 <tr>
@@ -104,7 +119,7 @@
         {% if member_loyalty_card.file or member_loyalty_card.ordered_doc %}
         {% else %}
         <div class="notepad">
-            <p>Przypisanie dokumentu zlecenia:</p>
+            <p><b>Przypisanie dokumentu zlecenia:</b></p>
             <table width="100%">
 <!--                <tr>-->
 <!--                    <td>Numer dokumentu: </td>-->
@@ -133,7 +148,7 @@
 
         {% if member_loyalty_card.file %}
         <div class="notepad">
-            <p>Przypisany dokument zlecenia:</p>
+            <p><b>Przypisany dokument zlecenia:</b></p>
             <table width="100%">
                 <tr>
                     <td>Numer dokumentu: </td>
@@ -166,7 +181,7 @@
         {% endif %}
         {% if member_loyalty_card.ordered_doc %}
             <div class="notepad">
-            <p>Przypisany dokument zlecenia:</p>
+            <p><b>Przypisany dokument zlecenia:</b></p>
             <table width="100%">
                 <tr>
                     <td>Numer dokumentu: </td>
@@ -201,7 +216,7 @@
         {% if member_loyalty_card.file_a or member_loyalty_card.to_be_picked_up_doc %}
         {% else %}
         <div class="notepad">
-            <p>Przypisanie dokumentu odbioru:</p>
+            <p><b>Przypisanie dokumentu odbioru:</b></p>
             <table width="100%">
 <!--                <tr>-->
 <!--                    <td>Numer dokumentu: </td>-->
@@ -230,7 +245,7 @@
 
         {% if member_loyalty_card.file_a %}
         <div class="notepad">
-            <p>Przypisany dokument odbioru:</p>
+            <p><p>Przypisany dokument odbioru:</p></p>
             <table width="100%">
                 <tr>
                     <td>Numer dokumentu: </td>
@@ -264,7 +279,7 @@
 
         {% if member_loyalty_card.to_be_picked_up_doc %}
             <div class="notepad">
-            <p>Przypisany dokument zlecenia:</p>
+            <p><b>Przypisany dokument zlecenia:</b></p>
             <table width="100%">
                 <tr>
                     <td>Numer dokumentu: </td>
@@ -344,5 +359,5 @@
 {% endblock %}
 
 {% block menu %}
-    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
 {% endblock %}

@@ -1,0 +1,57 @@
+{% extends 'TI_Management_app/base.html' %}
+
+
+{% block breadcrumbs %}
+
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"><b> / Aktualizuj numer karty lojalnościowej</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+<h2 class="fadeInUp-animation">Aktualizacja numeru karty: {{member_loyalty_card.card}} - {{member.forename}} {{member.surname}}</h2>
+<hr>
+<br />
+    {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>{{form.errors}}</p>
+        </div>
+    {% endif %}
+    <h3><a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+    <br />
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table width="100%">
+            <tr>
+                <td><b>Rodzaj karty: </b></td>
+                <td>{{member_loyalty_card.card}}{{form.card.as_hidden}}</td>
+            </tr>
+            <tr>
+                <td><b>Numer karty: </b></td>
+                <td>
+                    {% if form.card_identity.errors %}
+                        <p class="hint">{{form.card_identity}}</p>
+                        <p>{{form.card_identity.errors}}</p>
+                    {% else %}
+                        <p>{{form.card_identity}}</p>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td></td>
+                <td>{{form.responsible}}</td>
+            </tr>
+        </table>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
+        <br />
+        <br />
+    </form>
+</div>
+{% endblock %}
+
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='loyalty_card' %}
+{% endblock %}
