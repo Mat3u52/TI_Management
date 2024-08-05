@@ -385,6 +385,13 @@ class MemberCardEditForm(forms.ModelForm):
                 'placeholder': 'Przyłóż kartę do czytnika'
             }
         ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Długość jest niepoprawna."
+            )
+        ],
+        max_length=100,
         required=False
     )
 
@@ -401,6 +408,19 @@ class MemberCardEditForm(forms.ModelForm):
             if MembersZZTI.objects.filter(card=card).exclude(id=self.instance.id).exists():
                 raise ValidationError(f"Karta jest już przypisana do innego Członka.")
         return card
+    # def clean_card(self):
+    #     card = self.cleaned_data.get('card')
+    #     if card:
+    #         hashed_card = make_password(card)
+    #
+    #         # Exclude the current instance from the check (if it exists)
+    #         if MembersZZTI.objects.filter(card=hashed_card).exclude(id=self.instance.id).exists():
+    #             raise ValidationError("Karta jest już przypisana do innego Członka.")
+    #
+    #         # Replace the raw card data with the hashed version
+    #         self.cleaned_data['card'] = hashed_card
+    #
+    #     return card
 
 
 class MemberEditForm(forms.ModelForm):
@@ -865,6 +885,16 @@ class CardStatusForm(forms.ModelForm):
         required=False
     )
 
+    confirmed_hid = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        required=False
+    )
+
     responsible = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
@@ -883,47 +913,179 @@ class CardStatusForm(forms.ModelForm):
             'file_a',
             'file_a_date',
             'responsible',
-            'confirmed'
+            'confirmed',
+            'member',
+            'confirmed_hid'
         ]
 
         widgets = {
-            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_action': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'file_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'file_a_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'card_status': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        member = cleaned_data.get('member')
+        confirmed_hid = cleaned_data.get('confirmed_hid')
+
+        if member and confirmed_hid:
+            try:
+                # Ensure 'member' is an instance of MembersZZTI and use its id for lookup
+                if isinstance(member, MembersZZTI):
+                    member_id = member.id
+                else:
+                    raise ValidationError("Invalid member information provided.")
+
+                # Retrieve the member object using the correct identifier
+                member_with_card = MembersZZTI.objects.get(id=member_id)
+
+                # Check if the entered confirmed_hid matches the stored hashed card
+                if not check_password(confirmed_hid, member_with_card.card):
+                    raise ValidationError("Podana karta nie jest prawidłowa.")
+
+            except MembersZZTI.DoesNotExist:
+                raise ValidationError("Członek nie istnieje.")
+
+            except Exception as e:
+                raise ValidationError(f"Wystąpił problem: {str(e)}")
+
+        else:
+            if not member:
+                raise ValidationError("Pole 'member' jest wymagane.")
+            # if not confirmed_hid:
+            #     raise ValidationError("Pole 'confirmed_hid' jest wymagane.")
+
+        return cleaned_data
 
 
 class CardStatusEditForm(forms.ModelForm):
 
     card_start_pin = forms.CharField(
         validators=[
-            RegexValidator(r'^\d{0,10}$',
-                           message="To pole musi być liczbą.")],
-        required=False)
+            RegexValidator(
+                regex=r'^\d{0,10}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        required=False
+    )
+
+    confirmed_hid = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        required=False
+    )
 
     responsible = forms.CharField(widget=forms.HiddenInput())
 
     class Meta:
         model = CardStatus
-        fields = ['ordered_doc',
-                  'to_be_picked_up_doc',
-                  'card_start_pin',
-                  'card_status',
-                  'date_of_action',
-                  'file_name',
-                  'file',
-                  'file_date',
-                  'file_name_a',
-                  'file_a',
-                  'file_a_date',
-                  'responsible',
-                  'confirmed']
+        fields = [
+            'ordered_doc',
+            'to_be_picked_up_doc',
+            'card_start_pin',
+            'card_status',
+            'date_of_action',
+            'file_name',
+            'file',
+            'file_date',
+            'file_name_a',
+            'file_a',
+            'file_a_date',
+            'responsible',
+            'confirmed',
+            'member',
+            'confirmed_hid'
+        ]
 
         widgets = {
-            'date_of_action': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
-            'file_a_date': forms.TextInput(attrs={'type': 'datetime-local'}),
+            'date_of_action': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'file_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'file_a_date': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+            'card_status': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'ordered_doc': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
+            'to_be_picked_up_doc': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            )
         }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        member = cleaned_data.get('member')
+        confirmed_hid = cleaned_data.get('confirmed_hid')
+
+        if member and confirmed_hid:
+            try:
+                # Ensure 'member' is an instance of MembersZZTI and use its id for lookup
+                if isinstance(member, MembersZZTI):
+                    member_id = member.id
+                else:
+                    raise ValidationError("Invalid member information provided.")
+
+                # Retrieve the member object using the correct identifier
+                member_with_card = MembersZZTI.objects.get(id=member_id)
+
+                # Check if the entered confirmed_hid matches the stored hashed card
+                if not check_password(confirmed_hid, member_with_card.card):
+                    raise ValidationError("Podana karta nie jest prawidłowa.")
+
+            except MembersZZTI.DoesNotExist:
+                raise ValidationError("Członek nie istnieje.")
+
+            except Exception as e:
+                raise ValidationError(f"Wystąpił problem: {str(e)}")
+
+        else:
+            if not member:
+                raise ValidationError("Pole 'member' jest wymagane.")
+            # if not confirmed_hid:
+            #     raise ValidationError("Pole 'confirmed_hid' jest wymagane.")
+
+        return cleaned_data
 
 
 class CardStatusCardIDForm(forms.ModelForm):
@@ -932,8 +1094,11 @@ class CardStatusCardIDForm(forms.ModelForm):
         validators=[
             RegexValidator(
                 regex=r'^[a-z0-9]+$',
-                message="To pole może składać się tylko z liczb i małych liter.")],
-        required=False)
+                message="To pole może składać się tylko z liczb i małych liter."
+            )
+        ],
+        required=False
+    )
 
     responsible = forms.CharField(widget=forms.HiddenInput())
 
@@ -1231,46 +1396,37 @@ class LoyaltyCardAddMemberForm(forms.ModelForm):
             ),
         }
 
-    # def clean(self):
-    #     cleaned_data = super().clean()
-    #     card = cleaned_data.get('confirmed_hid')
-    #     # member = cleaned_data.get('member')
-    #
-    #     if card:
-    #         # Check if the card exists in the Cards model
-    #         if not MembersZZTI.objects.filter(card=card).exists():
-    #             raise ValidationError(f"Karta nie istnieje.")
-    #
-    #         # Exclude the current instance from the check if it's an update
-    #         existing_member = MembersZZTI.objects.filter(card=card).exclude(id=self.instance.id).first()
-    #         if existing_member:
-    #             raise ValidationError(
-    #                 f"Karta jest przypisana do innego Członka (ID: {existing_member.id}).")
-    #
-    #     return cleaned_data
     def clean(self):
         cleaned_data = super().clean()
-        card = cleaned_data.get('confirmed_hid')
+        member = cleaned_data.get('member')
+        confirmed_hid = cleaned_data.get('confirmed_hid')
 
-        if card:
+        if member and confirmed_hid:
             try:
-                # Retrieve the member object with the corresponding hashed card
-                member_with_card = MembersZZTI.objects.filter(card=card).first()
-                if not member_with_card:
-                    raise ValidationError("Karta nie istnieje.")
+                # Ensure 'member' is an instance of MembersZZTI and use its id for lookup
+                if isinstance(member, MembersZZTI):
+                    member_id = member.id
+                else:
+                    raise ValidationError("Invalid member information provided.")
 
-                # Check if the entered card matches the stored hashed card
-                if not check_password(card, member_with_card.card):
+                # Retrieve the member object using the correct identifier
+                member_with_card = MembersZZTI.objects.get(id=member_id)
+
+                # Check if the entered confirmed_hid matches the stored hashed card
+                if not check_password(confirmed_hid, member_with_card.card):
                     raise ValidationError("Podana karta nie jest prawidłowa.")
 
-                # Exclude the current instance from the check if it's an update
-                existing_member = MembersZZTI.objects.filter(card=member_with_card.card).exclude(
-                    id=self.instance.id).first()
-                if existing_member:
-                    raise ValidationError(f"Karta jest przypisana do innego Członka (ID: {existing_member.id}).")
-
             except MembersZZTI.DoesNotExist:
-                raise ValidationError("Wystąpił problem podczas weryfikacji karty. Spróbuj ponownie.")
+                raise ValidationError("Członek nie istnieje.")
+
+            except Exception as e:
+                raise ValidationError(f"Wystąpił problem: {str(e)}")
+
+        else:
+            if not member:
+                raise ValidationError("Pole 'member' jest wymagane.")
+            # if not confirmed_hid:
+            #     raise ValidationError("Pole 'confirmed_hid' jest wymagane.")
 
         return cleaned_data
 
@@ -1300,15 +1456,84 @@ class LoyaltyCardsAddMemberFileToBePickedUpForm(forms.ModelForm):
 
 
 class OrderedCardDocumentForm(forms.ModelForm):
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Nazwa dokumentu',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa dokumentu musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=150
+    )
+
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
+    )
+
     class Meta:
         model = OrderedCardDocument
-        fields = ['card', 'title', 'file', 'responsible']
+        fields = [
+            'card',
+            'title',
+            'file',
+            'responsible'
+        ]
 
 
 class ToBePickedUpCardDocumentForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'aria-label': 'Nazwa dokumentu',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa dokumentu musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=150
+    )
+
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
+    )
+
     class Meta:
         model = ToBePickedUpCardDocument
-        fields = ['card', 'title', 'file', 'responsible']
+        fields = [
+            'card',
+            'title',
+            'file',
+            'responsible'
+        ]
 
 
 class ExportDataToTXTForm(forms.Form):
@@ -2614,6 +2839,11 @@ class VotingAddChoiceForm(forms.Form):
             }
         ),
         label='Poprawna odpowiedź'
+    )
+
+    open_ended_answer = forms.BooleanField(
+        label="Pytanie otwarte",
+        required=False
     )
 
 

@@ -1,14 +1,13 @@
 {% extends 'TI_Management_app/base.html' %}
-
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
-
 <!--<a href="{% url 'TI_Management_app:members_list' %}" xmlns="http://www.w3.org/1999/html"> / Baza Członków </a>-->
-<!--<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>-->
-<!--<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} {{member.member_nr}}</b></a>-->
-<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} {{member.member_nr}}</b></a>
+<!--<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>-->
 <!--<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=member_loyalty_card.pk category='none' %}"><b> / {{member_loyalty_card.card_name}}</b></a>-->
-<a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"><b> / Aktualizacja</b></a>
+<a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=member.pk pk1=member_loyalty_card.pk %}"><b> / Aktualizacja karty lojalnościowej {{ member_loyalty_card.card }}</b></a>
 {% endblock %}
 
 {% block content %}
@@ -139,7 +138,7 @@
 <!--                    </td>-->
 <!--                </tr>-->
                 <tr>
-                    <td>Dodaj dokument: </td>
+                    <td><b>Dodaj dokument: </b></td>
                     <td>{{ form.ordered_doc }}</td>
                 </tr>
             </table>
@@ -151,7 +150,7 @@
             <p><b>Przypisany dokument zlecenia:</b></p>
             <table width="100%">
                 <tr>
-                    <td>Numer dokumentu: </td>
+                    <td><b>Numer dokumentu: </b></td>
                     <td>
                         {% if member_loyalty_card.file %}
                             <a href="{{ member_loyalty_card.file.url }}">{{ member_loyalty_card.file_name }}</a>
@@ -159,19 +158,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Nazwa pliku: </td>
+                    <td><b>Nazwa pliku: </b></td>
                     {% if member_loyalty_card.file %}
-                        <td>{{ member_loyalty_card.file }}</td>
+                        <td>{{ member_loyalty_card.file|filename }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Data: </td>
+                    <td><b>Data: </b></td>
                     {% if member_loyalty_card.file %}
                         <td>{{ member_loyalty_card.file_date }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Dodany przez: </td>
+                    <td><b>Dodany przez: </b></td>
                     {% if member_loyalty_card.file %}
                         <td>{{ member_loyalty_card.responsible }}</td>
                     {% endif %}
@@ -184,7 +183,7 @@
             <p><b>Przypisany dokument zlecenia:</b></p>
             <table width="100%">
                 <tr>
-                    <td>Numer dokumentu: </td>
+                    <td><b>Numer dokumentu: </b></td>
                     <td>
                         {% if member_loyalty_card.ordered_doc.file %}
                             <a href="{{ member_loyalty_card.ordered_doc.file.url }}">{{ member_loyalty_card.ordered_doc.title }}</a>
@@ -192,19 +191,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Nazwa pliku: </td>
+                    <td><b>Nazwa pliku: </b></td>
                     {% if member_loyalty_card.ordered_doc.file %}
-                        <td>{{ member_loyalty_card.ordered_doc.file|cut:'OrderedCardDocument/' }}</td>
+                        <td>{{ member_loyalty_card.ordered_doc.file|filename }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Data: </td>
+                    <td><b>Data: </b></td>
                     {% if member_loyalty_card.ordered_doc.file %}
                         <td>{{ member_loyalty_card.ordered_doc.created_date }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Dodany przez: </td>
+                    <td><b>Dodany przez: </b></td>
                     {% if member_loyalty_card.ordered_doc.file %}
                         <td>{{ member_loyalty_card.ordered_doc.responsible }}</td>
                     {% endif %}
@@ -236,7 +235,7 @@
 <!--                    </td>-->
 <!--                </tr>-->
                 <tr>
-                    <td>Dodaj dokument: </td>
+                    <td><b>Dodaj dokument: </b></td>
                     <td>{{ form.to_be_picked_up_doc }}</td>
                 </tr>
             </table>
@@ -248,7 +247,7 @@
             <p><p>Przypisany dokument odbioru:</p></p>
             <table width="100%">
                 <tr>
-                    <td>Numer dokumentu: </td>
+                    <td><b>Numer dokumentu: </b></td>
                     <td>
                         {% if member_loyalty_card.file_a %}
                             <a href="{{ member_loyalty_card.file_a.url }}">{{ member_loyalty_card.file_name_a }}</a>
@@ -256,19 +255,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Nazwa pliku: </td>
+                    <td><b>Nazwa pliku: </b></td>
                     {% if member_loyalty_card.file_a %}
-                        <td>{{ member_loyalty_card.file_a }}</td>
+                        <td>{{ member_loyalty_card.file_a|filename }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Data: </td>
+                    <td><b>Data: </b></td>
                     {% if member_loyalty_card.file_a %}
                         <td>{{ member_loyalty_card.file_a_date }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Dodany przez: </td>
+                    <td><b>Dodany przez: </b></td>
                     {% if member_loyalty_card.file_a %}
                         <td>{{ member_loyalty_card.responsible }}</td>
                     {% endif %}
@@ -282,7 +281,7 @@
             <p><b>Przypisany dokument zlecenia:</b></p>
             <table width="100%">
                 <tr>
-                    <td>Numer dokumentu: </td>
+                    <td><b>Numer dokumentu: </b></td>
                     <td>
                         {% if member_loyalty_card.to_be_picked_up_doc.file %}
                             <a href="{{ member_loyalty_card.to_be_picked_up_doc.file.url }}">{{ member_loyalty_card.to_be_picked_up_doc.title }}</a>
@@ -290,19 +289,19 @@
                     </td>
                 </tr>
                 <tr>
-                    <td>Nazwa pliku: </td>
+                    <td><b>Nazwa pliku: </b></td>
                     {% if member_loyalty_card.to_be_picked_up_doc.file %}
-                        <td>{{ member_loyalty_card.to_be_picked_up_doc.file|cut:'ToBePickedUpCardDocument/' }}</td>
+                        <td>{{ member_loyalty_card.to_be_picked_up_doc.file|filename }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Data: </td>
+                    <td><b>Data: </b></td>
                     {% if member_loyalty_card.to_be_picked_up_doc.file %}
                         <td>{{ member_loyalty_card.to_be_picked_up_doc.created_date }}</td>
                     {% endif %}
                 </tr>
                 <tr>
-                    <td>Dodany przez: </td>
+                    <td><b>Dodany przez: </b></td>
                     {% if member_loyalty_card.to_be_picked_up_doc.file %}
                         <td>{{ member_loyalty_card.to_be_picked_up_doc.responsible }}</td>
                     {% endif %}

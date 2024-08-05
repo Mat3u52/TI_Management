@@ -786,7 +786,8 @@ class ChoiceAdmin(admin.ModelAdmin):
         'author',
         'poll',
         'answer',
-        'correct'
+        'correct',
+        'open_ended_answer'
     )
     list_filter = (
         'created_date',
@@ -795,7 +796,8 @@ class ChoiceAdmin(admin.ModelAdmin):
         'author',
         'poll',
         'answer',
-        'correct'
+        'correct',
+        'open_ended_answer'
     )
     search_fields = (
         'poll',

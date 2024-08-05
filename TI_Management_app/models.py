@@ -255,7 +255,13 @@ class Vote(models.Model):
     date_end = models.DateTimeField(default=None, blank=True, null=True)
     importance = models.BooleanField(default=False)
 
+    min_amount_members = models.IntegerField(null=False, blank=False, default=0)
+    min_amount_commission = models.IntegerField(null=False, blank=False, default=0)
+    turnout = models.IntegerField(null=False, blank=False, default=0)
+
     members = models.ManyToManyField(MembersZZTI, related_name='voteMember')
+
+    election_commission = models.ManyToManyField(MembersZZTI, related_name='voteElectionCommission')
 
     history = HistoricalRecords()
 
@@ -281,20 +287,6 @@ class Vote(models.Model):
 
     def get_absolute_url(self):
         return reverse('TI_Management_app:voting_add', args=[self.pk])
-
-
-# class VoteMethod(models.Model):
-#
-#     class VoteMethodChoices(models.TextChoices):
-#         OFFLINE_VOTING = 'lums_voting_station', 'LUMS Voting Station'
-#         ONLINE_VOTING = 'lums_online', 'LUMS Online'
-#
-#     method = models.CharField(max_length=100, unique=True, choices=VoteMethodChoices.choices)
-#
-#     objects = models.Manager()  # default manager
-#
-#     def __str__(self):
-#         return self.get_method_display()
 
 
 class Poll(models.Model):
@@ -332,6 +324,7 @@ class Choice(models.Model):
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, null=True, related_name='pollChoice')
     answer = models.CharField(max_length=250, blank=False, default=None)
     correct = models.BooleanField(default=False)
+    open_ended_answer = models.BooleanField(default=False)
     # status = models.BooleanField(default=False)
     # status_description = models.BooleanField(default=False)
 

@@ -21,7 +21,7 @@
     </li>
     <li class="{% if active_tab == 'member_occupation_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:member_occupation_add' %}">
-            <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;stanowsko</b>
+            <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;stanowisko</b>
         </a>
     </li>
     <hr>
@@ -43,22 +43,30 @@
         </a>
     </li>
     <hr>
+    <li class="{% if active_tab == 'participation_tools_list' %} active {% endif %}">
+        <a href="#"><h4><b>Głosowania, ankiety i konkursy</b></h4></a>
+    </li>
     <li class="{% if active_tab == 'voting_list' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:voting_list' %}"><h4><b>Głosowania</b></h4></a>
+        <a href="{% url 'TI_Management_app:voting_list' %}"><b>&#160;&#160;&#8226;&nbsp;Głosowania</b></a>
     </li>
     <li class="{% if active_tab == 'voting_add' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:voting_add' %}">
-            <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;nowe&nbsp;głosowanie</b>
+            &#160;&#160;&#160;&#160;&#8728;&nbsp;dodaj&nbsp;nowe&nbsp;głosowanie
         </a>
     </li>
     <li class="{% if active_tab == 'voting_report' %} active {% endif %}">
         <a href="#">
-            <b>&#160;&#160;&#8226;&nbsp;raportowanie</b>
+            &#160;&#160;&#160;&#160;&#8728;&nbsp;historia i raportowanie
         </a>
     </li>
     <li class="{% if active_tab == 'voting_import' %} active {% endif %}">
         <a href="#">
-            <b>&#160;&#160;&#8226;&nbsp;importuj&nbsp;dane&nbsp;ze&nbsp;stacji&nbsp;głosowania</b>
+            &#160;&#160;&#160;&#160;&#8728;&nbsp;importuj&nbsp;dane&nbsp;ze&nbsp;stacji&nbsp;głosowania
+        </a>
+    </li>
+    <li class="{% if active_tab == 'voting_import' %} active {% endif %}">
+        <a href="#">
+            &#160;&#160;&#160;&#160;&#8728;&nbsp;aktywne sesje głosowania
         </a>
     </li>
     <hr>
@@ -84,7 +92,7 @@
         <a href="{% url 'TI_Management_app:scholarships_add_search' %}">&#160;&#160;&#160;&#160;&#8728;&nbsp;dodaj&nbsp;stypendium</a>
     </li>
     <li class="{% if active_tab == 'average_salary' %} active {% endif %}">
-        <a href="{% url 'TI_Management_app:scholarships_average_salary_add' %}">&#160;&#160;&#160;&#160;&#8728;&nbsp;dodaj&nbsp;przeciętne&nbsp;pwynagrodzenie</a>
+        <a href="{% url 'TI_Management_app:scholarships_average_salary_add' %}">&#160;&#160;&#160;&#160;&#8728;&nbsp;dodaj&nbsp;przeciętne&nbsp;wynagrodzenie</a>
     </li>
     <li class="{% if active_tab == 'relief' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:relief_status_list' %}">

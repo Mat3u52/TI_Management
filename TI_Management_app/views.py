@@ -1062,9 +1062,7 @@ def loyalty_card_add_member(request, pk, pk1):
     if request.method == "POST":
         form = LoyaltyCardAddMemberForm(request.POST)
         if form.is_valid():
-
             confirmed_hid = form.cleaned_data['confirmed_hid']
-
             loyalty_card_member = form.save(commit=False)
             loyalty_card_member.author = request.user
             loyalty_card_member.card = loyalty_card
@@ -1110,13 +1108,20 @@ def loyalty_cards_add_file_order(request, pk):
             return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
-        form = OrderedCardDocumentForm(initial={'card': loyalty_card,
-                                                'responsible': username})
-    return render(request, 'TI_Management_app/loyalty_cards_add_file_order.html',
-                  {
-                      'form': form,
-                      'loyalty_card': loyalty_card}
-                  )
+        form = OrderedCardDocumentForm(
+            initial={
+                'card': loyalty_card,
+                'responsible': username
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_cards_add_file_order.html',
+        {
+            'form': form,
+            'loyalty_card': loyalty_card
+        }
+    )
 
 
 @login_required
@@ -1133,97 +1138,104 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
             return redirect('TI_Management_app:loyalty_card_detail', pk=loyalty_card.pk, category='none')
     else:
         username = request.user.username
-        form = ToBePickedUpCardDocumentForm(initial={'card': loyalty_card,
-                                                     'responsible': username})
-    return render(request, 'TI_Management_app/loyalty_cards_add_file_to_be_picked_up.html',
-                  {
-                      'form': form,
-                      'loyalty_card': loyalty_card}
-                  )
-
-
-@login_required
-def loyalty_cards_add_member_file_order(request, pk):
-    loyalty_card = get_object_or_404(CardStatus, pk=pk)
-    if request.method == "POST":
-        form = LoyaltyCardsAddMemberFileOrderForm(request.POST, request.FILES, instance=loyalty_card)
-        if form.is_valid():
-            loyalty_card_member = form.save(commit=False)
-            loyalty_card_member.author = request.user
-            loyalty_card_member.file_date = timezone.now()
-            loyalty_card_member.save()
-            messages.success(request, f"Dodano dokument!")
-            return redirect('TI_Management_app:loyalty_card_list')
-    else:
-        form = LoyaltyCardsAddMemberFileOrderForm(instance=loyalty_card)
-    return render(request, 'TI_Management_app/loyalty_cards_add_member_file_order.html',
-                  {'form': form,
-                   'loyalty_card': loyalty_card})
-
-
-@login_required
-def loyalty_card_member_file_order_search(request, pk):
-    loyalty_card = get_object_or_404(Cards, pk=pk)
-    loyalty_card_validator = CardStatus.objects.all()
-    if request.method == "POST":
-        searched = request.POST.get('searched', False)
-        loyalty_card_member = MembersZZTI.objects.filter(
-            Q(forename__contains=searched.capitalize()) |
-            Q(surname__contains=searched.capitalize()) |
-            Q(member_nr__contains=searched) |
-            Q(phone_number__contains=searched)
+        form = ToBePickedUpCardDocumentForm(
+            initial={
+                'card': loyalty_card,
+                'responsible': username
+            }
         )
-        return render(request,
-                      'TI_Management_app/loyalty_card_member_file_order_search.html',
-                      {'searched': searched,
-                       'loyalty_card_member': loyalty_card_member,
-                       'loyalty_card': loyalty_card,
-                       'loyalty_card_validator': loyalty_card_validator})
-    else:
-        return render(request,
-                      'TI_Management_app/loyalty_card_member_file_order_search.html',
-                      {})
+    return render(
+        request,
+        'TI_Management_app/loyalty_card/loyalty_cards_add_file_to_be_picked_up.html',
+        {
+            'form': form,
+            'loyalty_card': loyalty_card
+        }
+    )
 
 
-@login_required
-def loyalty_cards_add_member_file_to_be_picked_up(request, pk):
-    loyalty_card = get_object_or_404(CardStatus, pk=pk)
-    if request.method == "POST":
-        form = LoyaltyCardsAddMemberFileToBePickedUpForm(request.POST, request.FILES, instance=loyalty_card)
-        if form.is_valid():
-            loyalty_card_member = form.save(commit=False)
-            loyalty_card_member.author = request.user
-            loyalty_card_member.file_a_date = timezone.now()
-            loyalty_card_member.save()
-            messages.success(request, "Dodano dokument!")
-            return redirect('TI_Management_app:loyalty_card_list')
-    else:
-        form = LoyaltyCardsAddMemberFileToBePickedUpForm(instance=loyalty_card)
-    return render(request, 'TI_Management_app/loyalty_cards_add_member_file_to_be_picked_up.html',
-                  {'form': form,
-                   'loyalty_card': loyalty_card})
+# @login_required
+# def loyalty_cards_add_member_file_order(request, pk):
+#     loyalty_card = get_object_or_404(CardStatus, pk=pk)
+#     if request.method == "POST":
+#         form = LoyaltyCardsAddMemberFileOrderForm(request.POST, request.FILES, instance=loyalty_card)
+#         if form.is_valid():
+#             loyalty_card_member = form.save(commit=False)
+#             loyalty_card_member.author = request.user
+#             loyalty_card_member.file_date = timezone.now()
+#             loyalty_card_member.save()
+#             messages.success(request, f"Dodano dokument!")
+#             return redirect('TI_Management_app:loyalty_card_list')
+#     else:
+#         form = LoyaltyCardsAddMemberFileOrderForm(instance=loyalty_card)
+#     return render(request, 'TI_Management_app/loyalty_cards_add_member_file_order.html',
+#                   {'form': form,
+#                    'loyalty_card': loyalty_card})
 
 
-@login_required
-def loyalty_card_member_file_to_be_picked_up_search(request, pk):
-    loyalty_card = get_object_or_404(Cards, pk=pk)
-    loyalty_card_validator = CardStatus.objects.all()
-    if request.method == "POST":
-        searched = request.POST.get('searched', False)
-        loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
-                                                         Q(surname__contains=searched.capitalize()) |
-                                                         Q(member_nr__contains=searched) |
-                                                         Q(phone_number__contains=searched))
-        return render(request,
-                      'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
-                      {'searched': searched,
-                       'loyalty_card_member': loyalty_card_member,
-                       'loyalty_card': loyalty_card,
-                       'loyalty_card_validator': loyalty_card_validator})
-    else:
-        return render(request,
-                      'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
-                      {})
+# @login_required
+# def loyalty_card_member_file_order_search(request, pk):
+#     loyalty_card = get_object_or_404(Cards, pk=pk)
+#     loyalty_card_validator = CardStatus.objects.all()
+#     if request.method == "POST":
+#         searched = request.POST.get('searched', False)
+#         loyalty_card_member = MembersZZTI.objects.filter(
+#             Q(forename__contains=searched.capitalize()) |
+#             Q(surname__contains=searched.capitalize()) |
+#             Q(member_nr__contains=searched) |
+#             Q(phone_number__contains=searched)
+#         )
+#         return render(request,
+#                       'TI_Management_app/loyalty_card_member_file_order_search.html',
+#                       {'searched': searched,
+#                        'loyalty_card_member': loyalty_card_member,
+#                        'loyalty_card': loyalty_card,
+#                        'loyalty_card_validator': loyalty_card_validator})
+#     else:
+#         return render(request,
+#                       'TI_Management_app/loyalty_card_member_file_order_search.html',
+#                       {})
+
+
+# @login_required
+# def loyalty_cards_add_member_file_to_be_picked_up(request, pk):
+#     loyalty_card = get_object_or_404(CardStatus, pk=pk)
+#     if request.method == "POST":
+#         form = LoyaltyCardsAddMemberFileToBePickedUpForm(request.POST, request.FILES, instance=loyalty_card)
+#         if form.is_valid():
+#             loyalty_card_member = form.save(commit=False)
+#             loyalty_card_member.author = request.user
+#             loyalty_card_member.file_a_date = timezone.now()
+#             loyalty_card_member.save()
+#             messages.success(request, "Dodano dokument!")
+#             return redirect('TI_Management_app:loyalty_card_list')
+#     else:
+#         form = LoyaltyCardsAddMemberFileToBePickedUpForm(instance=loyalty_card)
+#     return render(request, 'TI_Management_app/loyalty_cards_add_member_file_to_be_picked_up.html',
+#                   {'form': form,
+#                    'loyalty_card': loyalty_card})
+
+
+# @login_required
+# def loyalty_card_member_file_to_be_picked_up_search(request, pk):
+#     loyalty_card = get_object_or_404(Cards, pk=pk)
+#     loyalty_card_validator = CardStatus.objects.all()
+#     if request.method == "POST":
+#         searched = request.POST.get('searched', False)
+#         loyalty_card_member = MembersZZTI.objects.filter(Q(forename__contains=searched.capitalize()) |
+#                                                          Q(surname__contains=searched.capitalize()) |
+#                                                          Q(member_nr__contains=searched) |
+#                                                          Q(phone_number__contains=searched))
+#         return render(request,
+#                       'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
+#                       {'searched': searched,
+#                        'loyalty_card_member': loyalty_card_member,
+#                        'loyalty_card': loyalty_card,
+#                        'loyalty_card_validator': loyalty_card_validator})
+#     else:
+#         return render(request,
+#                       'TI_Management_app/loyalty_card_member_file_to_be_picked_up_search.html',
+#                       {})
 
 
 @login_required
@@ -1249,26 +1261,37 @@ def loyalty_card_delete_member(request, pk, pk1):
 def member_loyalty_card_edit(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
+    # loyalty_card = get_object_or_404(Cards, pk=pk)
     ordered_card_file = OrderedCardDocument.objects.all()
     if request.method == "POST":
+
         form = CardStatusEditForm(request.POST, request.FILES, instance=member_loyalty_card)
+        # form.fields['member'].initial = member
         if form.is_valid():
+            confirmed_hid = form.cleaned_data['confirmed_hid']
             member_loyalty_card = form.save(commit=False)
             member_loyalty_card.author = request.user
             member_loyalty_card.member = member
             member_loyalty_card.date_of_action = timezone.now()
+            if confirmed_hid:
+                member_loyalty_card.confirmed = True
             member_loyalty_card.save()
-            messages.success(request, f"Zaktualizowano!")
+
+            messages.success(request, f"Zaktualizowano Kartę Lojalnościową!")
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = CardStatusEditForm(instance=member_loyalty_card)
-    return render(request, 'TI_Management_app/member_loyalty_card_edit.html',
-                  {
-                      'form': form,
-                      'member': member,
-                      'member_loyalty_card': member_loyalty_card,
-                      'ordered_card_file': ordered_card_file}
-                  )
+        # form.fields['member'].initial = member
+    return render(
+        request,
+        'TI_Management_app/members/member_loyalty_card_edit.html',
+        {
+            'form': form,
+            'member': member,
+            'member_loyalty_card': member_loyalty_card,
+            'ordered_card_file': ordered_card_file
+        }
+    )
 
 
 @login_required
@@ -1287,12 +1310,14 @@ def member_loyalty_card_id_edit(request, pk, pk1):
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         form = CardStatusCardIDForm(instance=member_loyalty_card)
-    return render(request, 'TI_Management_app/member_loyalty_card_id_edit.html',
-                  {
-                      'form': form,
-                      'member': member,
-                      'member_loyalty_card': member_loyalty_card}
-                  )
+    return render(
+        request, 'TI_Management_app/members/member_loyalty_card_id_edit.html',
+        {
+            'form': form,
+            'member': member,
+            'member_loyalty_card': member_loyalty_card
+        }
+    )
 
 
 @login_required
@@ -1302,23 +1327,35 @@ def member_loyalty_card_add(request, pk, pk1):
     if request.method == "POST":
         form = CardStatusForm(request.POST, request.FILES)
         if form.is_valid():
+            confirmed_hid = form.cleaned_data['confirmed_hid']
             loyalty_card = form.save(commit=False)
             loyalty_card.author = request.user
             loyalty_card.member = member
             loyalty_card.card = card_add
             loyalty_card.date_of_action = timezone.now()
+            if confirmed_hid:
+                loyalty_card.confirmed = True
+
             loyalty_card.save()
-            messages.success(request, "Dodano członka!")
+            messages.success(request, "Dodano kartę lojalnościową!")
             return redirect('TI_Management_app:member_detail', pk=member.pk)
     else:
         username = request.user.username
-        form = CardStatusForm(initial={'responsible': username})
-    return render(request, 'TI_Management_app/member_loyalty_card_add.html',
-                  {
-                      'form': form,
-                      'member': member,
-                      'card_add': card_add}
-                  )
+        form = CardStatusForm(
+            initial={
+                'responsible': username,
+                'member': member
+            }
+        )
+    return render(
+        request,
+        'TI_Management_app/members/member_loyalty_card_add.html',
+        {
+            'form': form,
+            'member': member,
+            'card_add': card_add
+        }
+    )
 
 
 @login_required
@@ -3628,18 +3665,18 @@ def voting_add(request):
 
                         if period == 'from':
                             for group in participants_group:
-                                group_members = GroupsMember.objects.filter(group=group, date_of_accession__gt=date_accede)
+                                group_members = GroupsMember.objects.filter(group=group, member__date_of_accession__gt=date_accede)
                                 for group_member in group_members:
                                     members_set.add(group_member.member)
 
                         elif period == 'to':
                             for group in participants_group:
-                                group_members = GroupsMember.objects.filter(group=group, date_of_accession__lt=date_accede)
+                                group_members = GroupsMember.objects.filter(group=group, member__date_of_accession__lt=date_accede)
                                 for group_member in group_members:
                                     members_set.add(group_member.member)
                         else:
                             for group in participants_group:
-                                group_members = GroupsMember.objects.filter(group=group, date_of_accession=date_accede)
+                                group_members = GroupsMember.objects.filter(group=group, member__date_of_accession=date_accede)
                                 for group_member in group_members:
                                     members_set.add(group_member.member)
                                  
@@ -3696,6 +3733,9 @@ def voting_add_poll(request, pk):
             poll.vote = voting
             poll.description = sanitized_description
             poll.save()
+
+            # open_ended_answer
+            # open_ended_answer = form.cleaned_data['open_ended_answer']
 
             answers = []
             correct_choices = []

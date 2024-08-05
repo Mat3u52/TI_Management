@@ -1,38 +1,48 @@
 {% extends 'TI_Management_app/base.html' %}
 
 {% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:loyalty_card_list' %}"> / Karty Lojalnościowe </a>
-<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"> / {{loyalty_card.card_name}}</a>
-<a href="{% url 'TI_Management_app:loyalty_cards_add_file_order' pk=loyalty_card.pk %}"> / Dodaj dokument zlecenie</a>
+<a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
+<a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}"><b> / {{loyalty_card.card_name}}</b></a>
+<a href="{% url 'TI_Management_app:loyalty_cards_add_file_order' pk=loyalty_card.pk %}"><b> / Dodaj dokument zlecenie</b></a>
 {% endblock %}
 
 {% block content %}
 
-   <div class="hero-unit">
-        <h2>
-            <a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}">
-                {{ loyalty_card.card_name }}
-            </a>
-        </h2>
+<div class="hero-unit">
+<h2 class="fadeInUp-animation">Dodaj dokument zlecenie</h2>
+<hr>
+<br />
+    <h3>
+        <a href="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='none' %}">
+            {{ loyalty_card.card_name }}
+        </a>
+    </h3>
+    <br />
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
+        {% endif %}
+
         <p>
-            Dokument Zlecenie
+            {{form.title}}
         </p>
-        <form method="post" class="post-form" enctype="multipart/form-data">
-            {% csrf_token %}
-            <p>
-                {{form.title}}
-            </p>
-            {{form.responsible.as_hidden}}
-            <label class="custom-file-upload">
-                Wybierz dokument
-                {{form.file}}
-            </label>
-            <button type="submit" class="btn btn-primary btn-large pull-right">
-                Dodaj
-            </button>
-            <br />
-        </form>
-    </div>
+        {{form.responsible.as_hidden}}
+        <label class="custom-file-upload">
+            Wybierz dokument
+            {{form.file}}
+        </label>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Dodaj
+        </button>
+        <br />
+        <br />
+    </form>
+</div>
 
 {% endblock %}
 

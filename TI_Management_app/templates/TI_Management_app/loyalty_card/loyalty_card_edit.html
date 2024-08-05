@@ -2,20 +2,22 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
-<a href="{% url 'TI_Management_app:loyalty_card_edit' pk=loyalty_card.pk %}"><b> / Modyfikacja Karty Lojalnościowej</b></a>
+<a href="{% url 'TI_Management_app:loyalty_card_edit' pk=loyalty_card.pk %}"><b> / Aktualizacja Karty Lojalnościowej</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <h2 class="fadeInUp-animation">Modyfikuj kartę lojalnościową {{ loyalty_card.card_name }}</h2>
+    <h2 class="fadeInUp-animation">Aktualizuj kartę lojalnościową {{ loyalty_card.card_name }}</h2>
     <hr>
     <br />
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
-        <p>{{form.errors}}</p>
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
         {% endif %}
-        <p><b>Modyfikuj:</b></p>
+        <p><b>Zmień nazwe:</b></p>
         {{form.card_name}}
 
         <br />

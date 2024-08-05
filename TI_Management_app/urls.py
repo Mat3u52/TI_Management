@@ -75,17 +75,17 @@ urlpatterns = [
         name='member_file_delete'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-loyalty-card-add/<int:pk1>/',
+        'TI_Management_app/members/<int:pk>/member-loyalty-card-add/<int:pk1>/',
         views.member_loyalty_card_add,
         name='member_loyalty_card_add'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-loyalty-card-edit/<int:pk1>/',
+        'TI_Management_app/members/<int:pk>/member-loyalty-card-edit/<int:pk1>/',
         views.member_loyalty_card_edit,
         name='member_loyalty_card_edit'
     ),
     path(
-        'TI_Management_app/<int:pk>/edit-loyalty-card-id-edit/<int:pk1>/',
+        'TI_Management_app/members/<int:pk>/member-loyalty-card-id-edit/<int:pk1>/',
         views.member_loyalty_card_id_edit,
         name='member_loyalty_card_id_edit'
     ),
@@ -255,35 +255,35 @@ urlpatterns = [
         name='loyalty_card_delete_member'
     ),
     path(
-        'TI_Management_app/loyalty-cards-add-file-order/<int:pk>/',
+        'TI_Management_app/loyalty-card/loyalty-cards-add-file-order/<int:pk>/',
         views.loyalty_cards_add_file_order,
         name='loyalty_cards_add_file_order'
     ),
     path(
-        'TI_Management_app/loyalty-cards-add-file-to-be-picked-up/<int:pk>/',
+        'TI_Management_app/loyalty-card/loyalty-cards-add-file-to-be-picked-up/<int:pk>/',
         views.loyalty_cards_add_file_to_be_picked_up,
         name='loyalty_cards_add_file_to_be_picked_up'
     ),
-    path(
-        'TI_Management_app/loyalty-cards-add-member-file-order/<int:pk>/',
-        views.loyalty_cards_add_member_file_order,
-        name='loyalty_cards_add_member_file_order'
-    ),
-    path(
-        'TI_Management_app/loyalty-cards-add-member-file-order-search/<int:pk>/',
-        views.loyalty_card_member_file_order_search,
-        name='loyalty_card_member_file_order_search'
-    ),
-    path(
-        'TI_Management_app/loyalty-cards-add-member-file-to-be-picked-up/<int:pk>/',
-        views.loyalty_cards_add_member_file_to_be_picked_up,
-        name='loyalty_cards_add_member_file_to_be_picked_up'
-    ),
-    path(
-        'TI_Management_app/loyalty-cards-add-member-file-to-be-picked-up-search/<int:pk>/',
-        views.loyalty_card_member_file_to_be_picked_up_search,
-        name='loyalty_card_member_file_to_be_picked_up_search'
-    ),
+    # path(
+    #     'TI_Management_app/loyalty-cards-add-member-file-order/<int:pk>/',
+    #     views.loyalty_cards_add_member_file_order,
+    #     name='loyalty_cards_add_member_file_order'
+    # ),
+    # path(
+    #     'TI_Management_app/loyalty-cards-add-member-file-order-search/<int:pk>/',
+    #     views.loyalty_card_member_file_order_search,
+    #     name='loyalty_card_member_file_order_search'
+    # ),
+    # path(
+    #     'TI_Management_app/loyalty-cards-add-member-file-to-be-picked-up/<int:pk>/',
+    #     views.loyalty_cards_add_member_file_to_be_picked_up,
+    #     name='loyalty_cards_add_member_file_to_be_picked_up'
+    # ),
+    # path(
+    #     'TI_Management_app/loyalty-cards-add-member-file-to-be-picked-up-search/<int:pk>/',
+    #     views.loyalty_card_member_file_to_be_picked_up_search,
+    #     name='loyalty_card_member_file_to_be_picked_up_search'
+    # ),
     path(
         'TI_Management_app/loyalty-card/loyalty-cards-member-search/<int:pk>/',
         views.loyalty_card_member_search,

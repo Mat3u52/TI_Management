@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:loyalty_card_list' %}"><b> / Karty Lojalnościowe </b></a>
@@ -49,20 +50,20 @@
                                 <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                             </a>
                         </p>
-                        <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                        <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                        <p><b>Numer telefonu:</b> {{loyalty_card_status.member.phone_number|phone_number}}</p>
+                        <p><b>E-mail:</b> {{loyalty_card_status.member.email}}</p>
                         <p>
-                            Status:
+                            <b>Status:</b>
                             {% if  loyalty_card_status.card_status == 'active' %}
-                                Aktywny
+                                <span style="color: #00FF00;">Aktywny</span>
                             {% elif loyalty_card_status.card_status == 'toOrder' %}
                                 Do zlecenia
                             {% elif loyalty_card_status.card_status == 'ordered' %}
-                                Zlecona
+                                <span style="color: #FFC300;">Zlecona</span>
                             {% elif loyalty_card_status.card_status == 'toBePickedUp' %}
                                 Do odbioru
                             {% elif loyalty_card_status.card_status == 'deactivated' %}
-                                Dezaktywowana
+                                <span style="color: #FF0000;">Dezaktywowana</span>
                             {% endif %}
                         </p>
 
@@ -73,253 +74,6 @@
 
 
 
-            </li>
-          </ul>
-    </div>
-
-
-    <div class="well sidebar-nav">
-        <ul class="nav nav-list">
-            <li class="nav-header" id="showLoyaltyCardMembersActive">
-                Lista aktywnych użytkowników {{ loyalty_card.card_name }}:
-            </li>
-            <li>
-                <div class="notepad">
-                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='active' %}">
-                        {% csrf_token %}
-                        <p>Separator:</p>
-                        {% for radio in form.separator %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <hr />
-                        <p>Kolumny:</p>
-                        {% for radio in form.data %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <br />
-                        <p>Od:</p>
-                        {{form.start_date}}
-                        <p>Do:</p>
-                        {{form.end_date}}
-                        <br />
-                        <br />
-                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
-                    </form>
-                </div>
-            </li>
-            <li id="objLoyaltyCardMembersActive" style="display: none">
-                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                    {% if loyalty_card_status.card_status == 'active' %}
-                    <div class="notepad">
-                        <p>
-                            <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
-                            </a>
-                        </p>
-                        <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                        <p>E-mail: {{loyalty_card_status.member.email}}</p>
-
-                        <a href="{% url 'TI_Management_app:loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
-                        <br />
-                    </div>
-                    {% endif %}
-                {% endfor %}
-                <br />
-            </li>
-          </ul>
-    </div>
-
-    <div class="well sidebar-nav">
-        <ul class="nav nav-list">
-            <li class="nav-header" id="showLoyaltyCardMembersReadyToGet">
-                Lista karty do odbioru {{ loyalty_card.card_name }}:
-            </li>
-            <li>
-                <div class="notepad">
-                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toBePickedUp' %}">
-                        {% csrf_token %}
-                        <p>Separator:</p>
-                        {% for radio in form.separator %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <hr>
-                        <p>Kolumny:</p>
-                        {% for radio in form.data %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <br />
-                        <p>Od:</p>
-                        {{form.start_date}}
-                        <p>Do:</p>
-                        {{form.end_date}}
-                        <br />
-                        <br />
-                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
-                    </form>
-                </div>
-            </li>
-            <li id="objLoyaltyCardMembersReadyToGet" style="display: none">
-                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                    {% if loyalty_card_status.card_status == 'toBePickedUp' %}
-                        <div class="notepad">
-                            <p>
-                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
-                                </a>
-                            </p>
-                            <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
-                            <p>Rodzaj: {{loyalty_card.card_name}}</p>
-                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
-                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
-                            <p>Status:
-                                {% if loyalty_card_status.card_status == 'toBePickedUp' %}
-                                    Do odbioru
-                                {% endif %}
-                            </p>
-                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                <br />
-            </li>
-          </ul>
-    </div>
-
-    <div class="well sidebar-nav">
-        <ul class="nav nav-list">
-            <li class="nav-header" id="showLoyaltyCardMembersOrdered">
-                Lista wysłanych karty {{ loyalty_card.card_name }}:
-            </li>
-            <li>
-                <div class="notepad">
-                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
-                        {% csrf_token %}
-                        <p>Separator:</p>
-                        {% for radio in form.separator %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <hr>
-                        <p>Kolumny:</p>
-                        {% for radio in form.data %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <br />
-                        <p>Od:</p>
-                        {{form.start_date}}
-                        <p>Do:</p>
-                        {{form.end_date}}
-                        <br />
-                        <br />
-                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
-                    </form>
-                </div>
-            </li>
-            <li id="objLoyaltyCardMembersOrdered" style="display: none">
-                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                    {% if loyalty_card_status.card_status == 'ordered' %}
-                        <div class="notepad">
-                            <p>
-                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
-                                </a>
-                            </p>
-                            <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
-                            <p>Rodzaj: {{loyalty_card.card_name}}</p>
-                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
-                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
-                            <p>Status:
-                                {% if loyalty_card_status.card_status == 'ordered' %}
-                                    Zlecona
-                                {% endif %}
-                            </p>
-                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                <br />
-            </li>
-          </ul>
-    </div>
-
-    <div class="well sidebar-nav">
-        <ul class="nav nav-list">
-            <li class="nav-header" id="showLoyaltyCardMembersToOrder">
-                Zlecenia na kartę {{ loyalty_card.card_name }}:
-            </li>
-            <li>
-                <div class="notepad">
-                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toOrder'%}">
-                        {% csrf_token %}
-                        <p>Separator:</p>
-                        {% for radio in form.separator %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <hr>
-                        <p>Kolumny:</p>
-                        {% for radio in form.data %}
-                            <label class="horizontal-radio">
-                                {{ radio.tag }} {{ radio.choice_label }}
-                            </label>
-                        {% endfor %}
-                        <br />
-                        <br />
-                        <p>Od:</p>
-                        {{form.start_date}}
-                        <p>Do:</p>
-                        {{form.end_date}}
-                        <br />
-                        <br />
-                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
-                    </form>
-                </div>
-            </li>
-            <li id="objLoyaltyCardMembersToOrder" style="display: none">
-                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
-                    {% if loyalty_card_status.card_status == 'toOrder' %}
-                        <div class="notepad">
-                            <p>
-                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
-                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
-                                </a>
-                            </p>
-                            <p>M Nr: {{loyalty_card_status.member.member_nr}}</p>
-                            <p>Rodzaj: {{loyalty_card.card_name}}</p>
-                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
-                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
-                            <p>Status:
-                                {% if loyalty_card_status.card_status == 'toOrder' %}
-                                    Zlecona
-                                {% endif %}
-                            </p>
-                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-                <br />
             </li>
           </ul>
     </div>
@@ -365,12 +119,12 @@
                     {% for ordered_file in ordered_card_file %}
                         {% if ordered_file.card.id == loyalty_card.pk %}
 
-                            <p>Nr dokumentu:
+                            <p><b>Nr dokumentu:</b>
                                 <a href="{{ ordered_file.file.url }}">{{ ordered_file.title }}</a>
                             </p>
-                            <p>Nazwa: {{ ordered_file.file|cut:'OrderedCardDocument/' }}</p>
-                            <p>Data: {{ ordered_file.created_date }}</p>
-                            <p>Dodany przez: {{ ordered_file.responsible }}</p>
+                            <p><b>Nazwa:</b> {{ ordered_file.file|filename }}</p>
+                            <p><b>Data:</b> {{ ordered_file.created_date }}</p>
+                            <p><b>Dodany przez:</b> {{ ordered_file.responsible }}</p>
                             <br />
 
                         {% endif %}
@@ -424,12 +178,12 @@
                     {% for to_be_picked_up_file in to_be_picked_up_doc_card_file %}
                         {% if to_be_picked_up_file.card.id == loyalty_card.pk %}
 
-                            <p>Nr dokumentu:
+                            <p><b>Nr dokumentu:</b>
                                 <a href="{{ ordered_file.file.url }}">{{ to_be_picked_up_file.title }}</a>
                             </p>
-                            <p>Nazwa: {{ to_be_picked_up_file.file|cut:'ToBePickedUpCardDocument/' }}</p>
-                            <p>Data: {{ to_be_picked_up_file.created_date }}</p>
-                            <p>Dodany przez: {{ to_be_picked_up_file.responsible }}</p>
+                            <p><b>Nazwa:</b> {{ to_be_picked_up_file.file|filename }}</p>
+                            <p><b>Data:</b> {{ to_be_picked_up_file.created_date }}</p>
+                            <p><b>Dodany przez:</b> {{ to_be_picked_up_file.responsible }}</p>
                             <br />
 
                         {% endif %}
@@ -485,6 +239,252 @@
 
     <div class="well sidebar-nav">
         <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersActive">
+                Lista aktywnych użytkowników {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='active' %}">
+                        {% csrf_token %}
+                        <p>Separator:</p>
+                        {% for radio in form.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <hr />
+                        <p>Kolumny:</p>
+                        {% for radio in form.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
+                        {{form.start_date}}
+                        <p>Do:</p>
+                        {{form.end_date}}
+                        <br />
+                        <br />
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersActive" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'active' %}
+                    <div class="notepad">
+                        <p>
+                            <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
+                            </a>
+                        </p>
+                        <p><b>Numer telefonu:</b> {{loyalty_card_status.member.phone_number|phone_number}}</p>
+                        <p><b>E-mail:</b> {{loyalty_card_status.member.email}}</p>
+
+                        <a href="{% url 'TI_Management_app:loyalty_card_delete_member' pk=loyalty_card.pk pk1=loyalty_card_status.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        <br />
+                    </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersReadyToGet">
+                Lista karty do odbioru {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toBePickedUp' %}">
+                        {% csrf_token %}
+                        <p>Separator:</p>
+                        {% for radio in form.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <hr>
+                        <p>Kolumny:</p>
+                        {% for radio in form.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
+                        {{form.start_date}}
+                        <p>Do:</p>
+                        {{form.end_date}}
+                        <br />
+                        <br />
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersReadyToGet" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'toBePickedUp' %}
+                        <div class="notepad">
+                            <p>
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
+                                </a>
+                            </p>
+                            <p><b>M Nr:</b> {{loyalty_card_status.member.member_nr}}</p>
+                            <p><b>Rodzaj:</b> {{loyalty_card.card_name}}</p>
+                            <p><b>Nr karty:</b> {{loyalty_card_status.card_identity}}</p>
+                            <p><b>Data:</b> {{loyalty_card_status.date_of_action}}</p>
+                            <p><b>Status:</b>
+                                {% if loyalty_card_status.card_status == 'toBePickedUp' %}
+                                    Do odbioru
+                                {% endif %}
+                            </p>
+                            <p><b>Numer telefonu:</b> {{loyalty_card_status.member.phone_number|phone_number}}</p>
+                            <p><b>E-mail:</b> {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersOrdered">
+                Lista wysłanych karty {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='ordered' %}">
+                        {% csrf_token %}
+                        <p>Separator:</p>
+                        {% for radio in form.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <hr>
+                        <p>Kolumny:</p>
+                        {% for radio in form.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
+                        {{form.start_date}}
+                        <p>Do:</p>
+                        {{form.end_date}}
+                        <br />
+                        <br />
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersOrdered" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'ordered' %}
+                        <div class="notepad">
+                            <p>
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
+                                </a>
+                            </p>
+                            <p><b>M Nr:</b> {{loyalty_card_status.member.member_nr}}</p>
+                            <p><b>Rodzaj:</b> {{loyalty_card.card_name}}</p>
+                            <p><b>Nr karty:</b> {{loyalty_card_status.card_identity}}</p>
+                            <p><b>Data:</b> {{loyalty_card_status.date_of_action}}</p>
+                            <p><b>Status:</b>
+                                {% if loyalty_card_status.card_status == 'ordered' %}
+                                    Zlecona
+                                {% endif %}
+                            </p>
+                            <p><b>Numer telefonu:</b> {{loyalty_card_status.member.phone_number|phone_number}}</p>
+                            <p><b>E-mail:</b> {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
+            <li class="nav-header" id="showLoyaltyCardMembersToOrder">
+                Zlecenia na kartę {{ loyalty_card.card_name }}:
+            </li>
+            <li>
+                <div class="notepad">
+                    <form method="post" action="{% url 'TI_Management_app:loyalty_card_detail' pk=loyalty_card.pk category='toOrder'%}">
+                        {% csrf_token %}
+                        <p>Separator:</p>
+                        {% for radio in form.separator %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <hr>
+                        <p>Kolumny:</p>
+                        {% for radio in form.data %}
+                            <label class="horizontal-radio">
+                                {{ radio.tag }} {{ radio.choice_label }}
+                            </label>
+                        {% endfor %}
+                        <br />
+                        <br />
+                        <p>Od:</p>
+                        {{form.start_date}}
+                        <p>Do:</p>
+                        {{form.end_date}}
+                        <br />
+                        <br />
+                        <button class="btn btn-info btn-sm pull-right" type="submit">Wygeneruj listę</button>
+                    </form>
+                </div>
+            </li>
+            <li id="objLoyaltyCardMembersToOrder" style="display: none">
+                {% for loyalty_card_status in loyalty_card.loyaltyCardStatus.all %}
+                    {% if loyalty_card_status.card_status == 'toOrder' %}
+                        <div class="notepad">
+                            <p>
+                                <a href="{% url 'TI_Management_app:member_loyalty_card_edit' pk=loyalty_card_status.member.id pk1=loyalty_card_status.id %}">
+                                    <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
+                                </a>
+                            </p>
+                            <p><b>M Nr:</b> {{loyalty_card_status.member.member_nr}}</p>
+                            <p><b>Rodzaj:</b> {{loyalty_card.card_name}}</p>
+                            <p><b>Nr karty:</b> {{loyalty_card_status.card_identity}}</p>
+                            <p><b>Data:</b> {{loyalty_card_status.date_of_action}}</p>
+                            <p><b>Status:</b>
+                                {% if loyalty_card_status.card_status == 'toOrder' %}
+                                    Zlecona
+                                {% endif %}
+                            </p>
+                            <p><b>Numer telefonu:</b> {{loyalty_card_status.member.phone_number|phone_number}}</p>
+                            <p><b>E-mail:</b> {{loyalty_card_status.member.email}}</p>
+                        </div>
+                    {% endif %}
+                {% endfor %}
+                <br />
+            </li>
+          </ul>
+    </div>
+
+    <div class="well sidebar-nav">
+        <ul class="nav nav-list">
             <li class="nav-header" id="showLoyaltyCardMembersDeactivated">
                 Karty dezaktywowane {{ loyalty_card.card_name }}:
             </li>
@@ -527,15 +527,15 @@
                                     <b>{{loyalty_card_status.member.forename}} {{loyalty_card_status.member.surname}}</b>
                                 </a>
                             </p>
-                            <p>Nr karty: {{loyalty_card_status.card_identity}}</p>
-                            <p>Data: {{loyalty_card_status.date_of_action}}</p>
-                            <p>Status:
+                            <p><b>Nr karty:</b> {{loyalty_card_status.card_identity}}</p>
+                            <p><b>Data:</b> {{loyalty_card_status.date_of_action}}</p>
+                            <p><b>Status:</b>
                                 {% if loyalty_card_status.card_status == 'deactivated' %}
                                     Dezaktywowana
                                 {% endif %}
                             </p>
-                            <p>Numer telefonu: {{loyalty_card_status.member.phone_number}}</p>
-                            <p>E-mail: {{loyalty_card_status.member.email}}</p>
+                            <p><b>Numer telefonu:</b> {{loyalty_card_status.member.phone_number|phone_number}}</p>
+                            <p><b>E-mail:</b> {{loyalty_card_status.member.email}}</p>
                         </div>
                     {% endif %}
                 {% endfor %}
