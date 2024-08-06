@@ -709,7 +709,10 @@ class VoteAdmin(admin.ModelAdmin):
         'date_end',
         'importance',
         'date_accede',
-        'period'
+        'period',
+        'min_amount_members',
+        'min_amount_commission',
+        'turnout'
         # 'members'
     )
     list_filter = (
@@ -726,7 +729,10 @@ class VoteAdmin(admin.ModelAdmin):
         'date_end',
         'importance',
         'date_accede',
-        'period'
+        'period',
+        'min_amount_members',
+        'min_amount_commission',
+        'turnout'
         # 'members'
     )
     search_fields = (

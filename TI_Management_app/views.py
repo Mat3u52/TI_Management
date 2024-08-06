@@ -3724,6 +3724,7 @@ def voting_add_poll(request, pk):
         form = VotingAddPollForm(request.POST)
         form_choice = VotingAddChoiceForm(request.POST)
         if all([form.is_valid(), form_choice.is_valid()]):
+            question = form.cleaned_data['question']
             finish = form.cleaned_data['finish']
             description = form.cleaned_data['description']
             sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
@@ -3731,11 +3732,13 @@ def voting_add_poll(request, pk):
             poll = form.save(commit=False)
             poll.author = request.user
             poll.vote = voting
+            poll.question = question.title()
             poll.description = sanitized_description
             poll.save()
 
             # open_ended_answer
-            # open_ended_answer = form.cleaned_data['open_ended_answer']
+            open_ended_answer = form_choice.cleaned_data['open_ended_answer']
+            print(open_ended_answer)
 
             answers = []
             correct_choices = []
@@ -3745,12 +3748,13 @@ def voting_add_poll(request, pk):
                     answers.append(request.POST[key])
                     correct_choices.append(request.POST.get(f'correct_{answer_index}') == 'on')
 
-            # print(answers)
-            # print(correct_choices)
-
-            for answer, is_correct in zip(answers, correct_choices):
-                choice = Choice(author=request.user, poll=poll, answer=answer, correct=is_correct)
+            if open_ended_answer or not answers:
+                choice = Choice(author=request.user, poll=poll, open_ended_answer=True)
                 choice.save()
+            else:
+                for answer, is_correct in zip(answers, correct_choices):
+                    choice = Choice(author=request.user, poll=poll, answer=answer, correct=is_correct, open_ended_answer=False)
+                    choice.save()
 
             if finish:
                 messages.success(request, "Podsumowanie")

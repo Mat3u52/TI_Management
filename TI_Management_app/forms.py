@@ -2827,7 +2827,7 @@ class VotingAddChoiceForm(forms.Form):
                 message="Odpowiedź musi zawierać co najmniej 2 znaki."
             )
         ],
-        required=True,
+        required=False,
         max_length=250
     )
 

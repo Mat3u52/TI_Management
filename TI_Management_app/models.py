@@ -322,7 +322,7 @@ class Choice(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorChoice')
     poll = models.ForeignKey(Poll, on_delete=models.CASCADE, null=True, related_name='pollChoice')
-    answer = models.CharField(max_length=250, blank=False, default=None)
+    answer = models.CharField(max_length=250, blank=True, null=True, default=None)
     correct = models.BooleanField(default=False)
     open_ended_answer = models.BooleanField(default=False)
     # status = models.BooleanField(default=False)

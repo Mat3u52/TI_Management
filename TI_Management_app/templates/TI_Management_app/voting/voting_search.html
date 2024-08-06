@@ -14,13 +14,12 @@
         {% for vote in voting %}
             <div class="notepad">
                 <h3>
-                    <a href="#">
+                    <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}">
                         {{vote.title}}
                     </a>
                 </h3>
-
                 <p>
-                    <a href="#" class="btn btn-primary btn-large pull-right">
+                    <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
                         Więcej informacji
                     </a>
                 </p>

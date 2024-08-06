@@ -37,7 +37,13 @@
 
         <p><b>Możliwe odpowiedzi:</b></p>
 
+        <div id="openEndedAnswer">
+            <label for="openEndedAnswerCheckbox">Pytanie otwarte:</label>
+            {{ form_choice.open_ended_answer }}
+        </div>
+
         <div id="inputContainer">
+            <br />
             <div class="inputGroup">
                 <label for="answer_0">Odpowiedź 1:</label>
                 {{ form_choice.answer_0 }}
@@ -53,9 +59,9 @@
                 <label for="correct_0">Poprawna odpowiedź:</label>
                 {{ form_choice.correct_0 }}
             </div>
-        </div>
-        <br />
         <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
+        </div>
+
 
         <br />
         <br />
@@ -155,6 +161,16 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('number_of_responses').value = checkedCount || 1;
     }
 
+    function toggleInputContainer() {
+        const openEndedAnswerCheckbox = document.querySelector('#id_open_ended_answer');
+        const inputContainer = document.getElementById('inputContainer');
+        if (openEndedAnswerCheckbox.checked) {
+            inputContainer.style.display = 'none';
+        } else {
+            inputContainer.style.display = 'block';
+        }
+    }
+
     document.getElementById('addButton').addEventListener('click', function() {
         const newInputGroup = document.createElement('div');
         newInputGroup.classList.add('inputGroup');
@@ -197,6 +213,12 @@ document.addEventListener('DOMContentLoaded', function () {
     document.querySelectorAll('input[type="checkbox"].correct').forEach(checkbox => {
         checkbox.addEventListener('change', updateNumberOfResponses);
     });
+
+    const openEndedAnswerCheckbox = document.querySelector('#id_open_ended_answer');
+    if (openEndedAnswerCheckbox) {
+        openEndedAnswerCheckbox.addEventListener('change', toggleInputContainer);
+        toggleInputContainer();  // Initialize on page load
+    }
 
     updateNumberOfResponses();
 });
