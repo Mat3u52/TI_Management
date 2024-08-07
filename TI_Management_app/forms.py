@@ -2529,6 +2529,19 @@ class VotingAddForm(forms.ModelForm):
         max_length=250
     )
 
+    commission = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Członek komisji wyborczej',
+                'aria-label': 'Członek komisji wyborczej',
+                'list': 'commission_database'
+            }
+        ),
+        required=True,
+        max_length=250
+    )
+
     participants = forms.CharField(
         widget=forms.TextInput(
             attrs={
@@ -2589,11 +2602,6 @@ class VotingAddForm(forms.ModelForm):
             'description': CKEditor5Widget(
                 config_name='default'
             ),
-            # 'vote_type': forms.Select(
-            #     attrs={
-            #         'class': 'form-control select'
-            #     }
-            # ),
             'vote_type': forms.RadioSelect(
                 attrs={
                     'class': 'form-check-input'
@@ -2611,48 +2619,6 @@ class VotingAddForm(forms.ModelForm):
             ),
         }
 
-    # def clean_date_accede(self):
-    #     period = self.cleaned_data.get("period")
-    #     date_accede = self.cleaned_data.get("date_accede")
-    #     participants = self.cleaned_data.get('participants', '')
-    #
-    #
-    #     print(f"Received period: {period}")
-    #     print(f"Received date_accede: {date_accede}")
-    #     print(f"Received participants: {participants}")
-    #
-    #     if participants and date_accede:
-    #         if isinstance(date_accede, datetime):
-    #             date_accede_obj = date_accede.date()
-    #         else:
-    #             try:
-    #                 date_accede_obj = datetime.strptime(date_accede, '%Y-%m-%d').date()
-    #             except ValueError:
-    #                 raise ValidationError("Invalid date format. Please use YYYY-MM-DD.")
-    #
-    #         participants_list = [p.strip() for p in participants.split(',') if p.strip()]
-    #         for participant in participants_list:
-    #             try:
-    #                 member = MembersZZTI.objects.get(member_nr=participant)
-    #                 print(f"Checking member: {member}")
-    #
-    #                 if period is None:
-    #                     print(f"Checking period condition: {period}")
-    #                     if isinstance(member.date_of_accession, datetime):
-    #                         member_date_of_accession = member.date_of_accession.date()
-    #                     else:
-    #                         member_date_of_accession = member.date_of_accession
-    #
-    #                     print(f"Comparing dates: {date_accede_obj} > {member_date_of_accession}")
-    #
-    #                     if date_accede_obj > member_date_of_accession:
-    #                         raise ValidationError(
-    #                             f"Data akcesji ({date_accede_obj}) nie może być późniejsza niż data przystąpienia ({member_date_of_accession}) dla członka: {member.forename} {member.surname}."
-    #                         )
-    #             except MembersZZTI.DoesNotExist:
-    #                 print(f"Member not found: {participant}")
-    #     return date_accede
-
     def clean_participants(self):
         participants = self.cleaned_data.get('participants', '')
         if participants:
@@ -2668,6 +2634,22 @@ class VotingAddForm(forms.ModelForm):
                 raise ValidationError(f"Członek / Członkowie {', '.join(invalid_participants)} nie istnieje w bazie.")
 
         return participants
+
+    def clean_commission(self):
+        commission = self.cleaned_data.get('commission', '')
+        if commission:
+            commission_list = [p.strip() for p in commission.split(',') if p.strip()]
+            invalid_commission = []
+            for commission in commission_list:
+                try:
+                    MembersZZTI.objects.get(member_nr=commission)
+                except MembersZZTI.DoesNotExist:
+                    invalid_commission.append(commission)
+
+            if invalid_commission:
+                raise ValidationError(f"Członek / Członkowie {', '.join(invalid_commission)} nie istnieje w bazie.")
+
+        return commission
 
     def clean(self):
         cleaned_data = super().clean()
@@ -2728,18 +2710,6 @@ class VotingAddForm(forms.ModelForm):
                     print(f"Member not found: {participant}")
 
         return cleaned_data
-
-        # if date_accede:
-        #     if isinstance(date_accede, str):
-        #         try:
-        #             date_accede = datetime.strptime(date_accede, '%Y-%m-%d').date()
-        #             cleaned_data['date_accede'] = date_accede
-        #         except ValueError:
-        #             raise ValidationError("Invalid date format. Please use YYYY-MM-DD.")
-        #
-        #     # Additional checks can be added here as per your logic
-        #
-        # return cleaned_data
 
 
 class VotingAddPollForm(forms.ModelForm):

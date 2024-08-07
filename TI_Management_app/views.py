@@ -3752,7 +3752,7 @@ def voting_add_poll(request, pk):
                 choice = Choice(author=request.user, poll=poll, open_ended_answer=True)
                 choice.save()
             else:
-                for answer, is_correct in zip(answers, correct_choices):
+                for answer, is_correct in set(zip(answers, correct_choices)):
                     choice = Choice(author=request.user, poll=poll, answer=answer, correct=is_correct, open_ended_answer=False)
                     choice.save()
 

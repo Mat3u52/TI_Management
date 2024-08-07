@@ -245,7 +245,7 @@ class Vote(models.Model):
     title = models.CharField(max_length=250, null=False, blank=False)
     description = CKEditor5Field(null=True, blank=True)
     # vote_type = models.CharField(max_length=250, choices=VOTE_TYPE_CHOICES, default=None)
-    vote_type = models.CharField(max_length=100, choices=VoteTypeChoices.choices, default=VoteTypeChoices.OPEN_VOTING)
+    vote_type = models.CharField(max_length=100, choices=VoteTypeChoices.choices, default=VoteTypeChoices.CONFIDENTIAL_VOTING)
     period = models.CharField(max_length=100, choices=PeriodChoices.choices, default=PeriodChoices.NO_PERIOD)
     vote_method_online = models.BooleanField(default=False)
     vote_method_offline = models.BooleanField(default=False)
@@ -334,10 +334,12 @@ class Choice(models.Model):
         verbose_name_plural = 'Odpowiedzi'
 
     def __str__(self):
-        return self.answer
+        if self.answer:
+            return self.answer
+        return self.slug
 
     def save(self, *args, **kwargs):
-        if not self.slug:
+        if not self.slug and self.answer:
             self.slug = slugify(self.answer)
         super().save(*args, **kwargs)
 

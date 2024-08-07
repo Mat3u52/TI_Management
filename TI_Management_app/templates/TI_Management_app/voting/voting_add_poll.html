@@ -58,13 +58,16 @@
 
                 <label for="correct_0">Poprawna odpowiedź:</label>
                 {{ form_choice.correct_0 }}
+
             </div>
-        <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
+
         </div>
-
-
+        <div id="inputButton">
+            <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
+        </div>
         <br />
         <br />
+
 
         <p><b>Ilość możliwych odpowiedzi:</b></p>
         <p>
@@ -110,6 +113,7 @@
             <hr>
             <table>
                 {% for choice in poll.pollChoice.all %}
+                    {% if choice.answer is not None %}
                         {% if choice.correct %}
                             <tr>
                                 <td>
@@ -131,6 +135,13 @@
                                 </td>
                             </tr>
                         {% endif %}
+                    {% else %}
+                        <tr>
+                            <td>
+                                <textarea style="resize: none;" rows="4" cols="50" disabled></textarea>
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </table>
         </div>
@@ -166,8 +177,10 @@ document.addEventListener('DOMContentLoaded', function () {
         const inputContainer = document.getElementById('inputContainer');
         if (openEndedAnswerCheckbox.checked) {
             inputContainer.style.display = 'none';
+            inputButton.style.display = 'none';
         } else {
             inputContainer.style.display = 'block';
+            inputButton.style.display = 'block';
         }
     }
 

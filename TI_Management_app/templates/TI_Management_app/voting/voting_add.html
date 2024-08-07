@@ -30,7 +30,8 @@
         <br /><br />
 
         <p><b>Rodzaj głosowania:</b></p>
-        {{ form.vote_type }}
+        <p>Tajne</p>
+        {{ form.vote_type.as_hidden }}
         <br /><br />
 
         <p><b>Grupa docelowa:</b></p>
@@ -77,11 +78,44 @@
         <br /><br />
 
         <p><b>Typ głosowania:</b></p>
-        {{ form.vote_method_online }}
-        {{ form.vote_method_online.label }}
-        {{ form.vote_method_offline }}
-        {{ form.vote_method_offline.label }}
+        <p>LUMS Voting Station</p>
+<!--        {{ form.vote_method_online }}-->
+<!--        {{ form.vote_method_online.label }}-->
+<!--        {{ form.vote_method_offline }}-->
+<!--        {{ form.vote_method_offline.label }}-->
         <br /><br />
+
+
+
+
+
+        <p><b>Skład komisji wyborczej:</b></p>
+        <br />
+        <div id="commission-section">
+            <div id="inputContainerCommission">
+                <div class="inputGroupCommission">
+                    <label for="commission_0">Członek komisji wyborczej 1:</label>
+                    {{ form.commission }}
+                    <datalist id="commission_database">
+                        {% for member in members %}
+                            <option value="{{ member.member_nr }}">{{ member.forename }} {{ member.surname }}</option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+            </div>
+            <button type="button" id="addButtonCommission" class="btn btn-primary btn-small pull-left">Dodaj</button>
+        </div>
+        <br />
+        <br />
+
+
+
+
+
+
+
+
+
 
         <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
         <br /><br />
@@ -92,6 +126,7 @@
     document.addEventListener('DOMContentLoaded', function () {
         var checkbox = document.getElementById('{{ form.participants_all.id_for_label }}');
         var participantsSection = document.getElementById('participants-section');
+        var participantsSectionCommission = document.getElementById('commission-section');
         var groupsSection = document.getElementById('groups-section');
 
         function toggleVisibility() {
@@ -130,6 +165,36 @@
 
             fieldCount++;
         });
+
+
+
+    let fieldCountCommission = 1;
+
+    document.getElementById('addButtonCommission').addEventListener('click', function() {
+        const newInputGroupCommission = document.createElement('div');
+        newInputGroupCommission.classList.add('inputGroupCommission');
+
+        const newLabelCommission = document.createElement('label');
+        newLabelCommission.setAttribute('for', `commission_${fieldCountCommission}`);
+        newLabelCommission.textContent = `Członek komisji wyborczej ${fieldCountCommission + 1}:`;
+
+        const newInputCommission = document.createElement('input');
+        newInputCommission.setAttribute('type', 'text');
+        newInputCommission.setAttribute('id', `commission_${fieldCountCommission}`);
+        newInputCommission.setAttribute('name', 'commission');
+        newInputCommission.setAttribute('placeholder', `Członek komisji wyborczej`);
+        newInputCommission.setAttribute('list', 'commission_database');
+
+        newInputGroupCommission.appendChild(newLabelCommission);
+        newInputGroupCommission.appendChild(newInputCommission);
+        document.getElementById('inputContainerCommission').appendChild(newInputGroupCommission);
+
+        fieldCountCommission++;
+    });
+
+
+
+
     });
 </script>
 

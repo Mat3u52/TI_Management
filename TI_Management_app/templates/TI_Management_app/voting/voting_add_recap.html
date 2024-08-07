@@ -24,6 +24,7 @@
             <hr>
             <table>
                 {% for choice in poll.pollChoice.all %}
+                    {% if choice.answer is not None %}
                         {% if choice.correct %}
                             <tr>
                                 <td>
@@ -45,6 +46,13 @@
                                 </td>
                             </tr>
                         {% endif %}
+                    {% else %}
+                        <tr>
+                            <td>
+                                <textarea style="resize: none;" rows="4" cols="50" disabled></textarea>
+                            </td>
+                        </tr>
+                    {% endif %}
                 {% endfor %}
             </table>
 <!--            <ul>-->
