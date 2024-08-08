@@ -405,3 +405,37 @@ table.dataTable thead .sorting_desc_disabled:after,
 table.dataTable thead .sorting_desc_disabled:before {
   bottom: .5em;
 }
+
+.container-commission {
+    display: flex; /* Use flexbox layout */
+    flex-wrap: wrap; /* Allow items to wrap to the next line if needed */
+    gap: 10px; /* Optional: Use gap for consistent spacing between items */
+}
+
+.container-commission > div {
+    flex: 1; /* Distribute space evenly */
+    padding: 20px;
+    border: 1px solid #000;
+    margin: 0; /* Remove margin since gap is used */
+    box-sizing: border-box; /* Ensure padding and border are included in the width and height */
+}
+.commission-member {
+    flex: 1;
+    padding: 20px;
+    border: 1px solid #000;
+    margin: 0;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column; /* Ensures the image and name stack vertically */
+    align-items: center; /* Centers the content horizontally */
+}
+
+.commission-member img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 10px; /* Adds space between the image and the name */
+}
+
+.commission-member div {
+    text-align: center; /* Centers the name text */
+}

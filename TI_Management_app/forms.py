@@ -2533,8 +2533,8 @@ class VotingAddForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
-                'placeholder': 'Członek komisji wyborczej',
-                'aria-label': 'Członek komisji wyborczej',
+                'placeholder': 'Członek Komisji Wyborczej',
+                'aria-label': 'Członek Komisji Wyborczej',
                 'list': 'commission_database'
             }
         ),
@@ -2580,8 +2580,84 @@ class VotingAddForm(forms.ModelForm):
 
     vote_method_offline = forms.BooleanField(
         required=False,
-        widget=forms.CheckboxInput(),
-        label='LUMS Voting Station'
+        widget=forms.CheckboxInput(attrs={'disabled': 'disabled'}),
+        label='LUMS Voting Station',
+        initial=True
+    )
+
+    min_amount_members = forms.IntegerField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'aria-label': 'Minimalna ilość Uczestników'
+            }
+        ),
+        validators=[
+            MinValueValidator(
+                limit_value=1,
+                message="Minimalna ilość Uczestników musi być dodatnia i nie mniejsza niż 1."
+            ),
+            MaxValueValidator(
+                limit_value=9999,
+                message="Maksymalna ilość Czestników to 9999."
+            ),
+            RegexValidator(
+                r'^\d{0,8}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        required=True
+    )
+
+    min_amount_commission = forms.IntegerField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'aria-label': 'Minimalna ilość Komisji Wyborczej'
+            }
+        ),
+        validators=[
+            MinValueValidator(
+                limit_value=1,
+                message="Minimalna ilość Komisji Wyborczej musi być dodatnia i nie mniejsza niż 1."
+            ),
+            MaxValueValidator(
+                limit_value=9999,
+                message="Maksymalna ilość Komisji Wyborczej to 9999."
+            ),
+            RegexValidator(
+                r'^\d{0,8}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        required=True
+    )
+
+    turnout = forms.IntegerField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'aria-label': 'Minimalna frekwencja'
+            }
+        ),
+        validators=[
+            MinValueValidator(
+                limit_value=1,
+                message="Minimalna frekwencja musi być dodatnia i nie mniejsza niż 1."
+            ),
+            MaxValueValidator(
+                limit_value=100,
+                message="Maksymalna frekwencja to 100%."
+            ),
+            RegexValidator(
+                r'^\d{0,8}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        required=True
     )
 
     class Meta:
@@ -2596,7 +2672,10 @@ class VotingAddForm(forms.ModelForm):
             'participants_all',
             'participants_group',
             'date_accede',
-            'period'
+            'period',
+            'min_amount_members',
+            'min_amount_commission',
+            'turnout'
         ]
         widgets = {
             'description': CKEditor5Widget(

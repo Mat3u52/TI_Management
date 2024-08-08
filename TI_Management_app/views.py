@@ -3599,6 +3599,7 @@ def voting_add(request):
             # vote_method_offline = form.cleaned_data['vote_method_offline']
             participants_group = form.cleaned_data['participants_group']
             participants = request.POST.getlist('participants')
+            commission = request.POST.getlist('commission')
 
             period = form.cleaned_data['period']
             date_accede = form.cleaned_data['date_accede']
@@ -3607,35 +3608,25 @@ def voting_add(request):
             voting = form.save(commit=False)
             voting.author = request.user
             voting.description = sanitized_description
+            voting.vote_method_offline = True
             voting.save()
 
-            # if participants_all:
-            #     if period and date_accede:
-            #         members_to_add = set()
-            #         date_accede = datetime.strptime(date_accede, '%Y-%m-%d').date()
-            #         if isinstance(date_accede, datetime):
-            #             date_accede = date_accede.date()
+            commission_set = set()
+            for commission_one in commission:
+                try:
+                    commission_member = MembersZZTI.objects.get(member_nr=commission_one)
+                    commission_set.add(commission_member)
+                except MembersZZTI.DoesNotExist:
+                    print(f"Commission with member_nr {commission_one} does not exist")
+
+            print(commission_set)
+
+            # for member_commission in commission_set:
+            #     voting.election_commission.add(member_commission)
             #
-            #         if period == 'from':
-            #             members_to_add = members.filter(date_of_accession__gt=date_accede)
-            #         elif period == 'to':
-            #             members_to_add = members.filter(date_of_accession__lt=date_accede)
-            #         else:
-            #             members_to_add = members.filter(date_of_accession=date_accede)
-            #         # if period == 'from':
-            #         #     members_to_add = {member for member in members if member.date_of_accession > date_accede}
-            #         # elif period == 'to':
-            #         #     members_to_add = {member for member in members if member.date_of_accession < date_accede}
-            #         # else:
-            #         #     members_to_add = {member for member in members if member.date_of_accession == date_accede}
-            #
-            #         voting.members.set(members_to_add)
-            #         voting.save()
-            #     else:
-            #         for member in set(members):
-            #             # print(member.member_nr)
-            #             voting.members.add(member)
-            #         voting.save()
+            # voting.save()
+            voting.election_commission.set(commission_set)
+
             if participants_all:
                 members_to_add = set()
                 if period and date_accede:
@@ -3698,7 +3689,7 @@ def voting_add(request):
                 for member_set in members_set:
                     voting.members.add(member_set)
 
-                voting.save()
+            voting.save()
 
             messages.success(request, f"Dodano głosowanie - {voting.title}!")
             return redirect('TI_Management_app:voting_add_poll', pk=voting.pk)

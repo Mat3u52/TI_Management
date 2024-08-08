@@ -78,23 +78,19 @@
         <br /><br />
 
         <p><b>Typ głosowania:</b></p>
-        <p>LUMS Voting Station</p>
+<!--        <p>LUMS Voting Station</p>-->
 <!--        {{ form.vote_method_online }}-->
 <!--        {{ form.vote_method_online.label }}-->
-<!--        {{ form.vote_method_offline }}-->
-<!--        {{ form.vote_method_offline.label }}-->
+        {{ form.vote_method_offline }}
+        {{ form.vote_method_offline.label }}
         <br /><br />
 
-
-
-
-
-        <p><b>Skład komisji wyborczej:</b></p>
+        <p><b>Skład Komisji Wyborczej:</b></p>
         <br />
         <div id="commission-section">
             <div id="inputContainerCommission">
                 <div class="inputGroupCommission">
-                    <label for="commission_0">Członek komisji wyborczej 1:</label>
+                    <label for="commission_0">Członek Komisji Wyborczej 1:</label>
                     {{ form.commission }}
                     <datalist id="commission_database">
                         {% for member in members %}
@@ -107,18 +103,22 @@
         </div>
         <br />
         <br />
+        <p><b>Minimalna ilość Uczestników:</b></p>
+        {{ form.min_amount_members }}
+        <br />
+        <br />
+        <p><b>Minimalna ilość Komisji Wyborczej:</b></p>
+        {{ form.min_amount_commission }}
+        <br />
+        <br />
+        <p><b>Minimalna frekwencja [%] + 1 głos:</b></p>
+        {{ form.turnout }}
 
-
-
-
-
-
-
-
-
-
+        <br />
+        <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>
-        <br /><br />
+        <br />
+        <br />
     </form>
 </div>
 
@@ -176,13 +176,13 @@
 
         const newLabelCommission = document.createElement('label');
         newLabelCommission.setAttribute('for', `commission_${fieldCountCommission}`);
-        newLabelCommission.textContent = `Członek komisji wyborczej ${fieldCountCommission + 1}:`;
+        newLabelCommission.textContent = `Członek Komisji Wyborczej ${fieldCountCommission + 1}:`;
 
         const newInputCommission = document.createElement('input');
         newInputCommission.setAttribute('type', 'text');
         newInputCommission.setAttribute('id', `commission_${fieldCountCommission}`);
         newInputCommission.setAttribute('name', 'commission');
-        newInputCommission.setAttribute('placeholder', `Członek komisji wyborczej`);
+        newInputCommission.setAttribute('placeholder', `Członek Komisji Wyborczej`);
         newInputCommission.setAttribute('list', 'commission_database');
 
         newInputGroupCommission.appendChild(newLabelCommission);

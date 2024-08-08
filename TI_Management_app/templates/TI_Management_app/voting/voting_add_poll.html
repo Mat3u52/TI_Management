@@ -95,6 +95,19 @@
 <div class="hero-unit">
     <h3>{{ voting.title }}</h3>
     <hr>
+    <p><em><small>{{ voting.description|safe }}</small></em></p>
+    <br />
+    <p><b>Komisja Wyborcza:</b></p>
+    <div class="container-commission">
+        {% for commission in voting.election_commission.all %}
+            <div class="commission-member">
+                <div><img src="{% thumbnail commission.image 150x0  quality=100 %}"></div>
+                <div>{{ commission.forename }}&nbsp;{{ commission.surname }}</div>
+            </div>
+        {% empty %}
+            <div>Brak komisji wyborczej.</div>
+        {% endfor %}
+    </div>
     <br />
 
     <p><b>Ilość uczestników:</b> {{ voting.members.count }}</p>
