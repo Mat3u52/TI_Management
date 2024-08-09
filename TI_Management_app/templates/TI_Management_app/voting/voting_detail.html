@@ -18,16 +18,39 @@
         <em>{{ voting.description|safe }}</em>
 
         <p><b>Ilość uczestników:</b> {{ voting.members.count }}</p>
+        <p><b>Minimalna ilość Uczestników:</b> {{ voting.min_amount_members }}</p>
         <p><b>Uczestnicy:</b></p>
             <ul>
                 {% for member in voting.members.all %}
                     <li>
+                        {{ member.member_nr }} -
                         <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
-                            {{ member.forename }} {{ member.surname }} - {{ member.member_nr }}
+                            {{ member.forename }} {{ member.surname }}
                         </a>
                     </li>
                 {% endfor %}
             </ul>
+        <br />
+
+        <p><b>Komisja Wyborcza:</b></p>
+        <div class="container-commission">
+            {% for commission in voting.election_commission.all %}
+                <div class="commission-member">
+                    <div><img src="{% thumbnail commission.image 150x0  quality=100 %}"></div>
+                    <div>
+                        <a href="{% url 'TI_Management_app:member_detail' pk=commission.pk %}">
+                            {{ commission.forename }}&nbsp;{{ commission.surname }}
+                        </a>
+                    </div>
+                </div>
+            {% empty %}
+                <div>Brak komisji wyborczej.</div>
+            {% endfor %}
+        </div>
+        <br />
+        <p><b>Minimalna ilość Komisji Wyborczej:</b> {{ voting.min_amount_commission }} </p>
+        <br />
+        <p><b>Minimalna frekwencja [%] + 1 głos:</b> {{ voting.turnout }} </p>
         <br />
         <p><b>Start:</b> {{voting.date_start}} </p>
         <p><b>Koniec:</b> {{voting.date_end}} </p>

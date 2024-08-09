@@ -3863,6 +3863,13 @@ def voting_edit(request, pk):
     # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
     members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
 
+    current_date = timezone.now()
+    voting_date_start = voting.date_start
+    if voting_date_start > current_date:
+        voting_status: bool = True
+    else:
+        voting_status: bool = False
+
     if request.method == "POST":
         form = VotingAddForm(request.POST, instance=voting)
         form_duration = VotingAddRecapForm(request.POST, instance=voting)
@@ -3920,7 +3927,8 @@ def voting_edit(request, pk):
             'form': form,
             'form_duration': form_duration,
             'members': members,
-            'voting': voting
+            'voting': voting,
+            'voting_status': voting_status
         }
     )
 

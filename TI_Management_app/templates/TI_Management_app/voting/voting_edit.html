@@ -8,6 +8,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% if voting_status %}
+
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">Aktualizacja - {{ voting.title|truncatewords:20 }} </h2>
     <hr>
@@ -37,15 +40,17 @@
         <br /><br />
 
         <p><b>Rodzaj głosowania:</b></p>
-        {{ form.vote_type }}
+        {{ form.dummy_vote_type }}
+        {{ form.dummy_vote_type.label }}
         <br /><br />
-        
+        <div class="notepad">
         <p><b>Uczestnicy:</b></p>
             <ul>
                 {% for member in voting.members.all %}
                     <li>
+                        {{ member.member_nr }} -
                         <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
-                            {{ member.forename }} {{ member.surname }} - {{ member.member_nr }}
+                            {{ member.forename }} {{ member.surname }}
                         </a>
                         <a href="{% url 'TI_Management_app:remove_member_from_vote' vote_pk=voting.pk member_pk=member.pk %}"
                            class="btn btn-danger btn-small pull-right">
@@ -55,6 +60,7 @@
                 {% endfor %}
             </ul>
         <br />
+        <p><b>Dodaj:</b></p>
         <p>
             {{ form.participants_all }}
             {{ form.participants_all.label }}
@@ -86,17 +92,34 @@
                 {{ form.participants_group.label }}
             </label>
         </div>
+        <br />
+        <p><b>Minimalna ilość Uczestników:</b></p>
+        {{ form.min_amount_members }}
+        <br />
+        <br />
+
+        </div>
 
         <br />
         <br />
 
         <p><b>Typ głosowania:</b></p>
-        {{ form.vote_method_online }}
-        {{ form.vote_method_online.label }}
+<!--        {{ form.vote_method_online }}-->
+<!--        {{ form.vote_method_online.label }}-->
         {{ form.vote_method_offline }}
         {{ form.vote_method_offline.label }}
         <br />
         <br />
+
+        <p><b>Minimalna ilość Komisji Wyborczej:</b></p>
+        {{ form.min_amount_commission }}
+        <br />
+        <br />
+        <p><b>Minimalna frekwencja [%] + 1 głos:</b></p>
+        {{ form.turnout }}
+        <br />
+        <br />
+
 
         <p><b>Początek głosowania:</b></p>
             {{ form_duration.date_start }}
@@ -162,6 +185,8 @@
         });
     });
 </script>
+
+{% endif %}
 
 {% endblock %}
 

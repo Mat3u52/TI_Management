@@ -2659,13 +2659,19 @@ class VotingAddForm(forms.ModelForm):
         ],
         required=True
     )
+    dummy_vote_type = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(attrs={'disabled': 'disabled'}),
+        label='Tajne',
+        initial=True
+    )
 
     class Meta:
         model = Vote
         fields = [
             'title',
             'description',
-            'vote_type',
+            'dummy_vote_type',
             'vote_method_online',
             'vote_method_offline',
             'participants',

@@ -102,21 +102,36 @@
         {% for commission in voting.election_commission.all %}
             <div class="commission-member">
                 <div><img src="{% thumbnail commission.image 150x0  quality=100 %}"></div>
-                <div>{{ commission.forename }}&nbsp;{{ commission.surname }}</div>
+                <div>
+                    <a href="{% url 'TI_Management_app:member_detail' pk=commission.pk %}">
+                        {{ commission.forename }}&nbsp;{{ commission.surname }}
+                    </a>
+                </div>
             </div>
         {% empty %}
             <div>Brak komisji wyborczej.</div>
         {% endfor %}
     </div>
     <br />
+    <p><b>Minimalna ilość Komisji Wyborczej:</b> {{ voting.min_amount_commission }} </p>
+    <br />
 
-    <p><b>Ilość uczestników:</b> {{ voting.members.count }}</p>
+    <p><b>Ilość Uczestników:</b> {{ voting.members.count }}</p>
         <p><b>Uczestnicy:</b></p>
             <ul>
                 {% for member in voting.members.all %}
-                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
+                    <li>
+                        {{ member.member_nr }} -
+                        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                            {{ member.forename }} {{ member.surname }}
+                        </a>
+                    </li>
                 {% endfor %}
             </ul>
+    <br />
+    <p><b>Minimalna ilość Uczestników:</b> {{ voting.min_amount_members }} </p>
+    <br />
+    <p><b>Minimalna frekwencja [%] + 1 głos:</b> {{ voting.turnout }} </p>
     <br />
 
     {% for poll in voting.votePoll.all %}
