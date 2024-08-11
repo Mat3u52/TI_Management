@@ -3603,7 +3603,7 @@ def voting_add(request):
 
             period = form.cleaned_data['period']
             date_accede = form.cleaned_data['date_accede']
-            print(f"Received period views: {period}")
+            # print(f"Received period views: {period}")
 
             voting = form.save(commit=False)
             voting.author = request.user
@@ -3619,7 +3619,7 @@ def voting_add(request):
                 except MembersZZTI.DoesNotExist:
                     print(f"Commission with member_nr {commission_one} does not exist")
 
-            print(commission_set)
+            # print(commission_set)
 
             # for member_commission in commission_set:
             #     voting.election_commission.add(member_commission)
@@ -3881,10 +3881,24 @@ def voting_edit(request, pk):
             participants_all = form.cleaned_data['participants_all']
             participants_group = form.cleaned_data['participants_group']
             participants = request.POST.getlist('participants')
+            commission = request.POST.getlist('commission')
 
             voting = form.save(commit=False)
             voting.author = request.user
             voting.description = sanitized_description
+            voting.save()
+
+            commission_set = set()
+            for commission_one in commission:
+                try:
+                    commission_member = MembersZZTI.objects.get(member_nr=commission_one)
+                    commission_set.add(commission_member)
+                except MembersZZTI.DoesNotExist:
+                    print(f"Commission with member_nr {commission_one} does not exist")
+
+            # voting.election_commission.set(commission_set)
+            for member_set in commission_set:
+                voting.election_commission.add(member_set)
             voting.save()
 
             if participants_all:
@@ -3939,6 +3953,16 @@ def remove_member_from_vote(request, vote_pk, member_pk):
     member_instance = get_object_or_404(MembersZZTI, pk=member_pk)
 
     vote_instance.members.remove(member_instance)
+
+    return redirect('TI_Management_app:voting_edit', pk=vote_pk)
+
+
+@login_required
+def remove_election_commission_from_vote(request, vote_pk, member_pk):
+    vote_instance = get_object_or_404(Vote, pk=vote_pk)
+    election_commission_instance = get_object_or_404(MembersZZTI, pk=member_pk)
+
+    vote_instance.election_commission.remove(election_commission_instance)
 
     return redirect('TI_Management_app:voting_edit', pk=vote_pk)
 

@@ -168,31 +168,29 @@
 
 
 
-    let fieldCountCommission = 1;
+        let fieldCountCommission = 1;
 
-    document.getElementById('addButtonCommission').addEventListener('click', function() {
-        const newInputGroupCommission = document.createElement('div');
-        newInputGroupCommission.classList.add('inputGroupCommission');
+        document.getElementById('addButtonCommission').addEventListener('click', function() {
+            const newInputGroupCommission = document.createElement('div');
+            newInputGroupCommission.classList.add('inputGroupCommission');
 
-        const newLabelCommission = document.createElement('label');
-        newLabelCommission.setAttribute('for', `commission_${fieldCountCommission}`);
-        newLabelCommission.textContent = `Członek Komisji Wyborczej ${fieldCountCommission + 1}:`;
+            const newLabelCommission = document.createElement('label');
+            newLabelCommission.setAttribute('for', `commission_${fieldCountCommission}`);
+            newLabelCommission.textContent = `Członek Komisji Wyborczej ${fieldCountCommission + 1}:`;
 
-        const newInputCommission = document.createElement('input');
-        newInputCommission.setAttribute('type', 'text');
-        newInputCommission.setAttribute('id', `commission_${fieldCountCommission}`);
-        newInputCommission.setAttribute('name', 'commission');
-        newInputCommission.setAttribute('placeholder', `Członek Komisji Wyborczej`);
-        newInputCommission.setAttribute('list', 'commission_database');
+            const newInputCommission = document.createElement('input');
+            newInputCommission.setAttribute('type', 'text');
+            newInputCommission.setAttribute('id', `commission_${fieldCountCommission}`);
+            newInputCommission.setAttribute('name', 'commission');
+            newInputCommission.setAttribute('placeholder', `Członek Komisji Wyborczej`);
+            newInputCommission.setAttribute('list', 'commission_database');
 
-        newInputGroupCommission.appendChild(newLabelCommission);
-        newInputGroupCommission.appendChild(newInputCommission);
-        document.getElementById('inputContainerCommission').appendChild(newInputGroupCommission);
+            newInputGroupCommission.appendChild(newLabelCommission);
+            newInputGroupCommission.appendChild(newInputCommission);
+            document.getElementById('inputContainerCommission').appendChild(newInputGroupCommission);
 
-        fieldCountCommission++;
-    });
-
-
+            fieldCountCommission++;
+        });
 
 
     });

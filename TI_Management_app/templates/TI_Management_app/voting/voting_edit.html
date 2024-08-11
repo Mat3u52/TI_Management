@@ -97,6 +97,7 @@
         {{ form.min_amount_members }}
         <br />
         <br />
+        {{ form.period.as_hidden }}
 
         </div>
 
@@ -110,9 +111,46 @@
         {{ form.vote_method_offline.label }}
         <br />
         <br />
+        <div class="notepad">
 
-        <p><b>Minimalna ilość Komisji Wyborczej:</b></p>
-        {{ form.min_amount_commission }}
+            <p><b>Komisja Wyborcza:</b></p>
+            <ul>
+                {% for member in voting.election_commission.all %}
+                    <li>
+                        {{ member.member_nr }} -
+                        <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                            {{ member.forename }} {{ member.surname }}
+                        </a>
+                        <a href="{% url 'TI_Management_app:remove_election_commission_from_vote' vote_pk=voting.pk member_pk=member.pk %}"
+                           class="btn btn-danger btn-small pull-right">
+                            usuń
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <br />
+
+            <div id="commission-section">
+            <div id="inputContainerCommission">
+                <div class="inputGroupCommission">
+                    <label for="commission_0">Członek Komisji Wyborczej 1:</label>
+                    {{ form.commission }}
+                    <datalist id="commission_database">
+                        {% for member in members %}
+                            <option value="{{ member.member_nr }}">{{ member.forename }} {{ member.surname }}</option>
+                        {% endfor %}
+                    </datalist>
+                </div>
+            </div>
+            <button type="button" id="addButtonCommission" class="btn btn-primary btn-small pull-left">Dodaj</button>
+            </div>
+            <br />
+            <br />
+
+            <p><b>Minimalna ilość Komisji Wyborczej:</b></p>
+            {{ form.min_amount_commission }}
+
+        </div>
         <br />
         <br />
         <p><b>Minimalna frekwencja [%] + 1 głos:</b></p>
@@ -146,6 +184,7 @@
         var checkbox = document.getElementById('{{ form.participants_all.id_for_label }}');
         var participantsSection = document.getElementById('participants-section');
         var groupsSection = document.getElementById('groups-section');
+        var participantsSectionCommission = document.getElementById('commission-section');
 
         function toggleVisibility() {
             if (checkbox.checked) {
@@ -183,6 +222,32 @@
 
             fieldCount++;
         });
+
+
+        let fieldCountCommission = 1;
+
+        document.getElementById('addButtonCommission').addEventListener('click', function() {
+            const newInputGroupCommission = document.createElement('div');
+            newInputGroupCommission.classList.add('inputGroupCommission');
+
+            const newLabelCommission = document.createElement('label');
+            newLabelCommission.setAttribute('for', `commission_${fieldCountCommission}`);
+            newLabelCommission.textContent = `Członek Komisji Wyborczej ${fieldCountCommission + 1}:`;
+
+            const newInputCommission = document.createElement('input');
+            newInputCommission.setAttribute('type', 'text');
+            newInputCommission.setAttribute('id', `commission_${fieldCountCommission}`);
+            newInputCommission.setAttribute('name', 'commission');
+            newInputCommission.setAttribute('placeholder', `Członek Komisji Wyborczej`);
+            newInputCommission.setAttribute('list', 'commission_database');
+
+            newInputGroupCommission.appendChild(newLabelCommission);
+            newInputGroupCommission.appendChild(newInputCommission);
+            document.getElementById('inputContainerCommission').appendChild(newInputGroupCommission);
+
+            fieldCountCommission++;
+        });
+
     });
 </script>
 
