@@ -341,6 +341,9 @@ class Choice(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug and self.answer:
             self.slug = slugify(self.answer)
+        else:
+            # Generate a unique slug if the answer is missing
+            self.slug = slugify(f"{self.poll}")
         super().save(*args, **kwargs)
 
 

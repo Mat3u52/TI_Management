@@ -2704,6 +2704,18 @@ class VotingAddForm(forms.ModelForm):
             ),
         }
 
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
+        # Determine if the form is in edit mode (i.e., the instance already exists)
+        is_editing = self.instance and self.instance.pk
+
+        # Make the commission field optional (required=False) if editing
+        if is_editing:
+            self.fields['commission'].required = False
+        else:
+            self.fields['commission'].required = True
+
     def clean_participants(self):
         participants = self.cleaned_data.get('participants', '')
         if participants:
@@ -2722,6 +2734,7 @@ class VotingAddForm(forms.ModelForm):
 
     def clean_commission(self):
         commission = self.cleaned_data.get('commission', '')
+
         if commission:
             commission_list = [p.strip() for p in commission.split(',') if p.strip()]
             invalid_commission = []
@@ -2742,9 +2755,9 @@ class VotingAddForm(forms.ModelForm):
         date_accede = cleaned_data.get("date_accede")
         participants = cleaned_data.get('participants', '')
 
-        print(f"Received period: {period}")
-        print(f"Received date_accede: {date_accede}")
-        print(f"Received participants: {participants}")
+        # print(f"Received period: {period}")
+        # print(f"Received date_accede: {date_accede}")
+        # print(f"Received participants: {participants}")
 
         if participants and date_accede:
             if isinstance(date_accede, datetime):
@@ -2760,17 +2773,17 @@ class VotingAddForm(forms.ModelForm):
             for participant in participants_list:
                 try:
                     member = MembersZZTI.objects.get(member_nr=participant)
-                    print(f"Checking member: {member}")
+                    # print(f"Checking member: {member}")
 
                     # Assuming `period` should be checked as well, otherwise this check might not be necessary
                     if period == 'from':
-                        print(f"Checking period condition: {period}")
+                        # print(f"Checking period condition: {period}")
                         if isinstance(member.date_of_accession, datetime):
                             member_date_of_accession = member.date_of_accession.date()
                         else:
                             member_date_of_accession = member.date_of_accession
 
-                        print(f"Comparing dates: {date_accede_obj} > {member_date_of_accession}")
+                        # print(f"Comparing dates: {date_accede_obj} > {member_date_of_accession}")
 
                         if date_accede_obj > member_date_of_accession:
                             raise ValidationError(
@@ -2778,13 +2791,13 @@ class VotingAddForm(forms.ModelForm):
                             )
 
                     elif period == 'to':
-                        print(f"Checking period condition: {period}")
+                        # print(f"Checking period condition: {period}")
                         if isinstance(member.date_of_accession, datetime):
                             member_date_of_accession = member.date_of_accession.date()
                         else:
                             member_date_of_accession = member.date_of_accession
 
-                        print(f"Comparing dates: {date_accede_obj} < {member_date_of_accession}")
+                        # print(f"Comparing dates: {date_accede_obj} < {member_date_of_accession}")
 
                         if date_accede_obj < member_date_of_accession:
                             raise ValidationError(
