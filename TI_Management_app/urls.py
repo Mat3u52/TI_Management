@@ -549,6 +549,11 @@ urlpatterns = [
         name='remove_election_commission_from_vote'
     ),
     path(
+        'TI_Management_app/voting/voting-edit-poll-remove/<int:vote_pk>/<int:poll_pk>/',
+        views.voting_edit_poll_remove,
+        name='voting_edit_poll_remove'
+    ),
+    path(
         'TI_Management_app/voting/voting-list/',
         views.voting_list,
         name='voting_list'

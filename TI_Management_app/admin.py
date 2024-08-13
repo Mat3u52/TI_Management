@@ -701,7 +701,7 @@ class VoteAdmin(admin.ModelAdmin):
         'slug',
         'author',
         'title',
-        'description',
+        # 'description',
         'vote_type',
         'vote_method_online',
         'vote_method_offline',
@@ -721,7 +721,7 @@ class VoteAdmin(admin.ModelAdmin):
         'slug',
         'author',
         'title',
-        'description',
+        # 'description',
         'vote_type',
         'vote_method_online',
         'vote_method_offline',
@@ -757,7 +757,7 @@ class PollAdmin(admin.ModelAdmin):
         'author',
         'vote',
         'question',
-        'description',
+        # 'description',
         'number_of_responses'
     )
     list_filter = (
@@ -767,7 +767,7 @@ class PollAdmin(admin.ModelAdmin):
         'author',
         'vote',
         'question',
-        'description',
+        # 'description',
         'number_of_responses'
     )
     search_fields = (

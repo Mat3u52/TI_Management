@@ -2707,10 +2707,9 @@ class VotingAddForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # Determine if the form is in edit mode (i.e., the instance already exists)
+        # the instance already exists
         is_editing = self.instance and self.instance.pk
 
-        # Make the commission field optional (required=False) if editing
         if is_editing:
             self.fields['commission'].required = False
         else:

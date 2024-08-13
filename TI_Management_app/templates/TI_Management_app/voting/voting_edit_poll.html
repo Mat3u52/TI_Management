@@ -8,6 +8,9 @@
 {% endblock %}
 
 {% block content %}
+
+{% if voting_status %}
+
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">Aktualizacja głosowania - {{ voting.title }}</h2>
     <hr>
@@ -34,6 +37,7 @@
         {{ form.media }}
         {{ form.description }}
         <br /><br />
+        {% if open_answer is not True %}
         <table width="100%">
             {% for choice in poll.pollChoice.all %}
                     {% if choice.correct %}
@@ -49,6 +53,7 @@
                     {% else %}
                         <tr>
                             <td>
+                                {% if choice.answer is not None %}
                                 {{ choice.answer }}
                                 {% if choice.answer|member_full_name_exist %}
                                     {{ choice.answer|member_full_name_exist }}
@@ -62,6 +67,7 @@
                                     class="btn btn-danger btn-small pull-right">
                                     usuń
                                 </a>
+                                {% endif %}
                             </td>
                         </tr>
                     {% endif %}
@@ -101,14 +107,25 @@
 
         <br />
         <br />
+
+        {% else %}
+
         <div id="openEndedAnswer">
             <label for="openEndedAnswerCheckbox">Pytanie otwarte:</label>
-            {{ form_choice.open_ended_answer }}
+<!--            {{ form_choice.open_ended_answer }}-->
+            <input
+                type="checkbox"
+                aria-label=""
+                name=""
+                checked
+                disabled>
         </div>
         <br />
         <textarea style="resize: none;" rows="4" cols="50" disabled></textarea>
         <br />
         <br />
+
+        {% endif %}
 
 <!--        <p><b>Koniec:</b></p>-->
         <p>
@@ -117,7 +134,12 @@
 
         <br />
         <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        <p>
+            <a href="{% url 'TI_Management_app:voting_edit_poll_remove' vote_pk=voting.pk poll_pk=poll.pk %}" class="btn btn-danger btn-large pull-left">
+                Usuń
+            </a>
+            <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        </p>
         <br />
         <br />
     </form>
@@ -182,6 +204,8 @@ document.addEventListener('DOMContentLoaded', function () {
     updateNumberOfResponses();
 });
 </script>
+
+{% endif %}
 
 {% endblock %}
 

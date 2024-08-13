@@ -3968,12 +3968,36 @@ def remove_election_commission_from_vote(request, vote_pk, member_pk):
 
 
 @login_required
+def voting_edit_poll_remove(request, vote_pk, poll_pk):
+    # vote_instance = get_object_or_404(Vote, pk=vote_pk)
+    poll_instance = get_object_or_404(Poll, pk=poll_pk)
+
+    poll_instance.delete()
+
+    return redirect('TI_Management_app:voting_detail', pk=vote_pk)
+
+
+@login_required
 def voting_edit_poll(request, pk, poll_pk):
     voting = get_object_or_404(Vote, pk=pk)
     poll = get_object_or_404(Poll, pk=poll_pk)
     poll_exist = voting.votePoll.exists()
     members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
-    # choice = get_object_or_404(Choice, pk=choice_pk)
+    # choice = Choice.objects.filter(poll=poll_pk)
+    choices = poll.pollChoice.all()
+
+    current_date = timezone.now()
+    voting_date_start = voting.date_start
+    if voting_date_start > current_date:
+        voting_status: bool = True
+    else:
+        voting_status: bool = False
+
+    for choice in choices:
+        if choice.open_ended_answer is True:
+            open_answer: bool = True
+        else:
+            open_answer: bool = False
 
     if request.method == "POST":
         form = VotingAddPollForm(request.POST, instance=poll)
@@ -4018,7 +4042,9 @@ def voting_edit_poll(request, pk, poll_pk):
             'voting': voting,
             'poll_exist': poll_exist,
             'poll': poll,
-            'members': members
+            'members': members,
+            'voting_status': voting_status,
+            'open_answer': open_answer
         }
     )
 

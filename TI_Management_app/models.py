@@ -263,6 +263,9 @@ class Vote(models.Model):
 
     election_commission = models.ManyToManyField(MembersZZTI, related_name='voteElectionCommission')
 
+    # session_start
+    # session_end
+
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
