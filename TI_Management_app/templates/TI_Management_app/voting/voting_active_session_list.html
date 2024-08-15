@@ -1,0 +1,66 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:active_voting_list' %}"><b> / Aktywne Sesje Głosowania </b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktywne Sesje Głosowania</h2>
+    <hr>
+    <br />
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:active_voting_search' %}">
+        {% csrf_token %}
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Szukaj Głosowania"
+                aria-label="Search"
+                name="searched"
+                autofocus="autofocus">
+        <br />
+        <br />
+        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    <p><b>Aktywne sejse:</b></p>
+    <br />
+    {% for vote in voting %}
+    <h3>
+        <a href="{% url 'TI_Management_app:voting_detail' pk=vote.pk %}">
+            {{vote.title}}
+        </a>
+    </h3>
+    <hr>
+    <div class="notepad">
+        <p><b>Ilość uczestników:</b> {{ vote.members.count }}</p>
+        <p><b>Opis:</b></p>
+        <em>{{ vote.description|safe }}</em>
+        <br />
+        <p><b>Start:</b> {{vote.date_start}} </p>
+        <p><b>Koniec:</b> {{vote.date_end}} </p>
+
+        <p>
+            <a href="{% url 'TI_Management_app:voting_detail' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
+                Więcej informacji
+            </a>
+        </p>
+        <div class="date"><p>Data dodania: {{vote.created_date}} przez: {{ vote.author }}</p></div>
+    </div>
+    <br />
+    {% endfor %}
+</div>
+
+
+{% include 'TI_Management_app/pagination.html' with page=voting %}
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='active_voting_list' %}
+{% endblock %}

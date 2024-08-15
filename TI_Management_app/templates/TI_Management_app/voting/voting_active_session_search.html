@@ -1,0 +1,41 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:active_voting_list' %}"><b> / Aktywne Sesje Głosowania </b></a>
+<a href="#"><b> / Wyszukiwarka</b></a>
+{% endblock %}
+
+{% block content %}
+    {% if searched %}
+        <h2 class="fadeInUp-animation">Szukasz: <span class="search-style">{{ searched }}</span></h2>
+        <hr>
+        <br />
+        <div class="hero-unit">
+        {% for vote in voting %}
+            <div class="notepad">
+                <h3>
+                    <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}">
+                        {{vote.title}}
+                    </a>
+                </h3>
+                <p>
+                    <a href="{% url 'TI_Management_app:voting_add_poll' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
+                        Więcej informacji
+                    </a>
+                </p>
+                <div class="date"><p>Data dodania: {{ vote.created_date }}</p></div>
+            </div>
+        {% endfor %}
+        </div>
+    {% else %}
+        <div class="hero-unit">
+            <h4>Proszę, wprowadź frazę w pole wyszukiwania</h4>
+            <br />
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='active_voting_list' %}
+{% endblock %}
