@@ -263,15 +263,13 @@ class Vote(models.Model):
 
     election_commission = models.ManyToManyField(MembersZZTI, related_name='voteElectionCommission')
 
-    # session_start
-    # session_end
-
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
 
     class Meta:
         verbose_name_plural = 'Głosowanie'
+        ordering = ('-created_date',)
         """"
         This feature is disabled for MySQL DB
         origin = ['-created_date']
@@ -348,6 +346,113 @@ class Choice(models.Model):
             # Generate a unique slug if the answer is missing
             self.slug = slugify(f"{self.poll}")
         super().save(*args, **kwargs)
+
+
+class VotingSessionKickOff(models.Model):
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingSessionKickOff')
+    title = models.CharField(max_length=250, null=False, blank=False)
+
+    vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='voteVotingSessionKickOff')
+    commission_confirmed = models.BooleanField(default=False)
+
+    session_start = models.DateTimeField(default=None, blank=True, null=True)
+    session_end = models.DateTimeField(default=None, blank=True, null=True)
+    session_closed = models.BooleanField(default=False)
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Sesje Głosowania Rozpoczęcie'
+        ordering = ('-created_date',)
+        """"
+        This feature is disabled for MySQL DB
+        origin = ['-created_date']
+        indexes = [
+            models.Index(fields=['-created_date'])
+        ]
+        """
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('TI_Management_app:voting_session_kick_off', args=[self.pk])
+
+
+class VotingSessionKickOffSignature(models.Model):
+
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingSessionKickOffSignature')
+
+    voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='voteVotingSessionKickOff', null=False, blank=False)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionKickOffSignature', null=False, blank=False)
+    # vote = models.ForeignKey(Vote, on_delete=models.CASCADE, related_name='voteVotingSessionKickOffSignature', null=False, blank=False)
+    signature = models.BooleanField(default=False)
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Podpisy rozpoczęcia sesji '
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.voting_session_kick_off
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.voting_session_kick_off}")
+        super().save(*args, **kwargs)
+
+# class VotingSession(models.Model):
+#
+#     created_date = models.DateTimeField(auto_now_add=True)
+#     updated_date = models.DateTimeField(auto_now=True)
+#     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+#     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingSession')
+#     title = models.CharField(max_length=250, null=False, blank=False)
+#
+#     vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='voteVotingSession')
+#     commission_confirmed = models.BooleanField(default=False)
+#
+#     history = HistoricalRecords()
+#
+#     objects = models.Manager()  # default manager
+#
+#     class Meta:
+#         verbose_name_plural = 'Sesje Głosowania Rozpoczęcie'
+#         """"
+#         This feature is disabled for MySQL DB
+#         origin = ['-created_date']
+#         indexes = [
+#             models.Index(fields=['-created_date'])
+#         ]
+#         """
+#
+#     def __str__(self):
+#         return self.title
+#
+#     def save(self, *args, **kwargs):
+#         if not self.slug:
+#             self.slug = slugify(self.title)
+#         super().save(*args, **kwargs)
+#
+#     def get_absolute_url(self):
+#         return reverse('TI_Management_app:voting_session_kick_off', args=[self.pk])
 
 
 class MembersFile(models.Model):

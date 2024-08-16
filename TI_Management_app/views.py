@@ -128,6 +128,7 @@ import weasyprint
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 import redis
+
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 
 
@@ -150,13 +151,14 @@ ALLOWED_ATTRIBUTES = {
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
 
+    """
+        It is temporary piece of code for verification whether user is not deactivate.
+    """
     for member in members_obj:
         if member.date_of_abandonment:
             if member.date_of_abandonment < timezone.now():
                 member.deactivate = True
                 member.save()
-
-
 
     paginator = Paginator(members_obj, 50)
     page = request.GET.get('page')
@@ -3798,9 +3800,10 @@ def voting_add_recap(request, pk):
 
 @login_required
 def voting_list(request):
-    vote_obj = Vote.objects.all().order_by('-created_date')
+    # vote_obj = Vote.objects.all().order_by('-created_date')
+    vote_obj = Vote.objects.filter(date_start__gte=timezone.now()).order_by('-created_date')
     votes_without_date_start = Vote.objects.filter(date_start__isnull=True)
-    votes_with_date_start = Vote.objects.filter(date_start__isnull=False)
+    votes_with_date_start = Vote.objects.filter(date_start__gte=timezone.now(), date_start__isnull=False)
 
     paginator = Paginator(vote_obj, 50)
     page = request.GET.get('page')
@@ -3827,7 +3830,10 @@ def voting_list(request):
 def voting_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
-        voting = Vote.objects.filter(Q(title__icontains=searched))
+        voting = Vote.objects.filter(
+            Q(title__icontains=searched) &
+            Q(date_start__gte=timezone.now())
+        )
         return render(
             request,
             'TI_Management_app/voting/voting_search.html',
@@ -4055,3 +4061,53 @@ def remove_choice_from_poll(request, pk, vote_pk, poll_pk):
     choice.delete()
     return redirect('TI_Management_app:voting_edit_poll', pk=vote_pk, poll_pk=poll_pk)
 
+
+@login_required
+def voting_active_session_list(request):
+    vote_obj = Vote.objects.filter(
+        date_start__lte=timezone.now(),
+        date_end__gte=timezone.now()
+    ).order_by('-created_date')
+
+    paginator = Paginator(vote_obj, 50)
+    page = request.GET.get('page')
+    try:
+        voting = paginator.page(page)
+    except PageNotAnInteger:
+        voting = paginator.page(1)
+    except EmptyPage:
+        voting = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_list.html',
+        {
+            'page': page,
+            'voting': voting
+        }
+    )
+
+
+@login_required
+def voting_active_session_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        voting = Vote.objects.filter(
+            Q(title__icontains=searched) &
+            Q(date_start__lte=timezone.now()) &
+            Q(date_end__gte=timezone.now())
+        )
+        return render(
+            request,
+            'TI_Management_app/voting/active_voting_search.html',
+            {
+                'searched': searched,
+                'voting': voting
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/voting/active_voting_search.html',
+            {}
+        )

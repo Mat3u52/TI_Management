@@ -60,7 +60,6 @@
     <p><b>Przygotowane głosowania:</b></p>
     <br />
 {% for vote in votes_with_date_start %}
-    {% if voting_status is not True %}
 
     <h3>
         <a href="{% url 'TI_Management_app:voting_detail' pk=vote.pk %}">
@@ -91,8 +90,6 @@
         <div class="date"><p>Data dodania: {{vote.created_date}} przez: {{ vote.author }}</p></div>
     </div>
     <br />
-
-    {% endif %}
 
 {% endfor %}
 </div>

@@ -3,7 +3,7 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
-<a href="{% url 'TI_Management_app:voting_detail' voting.pk %}"><b> / {{ voting.title|truncatewords:20 }} </b></a>
+<a href="{% url 'TI_Management_app:voting_detail' voting.pk %}"><b> / {{ voting.title|truncatewords:5 }} </b></a>
 <a href="{% url 'TI_Management_app:voting_edit' voting.pk %}"><b> / Aktualizacja </b></a>
 {% endblock %}
 

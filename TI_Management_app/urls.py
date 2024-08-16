@@ -563,5 +563,15 @@ urlpatterns = [
         views.voting_search,
         name='voting_search'
     ),
+    path(
+        'TI_Management_app/voting/voting-active-session-list/',
+        views.voting_active_session_list,
+        name='voting_active_session_list'
+    ),
+    path(
+        'TI_Management_app/voting/voting-active-session-search/',
+        views.voting_active_session_search,
+        name='voting_active_session_search'
+    ),
 ]
 

@@ -64,8 +64,8 @@
             &#160;&#160;&#160;&#160;&#8728;&nbsp;importuj&nbsp;dane&nbsp;ze&nbsp;stacji&nbsp;głosowania
         </a>
     </li>
-    <li class="{% if active_tab == 'voting_import' %} active {% endif %}">
-        <a href="#">
+    <li class="{% if active_tab == 'voting_active_session_list' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:voting_active_session_list' %}">
             &#160;&#160;&#160;&#160;&#8728;&nbsp;aktywne sesje głosowania
         </a>
     </li>
