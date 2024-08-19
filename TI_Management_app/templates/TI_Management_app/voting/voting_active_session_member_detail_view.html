@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+{% load static %}
+{% load ti_management_tags %}
+{% load thumbnail %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
+
+        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
+
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/TI_Management_app.js' %}"></script>
+
+    </head>
+
+<body>
+
+
+
+<div class="hero-unit">
+  <h2 class="fadeInUp-animation">{{member.forename}} {{member.surname}} - {{member.member_nr}}</h2>
+  <hr>
+  <br />
+  {% if member.created_date %}
+  <div class="notepad">
+    <div style='display: block; float: right; margin-left: auto;'>
+      <div style="float: right; margin-left: auto;">
+        <a href="{{ member.image.url }}">
+          <img src="{% thumbnail member.image 250x0  quality=100 %}">
+        </a>
+<!--        <img src="{{ member.image.url }}" alt="image" style="width: 250px;">-->
+      </div>
+      <br/>
+
+      {% if member.deactivate %}
+        <span class="label label-warning pull-left">Dezaktywacja!</span>
+      {% endif %}
+
+      {% with existing_user=member.member_nr|admin_exist %}
+        {% if existing_user %}
+          <span class="label label-info pull-right">Administrator</span>
+        {% else %}
+          <!-- User not found -->
+        {% endif %}
+      {% endwith %}
+    </div>
+        <table>
+          <tr>
+            <td><p class="tableCredential"><b>Uczestnik:</b></p></td>
+            <td><p>{{member.forename}} {{member.surname}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Funkcja:</b></p></td>
+            <td><p>{{member.role}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Zawód:</b></p></td>
+            <td><p>{{member.occupation}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Numer uczestnika:</b></p></td>
+            <td><p>{{member.member_nr}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Płeć: </b></p></td>
+            <td>
+              {% if member.sex == 'male' %}<p>M</p>
+              {% elif member.sex == 'female' %}<p>K</p>
+              {% else %}<p>None</p>{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Data urodzenia: </b></p></td>
+            <td><p>{{member.birthday}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
+            <td><p>{{member.birthplace}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>PIN: </b></p></td>
+            <td><p>{{member.pin}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
+            <td><p>{{member.phone_number|phone_number}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>E-mail: </b></p></td>
+            <td><p>{{member.email}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
+            <td><p>{{member.date_of_accession}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
+            <td><p>{{member.date_of_abandonment}}</p></td>
+          </tr>
+          <tr>
+            <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
+            <td>
+              {% if member.type_of_contract == 'indefinite_period_of_time' %}<p>Na czas nieokreślony</p>
+              {% elif member.type_of_contract == 'limited_duration' %}<p>Na czas określony</p>
+              {% else %}<p>None</p>{% endif %}
+            </td>
+          </tr>
+          <tr>
+            <td class="tableCredential"><p><b>Data zatrudnienia: </b></p></td>
+            <td><p>{{member.date_of_contract}}</p></td>
+          </tr>
+          <tr>
+            <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
+            <td><p>{{member.expiration_date_contract}}</p></td>
+          </tr>
+        </table>
+  </div>
+</div>
+
+</body>
+</html>
