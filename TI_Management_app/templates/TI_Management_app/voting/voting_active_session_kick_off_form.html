@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{% load static %}
+{% load ti_management_tags %}
+{% load thumbnail %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/TI_Management_app.js' %}"></script>
+    </head>
+<body>
+<div class="hero-unit">
+  <h2 class="fadeInUp-animation">{{member.forename}} {{member.surname}} - {{member.member_nr}}</h2>
+  <hr>
+  <br />
+    <form method="post">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit">Submit</button>
+    </form>
+
+</div>
+
+</body>
+</html>
