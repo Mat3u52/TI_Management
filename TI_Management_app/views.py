@@ -29,7 +29,9 @@ from .models import (
     BankStatement,
     Vote,
     Choice,
-    Poll
+    Poll,
+    VotingSessionKickOff,
+    VotingSessionKickOffSignature
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -82,12 +84,13 @@ from .forms import (
     VotingAddForm,
     VotingAddPollForm,
     VotingAddChoiceForm,
-    VotingAddRecapForm
+    VotingAddRecapForm,
+    VotingSessionKickOffForm
 )
 from django.views.decorators.http import require_POST
-from django.views.generic import DetailView
+from django.views.generic.detail import DetailView
 from django.views.generic import TemplateView
-from django.views.generic import CreateView
+from django.views.generic.edit import CreateView
 from django.db.models.query_utils import Q
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.hashers import make_password, check_password
@@ -4111,3 +4114,49 @@ def voting_active_session_search(request):
             'TI_Management_app/voting/active_voting_search.html',
             {}
         )
+
+
+@login_required
+def voting_active_session_detail(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_detail.html',
+        {
+            'voting': voting
+        }
+    )
+
+
+class VotingActiveSessionMemberDetail(LoginRequiredMixin, DetailView):
+    model = MembersZZTI
+    template_name = 'TI_Management_app/voting/voting_active_session_member_detail.html'
+    context_object_name = 'member'
+
+
+@login_required
+def voting_active_session_kick_off(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+    # session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk)
+
+    if request.method == "POST":
+        form = VotingSessionKickOffForm(request.POST)
+        if form.is_valid():
+            session_kick_off = form.save(commit=False)
+
+            session_kick_off.author = request.user
+            session_kick_off.save()
+
+            messages.success(request, f"Dodano podpis Członak komisji")
+            return redirect('TI_Management_app:voting_active_session_kick_off')
+    else:
+        form = VotingSessionKickOffForm()
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_kick_off.html',
+        {
+            'form': form,
+            'voting': voting
+        }
+    )

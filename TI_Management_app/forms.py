@@ -30,7 +30,9 @@ from .models import (
     BankStatement,
     Vote,
     Poll,
-    Choice
+    Choice,
+    VotingSessionKickOff,
+    VotingSessionKickOffSignature
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -2957,3 +2959,31 @@ class VotingAddRecapForm(forms.ModelForm):
                 raise ValidationError("Data rozpoczęcia musi być wcześniejsza niż data zakończenia.")
 
         return cleaned_data
+
+
+class VotingSessionKickOffForm(forms.Form):
+
+    commission_signature = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'autofocus': 'autofocus',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Długość jest niepoprawna."
+            )
+        ],
+        max_length=100,
+        required=True
+    )
+
+    class Meta:
+        model = VotingSessionKickOff
+        fields = [
+            'commission_signature'
+            'title'
+        ]

@@ -1,5 +1,6 @@
 from django.urls import path
 from . import views
+from TI_Management_app.views import VotingActiveSessionMemberDetail
 
 app_name = 'TI_Management_app'
 
@@ -572,6 +573,21 @@ urlpatterns = [
         'TI_Management_app/voting/voting-active-session-search/',
         views.voting_active_session_search,
         name='voting_active_session_search'
+    ),
+    path(
+        'TI_Management_app/voting/voting-active-session-detail/<int:pk>/',
+        views.voting_active_session_detail,
+        name='voting_active_session_detail'
+    ),
+    path(
+        'voting-active-session-member-detail/<slug:slug>/',
+        VotingActiveSessionMemberDetail.as_view(),
+        name='voting_active_session_member_detail'
+    ),
+    path(
+        'TI_Management_app/voting/voting-active-session-kick-off/<int:pk>/',
+        views.voting_active_session_kick_off,
+        name='voting_active_session_kick_off'
     ),
 ]
 

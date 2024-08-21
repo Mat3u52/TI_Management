@@ -1,10 +1,227 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load static %}
+{% load ti_management_tags %}
+{% load thumbnail %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
 
-</body>
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
+
+        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
+
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/TI_Management_app.js' %}"></script>
+
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+    <div class="hero-unit">
+        <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
+        <hr>
+        <br />
+        <div class="notepad">
+            <p><b>Opis:</b></p>
+            <em>{{ voting.description|safe }}</em>
+
+            <p><b>Ilość uczestników:</b> {{ voting.members.count }}</p>
+            <p><b>Minimalna ilość Uczestników:</b> {{ voting.min_amount_members }}</p>
+            <p><b>Uczestnicy:</b></p>
+                <ul>
+                    {% for member in voting.members.all %}
+                        <li>
+                            {{ member.member_nr }} -
+<!--                            <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">-->
+                            <a href="{{ member.get_absolute_url }}" target="_blank"
+                                onclick="
+                                window.open('{{ member.get_absolute_url }}', 'window11', 'width=800,height=400');
+                            return false;">
+                                {{ member.forename }} {{ member.surname }}
+                            </a>
+                        </li>
+                    {% endfor %}
+                </ul>
+            <br />
+
+            <p><b>Komisja Wyborcza:</b></p>
+            <div class="container-commission">
+                {% for commission in voting.election_commission.all %}
+                    <div class="commission-member">
+                        <div><img src="{% thumbnail commission.image 150x0  quality=100 %}"></div>
+                        <div>
+                            <a href="{% url 'TI_Management_app:member_detail' pk=commission.pk %}">
+                                {{ commission.forename }}&nbsp;{{ commission.surname }}
+                            </a>
+                        </div>
+                    </div>
+                {% empty %}
+                    <div>Brak komisji wyborczej.</div>
+                {% endfor %}
+            </div>
+            <br />
+            <p><b>Minimalna ilość Komisji Wyborczej:</b> {{ voting.min_amount_commission }} </p>
+            <br />
+            <p><b>Minimalna frekwencja [%] + 1 głos:</b> {{ voting.turnout }} </p>
+            <br />
+            <p><b>Start:</b> {{voting.date_start}} </p>
+            <p><b>Koniec:</b> {{voting.date_end}} </p>
+            <div id="countdown"></div>
+            <br />
+            <div id="actualization" style="display: none">
+            <p>
+                <a href="{% url 'TI_Management_app:voting_edit' pk=voting.pk %}" class="btn btn-primary btn-large pull-right">
+                    Aktualizuj
+                </a>
+            </p>
+            </div>
+            <div id="start" style="display: none">
+                <p>
+                    <a href="{% url 'TI_Management_app:voting_active_session_kick_off' pk=voting.pk %}" class="btn btn-success btn-large pull-right">
+                        Rozpocznij Głosowanie
+                    </a>
+                </p>
+            </div>
+            <br />
+            <br />
+            <p><b>Karta głosowania:</b></p>
+            <br />
+            {% for poll in voting.votePoll.all %}
+            <h4>{{ poll.question }}</h4>
+                <em><small>{{ poll.description|safe }}</small></em>
+            <hr>
+    <!--        <table>-->
+    <!--            {% for choice in poll.pollChoice.all %}-->
+    <!--                    {% if choice.correct %}-->
+    <!--                        <tr>-->
+    <!--                            <td>-->
+    <!--                                <span style="color:green">{{ choice.answer }}</span>-->
+    <!--                            </td>-->
+    <!--                        </tr>-->
+    <!--                    {% else %}-->
+    <!--                        <tr>-->
+    <!--                            <td>-->
+    <!--                                {{ choice.answer }}-->
+    <!--                                {% if choice.answer|member_full_name_exist %}-->
+    <!--                                    {{ choice.answer|member_full_name_exist }}-->
+    <!--                                {% endif %}-->
+    <!--                                {% with choice.answer|member_img_exist as image_url %}-->
+    <!--                                    {% if image_url %}-->
+    <!--                                        <img src="{% thumbnail image_url 150x0  quality=100 %}">-->
+    <!--                                    {% endif %}-->
+    <!--                                {% endwith %}-->
+    <!--                            </td>-->
+    <!--                        </tr>-->
+    <!--                    {% endif %}-->
+    <!--            {% endfor %}-->
+    <!--        </table>-->
+            <table>
+                {% for choice in poll.pollChoice.all %}
+                    {% if choice.answer is not None %}
+                        {% if choice.correct %}
+                            <tr>
+                                <td>
+                                    <span style="color:green">{{ choice.answer }}</span>
+                                </td>
+                            </tr>
+                        {% else %}
+                            <tr>
+                                <td>
+                                    {{ choice.answer }}
+                                    {% if choice.answer|member_full_name_exist %}
+                                        {{ choice.answer|member_full_name_exist }}
+                                    {% endif %}
+                                    {% with choice.answer|member_img_exist as image_url %}
+                                        {% if image_url %}
+                                            <img src="{% thumbnail image_url 150x0  quality=100 %}">
+                                        {% endif %}
+                                    {% endwith %}
+                                </td>
+                            </tr>
+                        {% endif %}
+                    {% else %}
+                        <tr>
+                            <td>
+                                <textarea style="resize: none;" rows="4" cols="50" disabled></textarea>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+
+            <p style="text-align: right; margin-left: auto;"><small>Ilość dopuszczalnych wyborów:</small> {{ poll.number_of_responses }}</p>
+            <div id="actualizationPoll">
+                <p>
+                    <a href="{% url 'TI_Management_app:voting_edit_poll' pk=voting.pk poll_pk=poll.pk %}" class="btn btn-primary btn-large pull-right">
+                        Aktualizuj pytanie
+                    </a>
+                </p>
+            </div>
+
+                <br />
+                <br />
+                <br />
+            {% endfor %}
+
+            <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
+        </div>
+    </div>
+
+<script>
+const dateStart = new Date("{{ voting.date_start|date:'Y-m-d H:i:s' }}").getTime();
+const dateEnd = new Date("{{ voting.date_end|date:'Y-m-d H:i:s' }}").getTime();
+
+
+function updateCountdown(targetDate, message) {
+    const now = new Date().getTime();
+    const distance = targetDate - now;
+
+    if (distance < 0) {
+        return false;
+    }
+
+    const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+    const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+    const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+    const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+    document.getElementById("countdown").innerHTML = `${message} ${days}d ${hours}h ${minutes}m ${seconds}s`;
+
+    return true;
+}
+
+function countdown() {
+
+    let countdownActive = updateCountdown(dateStart, "<b>Rozpoczęcie głosowania:</b>");
+    start.style.display = 'none';
+    actualization.style.display = 'block';
+    actualizationPoll.style.display = 'block';
+
+    if (!countdownActive) {
+        actualization.style.display = 'none';
+        actualizationPoll.style.display = 'none';
+        start.style.display = 'block';
+        countdownActive = updateCountdown(dateEnd, "<b>Zakończenie głosowania:</b>");
+    }
+
+    if (!countdownActive) {
+        document.getElementById("countdown").innerHTML = "Głosowanie zakończone";
+        actualization.style.display = 'none';
+        actualizationPoll.style.display = 'none';
+        start.style.display = 'none';
+    }
+}
+
+// Update the countdown every second
+setInterval(countdown, 1000);
+</script>
+
+
+
+    </body>
 </html>

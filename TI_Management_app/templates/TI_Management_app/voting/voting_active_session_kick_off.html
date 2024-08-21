@@ -18,13 +18,13 @@
     </head>
 <body>
 <div class="hero-unit">
-  <h2 class="fadeInUp-animation">{{member.forename}} {{member.surname}} - {{member.member_nr}}</h2>
+  <h2 class="fadeInUp-animation">voting</h2>
   <hr>
   <br />
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}
-      <button type="submit">Submit</button>
+      <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
     </form>
 
 </div>
