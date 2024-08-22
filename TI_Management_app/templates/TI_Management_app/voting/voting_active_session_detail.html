@@ -40,7 +40,7 @@
 <!--                            <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">-->
                             <a href="{{ member.get_absolute_url }}" target="_blank"
                                 onclick="
-                                window.open('{{ member.get_absolute_url }}', 'window11', 'width=800,height=400');
+                                window.open('{{ member.get_absolute_url }}', 'window11', 'width=800,height=600');
                             return false;">
                                 {{ member.forename }} {{ member.surname }}
                             </a>
@@ -55,7 +55,11 @@
                     <div class="commission-member">
                         <div><img src="{% thumbnail commission.image 150x0  quality=100 %}"></div>
                         <div>
-                            <a href="{% url 'TI_Management_app:member_detail' pk=commission.pk %}">
+                            <a href="{{ commission.get_absolute_url }}" target="_blank"
+                                onclick="
+                                window.open('{{ commission.get_absolute_url }}', 'window12', 'width=800,height=600');
+                            return false;">
+<!--                            <a href="{% url 'TI_Management_app:member_detail' pk=commission.pk %}">-->
                                 {{ commission.forename }}&nbsp;{{ commission.surname }}
                             </a>
                         </div>

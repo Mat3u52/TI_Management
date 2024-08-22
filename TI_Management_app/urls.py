@@ -589,5 +589,6 @@ urlpatterns = [
         views.voting_active_session_kick_off,
         name='voting_active_session_kick_off'
     ),
+    # path('check-member-exists/', views.check_member_exists, name='check_member_exists'),
 ]
 

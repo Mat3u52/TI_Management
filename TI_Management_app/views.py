@@ -4141,17 +4141,17 @@ def voting_active_session_kick_off(request, pk):
     # session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk)
 
     if request.method == "POST":
-        form = VotingSessionKickOffForm(request.POST)
+        form = VotingSessionKickOffForm(request.POST, initial={'title': f"sesja#{timezone.now()}#{voting.title}"})
         if form.is_valid():
             session_kick_off = form.save(commit=False)
-
             session_kick_off.author = request.user
+            session_kick_off.session_start = timezone.now()
             session_kick_off.save()
 
             messages.success(request, f"Dodano podpis Członak komisji")
             return redirect('TI_Management_app:voting_active_session_kick_off')
     else:
-        form = VotingSessionKickOffForm()
+        form = VotingSessionKickOffForm(initial={'title': f"session-{timezone.now()}-{voting.title}"})
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_kick_off.html',
@@ -4160,3 +4160,16 @@ def voting_active_session_kick_off(request, pk):
             'voting': voting
         }
     )
+
+
+# def check_member_exists(request):
+#     card_input = request.GET.get('card')
+#     member_exists = False
+#
+#     # Check if any member's card matches the hashed input card
+#     for member in MembersZZTI.objects.all():
+#         if member.card and check_password(card_input, member.card):
+#             member_exists = True
+#             break
+#
+#     return JsonResponse({'exists': member_exists})

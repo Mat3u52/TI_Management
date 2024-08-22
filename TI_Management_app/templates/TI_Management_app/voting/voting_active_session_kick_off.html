@@ -15,19 +15,63 @@
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
+<!--        <meta name="csrf-token" content="{{ csrf_token }}">-->
     </head>
 <body>
 <div class="hero-unit">
-  <h2 class="fadeInUp-animation">voting</h2>
+  <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
   <hr>
   <br />
     <form method="post">
-      {% csrf_token %}
-      {{ form.as_p }}
-      <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
-    </form>
+        {% csrf_token %}
+        {{ form.title }}
 
+        {% for commission in voting.election_commission.all %}
+            {{ commission }}
+        {% endfor %}
+
+        <div id="inputContainer">
+            <br />
+            <div class="inputGroup">
+                <label for="signature_0">Podpis 1:</label>
+                {{ form.signature_0 }}
+            </div>
+        </div>
+        <button type="button" id="addButton" class="btn btn-secondary">Dodaj</button>
+        <button type="submit" class="btn btn-primary btn-large pull-right">Rozpocznij sesje</button>
+    </form>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    let fieldCount = 1;
+
+    document.getElementById('addButton').addEventListener('click', function() {
+        const newInputGroup = document.createElement('div');
+        newInputGroup.classList.add('inputGroup');
+
+        const newLabel = document.createElement('label');
+        newLabel.setAttribute('for', `signature_${fieldCount}`);
+        newLabel.textContent = `Podpis ${fieldCount + 1}:`;
+
+        const newInput = document.createElement('input');
+        newInput.setAttribute('type', 'password');
+        newInput.setAttribute('autocomplete', 'new-password');
+        newInput.setAttribute('id', `signature_${fieldCount}`);
+        newInput.setAttribute('name', `signature_${fieldCount}`);
+        newInput.setAttribute('placeholder', `Przyłóż kartę do czytnika`);
+
+        newInputGroup.appendChild(newLabel);
+        newInputGroup.appendChild(newInput);
+
+        document.getElementById('inputContainer').appendChild(newInputGroup);
+
+        newInput.focus();
+
+        fieldCount++;
+    });
+});
+</script>
 
 </body>
 </html>

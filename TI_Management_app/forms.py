@@ -2961,9 +2961,9 @@ class VotingAddRecapForm(forms.ModelForm):
         return cleaned_data
 
 
-class VotingSessionKickOffForm(forms.Form):
+class VotingSessionKickOffForm(forms.ModelForm):
 
-    commission_signature = forms.CharField(
+    signature_0 = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
                 'autocomplete': 'new-password',
@@ -2981,9 +2981,27 @@ class VotingSessionKickOffForm(forms.Form):
         required=True
     )
 
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Tytuł',
+                'aria-label': 'Tytuł'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
     class Meta:
         model = VotingSessionKickOff
         fields = [
-            'commission_signature'
             'title'
         ]
