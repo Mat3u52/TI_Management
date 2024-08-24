@@ -2,6 +2,7 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
+{% if user.is_authenticated %}
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -229,3 +230,5 @@ setInterval(countdown, 1000);
 
     </body>
 </html>
+
+{% endif %}

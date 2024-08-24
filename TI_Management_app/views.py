@@ -85,7 +85,8 @@ from .forms import (
     VotingAddPollForm,
     VotingAddChoiceForm,
     VotingAddRecapForm,
-    VotingSessionKickOffForm
+    VotingSessionKickOffForm,
+    VotingSessionKickOffSignatureForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -4138,20 +4139,20 @@ class VotingActiveSessionMemberDetail(LoginRequiredMixin, DetailView):
 @login_required
 def voting_active_session_kick_off(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
-    # session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk)
+    now = timezone.now()
 
     if request.method == "POST":
-        form = VotingSessionKickOffForm(request.POST, initial={'title': f"sesja#{timezone.now()}#{voting.title}"})
+        form = VotingSessionKickOffForm(request.POST, initial={'title': f"sesja#{now.timestamp()}#{voting.title}"})
         if form.is_valid():
             session_kick_off = form.save(commit=False)
             session_kick_off.author = request.user
-            session_kick_off.session_start = timezone.now()
+            # session_kick_off.session_start = timezone.now()
             session_kick_off.save()
 
-            messages.success(request, f"Dodano podpis Członak komisji")
-            return redirect('TI_Management_app:voting_active_session_kick_off')
+            messages.success(request, f"Rozpoczęcie sesji głosowania")
+            return redirect('TI_Management_app:voting_active_session_kick_off_edit', pk_vote=pk, pk_kick_off=session_kick_off.id)
     else:
-        form = VotingSessionKickOffForm(initial={'title': f"session-{timezone.now()}-{voting.title}"})
+        form = VotingSessionKickOffForm(initial={'title': f"sesja#{now.timestamp()}#{voting.title}"})
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_kick_off.html',
@@ -4162,14 +4163,33 @@ def voting_active_session_kick_off(request, pk):
     )
 
 
-# def check_member_exists(request):
-#     card_input = request.GET.get('card')
-#     member_exists = False
-#
-#     # Check if any member's card matches the hashed input card
-#     for member in MembersZZTI.objects.all():
-#         if member.card and check_password(card_input, member.card):
-#             member_exists = True
-#             break
-#
-#     return JsonResponse({'exists': member_exists})
+@login_required
+def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
+    voting = get_object_or_404(Vote, pk=pk_vote)
+    session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+
+    if request.method == "POST":
+        # form = VotingSessionKickOffForm(request.POST, initial={session_kick_off_edit})
+        form_signature = VotingSessionKickOffSignatureForm(request.POST)
+        if form_signature.is_valid():
+            session_kick_off = form_signature.save(commit=False)
+            session_kick_off.author = request.user
+            session_kick_off.voting_session_kick_off = session_kick_off_edit.id
+            # session_kick_off.session_start = timezone.now()
+            session_kick_off.save()
+
+            messages.success(request, f"Dodano podpis Członak komisji")
+            return redirect('TI_Management_app:voting_active_session_kick_off_edit', pk_vote=voting.id, pk_kick_off=session_kick_off_edit.id)
+    else:
+        # form = VotingSessionKickOffForm(initial={session_kick_off_edit})
+        form_signature = VotingSessionKickOffSignatureForm()
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_kick_off_edit.html',
+        {
+            # 'form': form,
+            'form_signature': form_signature,
+            'voting': voting
+        }
+    )
+

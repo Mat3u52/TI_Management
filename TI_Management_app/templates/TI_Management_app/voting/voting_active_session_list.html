@@ -32,19 +32,7 @@
     <br />
     {% for vote in voting %}
     <h3>
-        <a href="{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}" target="_blank"
-           onclick="
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window1', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window2', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window3', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window4', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window5', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window6', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window7', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window8', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window9', 'width=800,height=600');
-           window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window10', 'width=800,height=600');
-           return false;">
+        <a href="#">
             {{vote.title}}
         </a>
     </h3>
@@ -55,6 +43,8 @@
         <em>{{ vote.description|safe }}</em>
         <br />
         <p><b>Start:</b> {{vote.date_start}} </p>
+        {% if user.is_authenticated %}
+<!--        <div class="auth-section" style="display: none;">-->
         <p>
             <a href="{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}"
                target="_blank"
@@ -74,6 +64,8 @@
                 Więcej informacji
             </a>
         </p>
+<!--        </div>-->
+        {% endif %}
 
         <!--        <p>-->
 <!--            <a href="{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}" target="popup" onclick="window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}','name','width=800,height=400')" class="btn btn-primary btn-large pull-right">-->
@@ -86,6 +78,18 @@
     <br />
     {% endfor %}
 </div>
+
+<!--<script>-->
+<!--    document.addEventListener("DOMContentLoaded", function() {-->
+<!--        const isAuthenticated = document.body.getAttribute("data-authenticated") === "true";-->
+<!--        if (isAuthenticated) {-->
+<!--            // Show all elements with class "auth-section"-->
+<!--            document.querySelectorAll('.auth-section').forEach(function(section) {-->
+<!--                section.style.display = "block";-->
+<!--            });-->
+<!--        }-->
+<!--    });-->
+<!--</script>-->
 
 {% include 'TI_Management_app/pagination.html' with page=voting %}
 

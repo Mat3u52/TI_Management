@@ -2,6 +2,7 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
+{% if user.is_authenticated %}
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -15,7 +16,6 @@
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
-<!--        <meta name="csrf-token" content="{{ csrf_token }}">-->
     </head>
 <body>
 <div class="hero-unit">
@@ -24,54 +24,30 @@
   <br />
     <form method="post">
         {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
         {{ form.title }}
+        <br />
+        <p>Czas zakończenia sesji:</p>
+        {{ form.session_end }}
+        <br />
+        <p>Wymagane podpsy Członków Komisji Wyborczej:</p>
 
         {% for commission in voting.election_commission.all %}
-            {{ commission }}
+            {{ commission.forename }} {{ commission.surname }}<br />
         {% endfor %}
 
-        <div id="inputContainer">
-            <br />
-            <div class="inputGroup">
-                <label for="signature_0">Podpis 1:</label>
-                {{ form.signature_0 }}
-            </div>
-        </div>
-        <button type="button" id="addButton" class="btn btn-secondary">Dodaj</button>
-        <button type="submit" class="btn btn-primary btn-large pull-right">Rozpocznij sesje</button>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Złóż podpis</button>
+        <br />
+        <br />
     </form>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    let fieldCount = 1;
-
-    document.getElementById('addButton').addEventListener('click', function() {
-        const newInputGroup = document.createElement('div');
-        newInputGroup.classList.add('inputGroup');
-
-        const newLabel = document.createElement('label');
-        newLabel.setAttribute('for', `signature_${fieldCount}`);
-        newLabel.textContent = `Podpis ${fieldCount + 1}:`;
-
-        const newInput = document.createElement('input');
-        newInput.setAttribute('type', 'password');
-        newInput.setAttribute('autocomplete', 'new-password');
-        newInput.setAttribute('id', `signature_${fieldCount}`);
-        newInput.setAttribute('name', `signature_${fieldCount}`);
-        newInput.setAttribute('placeholder', `Przyłóż kartę do czytnika`);
-
-        newInputGroup.appendChild(newLabel);
-        newInputGroup.appendChild(newInput);
-
-        document.getElementById('inputContainer').appendChild(newInputGroup);
-
-        newInput.focus();
-
-        fieldCount++;
-    });
-});
-</script>
-
 </body>
 </html>
+{% endif %}

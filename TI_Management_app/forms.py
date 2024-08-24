@@ -2963,7 +2963,58 @@ class VotingAddRecapForm(forms.ModelForm):
 
 class VotingSessionKickOffForm(forms.ModelForm):
 
-    signature_0 = forms.CharField(
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Tytuł',
+                'aria-label': 'Tytuł'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250,
+        disabled=True
+    )
+
+    class Meta:
+        model = VotingSessionKickOff
+        fields = [
+            'title',
+            'session_end'
+        ]
+
+        widgets = {
+            'session_end': forms.TextInput(
+                attrs={
+                    'type': 'datetime-local'
+                }
+            ),
+        }
+
+    def clean_session_end(self):
+        session_end = self.cleaned_data.get('session_end')
+        if session_end:
+            now = timezone.now()
+            max_time = now + timedelta(hours=8)
+
+            if session_end < now:
+                raise ValidationError("Czas zakończenia sesji nie może być wcześniejszy niż obecny czas.")
+            if session_end > max_time:
+                raise ValidationError("Czas zakończenia sesji nie może być późniejszy niż 8 godzin od teraz.")
+
+        return session_end
+
+
+class VotingSessionKickOffSignatureForm(forms.ModelForm):
+
+    commission_signature = forms.CharField(
         widget=forms.PasswordInput(
             attrs={
                 'autocomplete': 'new-password',
@@ -2981,27 +3032,28 @@ class VotingSessionKickOffForm(forms.ModelForm):
         required=True
     )
 
-    title = forms.CharField(
-        widget=forms.TextInput(
-            attrs={
-                'class': 'form-control me-2',
-                'type': 'text',
-                'placeholder': 'Tytuł',
-                'aria-label': 'Tytuł'
-            }
-        ),
-        validators=[
-            MinLengthValidator(
-                limit_value=2,
-                message="Tytuł musi zawierać co najmniej 2 znaki."
-            )
-        ],
-        required=True,
-        max_length=250
-    )
-
     class Meta:
-        model = VotingSessionKickOff
+        model = VotingSessionKickOffSignature
         fields = [
-            'title'
+            'commission_signature'
         ]
+
+    def clean_commission_signature(self):
+        commission_signature = self.cleaned_data['commission_signature']
+        vote = self.instance.vote  # Get the related Vote instance
+
+        if not vote:
+            raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
+
+        # Iterate through the members in election_commission
+        for member in vote.election_commission.all():
+            # Assuming the member model has a `hashed_card` field storing the hashed card signature
+            if check_password(commission_signature, member.card):
+                # If a match is found, the signature is valid
+                return commission_signature
+
+
+        # If no matches were found, raise an error
+        raise ValidationError("Podpis nie istnieje w komisji wyborczej tego głosowania.")
+
+
