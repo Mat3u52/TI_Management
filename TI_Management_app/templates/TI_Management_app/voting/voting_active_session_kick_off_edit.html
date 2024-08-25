@@ -16,7 +16,6 @@
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
-<!--        <meta name="csrf-token" content="{{ csrf_token }}">-->
     </head>
 <body>
 <div class="hero-unit">
@@ -30,13 +29,16 @@
                 <p>{{ form_signature.errors }}</p>
             </div>
         {% endif %}
-<!--        {{ form.title }}-->
+
         <p>Minimalna ilość podpisów Komisji Wyborczej:</p>
         {{ voting.min_amount_commission }}<br />
         {% for commission in voting.election_commission.all %}
             {{ commission.forename }} {{ commission.surname }}<br />
         {% endfor %}
         <br />
+        {% for commission_signed in voting_session_kick_off_signature %}
+            {{ commission_signed }}<br />
+        {% endfor %}
 
         {{ form_signature.commission_signature }}
 

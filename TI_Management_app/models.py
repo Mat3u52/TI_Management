@@ -414,11 +414,11 @@ class VotingSessionKickOffSignature(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return self.voting_session_kick_off
+        return f"{self.id}-{self.member}"
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(f"{self.voting_session_kick_off}")
+            self.slug = slugify(f"{self.id}-{self.member}")
         super().save(*args, **kwargs)
 
 

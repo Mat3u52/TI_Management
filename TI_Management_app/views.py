@@ -4146,6 +4146,7 @@ def voting_active_session_kick_off(request, pk):
         if form.is_valid():
             session_kick_off = form.save(commit=False)
             session_kick_off.author = request.user
+            session_kick_off.vote = voting
             # session_kick_off.session_start = timezone.now()
             session_kick_off.save()
 
@@ -4167,29 +4168,40 @@ def voting_active_session_kick_off(request, pk):
 def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+    voting_session_kick_off_signature = VotingSessionKickOffSignature.objects.filter(vote=voting)
 
     if request.method == "POST":
-        # form = VotingSessionKickOffForm(request.POST, initial={session_kick_off_edit})
-        form_signature = VotingSessionKickOffSignatureForm(request.POST)
-        if form_signature.is_valid():
-            session_kick_off = form_signature.save(commit=False)
-            session_kick_off.author = request.user
-            session_kick_off.voting_session_kick_off = session_kick_off_edit.id
-            # session_kick_off.session_start = timezone.now()
-            session_kick_off.save()
+        form_signature = VotingSessionKickOffSignatureForm(request.POST, voting_session_kick_off=session_kick_off_edit)
 
-            messages.success(request, f"Dodano podpis Członak komisji")
-            return redirect('TI_Management_app:voting_active_session_kick_off_edit', pk_vote=voting.id, pk_kick_off=session_kick_off_edit.id)
+        # Check if the form is valid before accessing cleaned_data
+        if form_signature.is_valid():
+            commission_signature = form_signature.cleaned_data['commission_signature']
+            vote = session_kick_off_edit.vote
+            for member in vote.election_commission.all():
+                if check_password(commission_signature, member.card):
+                    member_id = member
+
+                    session_kick_off_signature = form_signature.save(commit=False)
+                    session_kick_off_signature.author = request.user
+                    session_kick_off_signature.voting_session_kick_off = session_kick_off_edit
+                    session_kick_off_signature.member = member_id
+                    session_kick_off_signature.signature = True
+                    session_kick_off_signature.save()
+
+                    messages.success(request, "Dodano podpis Członka komisji")
+                    return redirect('TI_Management_app:voting_active_session_kick_off_edit', pk_vote=voting.id,
+                                    pk_kick_off=session_kick_off_edit.id)
     else:
-        # form = VotingSessionKickOffForm(initial={session_kick_off_edit})
-        form_signature = VotingSessionKickOffSignatureForm()
+        form_signature = VotingSessionKickOffSignatureForm(voting_session_kick_off=session_kick_off_edit)
+
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_kick_off_edit.html',
         {
-            # 'form': form,
             'form_signature': form_signature,
-            'voting': voting
+            'voting': voting,
+            'voting_session_kick_off_signature': voting_session_kick_off_signature
         }
     )
+
 
