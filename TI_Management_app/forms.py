@@ -2993,7 +2993,8 @@ class VotingSessionKickOffForm(forms.ModelForm):
         widgets = {
             'session_end': forms.TextInput(
                 attrs={
-                    'type': 'datetime-local'
+                    'type': 'datetime-local',
+                    'required': True
                 }
             ),
         }
@@ -3011,53 +3012,6 @@ class VotingSessionKickOffForm(forms.ModelForm):
 
         return session_end
 
-
-# class VotingSessionKickOffSignatureForm(forms.ModelForm):
-#
-#     commission_signature = forms.CharField(
-#         widget=forms.PasswordInput(
-#             attrs={
-#                 'autocomplete': 'new-password',
-#                 'autofocus': 'autofocus',
-#                 'placeholder': 'Przyłóż kartę do czytnika'
-#             }
-#         ),
-#         validators=[
-#             MinLengthValidator(
-#                 limit_value=2,
-#                 message="Długość jest niepoprawna."
-#             )
-#         ],
-#         max_length=100,
-#         required=True
-#     )
-#
-#     class Meta:
-#         model = VotingSessionKickOffSignature
-#         fields = [
-#             'commission_signature'
-#         ]
-#
-#     def clean_commission_signature(self):
-#         commission_signature = self.cleaned_data['commission_signature']
-#
-#         # Make sure the voting_session_kick_off is available
-#         voting_session_kick_off = self.instance.voting_session_kick_off
-#
-#         if not voting_session_kick_off:
-#             raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
-#
-#         vote = voting_session_kick_off.vote
-#
-#         # Iterate through the members in election_commission
-#         for member in vote.election_commission.all():
-#             # Assuming the member model has a `hashed_card` field storing the hashed card signature
-#             if check_password(commission_signature, member.card):
-#                 # If a match is found, the signature is valid
-#                 return commission_signature
-#
-#         # If no matches were found, raise an error
-#         raise ValidationError("Podpis nie istnieje w komisji wyborczej tego głosowania.")
 
 class VotingSessionKickOffSignatureForm(forms.ModelForm):
     commission_signature = forms.CharField(
@@ -3079,9 +3033,8 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        # Extract the custom parameter
         self.voting_session_kick_off = kwargs.pop('voting_session_kick_off', None)
-        super().__init__(*args, **kwargs)  # Call the parent constructor
+        super().__init__(*args, **kwargs)
 
     class Meta:
         model = VotingSessionKickOffSignature
@@ -3092,7 +3045,6 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
     def clean_commission_signature(self):
         commission_signature = self.cleaned_data['commission_signature']
 
-        # Use the voting_session_kick_off passed during initialization
         voting_session_kick_off = self.voting_session_kick_off
 
         if not voting_session_kick_off:
@@ -3100,7 +3052,6 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
 
         vote = voting_session_kick_off.vote
 
-        # Iterate through the members in election_commission
         for member in vote.election_commission.all():
             if check_password(commission_signature, member.card):
                 return commission_signature

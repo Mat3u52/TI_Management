@@ -37,8 +37,10 @@
         {% endfor %}
         <br />
         {% for commission_signed in voting_session_kick_off_signature %}
-            {{ commission_signed }}<br />
+            {{ commission_signed.member.forename }}<br />
         {% endfor %}
+
+        {{voting_session_kick_off_signature|length}}
 
         {{ form_signature.commission_signature }}
 
