@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block content %}
+{% if voting_status %}
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
     <hr>
@@ -103,7 +104,7 @@
         <br />
     </form>
 </div>
-
+{% endif %}
 {% endblock %}
 
 {% block menu %}

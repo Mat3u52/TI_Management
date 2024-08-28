@@ -8,6 +8,7 @@
 {% endblock %}
 
 {% block content %}
+{% if voting_status %}
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">Nowe głosowanie - {{ voting.title }}</h2>
     <hr>
@@ -188,7 +189,7 @@
     <br />
     <br />
 </div>
-
+{% endif %}
 <script>
 document.addEventListener('DOMContentLoaded', function () {
     console.log("JavaScript loaded");

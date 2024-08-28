@@ -2,7 +2,7 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
-{% if user.is_authenticated %}
+
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -34,7 +34,7 @@
         <p>Czas zakończenia sesji:</p>
         {{ form.session_end }}
         <br />
-        <p>Wymagane podpsy Członków Komisji Wyborczej:</p>
+        <p>Wymagane podpisy Członków Komisji Wyborczej:</p>
 
         {% for commission in voting.election_commission.all %}
             {{ commission.forename }} {{ commission.surname }}<br />
@@ -44,7 +44,7 @@
 
         <br />
         <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Złóż podpis</button>
+        <button type="submit" class="btn btn-primary btn-large pull-right">Składanie podpisów przez Komisję Wyborczą</button>
         <br />
         <br />
     </form>
@@ -52,4 +52,4 @@
 
 </body>
 </html>
-{% endif %}
+

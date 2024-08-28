@@ -3717,6 +3717,14 @@ def voting_add_poll(request, pk):
     poll_exist = voting.votePoll.exists()
     members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
 
+    current_date = timezone.now()
+    voting_date_start = voting.date_start
+    if voting_date_start > current_date:
+        voting_status: bool = True
+    else:
+        voting_status: bool = False
+
+
     if request.method == "POST":
         form = VotingAddPollForm(request.POST)
         form_choice = VotingAddChoiceForm(request.POST)
@@ -3770,7 +3778,8 @@ def voting_add_poll(request, pk):
             'form_choice': form_choice,
             'voting': voting,
             'poll_exist': poll_exist,
-            'members': members
+            'members': members,
+            'voting_status': voting_status
         }
     )
 
@@ -3779,6 +3788,13 @@ def voting_add_poll(request, pk):
 @login_required
 def voting_add_recap(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
+
+    current_date = timezone.now()
+    voting_date_start = voting.date_start
+    if voting_date_start > current_date:
+        voting_status: bool = True
+    else:
+        voting_status: bool = False
 
     if request.method == "POST":
         form = VotingAddRecapForm(request.POST, instance=voting)
@@ -3797,7 +3813,8 @@ def voting_add_recap(request, pk):
         'TI_Management_app/voting/voting_add_recap.html',
         {
             'form': form,
-            'voting': voting
+            'voting': voting,
+            'voting_status': voting_status
         }
     )
 
@@ -4103,7 +4120,7 @@ def voting_active_session_search(request):
         )
         return render(
             request,
-            'TI_Management_app/voting/active_voting_search.html',
+            'TI_Management_app/voting/voting_active_session_search.html',
             {
                 'searched': searched,
                 'voting': voting
@@ -4112,7 +4129,7 @@ def voting_active_session_search(request):
     else:
         return render(
             request,
-            'TI_Management_app/voting/active_voting_search.html',
+            'TI_Management_app/voting/voting_active_session_search.html',
             {}
         )
 
@@ -4120,12 +4137,20 @@ def voting_active_session_search(request):
 @login_required
 def voting_active_session_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
+    sessions = VotingSessionKickOff.objects.filter(vote=voting)
+
+    current_date = timezone.now()
+    sessions_date_start = sessions.date_end
+
+    if sessions_date_start < current_date or sessions.session_closed is True:
+
 
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_detail.html',
         {
-            'voting': voting
+            'voting': voting,
+            'sessions': sessions
         }
     )
 
@@ -4191,9 +4216,19 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
                 session_kick_off_signature.signature = True
                 session_kick_off_signature.save()
 
-                messages.success(request, "Dodano podpis Członka komisji")
-                return redirect('TI_Management_app:voting_active_session_kick_off_edit', pk_vote=voting.id,
-                                pk_kick_off=session_kick_off_edit.id)
+                # messages.success(request, "Dodano podpis Członka komisji")
+                if int(voting.min_amount_commission) > len(voting_session_kick_off_signature):
+                    return redirect(
+                        'TI_Management_app:voting_active_session_kick_off_edit',
+                        pk_vote=voting.id,
+                        pk_kick_off=session_kick_off_edit.id
+                    )
+                else:
+                    return redirect(
+                        'TI_Management_app:voting_active_session',
+                        pk_vote=voting.id,
+                        pk_kick_off=session_kick_off_edit.id
+                    )
     else:
         form_signature = VotingSessionKickOffSignatureForm(voting_session_kick_off=session_kick_off_edit)
 
@@ -4208,4 +4243,18 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
         }
     )
 
+
+@login_required
+def voting_active_session(request, pk_vote, pk_kick_off):
+    voting = get_object_or_404(Vote, pk=pk_vote)
+    session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session.html',
+        {
+            'voting': voting,
+            'session_kick_off': session_kick_off
+        }
+    )
 

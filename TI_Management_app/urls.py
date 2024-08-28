@@ -594,6 +594,10 @@ urlpatterns = [
         views.voting_active_session_kick_off_edit,
         name='voting_active_session_kick_off_edit'
     ),
-    # path('check-member-exists/', views.check_member_exists, name='check_member_exists'),
+    path(
+        'TI_Management_app/voting/voting-active-session/<int:pk_vote>/<int:pk_kick_off>/',
+        views.voting_active_session,
+        name='voting_active_session'
+    ),
 ]
 

@@ -2,12 +2,12 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
-<a href="{% url 'TI_Management_app:voting_active_session_list' %}"><b> / Aktywne Sesje Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_active_session_list' %}"><b> / Sesje Głosowania </b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <h2 class="fadeInUp-animation">Aktywne Sesje Głosowania</h2>
+    <h2 class="fadeInUp-animation">Sesje Głosowania</h2>
     <hr>
     <br />
     <form class="d-flex" method=POST action="{% url 'TI_Management_app:voting_active_session_search' %}">
@@ -43,8 +43,7 @@
         <em>{{ vote.description|safe }}</em>
         <br />
         <p><b>Start:</b> {{vote.date_start}} </p>
-        {% if user.is_authenticated %}
-<!--        <div class="auth-section" style="display: none;">-->
+
         <p>
             <a href="{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}"
                target="_blank"
@@ -64,32 +63,13 @@
                 Więcej informacji
             </a>
         </p>
-<!--        </div>-->
-        {% endif %}
 
-        <!--        <p>-->
-<!--            <a href="{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}" target="popup" onclick="window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}','name','width=800,height=400')" class="btn btn-primary btn-large pull-right">-->
-<!--                Więcej informacji-->
-<!--            </a>-->
-<!--        </p>-->
         <p><b>Koniec:</b> {{vote.date_end}} </p>
         <div class="date"><p>Data dodania: {{ vote.created_date }} przez: {{ vote.author }}</p></div>
     </div>
     <br />
     {% endfor %}
 </div>
-
-<!--<script>-->
-<!--    document.addEventListener("DOMContentLoaded", function() {-->
-<!--        const isAuthenticated = document.body.getAttribute("data-authenticated") === "true";-->
-<!--        if (isAuthenticated) {-->
-<!--            // Show all elements with class "auth-section"-->
-<!--            document.querySelectorAll('.auth-section').forEach(function(section) {-->
-<!--                section.style.display = "block";-->
-<!--            });-->
-<!--        }-->
-<!--    });-->
-<!--</script>-->
 
 {% include 'TI_Management_app/pagination.html' with page=voting %}
 

@@ -3044,7 +3044,6 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
 
     def clean_commission_signature(self):
         commission_signature = self.cleaned_data['commission_signature']
-
         voting_session_kick_off = self.voting_session_kick_off
 
         if not voting_session_kick_off:
@@ -3054,7 +3053,29 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
 
         for member in vote.election_commission.all():
             if check_password(commission_signature, member.card):
+                # Check if the signature already exists for this member in this voting session
+                existing_signature = voting_session_kick_off.voteVotingSessionKickOffSignature.filter(
+                    member=member).exists()
+                if existing_signature:
+                    raise ValidationError("Podpis już istnieje.")
+
                 return commission_signature
 
         raise ValidationError("Podpis nie istnieje w komisji wyborczej tego głosowania.")
+
+    # def clean_commission_signature(self):
+    #     commission_signature = self.cleaned_data['commission_signature']
+    #
+    #     voting_session_kick_off = self.voting_session_kick_off
+    #
+    #     if not voting_session_kick_off:
+    #         raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
+    #
+    #     vote = voting_session_kick_off.vote
+    #
+    #     for member in vote.election_commission.all():
+    #         if check_password(commission_signature, member.card):
+    #             return commission_signature
+    #
+    #     raise ValidationError("Podpis nie istnieje w komisji wyborczej tego głosowania.")
 
