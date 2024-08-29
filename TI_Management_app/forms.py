@@ -32,7 +32,8 @@ from .models import (
     Poll,
     Choice,
     VotingSessionKickOff,
-    VotingSessionKickOffSignature
+    VotingSessionKickOffSignature,
+    VotingSessionSignature
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -3025,7 +3026,7 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
         validators=[
             MinLengthValidator(
                 limit_value=2,
-                message="Długość jest niepoprawna."
+                message="Ilość znaków jest niepoprawna."
             )
         ],
         max_length=100,
@@ -3063,19 +3064,55 @@ class VotingSessionKickOffSignatureForm(forms.ModelForm):
 
         raise ValidationError("Podpis nie istnieje w komisji wyborczej tego głosowania.")
 
-    # def clean_commission_signature(self):
-    #     commission_signature = self.cleaned_data['commission_signature']
-    #
-    #     voting_session_kick_off = self.voting_session_kick_off
-    #
-    #     if not voting_session_kick_off:
-    #         raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
-    #
-    #     vote = voting_session_kick_off.vote
-    #
-    #     for member in vote.election_commission.all():
-    #         if check_password(commission_signature, member.card):
-    #             return commission_signature
-    #
-    #     raise ValidationError("Podpis nie istnieje w komisji wyborczej tego głosowania.")
+
+class VotingSessionSignatureForm(forms.ModelForm):
+    member_signature = forms.CharField(
+        widget=forms.PasswordInput(
+            attrs={
+                'autocomplete': 'new-password',
+                'autofocus': 'autofocus',
+                'placeholder': 'Przyłóż kartę do czytnika'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Ilość znaków jest niepoprawna."
+            )
+        ],
+        max_length=100,
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        self.voting_session_kick_off = kwargs.pop('voting_session_kick_off', None)
+        super().__init__(*args, **kwargs)
+
+    class Meta:
+        model = VotingSessionSignature
+        fields = [
+            'member_signature'
+        ]
+
+    def clean_member_signature(self):
+        member_signature = self.cleaned_data['member_signature']
+        voting_session_kick_off = self.voting_session_kick_off
+
+        if not voting_session_kick_off:
+            raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
+
+        vote = voting_session_kick_off.vote
+
+        for member in vote.members.all():
+            if check_password(member_signature, member.card):
+                # Check if the signature already exists for this member in this voting session
+                existing_signature = voting_session_kick_off.voteVotingSessionKickOffSignature.filter(
+                    member=member).exists()
+                if existing_signature:
+                    raise ValidationError("Podpis już istnieje.")
+
+                return member_signature
+
+        raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
+
 

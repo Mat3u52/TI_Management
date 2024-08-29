@@ -174,8 +174,8 @@
             {% endfor %}
 
             <p>Zakończone sesje głosowania:</p>
-            {% for session in sessions %}
-            {{ session }}<br />
+            {% for session in sessions_status %}
+                {{ session }}<br />
             {% endfor %}
 
             <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>

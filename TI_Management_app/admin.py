@@ -38,7 +38,8 @@ from .models import (
     FileFinance,
     BankStatement,
     VotingSessionKickOff,
-    VotingSessionKickOffSignature
+    VotingSessionKickOffSignature,
+    VotingSessionSignature
 )
 from django.http import HttpResponse
 
@@ -1356,6 +1357,40 @@ class VotingSessionKickOffSignatureAdmin(admin.ModelAdmin):
         'voting_session_kick_off',
         'member',
         'signature'
+    )
+    search_fields = (
+        'voting_session_kick_off',
+    )
+    actions = [export_to_csv]
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(VotingSessionSignature)
+class VotingSessionSignatureAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'voting_session_kick_off',
+        'member',
+        'signature',
+        'confirmation'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'voting_session_kick_off',
+        'member',
+        'signature',
+        'confirmation'
     )
     search_fields = (
         'voting_session_kick_off',

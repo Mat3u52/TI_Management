@@ -394,7 +394,6 @@ class VotingSessionKickOff(models.Model):
 
 
 class VotingSessionKickOffSignature(models.Model):
-
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
@@ -402,7 +401,6 @@ class VotingSessionKickOffSignature(models.Model):
 
     voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='voteVotingSessionKickOffSignature', null=False, blank=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionKickOffSignature', null=False, blank=False)
-    # vote = models.ForeignKey(Vote, on_delete=models.CASCADE, related_name='voteVotingSessionKickOffSignature', null=False, blank=False)
     signature = models.BooleanField(default=False)
 
     history = HistoricalRecords()
@@ -411,6 +409,34 @@ class VotingSessionKickOffSignature(models.Model):
 
     class Meta:
         verbose_name_plural = 'Podpisy rozpoczęcia sesji '
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return f"{self.id}-{self.member.member_nr}"
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.id}-{self.member.member_nr}")
+        super().save(*args, **kwargs)
+
+
+class VotingSessionSignature(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingSessionSignature')
+
+    voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='voteVotingSessionSignature', null=False, blank=False)
+    member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionSignature', null=False, blank=False)
+    signature = models.BooleanField(default=False)
+    confirmation = models.BooleanField(default=False)
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Podpisy uczestników sesji '
         ordering = ('-created_date',)
 
     def __str__(self):

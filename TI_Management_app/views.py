@@ -31,7 +31,8 @@ from .models import (
     Choice,
     Poll,
     VotingSessionKickOff,
-    VotingSessionKickOffSignature
+    VotingSessionKickOffSignature,
+    VotingSessionSignature
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy
@@ -86,7 +87,8 @@ from .forms import (
     VotingAddChoiceForm,
     VotingAddRecapForm,
     VotingSessionKickOffForm,
-    VotingSessionKickOffSignatureForm
+    VotingSessionKickOffSignatureForm,
+    VotingSessionSignatureForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -4138,19 +4140,19 @@ def voting_active_session_search(request):
 def voting_active_session_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     sessions = VotingSessionKickOff.objects.filter(vote=voting)
-
-    current_date = timezone.now()
-    sessions_date_start = sessions.date_end
-
-    if sessions_date_start < current_date or sessions.session_closed is True:
-
+    # Show only ended sessions
+    sessions_status = sessions.filter(
+        Q(session_end__lte=timezone.now()) |
+        Q(session_closed=True)
+    )
 
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_detail.html',
         {
             'voting': voting,
-            'sessions': sessions
+            'sessions': sessions,
+            'sessions_status': sessions_status
         }
     )
 
@@ -4194,8 +4196,6 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     voting_session_kick_off_signature = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off=session_kick_off_edit)
-    # voting_session_kick_off_count = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off=session_kick_off_edit).annotate(
-    #     signature_count=Count('id'))
 
     if request.method == "POST":
         form_signature = VotingSessionKickOffSignatureForm(request.POST, voting_session_kick_off=session_kick_off_edit)
@@ -4238,8 +4238,7 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
         {
             'form_signature': form_signature,
             'voting': voting,
-            'voting_session_kick_off_signature': voting_session_kick_off_signature,
-            # 'voting_session_kick_off_count': voting_session_kick_off_count
+            'voting_session_kick_off_signature': voting_session_kick_off_signature
         }
     )
 
@@ -4248,13 +4247,15 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
 def voting_active_session(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+    session_signature = VotingSessionSignature.objects.filter(voting_session_kick_off=session_kick_off)
 
     return render(
         request,
         'TI_Management_app/voting/voting_active_session.html',
         {
             'voting': voting,
-            'session_kick_off': session_kick_off
+            'session_kick_off': session_kick_off,
+            'session_signature': session_signature
         }
     )
 
