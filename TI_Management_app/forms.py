@@ -3085,7 +3085,7 @@ class VotingSessionSignatureForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
-        self.voting_session_kick_off = kwargs.pop('voting_session_kick_off', None)
+        self.vote = kwargs.pop('vote', None)
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -3096,17 +3096,17 @@ class VotingSessionSignatureForm(forms.ModelForm):
 
     def clean_member_signature(self):
         member_signature = self.cleaned_data['member_signature']
-        voting_session_kick_off = self.voting_session_kick_off
+        vote = self.vote
 
-        if not voting_session_kick_off:
+        if not vote:
             raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
 
-        vote = voting_session_kick_off.vote
+        # vote = voting_session_kick_off.vote
 
         for member in vote.members.all():
             if check_password(member_signature, member.card):
                 # Check if the signature already exists for this member in this voting session
-                existing_signature = voting_session_kick_off.voteVotingSessionKickOffSignature.filter(
+                existing_signature = vote.voteVotingSessionSignature.filter(
                     member=member).exists()
                 if existing_signature:
                     raise ValidationError("Podpis już istnieje.")

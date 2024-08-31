@@ -35,7 +35,7 @@ from .models import (
     VotingSessionSignature
 )
 from django.http import HttpResponseRedirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .forms import (
     MemberForm,
     MemberEditForm,
@@ -4224,10 +4224,35 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
                         pk_kick_off=session_kick_off_edit.id
                     )
                 else:
-                    return redirect(
-                        'TI_Management_app:voting_active_session',
-                        pk_vote=voting.id,
-                        pk_kick_off=session_kick_off_edit.id
+                    # return redirect(
+                    #     'TI_Management_app:voting_active_session',
+                    #     pk_vote=voting.id,
+                    #     pk_kick_off=session_kick_off_edit.id
+                    # )
+
+                    # return render(
+                    #     request,
+                    #     'TI_Management_app/voting/voting_active_session.html',
+                    #     {
+                    #         'redirect_url': reverse(
+                    #             'TI_Management_app:voting_active_session',
+                    #             args=[voting.id, session_kick_off_edit.id]
+                    #         )
+                    #     }
+                    # )
+                    return render(
+                        request,
+                        'TI_Management_app/voting/new_window_redirect.html',
+                        {
+                            'redirect_url': reverse(
+                                'TI_Management_app:voting_active_session',
+                                args=[voting.id, session_kick_off_edit.id]
+                            ),
+                            'safe_redirect_url': reverse(
+                                'TI_Management_app:voting_active_session_kick_off_validation',
+                                args=[voting.id, session_kick_off_edit.id]
+                            )
+                        }
                     )
     else:
         form_signature = VotingSessionKickOffSignatureForm(voting_session_kick_off=session_kick_off_edit)
@@ -4247,15 +4272,80 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
 def voting_active_session(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
-    session_signature = VotingSessionSignature.objects.filter(voting_session_kick_off=session_kick_off)
+    session_signature = VotingSessionSignature.objects.filter(vote=voting)
+
+    if request.method == "POST":
+        form = VotingSessionSignatureForm(request.POST, vote=voting)
+
+        if form.is_valid():
+            member_signature = form.cleaned_data['member_signature']
+            vote = session_kick_off.vote
+
+            for member in vote.members.all():
+                if check_password(member_signature, member.card):
+                    member_id = member
+
+            if member_id:
+                session_kick_off_signature = form.save(commit=False)
+                session_kick_off_signature.author = request.user
+                session_kick_off_signature.vote = voting
+                session_kick_off_signature.voting_session_kick_off = session_kick_off
+                session_kick_off_signature.member = member_id
+                session_kick_off_signature.signature = True
+                session_kick_off_signature.save()
+
+                return redirect(
+                    'TI_Management_app:voting_active_session_validation',
+                    pk_vote=voting.id,
+                    pk_kick_off=session_kick_off.id,
+                    pk_member=session_kick_off_signature.id
+                )
+    else:
+        form = VotingSessionSignatureForm(vote=voting)
 
     return render(
         request,
         'TI_Management_app/voting/voting_active_session.html',
         {
+            'form': form,
             'voting': voting,
             'session_kick_off': session_kick_off,
             'session_signature': session_signature
         }
     )
 
+
+@login_required
+def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
+    voting = get_object_or_404(Vote, pk=pk_vote)
+    session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+    # session_signature = VotingSessionSignature.objects.filter(vote=voting)
+    member = get_object_or_404(VotingSessionSignature, pk=pk_member)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_validation.html',
+        {
+            'voting': voting,
+            'session_kick_off': session_kick_off,
+            # 'session_signature': session_signature
+            'member': member
+        }
+    )
+
+
+@login_required
+def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
+    voting = get_object_or_404(Vote, pk=pk_vote)
+    session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+    session_signature = VotingSessionSignature.objects.filter(vote=voting)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_kick_off_validation.html',
+        {
+            'voting': voting,
+            'session_kick_off': session_kick_off,
+            'session_signature': session_signature
+        }
+    )

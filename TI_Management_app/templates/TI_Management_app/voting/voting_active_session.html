@@ -10,6 +10,7 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <meta name="description" content="zzti LUMS">
         <meta name="author" content="zzti LUMS">
+
         <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
 
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
@@ -58,6 +59,22 @@
                 </tr>
             </table>
         </div>
+
+        <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
+        <br />
+            {{ form.member_signature }}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dalej</button>
+        <br />
+        <br />
+        </form>
 
     </body>
 </html>
