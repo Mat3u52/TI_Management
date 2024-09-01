@@ -431,6 +431,7 @@ class VotingSessionSignature(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionSignature', null=False, blank=False)
     signature = models.BooleanField(default=False)
     confirmation = models.BooleanField(default=False)
+    reject = models.BooleanField(default=False)
 
     history = HistoricalRecords()
 

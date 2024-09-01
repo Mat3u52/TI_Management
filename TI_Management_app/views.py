@@ -4315,6 +4315,11 @@ def voting_active_session(request, pk_vote, pk_kick_off):
     )
 
 
+# def load_items(request):
+#     items = list(VotingSessionSignature.objects.values())  # Converts QuerySet to list of dictionaries
+#     return JsonResponse({'items': items})
+
+
 @login_required
 def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
@@ -4338,7 +4343,7 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
 def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
-    session_signature = VotingSessionSignature.objects.filter(vote=voting)
+    session_signatures = VotingSessionSignature.objects.filter(vote=voting)
 
     return render(
         request,
@@ -4346,6 +4351,6 @@ def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
         {
             'voting': voting,
             'session_kick_off': session_kick_off,
-            'session_signature': session_signature
+            'session_signatures': session_signatures
         }
     )

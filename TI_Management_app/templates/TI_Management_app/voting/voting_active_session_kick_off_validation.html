@@ -16,39 +16,62 @@
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
+<!--        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
+    <script type="text/javascript">
+        let countdown = 5;
+
+        function updateCountdown() {
+            if (countdown > 0) {
+                document.getElementById("countdown").innerHTML = countdown;
+                countdown--;
+            } else {
+                clearInterval(interval);  // zatrzymuje licznik
+                window.location.reload();  // odświeża stronę
+            }
+        }
+
+        // Aktualizuj licznik co sekundę
+        let interval = setInterval(updateCountdown, 1000);
+    </script>
     </head>
 <body>
 <div class="hero-unit">
-  <h2 class="fadeInUp-animation">Autoryzacja {{ voting.title }}</h2>
+  <h2 class="fadeInUp-animation">Autoryzacja Uczestnika głosowania - {{ voting.title }}</h2>
   <hr>
   <br />
-<!--    <form method="post">-->
-<!--        {% csrf_token %}-->
-<!--        {% if form.errors %}-->
-<!--            <div class="alert alert-danger">-->
-<!--                <p>{{ form.errors }}</p>-->
-<!--            </div>-->
-<!--        {% endif %}-->
-<!--        {{ form.title }}-->
-<!--        <br />-->
-<!--        <p>Czas zakończenia sesji:</p>-->
-<!--        {{ form.session_end }}-->
-<!--        <br />-->
-<!--        <p>Wymagane podpisy Członków Komisji Wyborczej:</p>-->
-
-<!--        {% for commission in voting.election_commission.all %}-->
-<!--            {{ commission.forename }} {{ commission.surname }}<br />-->
-<!--        {% endfor %}-->
-<!--        <br />-->
+    <p><span id="countdown">5</span> sekund.</p>
 
 
-<!--        <br />-->
-<!--        <br />-->
-<!--        <button type="submit" class="btn btn-primary btn-large pull-right">Składanie podpisów przez Komisję Wyborczą</button>-->
-<!--        <br />-->
-<!--        <br />-->
-<!--    </form>-->
-    {{ session_signature }}<br />
+    {% for session_signature in session_signatures %}
+        <div style="height:200px">
+            <div>
+                <img src="{% thumbnail session_signature.member.image 150x0  quality=100 %}">
+            </div>
+            <div>
+                <a href="{{ session_signature.member.get_absolute_url }}" target="_blank"
+                   onclick="window.open('{{ session_signature.member.get_absolute_url }}', 'window15', 'width=800,height=600'); return false;">
+                    {{ session_signature.member.forename }}&nbsp;{{ session_signature.member.surname }} - {{ session_signature.member.member_nr }}
+                </a>
+            </div>
+            <br />
+            
+            <div>
+                <a href="#" class="btn btn-success btn-large pull-left">
+                    Potwierdzam tożsamość
+                </a>
+            </div>
+            <br />
+            <br />
+            <div>
+                <a href="#" class="btn btn-danger btn-large pull-left">
+                    Odrzuć
+                </a>
+            </div>
+        </div>
+        <hr>
+    {% endfor %}
+
+    <br />
 </div>
 
 </body>

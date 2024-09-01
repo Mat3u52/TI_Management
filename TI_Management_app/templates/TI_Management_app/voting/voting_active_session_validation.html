@@ -42,12 +42,26 @@
               position: relative;
               text-align: center;
               color: #000000;
+              width: 100%;
             }
             .centered {
-              position: absolute;
-              top: 50%;
-              left: 50%;
-              transform: translate(-50%, -50%);
+                width:50%;
+                height: 100%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #FFFFFF;
+            }
+            @keyframes fadeInUp {
+                0% {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(0%);
+                    opacity: 1;
+                }
             }
             .fadeInUp-animation {
                 animation: 1.5s fadeInUp;
@@ -59,16 +73,19 @@
 
         <header class="container">
             <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS" style="width:100%;">
-            <div class="centered">Głosowanie<br />{{ voting.title }}<br /> {{ member.created_date }}</div>
+            <div class="centered"><br /><br />Głosowanie<br />{{ voting.title }}<br /> {{ member.created_date }}</div>
         </header>
 
         <div>
-          <h3>Dzień dobry, {{ member.forename }} {{ member.surname }} | MNo: {{ member.member_nr }} </h3>
             <hr>
-            <table style="width:100%" border="1">
+          <h3>Dzień dobry, {{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }} </h3>
+            <hr>
+            <table style="width:100%" border="0">
                 <tr>
                     <th rowspan="2">
-                        <h1 class="fadeInUp-animation"><span style="color:green;">&#10003;</span></h1>
+                        <br />
+                        <br />
+                        <h1 class="fadeInUp-animation"><span style="color:green; font-size: 124px;">&#10003;</span></h1>
                     </th>
                     <td>
                         <p>Jesteś na liście uprawnionych do głosowania. <br />
