@@ -609,7 +609,5 @@ urlpatterns = [
         views.voting_active_session_kick_off_validation,
         name='voting_active_session_kick_off_validation'
     ),
-    # path('TI_Management_app/voting/load-items/', views.load_items, name='load_items'),
-
 ]
 

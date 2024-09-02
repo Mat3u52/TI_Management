@@ -88,7 +88,8 @@ from .forms import (
     VotingAddRecapForm,
     VotingSessionKickOffForm,
     VotingSessionKickOffSignatureForm,
-    VotingSessionSignatureForm
+    VotingSessionSignatureForm,
+    VotingActiveSessionKickOffValidationForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -4345,12 +4346,37 @@ def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     session_signatures = VotingSessionSignature.objects.filter(vote=voting)
 
+    if request.method == "POST":
+        form = VotingActiveSessionKickOffValidationForm(request.POST, instance=session_signatures)
+
+        if form.is_valid():
+            confirmation = form.cleaned_data['confirmation']
+            reject = form.cleaned_data['reject']
+
+            session_kick_off = form.save(commit=False)
+            session_kick_off.author = request.user
+            session_kick_off.vote = voting
+            # session_kick_off.session_start = timezone.now()
+            session_kick_off.save()
+
+            return redirect(
+                'TI_Management_app:voting_active_session_kick_off_validation',
+                pk_vote=voting.id,
+                pk_kick_off=session_kick_off.id
+                # pk_member=session_signatures.id
+            )
+
+    else:
+        form = VotingActiveSessionKickOffValidationForm(instance=session_signatures)
+
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_kick_off_validation.html',
         {
+            'form': form,
             'voting': voting,
             'session_kick_off': session_kick_off,
             'session_signatures': session_signatures
         }
     )
+
