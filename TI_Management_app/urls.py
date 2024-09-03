@@ -609,5 +609,10 @@ urlpatterns = [
         views.voting_active_session_kick_off_validation,
         name='voting_active_session_kick_off_validation'
     ),
+    path(
+        'TI_Management_app/voting/voting-active-session-approve/<int:pk_vote>/<int:pk_kick_off>/<int:pk_member>/',
+        views.voting_active_session_approve,
+        name='voting_active_session_approve'
+    ),
 ]
 

@@ -1381,7 +1381,8 @@ class VotingSessionSignatureAdmin(admin.ModelAdmin):
         'voting_session_kick_off',
         'member',
         'signature',
-        'confirmation'
+        'confirmation',
+        'reject'
     )
     list_filter = (
         'created_date',
@@ -1392,7 +1393,8 @@ class VotingSessionSignatureAdmin(admin.ModelAdmin):
         'voting_session_kick_off',
         'member',
         'signature',
-        'confirmation'
+        'confirmation',
+        'reject'
     )
     search_fields = (
         'voting_session_kick_off',

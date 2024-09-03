@@ -67,15 +67,29 @@
                 animation: 1.5s fadeInUp;
             }
         </style>
+        <script type="text/javascript">
+            let countdown = 5;
 
+            function updateCountdown() {
+                if (countdown > 0) {
+                    document.getElementById("countdown").innerHTML = countdown;
+                    countdown--;
+                } else {
+                    clearInterval(interval);
+                    window.location.reload();
+                }
+            }
+
+            let interval = setInterval(updateCountdown, 1000);
+        </script>
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
-
         <header class="container">
             <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS" style="width:100%;">
             <div class="centered"><br /><br />Głosowanie<br />{{ voting.title }}<br /> {{ member.created_date }}</div>
         </header>
-
+        <p><span id="countdown">5</span> sekund.</p>
+        {% if member.confirmation is False and member.reject is False %}
         <div>
             <hr>
           <h3>Dzień dobry, {{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }} </h3>
@@ -97,9 +111,17 @@
                     <td><p>Zaczekaj na potwierdzenie tożsamości</p></td>
                 </tr>
             </table>
-
         </div>
-
+        {% elif member.confirmation is True and member.reject is False %}
+        <div>
+            <hr>
+          <h3>Dzień dobry, {{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }} </h3>
+            <hr>
+                <a href="#" class="btn btn-danger btn-large pull-left">
+                    Rozpocznij głosowanie
+                </a>
+        </div>
+        {% endif %}
     </body>
 </html>
 
