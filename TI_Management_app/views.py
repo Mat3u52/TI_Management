@@ -4091,6 +4091,13 @@ def voting_active_session_list(request):
         date_start__lte=timezone.now(),
         date_end__gte=timezone.now()
     ).order_by('-created_date')
+    active_session = VotingSessionKickOff.objects.order_by('-created_date').first()
+    current_date = timezone.now()
+    session_end = active_session.session_end
+    if session_end > current_date:
+        session_status: bool = True
+    else:
+        session_status: bool = False
 
     paginator = Paginator(vote_obj, 50)
     page = request.GET.get('page')
@@ -4106,7 +4113,8 @@ def voting_active_session_list(request):
         'TI_Management_app/voting/voting_active_session_list.html',
         {
             'page': page,
-            'voting': voting
+            'voting': voting,
+            'session_status': session_status
         }
     )
 
@@ -4368,6 +4376,28 @@ def voting_active_session_approve(request, pk_vote, pk_kick_off, pk_member):
     #         )
     #     }
     # )
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_kick_off_validation.html',
+        {
+            'voting': voting,
+            'session_kick_off': session_kick_off,
+            'session_signatures': session_signatures
+        }
+    )
+
+
+@login_required
+def voting_active_session_disapprove(request, pk_vote, pk_kick_off, pk_member):
+    voting = get_object_or_404(Vote, pk=pk_vote)
+    session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+    member = get_object_or_404(VotingSessionSignature, pk=pk_member)
+    session_signatures = VotingSessionSignature.objects.filter(vote=voting)
+
+    member.confirmation = True
+    member.reject = True
+    member.save()
 
     return render(
         request,

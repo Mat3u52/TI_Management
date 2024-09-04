@@ -614,5 +614,10 @@ urlpatterns = [
         views.voting_active_session_approve,
         name='voting_active_session_approve'
     ),
+    path(
+        'TI_Management_app/voting/voting-active-session-disapprove/<int:pk_vote>/<int:pk_kick_off>/<int:pk_member>/',
+        views.voting_active_session_disapprove,
+        name='voting_active_session_disapprove'
+    ),
 ]
 

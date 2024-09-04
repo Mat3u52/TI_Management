@@ -55,17 +55,17 @@
                 </a>
             </div>
             <br />
-            {{voting.id}} {{session_kick_off.id}} {{session_signature.member.id}}
+            {{voting.id}} {{session_kick_off.id}} {{session_signature.member.id}} {{session_signature.id}}
             
             <div>
-                <a href="{% url 'TI_Management_app:voting_active_session_approve' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.member.id %}" class="btn btn-success btn-large pull-left">
+                <a href="{% url 'TI_Management_app:voting_active_session_approve' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-success btn-large pull-left">
                     Potwierdzam tożsamość
                 </a>
             </div>
             <br />
             <br />
             <div>
-                <a href="#" class="btn btn-danger btn-large pull-left">
+                <a href="{% url 'TI_Management_app:voting_active_session_disapprove' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-danger btn-large pull-left">
                     Odrzuć
                 </a>
             </div>
