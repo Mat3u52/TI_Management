@@ -22,7 +22,7 @@
 
         function updateCountdown() {
             if (countdown > 0) {
-                document.getElementById("countdown").innerHTML = countdown;
+                // document.getElementById("countdown").innerHTML = countdown;
                 countdown--;
             } else {
                 clearInterval(interval);  // zatrzymuje licznik
@@ -39,11 +39,14 @@
   <h2>Autoryzacja Uczestnika głosowania - {{ voting.title }}</h2>
   <hr>
   <br />
-    <p><span id="countdown">5</span> sekund.</p>
+    <p><span id="countdown"></span></p>
 
 
     {% for session_signature in session_signatures %}
         {% if session_signature.confirmation is False and session_signature.reject is False %}
+        <div class="notepad">
+
+
         <div style="height:200px">
             <div>
                 <img src="{% thumbnail session_signature.member.image 150x0  quality=100 %}">
@@ -55,8 +58,6 @@
                 </a>
             </div>
             <br />
-            {{voting.id}} {{session_kick_off.id}} {{session_signature.member.id}} {{session_signature.id}}
-            
             <div>
                 <a href="{% url 'TI_Management_app:voting_active_session_approve' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-success btn-large pull-left">
                     Potwierdzam tożsamość
@@ -70,6 +71,9 @@
                 </a>
             </div>
         </div>
+
+        </div>
+        <br />
         <hr>
         {% endif %}
     {% endfor %}

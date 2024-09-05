@@ -31,20 +31,20 @@
         {% endif %}
         {{ form.title }}
         <br />
-        <p>Czas zakończenia sesji:</p>
+        <br />
+        <p><b>Zakończenie sesji:</b></p>
         {{ form.session_end }}
         <br />
-        <p>Wymagane podpisy Członków Komisji Wyborczej:</p>
-
-        {% for commission in voting.election_commission.all %}
-            {{ commission.forename }} {{ commission.surname }}<br />
-        {% endfor %}
         <br />
-
-
+        <p><b>Wymagane podpisy Członków Komisji Wyborczej:</b></p>
+        <ul>
+            {% for commission in voting.election_commission.all %}
+                <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
+            {% endfor %}
+        </ul>
         <br />
         <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Składanie podpisów przez Komisję Wyborczą</button>
+        <button type="submit" class="btn btn-primary btn-large pull-right">Podpisy Komisji Wyborczej</button>
         <br />
         <br />
     </form>

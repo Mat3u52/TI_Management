@@ -30,17 +30,28 @@
             </div>
         {% endif %}
 
-        <p>Minimalna ilość podpisów Komisji Wyborczej:</p>
-        {{ voting.min_amount_commission }}<br />
-        {% for commission in voting.election_commission.all %}
-            {{ commission.forename }} {{ commission.surname }}<br />
-        {% endfor %}
+        <p><b>Minimalna ilość podpisów Komisji Wyborczej:</b> {{ voting.min_amount_commission }}</p>
         <br />
-        {% for commission_signed in voting_session_kick_off_signature %}
-            {{ commission_signed.member.forename }}<br />
-        {% endfor %}
+        <ul>
+            {% for commission in voting.election_commission.all %}
+            <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
+            {% endfor %}
+        </ul>
+        <br />
+        <p><b>Obecność:</b> {{voting_session_kick_off_signature|length}}</p>
+        <ul>
+            {% for commission_signed in voting_session_kick_off_signature %}
+            <li>
+                <span style="color:green;">
+                {{ commission_signed.member.member_nr }} -
+                {{ commission_signed.member.forename }}
+                {{ commission_signed.member.surname }}
+                </span>
+            </li>
+            {% endfor %}
+        </ul>
 
-        {{voting_session_kick_off_signature|length}}
+        <br />
 
         {{ form_signature.commission_signature }}
 

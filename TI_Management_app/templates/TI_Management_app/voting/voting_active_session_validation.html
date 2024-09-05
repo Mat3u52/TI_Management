@@ -66,13 +66,18 @@
             .fadeInUp-animation {
                 animation: 1.5s fadeInUp;
             }
+            .full-width {
+                display:block;
+                text-align: center;
+                font-size: 10px;
+            }
         </style>
         <script type="text/javascript">
             let countdown = 5;
 
             function updateCountdown() {
                 if (countdown > 0) {
-                    document.getElementById("countdown").innerHTML = countdown;
+                    // document.getElementById("countdown").innerHTML = countdown;
                     countdown--;
                 } else {
                     clearInterval(interval);
@@ -86,13 +91,20 @@
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
         <header class="container">
             <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS" style="width:100%;">
-            <div class="centered"><br /><br />Głosowanie<br />{{ voting.title }}<br /> {{ member.created_date }}</div>
+            <div class="centered">
+                <br /><br />Głosowanie<br />{{ voting.title }}<br /> {{ member.created_date }}
+                {% if member.confirmation is True and member.reject is False %}
+                    <br />{{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }}
+                {% endif %}
+            </div>
         </header>
-        <p><span id="countdown">5</span> sekund.</p>
+        <p><span id="countdown"> </span></p>
         {% if member.confirmation is False and member.reject is False %}
         <div style="margin: 20px;">
             <hr>
-          <h3>Dzień dobry, {{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }} </h3>
+          <h3>
+                Dzień dobry, {{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }}
+          </h3>
             <hr>
             <table style="width:100%" border="0">
                 <tr>
@@ -115,10 +127,15 @@
         {% elif member.confirmation is True and member.reject is False %}
         <div style="margin: 20px;">
             <hr>
-          <h3>Dzień dobry, {{ member.member.forename }} {{ member.member.surname }} | MNo: {{ member.member.member_nr }} </h3>
+          <h5>
+              <span class="label label-default full-width">
+              To głosowanie jest tajne. Nikt poza Tobą nie będzie mógł zobaczyć oddanego przez Ciebie głosu.
+              </span>
+          </h5>
             <hr>
+                <p><b>Możesz oddać głos na ... kandydatów, poprzez zaznaczenie pola wyboru przy imieniu i nazwisku kandydata.</b></p>
                 <a href="#" class="btn btn-primary btn-large btn-block">
-                    Rozpocznij głosowanie
+                    Dotknij tutaj aby przejść dalej
                 </a>
         </div>
         {% elif member.confirmation is True and member.reject is True %}
@@ -145,7 +162,7 @@
         <script type="text/javascript">
             setTimeout(function() {
                 window.location.href = "{% url 'TI_Management_app:voting_active_session' pk_vote=voting.id pk_kick_off=session_kick_off.id %}"; // Replace with the target view's name
-            }, 3000); // 3000 milliseconds = 3 seconds
+            }, 3000);
         </script>
         {% endif %}
     </body>

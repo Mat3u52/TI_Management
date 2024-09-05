@@ -88,7 +88,7 @@
             <div id="start" style="display: none">
                 <p>
                     <a href="{% url 'TI_Management_app:voting_active_session_kick_off' pk=voting.pk %}" class="btn btn-success btn-large pull-right">
-                        Rozpocznij Głosowanie
+                        Rozpocznij sesje
                     </a>
                 </p>
             </div>
@@ -176,7 +176,13 @@
             <p>Zakończone sesje głosowania:</p>
             {% for session in sessions_status %}
                 {{ session }}<br />
+                {% for signature in session.memberVotingSessionSignature.all %}
+                    <ul>
+                        <li>{{ signature.member }}</li>
+                    </ul>
+                {% endfor %}
             {% endfor %}
+            <br />
 
             <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
         </div>

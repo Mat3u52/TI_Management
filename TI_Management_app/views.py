@@ -4091,13 +4091,17 @@ def voting_active_session_list(request):
         date_start__lte=timezone.now(),
         date_end__gte=timezone.now()
     ).order_by('-created_date')
+
     active_session = VotingSessionKickOff.objects.order_by('-created_date').first()
     current_date = timezone.now()
-    session_end = active_session.session_end
-    if session_end > current_date:
-        session_status: bool = True
+    if active_session is not None and active_session.session_end:
+        session_end = active_session.session_end
+        if session_end > current_date:
+            session_status = True
+        else:
+            session_status = False
     else:
-        session_status: bool = False
+        session_status = False
 
     paginator = Paginator(vote_obj, 50)
     page = request.GET.get('page')

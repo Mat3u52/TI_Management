@@ -44,16 +44,19 @@
         <br />
         <p><b>Start:</b> {{vote.date_start}} </p>
 
+        {% if session_status is False %}
         <p>
             <a href="{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}"
                target="_blank"
                onclick="
            window.open('{% url 'TI_Management_app:voting_active_session_detail' pk=vote.pk %}', 'window1', 'width=800,height=600');
+           this.style.display = 'none';
            return false;"
                class="btn btn-primary btn-large pull-right">
-                Rozpocznij Sesje
+                Więcej informacji
             </a>
         </p>
+        {% endif %}
 
         <p><b>Koniec:</b> {{vote.date_end}} </p>
         <div class="date"><p>Data dodania: {{ vote.created_date }} przez: {{ vote.author }}</p></div>
