@@ -174,14 +174,32 @@
             {% endfor %}
 
             <p>Zakończone sesje głosowania:</p>
+
             {% for session in sessions_status %}
-                {{ session }}<br />
-                {% for signature in session.memberVotingSessionSignature.all %}
+                <h4>Session: {{ session }}</h4>
+
+                {% for commission_signature in session.voteVotingSessionKickOffSignature.all %}
                     <ul>
-                        <li>{{ signature.member }}</li>
+                        <li>
+                            Członek Komisji:
+                            {{ commission_signature.member.member_nr }} -
+                            {{ commission_signature.member.forename }} {{ commission_signature.member.surname }}
+                        </li>
                     </ul>
                 {% endfor %}
+
+                <hr>
+
+                <!-- Accessing related VotingSessionSignature through the related_name -->
+                {% for signature in session.voteVotingSessionSignature.all %}
+                    <ul>
+                        <li>Członek: {{ signature.member.member_nr }} - {{ signature.member.forename }} {{ signature.member.surname }}</li>
+                    </ul>
+                {% endfor %}
+
             {% endfor %}
+
+
             <br />
 
             <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>

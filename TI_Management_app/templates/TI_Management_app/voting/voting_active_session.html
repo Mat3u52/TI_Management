@@ -47,6 +47,14 @@
         <header>
             <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS">
         </header>
+        <form method="post">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
+
         <br />
         <br />
 
@@ -62,13 +70,7 @@
             </table>
         </div>
 
-        <form method="post">
-        {% csrf_token %}
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                <p>{{ form.errors }}</p>
-            </div>
-        {% endif %}
+
         <br />
             {{ form.member_signature }}
         <br />

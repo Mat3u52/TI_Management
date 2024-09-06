@@ -294,7 +294,6 @@ class Vote(models.Model):
 
 
 class Poll(models.Model):
-    # created_date = models.DateTimeField(default=timezone.now)
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)

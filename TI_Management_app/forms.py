@@ -3114,34 +3114,3 @@ class VotingSessionSignatureForm(forms.ModelForm):
                 return member_signature
 
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
-
-
-# class VotingActiveSessionKickOffValidationForm(forms.ModelForm):
-#     confirmation = forms.BooleanField(
-#         widget=forms.CheckboxInput(
-#             attrs={
-#                 'class': 'form-control me-2',
-#                 'aria-label': 'Potwierdź'
-#             }
-#         ),
-#         label='',
-#         required=False
-#     )
-#     reject = forms.BooleanField(
-#         widget=forms.CheckboxInput(
-#             attrs={
-#                 'class': 'form-control me-2',
-#                 'aria-label': 'Odrzuć'
-#             }
-#         ),
-#         label='',
-#         required=False
-#     )
-#
-#     class Meta:
-#         model = VotingSessionSignature
-#         fields = [
-#             'member',
-#             'confirmation',
-#             'reject'
-#         ]

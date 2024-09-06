@@ -3721,10 +3721,13 @@ def voting_add_poll(request, pk):
 
     current_date = timezone.now()
     voting_date_start = voting.date_start
-    if voting_date_start > current_date:
-        voting_status: bool = True
+    if voting_date_start:
+        if voting_date_start > current_date:
+            voting_status: bool = True
+        else:
+            voting_status: bool = False
     else:
-        voting_status: bool = False
+        voting_status: bool = True
 
 
     if request.method == "POST":
@@ -3793,10 +3796,13 @@ def voting_add_recap(request, pk):
 
     current_date = timezone.now()
     voting_date_start = voting.date_start
-    if voting_date_start > current_date:
-        voting_status: bool = True
+    if voting_date_start:
+        if voting_date_start > current_date:
+            voting_status: bool = True
+        else:
+            voting_status: bool = False
     else:
-        voting_status: bool = False
+        voting_status: bool = True
 
     if request.method == "POST":
         form = VotingAddRecapForm(request.POST, instance=voting)
@@ -4315,17 +4321,13 @@ def voting_active_session(request, pk_vote, pk_kick_off):
     )
 
 
-# def load_items(request):
-#     items = list(VotingSessionSignature.objects.values())  # Converts QuerySet to list of dictionaries
-#     return JsonResponse({'items': items})
-
-
 @login_required
 def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     # session_signature = VotingSessionSignature.objects.filter(vote=voting)
     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
+    poll = Poll.objects.filter(vote=voting)
 
     return render(
         request,
@@ -4334,7 +4336,8 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
             'voting': voting,
             'session_kick_off': session_kick_off,
             # 'session_signature': session_signature
-            'member': member
+            'member': member,
+            'poll': poll
         }
     )
 
@@ -4366,20 +4369,6 @@ def voting_active_session_approve(request, pk_vote, pk_kick_off, pk_member):
     member.confirmation = True
     member.reject = False
     member.save()
-    # return render(
-    #     request,
-    #     'TI_Management_app/voting/new_window_redirect.html',
-    #     {
-    #         'redirect_url': reverse(
-    #             'TI_Management_app:voting_active_session',
-    #             args=[voting.id, session_kick_off.id]
-    #         ),
-    #         'safe_redirect_url': reverse(
-    #             'TI_Management_app:voting_active_session_kick_off_validation',
-    #             args=[voting.id, session_kick_off.id]
-    #         )
-    #     }
-    # )
 
     return render(
         request,
