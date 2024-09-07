@@ -4401,3 +4401,17 @@ def voting_active_session_disapprove(request, pk_vote, pk_kick_off, pk_member):
             'session_signatures': session_signatures
         }
     )
+
+# @login_required
+# def vote_view(request, poll_id):
+#     poll = Poll.objects.get(id=poll_id)
+#     if request.method == 'POST':
+#         form = ChoiceForm(request.POST, poll=poll)
+#         if form.is_valid():
+#             # Process the form
+#             selected_answers = form.cleaned_data['answer']
+#             # Do something with selected_answers
+#     else:
+#         form = ChoiceForm(poll=poll)
+#
+#     return render(request, 'vote.html', {'form': form})

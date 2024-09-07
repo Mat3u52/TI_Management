@@ -351,16 +351,13 @@ class Choice(models.Model):
 
 
 class VotingSessionKickOff(models.Model):
-
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingSessionKickOff')
     title = models.CharField(max_length=250, null=False, blank=False)
-
     vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='voteVotingSessionKickOff')
     commission_confirmed = models.BooleanField(default=False)
-
     session_start = models.DateTimeField(default=None, blank=True, null=True)
     session_end = models.DateTimeField(default=None, blank=True, null=True)
     session_closed = models.BooleanField(default=False)
@@ -446,6 +443,42 @@ class VotingSessionSignature(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.id}-{self.member.member_nr}")
+        super().save(*args, **kwargs)
+
+
+class VotingResponses(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingResponses')
+
+    vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='voteVotingResponses')
+    voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='voteVotingResponses', null=False, blank=False)
+    poll = models.ForeignKey(Poll, on_delete=models.CASCADE, related_name='pollVotingResponses', null=False, blank=False)
+    choice = models.ForeignKey(Choice, on_delete=models.CASCADE, related_name='choiceVotingResponses', null=False, blank=False)
+    description = CKEditor5Field(null=True, blank=True)
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Odpowiedzi z głosowania'
+        ordering = ('-created_date',)
+        """"
+        This feature is disabled for MySQL DB
+        origin = ['-created_date']
+        indexes = [
+            models.Index(fields=['-created_date'])
+        ]
+        """
+
+    def __str__(self):
+        return str(self.id)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(f"{self.created_date}")
         super().save(*args, **kwargs)
 
 

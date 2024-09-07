@@ -3114,3 +3114,57 @@ class VotingSessionSignatureForm(forms.ModelForm):
                 return member_signature
 
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
+
+
+# class ChoiceForm(forms.Form):
+#
+#     answer = forms.BooleanField(
+#         widget=forms.CheckboxInput(
+#             attrs={
+#                 'class': 'form-control me-2',
+#                 'aria-label': 'Odpowiedź'
+#             }
+#         ),
+#         label='',
+#         required=True
+#     )
+#
+#     def clean(self):
+#         cleaned_data = super().clean()
+#         answers = cleaned_data.get('answer')
+#
+#         # Ensure at least two checkboxes are selected
+#         if len(answers) != 2:
+#             raise forms.ValidationError('Ilość wybranych pozycji nie jest właściwa.')
+#
+#         return cleaned_data
+class ChoiceForm(forms.Form):
+    # Use ModelMultipleChoiceField to load choices dynamically from the model
+    answer = forms.ModelMultipleChoiceField(
+        queryset=Choice.objects.all(),
+        widget=forms.CheckboxSelectMultiple(
+            attrs={
+                'class': 'form-control',
+                'aria-label': 'Odpowiedź'
+            }
+        ),
+        label='',
+        required=True
+    )
+
+    def __init__(self, *args, **kwargs):
+        poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
+        super().__init__(*args, **kwargs)
+        if poll:
+            # Filter choices based on the specific poll
+            self.fields['answer'].queryset = Choice.objects.filter(poll=poll)
+
+    def clean(self):
+        cleaned_data = super().clean()
+        selected_answers = cleaned_data.get('answer')
+
+        # Custom validation logic - ensure exactly 2 answers are selected
+        if len(selected_answers) != 2:
+            raise forms.ValidationError('Please select exactly two options.')
+
+        return cleaned_data

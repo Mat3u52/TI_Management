@@ -136,41 +136,39 @@
                 <p><b>Możesz oddać głos poprzez zaznaczenie pola wyboru.</b></p>
 
 
-<table style="width: 100%">
-    {% for question in poll %}
-        <tr><td><b>{{ question.question }}</b></td></tr>
-        <tr><td><em><small>{{ question.description|safe }}</small></em></td></tr>
-        <tr><td>Dopuszczalna ilość wyborów: {{ question.number_of_responses }}</td></tr>
+            <table style="width: 100%;" border="1">
+                {% for question in poll %}
+                    <tr><td colspan="2"><b>{{ question.question }}</b></td></tr>
+                    <tr><td colspan="2"><em><small>{{ question.description|safe }}</small></em></td></tr>
+                    <tr><td colspan="2">Dopuszczalna ilość wyborów: {{ question.number_of_responses }}</td></tr>
 
-        {% for choice in question.pollChoice.all %}
-            {% if choice.answer is not None %}
-                {% if choice.correct %}
-                    <tr>
-                        <td><span style="color:green">{{ choice.answer }}</span></td>
-                    </tr>
-                {% else %}
-                    <tr>
-                        <td>
-                            {{ choice.answer }}
-                            {% if choice.answer|member_full_name_exist %}
-                                {{ choice.answer|member_full_name_exist }}
-                            {% endif %}
-                            {% with choice.answer|member_img_exist as image_url %}
-                                {% if image_url %}
-                                    <img src="{% thumbnail image_url 150x0 quality=100 %}">
-                                {% endif %}
-                            {% endwith %}
-                        </td>
-                    </tr>
-                {% endif %}
-            {% else %}
-                <tr>
-                    <td><textarea style="resize: none;" rows="4" cols="50" disabled></textarea></td>
-                </tr>
-            {% endif %}
-        {% endfor %}
-    {% endfor %}
-</table>
+                    {% for choice in question.pollChoice.all %}
+                        {% if choice.answer is not None %}
+                                <tr>
+                                    <td>
+                                        {{ choice.answer }}
+                                        {% if choice.answer|member_full_name_exist %}
+                                            {{ choice.answer|member_full_name_exist }}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% with choice.answer|member_img_exist as image_url %}
+                                            {% if image_url %}
+                                                <img src="{% thumbnail image_url 150x0 quality=100 %}">
+                                            {% endif %}
+                                        {% endwith %}
+                                    </td>
+                                </tr>
+                        {% else %}
+                            <tr colspan="2">
+                                <td><textarea style="resize: none;" rows="4" cols="50"></textarea></td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                {% endfor %}
+            </table>
+            <br />
+            <br />
 
 
                 <a href="#" class="btn btn-primary btn-large btn-block">
