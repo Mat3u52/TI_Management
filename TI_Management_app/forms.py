@@ -3116,55 +3116,55 @@ class VotingSessionSignatureForm(forms.ModelForm):
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
 
 
-# class ChoiceForm(forms.Form):
-#
-#     answer = forms.BooleanField(
-#         widget=forms.CheckboxInput(
-#             attrs={
-#                 'class': 'form-control me-2',
-#                 'aria-label': 'Odpowiedź'
-#             }
-#         ),
-#         label='',
-#         required=True
-#     )
-#
-#     def clean(self):
-#         cleaned_data = super().clean()
-#         answers = cleaned_data.get('answer')
-#
-#         # Ensure at least two checkboxes are selected
-#         if len(answers) != 2:
-#             raise forms.ValidationError('Ilość wybranych pozycji nie jest właściwa.')
-#
-#         return cleaned_data
 class ChoiceForm(forms.Form):
-    # Use ModelMultipleChoiceField to load choices dynamically from the model
-    answer = forms.ModelMultipleChoiceField(
-        queryset=Choice.objects.all(),
-        widget=forms.CheckboxSelectMultiple(
+    # answer = forms.BooleanField(required=False)
+    answer_0 = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(
             attrs={
-                'class': 'form-control',
-                'aria-label': 'Odpowiedź'
+                'class': 'form-control me-2',
             }
         ),
-        label='',
-        required=True
+        label='Odpowiedź'
     )
 
-    def __init__(self, *args, **kwargs):
-        poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
-        super().__init__(*args, **kwargs)
-        if poll:
-            # Filter choices based on the specific poll
-            self.fields['answer'].queryset = Choice.objects.filter(poll=poll)
 
-    def clean(self):
-        cleaned_data = super().clean()
-        selected_answers = cleaned_data.get('answer')
+# class VotingAddChoiceForm(forms.Form):
+#
+#     answer_0 = forms.CharField(
+#         widget=forms.TextInput(
+#             attrs={
+#                 'class': 'form-control me-2',
+#                 'type': 'text',
+#                 'id': 'answer_0',
+#                 'placeholder': 'Odpowiedź',
+#                 'aria-label': 'Odpowiedź',
+#                 'list': 'answer_database',
+#                 'autofocus': 'autofocus'
+#             }
+#         ),
+#         validators=[
+#             MinLengthValidator(
+#                 limit_value=2,
+#                 message="Odpowiedź musi zawierać co najmniej 2 znaki."
+#             )
+#         ],
+#         required=False,
+#         max_length=250
+#     )
+#
+#     correct_0 = forms.BooleanField(
+#         required=False,
+#         widget=forms.CheckboxInput(
+#             attrs={
+#                 'class': 'correct'
+#             }
+#         ),
+#         label='Poprawna odpowiedź'
+#     )
+#
+#     open_ended_answer = forms.BooleanField(
+#         label="Pytanie otwarte",
+#         required=False
+#     )
 
-        # Custom validation logic - ensure exactly 2 answers are selected
-        if len(selected_answers) != 2:
-            raise forms.ValidationError('Please select exactly two options.')
-
-        return cleaned_data

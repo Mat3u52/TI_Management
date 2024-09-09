@@ -72,6 +72,7 @@
                 font-size: 10px;
             }
         </style>
+        {% if not (member.confirmation is True and member.reject is False) %}
         <script type="text/javascript">
             let countdown = 5;
 
@@ -87,6 +88,7 @@
 
             let interval = setInterval(updateCountdown, 1000);
         </script>
+        {% endif %}
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
         <header class="container">
@@ -136,44 +138,78 @@
                 <p><b>Możesz oddać głos poprzez zaznaczenie pola wyboru.</b></p>
 
 
-            <table style="width: 100%;" border="1">
-                {% for question in poll %}
-                    <tr><td colspan="2"><b>{{ question.question }}</b></td></tr>
-                    <tr><td colspan="2"><em><small>{{ question.description|safe }}</small></em></td></tr>
-                    <tr><td colspan="2">Dopuszczalna ilość wyborów: {{ question.number_of_responses }}</td></tr>
+<form method="POST" action="{% url 'TI_Management_app:voting_active_session_validation' voting.pk session_kick_off.pk member.pk %}">
+    {% csrf_token %}
 
-                    {% for choice in question.pollChoice.all %}
-                        {% if choice.answer is not None %}
-                                <tr>
-                                    <td>
-                                        {{ choice.answer }}
-                                        {% if choice.answer|member_full_name_exist %}
-                                            {{ choice.answer|member_full_name_exist }}
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% with choice.answer|member_img_exist as image_url %}
-                                            {% if image_url %}
-                                                <img src="{% thumbnail image_url 150x0 quality=100 %}">
-                                            {% endif %}
-                                        {% endwith %}
-                                    </td>
-                                </tr>
-                        {% else %}
-                            <tr colspan="2">
-                                <td><textarea style="resize: none;" rows="4" cols="50"></textarea></td>
-                            </tr>
-                        {% endif %}
-                    {% endfor %}
+    {% for poll in polls %}
+        <div>
+            <h3>{{ poll.question }}</h3>
+            <ul>
+                {% for choice in poll.pollChoice.all %}
+                    <li>
+                        <label>
+                            <input type="checkbox" name="answer_{{ choice.pk }}" value="{{ choice.pk }}">
+                            {{ choice.text }}
+                        </label>
+                    </li>
                 {% endfor %}
-            </table>
-            <br />
-            <br />
+            </ul>
+        </div>
+    {% endfor %}
+
+    <button type="submit">Submit</button>
+</form>
 
 
-                <a href="#" class="btn btn-primary btn-large btn-block">
-                    Dotknij tutaj aby przejść dalej
-                </a>
+<!--            <form method="post" class="post-form">-->
+<!--                {% csrf_token %}-->
+<!--                {% if form.errors %}-->
+<!--                    <div class="alert alert-danger">-->
+<!--                        <p>{{ form.errors }}</p>-->
+<!--                    </div>-->
+<!--                {% endif %}-->
+
+<!--                <table style="width: 100%;" border="1">-->
+<!--                    {% for question in polls %}-->
+<!--                        <tr><td colspan="2"><b>{{ question.question }}</b></td></tr>-->
+<!--                        <tr><td colspan="2"><em><small>{{ question.description|safe }}</small></em></td></tr>-->
+<!--                        <tr><td colspan="2">Dopuszczalna ilość wyborów: {{ question.number_of_responses }}</td></tr>-->
+
+<!--                        {% for choice in question.pollChoice.all %}-->
+<!--                            {% if choice.answer is not None %}-->
+<!--                                    <tr>-->
+<!--                                        <td>-->
+<!--                                            {{ form.answer_0 }}-->
+<!--                                            {{ choice.answer }}-->
+<!--                                            {% if choice.answer|member_full_name_exist %}-->
+<!--                                                {{ choice.answer|member_full_name_exist }}-->
+<!--                                            {% endif %}-->
+
+<!--                                        </td>-->
+<!--                                        <td>-->
+<!--                                            {% with choice.answer|member_img_exist as image_url %}-->
+<!--                                                {% if image_url %}-->
+<!--                                                    <img src="{% thumbnail image_url 150x0 quality=100 %}">-->
+<!--                                                {% endif %}-->
+<!--                                            {% endwith %}-->
+<!--                                        </td>-->
+<!--                                    </tr>-->
+<!--                            {% else %}-->
+<!--                                <tr colspan="2">-->
+<!--                                    <td><textarea style="resize: none;" rows="4" cols="50"></textarea></td>-->
+<!--                                </tr>-->
+<!--                            {% endif %}-->
+<!--                        {% endfor %}-->
+<!--                    {% endfor %}-->
+<!--                </table>-->
+<!--                <br />-->
+<!--                <br />-->
+
+
+<!--                <button type="submit" class="btn btn-primary btn-large btn-block">Dotknij tutaj aby przejść dalej</button>-->
+
+
+<!--            </form>-->
         </div>
         {% elif member.confirmation is True and member.reject is True %}
         <div style="margin: 20px;">
