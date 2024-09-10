@@ -160,7 +160,7 @@
             </table>
 
             <p style="text-align: right; margin-left: auto;"><small>Ilość dopuszczalnych wyborów:</small> {{ poll.number_of_responses }}</p>
-            <div id="actualizationPoll">
+            <div id="actualizationPoll" style="display: none">
                 <p>
                     <a href="{% url 'TI_Management_app:voting_edit_poll' pk=voting.pk poll_pk=poll.pk %}" class="btn btn-primary btn-large pull-right">
                         Aktualizuj pytanie
@@ -209,6 +209,10 @@
 <script>
 const dateStart = new Date("{{ voting.date_start|date:'Y-m-d H:i:s' }}").getTime();
 const dateEnd = new Date("{{ voting.date_end|date:'Y-m-d H:i:s' }}").getTime();
+
+const start = document.getElementById("start");
+const actualization = document.getElementById("actualization");
+const actualizationPoll = document.getElementById("actualizationPoll");
 
 
 function updateCountdown(targetDate, message) {

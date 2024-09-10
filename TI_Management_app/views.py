@@ -4323,101 +4323,226 @@ def voting_active_session(request, pk_vote, pk_kick_off):
     )
 
 
+
 # @login_required
 # def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
 #     voting = get_object_or_404(Vote, pk=pk_vote)
 #     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
-#     # session_signature = VotingSessionSignature.objects.filter(vote=voting)
 #     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
-#     poll = Poll.objects.filter(vote=voting)
+#
+#     polls = Poll.objects.filter(vote=voting)
+#
+#     if request.method == 'POST':
+#
+#         form = ChoiceForm(request.POST)
+#
+#         if form.is_valid():
+#
+#             answers = []
+#
+#             for key in request.POST:
+#                 if key.startswith('answer_'):
+#                     answers.append(request.POST[key])
+#
+#             print(answers)
+#             for poll in polls:
+#                 choices = Choice.objects.filter(poll=poll)
+#                 for choice in choices:
+#                     if str(choice.pk) in answers:
+#                         voting_response = VotingResponses(
+#                             author=request.user,
+#                             vote=voting,
+#                             voting_session_kick_off=session_kick_off,
+#                             poll=poll,
+#                             choice=choice
+#                         )
+#                         voting_response.save()
+#
+#             return redirect('success_url')  # Redirect to a success page or view
+#     else:
+#         form = ChoiceForm()
 #
 #     return render(
 #         request,
 #         'TI_Management_app/voting/voting_active_session_validation.html',
 #         {
+#             'form': form,
 #             'voting': voting,
 #             'session_kick_off': session_kick_off,
-#             # 'session_signature': session_signature
 #             'member': member,
-#             'poll': poll
+#             'polls': polls,
 #         }
 #     )
+
+
+# @login_required
+# def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
+#     voting = get_object_or_404(Vote, pk=pk_vote)
+#     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+#     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
+#
+#     # Fetch all polls related to this vote
+#     polls = Poll.objects.filter(vote=voting)
+#
+#     if request.method == 'POST':
+#         forms = []  # Initialize forms list for both valid and invalid cases
+#         form_is_valid = True  # Flag to track if all forms are valid
+#
+#         for poll in polls:
+#             form = ChoiceForm(request.POST, poll=poll)  # Pass the poll to the form
+#             forms.append(form)  # Collect all forms whether valid or not
+#
+#             if form.is_valid():
+#                 answers = []
+#                 for key in request.POST:
+#                     if key.startswith('answer_'):
+#                         answers.append(request.POST[key])
+#
+#                 print(answers)
+#                 # Saving selected choices as voting responses
+#                 for choice in Choice.objects.filter(poll=poll):
+#                     if str(choice.pk) in answers:
+#                         voting_response = VotingResponses(
+#                             author=request.user,
+#                             vote=voting,
+#                             voting_session_kick_off=session_kick_off,
+#                             poll=poll,
+#                             choice=choice
+#                         )
+#                         voting_response.save()
+#
+#             else:
+#                 form_is_valid = False  # If any form is invalid, set this flag to False
+#
+#         if form_is_valid:
+#             # return redirect('success_url')  # Redirect to a success page or view
+#             return redirect(
+#                 'TI_Management_app:voting_active_session',
+#                 pk_vote=voting.id,
+#                 pk_kick_off=session_kick_off.id
+#             )
+#
+#         # If not all forms are valid, re-render the page with forms and errors
+#         return render(
+#             request,
+#             'TI_Management_app/voting/voting_active_session_validation.html',
+#             {
+#                 'forms': forms,  # Return the list of forms, some may contain errors
+#                 'voting': voting,
+#                 'session_kick_off': session_kick_off,
+#                 'member': member,
+#                 'polls': polls,
+#             }
+#         )
+#
+#     else:
+#         # Prepare the forms for each poll (in case of GET request)
+#         forms = [ChoiceForm(poll=poll) for poll in polls]
+#
+#     return render(
+#         request,
+#         'TI_Management_app/voting/voting_active_session_validation.html',
+#         {
+#             'forms': forms,  # A list of forms for each poll
+#             'voting': voting,
+#             'session_kick_off': session_kick_off,
+#             'member': member,
+#             'polls': polls,
+#         }
+#     )
+
 @login_required
 def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
+    # Fetch related objects
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
 
+    # Fetch all polls related to this vote
     polls = Poll.objects.filter(vote=voting)
 
     if request.method == 'POST':
+        forms = []  # Initialize list to store forms
+        form_is_valid = True  # Flag to track if all forms are valid
 
-        form = ChoiceForm(request.POST)
+        for poll in polls:
+            # Pass the specific poll to the form
+            form = ChoiceForm(request.POST, poll=poll)
+            forms.append(form)  # Collect forms for each poll
 
-        if form.is_valid():
+            if form.is_valid():
+                # Get cleaned data (selected answers)
+                selected_answers = [key for key, value in form.cleaned_data.items() if value]
 
-            answers = []
 
-            for key in request.POST:
-                if key.startswith('answer_'):
-                    answers.append(request.POST[key])
 
-            print(answers)
-            # for poll in polls:
-            #     choices = Choice.objects.filter(poll=poll)
-            #     for choice in choices:
-            #         if str(choice.pk) in answers:
-            #             voting_response = VotingResponses(
-            #                 author=request.user,
-            #                 vote=voting,
-            #                 voting_session_kick_off=session_kick_off,
-            #                 poll=poll,
-            #                 choice=choice
-            #             )
-            #             voting_response.save()
+                print(selected_answers)
 
-            # return redirect('success_url')  # Redirect to a success page or view
+                # Process and save selected choices as voting responses
+                for selected_answer in selected_answers:
+
+
+
+
+                    # Extract choice ID from field name (e.g., 'answer_1')
+                    choice_id = selected_answer.split('_')[1]
+
+                    print(choice_id)
+                    print(poll.id)
+
+                    choice = get_object_or_404(Choice, pk=choice_id, poll=poll)
+
+                    # Save the voting response
+                    voting_response = VotingResponses(
+                        author=request.user,
+                        vote=voting,
+                        voting_session_kick_off=session_kick_off,
+                        poll=poll,
+                        choice=choice
+                    )
+                    voting_response.save()
+
+            else:
+                # If any form is invalid, mark the flag as False
+                form_is_valid = False
+
+        # If all forms are valid, redirect to a success page
+        # if form_is_valid:
+        #     # return redirect('success_url')  # Redirect to a success page or view
+        #     return redirect(
+        #         'TI_Management_app:voting_active_session',
+        #         pk_vote=voting.id,
+        #         pk_kick_off=session_kick_off.id
+        #     )
+
+        # If there are invalid forms, re-render the template with errors
+        return render(
+            request,
+            'TI_Management_app/voting/voting_active_session_validation.html',
+            {
+                'forms': forms,  # Return the list of forms with errors (if any)
+                'voting': voting,
+                'session_kick_off': session_kick_off,
+                'member': member,
+                'polls': polls,
+            }
+        )
+
     else:
-        form = ChoiceForm()
+        # In case of GET request, generate empty forms for each poll
+        forms = [ChoiceForm(poll=poll) for poll in polls]
 
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_validation.html',
         {
-            'form': form,
+            'forms': forms,  # A list of forms for each poll
             'voting': voting,
             'session_kick_off': session_kick_off,
             'member': member,
             'polls': polls,
         }
     )
-
-
-# @login_required
-# def voting_active_session_responses(request, pk_vote, pk_kick_off, pk_member, pk_responses):
-#     voting = get_object_or_404(Vote, pk=pk_vote)
-#     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
-#     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
-#     session_signatures = VotingSessionSignature.objects.filter(vote=voting)
-#
-#     poll = Poll.objects.get(id=pk_responses)
-#
-#     if request.method == 'POST':
-#         form = ChoiceForm(request.POST, poll=poll)
-#         if form.is_valid():
-#             # Process the form
-#             selected_answers = form.cleaned_data['answer']
-#             # Do something with selected_answers
-#     else:
-#         form = ChoiceForm(poll=poll)
-#
-#     return render(
-#         request,
-#         'vote.html',
-#         {
-#             'form': form
-#         }
-#     )
 
 
 @login_required

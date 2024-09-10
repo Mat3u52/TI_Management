@@ -71,8 +71,12 @@
                 text-align: center;
                 font-size: 10px;
             }
+            input[type="checkbox"] {
+                min-width: 50% !important;
+                min-height: 35px;
+            }
         </style>
-        {% if not (member.confirmation is True and member.reject is False) %}
+        {% if not member.confirmation is True and member.reject is False %}
         <script type="text/javascript">
             let countdown = 5;
 
@@ -137,79 +141,76 @@
             <hr>
                 <p><b>Możesz oddać głos poprzez zaznaczenie pola wyboru.</b></p>
 
-
-<form method="POST" action="{% url 'TI_Management_app:voting_active_session_validation' voting.pk session_kick_off.pk member.pk %}">
+<form method="post">
     {% csrf_token %}
-
-    {% for poll in polls %}
-        <div>
-            <h3>{{ poll.question }}</h3>
-            <ul>
-                {% for choice in poll.pollChoice.all %}
-                    <li>
-                        <label>
-                            <input type="checkbox" name="answer_{{ choice.pk }}" value="{{ choice.pk }}">
-                            {{ choice.text }}
-                        </label>
-                    </li>
-                {% endfor %}
-            </ul>
-        </div>
+    {% for form in forms %}
+        <h3>{{ form.poll.question }}</h3>
+        {{ form.as_p }}
     {% endfor %}
-
     <button type="submit">Submit</button>
 </form>
 
 
-<!--            <form method="post" class="post-form">-->
-<!--                {% csrf_token %}-->
-<!--                {% if form.errors %}-->
+
+<!--                <form method="POST" action="{% url 'TI_Management_app:voting_active_session_validation' voting.pk session_kick_off.pk member.pk %}">-->
+<!--                    {% csrf_token %}-->
+<!--                    {% if form.errors %}-->
 <!--                    <div class="alert alert-danger">-->
 <!--                        <p>{{ form.errors }}</p>-->
 <!--                    </div>-->
-<!--                {% endif %}-->
+<!--                    {% endif %}-->
 
-<!--                <table style="width: 100%;" border="1">-->
-<!--                    {% for question in polls %}-->
-<!--                        <tr><td colspan="2"><b>{{ question.question }}</b></td></tr>-->
-<!--                        <tr><td colspan="2"><em><small>{{ question.description|safe }}</small></em></td></tr>-->
-<!--                        <tr><td colspan="2">Dopuszczalna ilość wyborów: {{ question.number_of_responses }}</td></tr>-->
+<!--                    <table style="width: 100%;" border="1">-->
+<!--                    {% for poll in polls %}-->
+<!--                        <tr><td colspan="2"><b>{{ poll.question }}</b></td></tr>-->
+<!--                        <tr><td colspan="2"><em><small>{{ poll.description|safe }}</small></em></td></tr>-->
+<!--                        <tr><td colspan="2">Dopuszczalna ilość wyborów: {{ poll.number_of_responses }}</td></tr>-->
 
-<!--                        {% for choice in question.pollChoice.all %}-->
+<!--                        {% for choice in poll.pollChoice.all %}-->
+<!--                        <tr>-->
 <!--                            {% if choice.answer is not None %}-->
-<!--                                    <tr>-->
-<!--                                        <td>-->
-<!--                                            {{ form.answer_0 }}-->
-<!--                                            {{ choice.answer }}-->
-<!--                                            {% if choice.answer|member_full_name_exist %}-->
-<!--                                                {{ choice.answer|member_full_name_exist }}-->
-<!--                                            {% endif %}-->
+<!--                            <td>-->
+<!--                            <input type="checkbox" name="answer_{{ choice.pk }}" value="{{ choice.pk }}">-->
+<!--                            {% if choice.answer|member_full_name_exist %}-->
+<!--                                {{ choice.answer|member_full_name_exist }}-->
+<!--                            {% endif %}-->
+<!--                            </td>-->
+<!--                            <td>-->
+<!--                            {% with choice.answer|member_img_exist as image_url %}-->
+<!--                                {% if image_url %}-->
+<!--                                    <img src="{% thumbnail image_url 150x0 quality=100 %}">-->
+<!--                                {% endif %}-->
+<!--                            {% endwith %}-->
+<!--                            </td>-->
 
-<!--                                        </td>-->
-<!--                                        <td>-->
-<!--                                            {% with choice.answer|member_img_exist as image_url %}-->
-<!--                                                {% if image_url %}-->
-<!--                                                    <img src="{% thumbnail image_url 150x0 quality=100 %}">-->
-<!--                                                {% endif %}-->
-<!--                                            {% endwith %}-->
-<!--                                        </td>-->
-<!--                                    </tr>-->
+
 <!--                            {% else %}-->
-<!--                                <tr colspan="2">-->
-<!--                                    <td><textarea style="resize: none;" rows="4" cols="50"></textarea></td>-->
+<!--                                <tr>-->
+<!--                                    <td colspan="2">-->
+<!--                                        <textarea style="resize: none;" rows="4" cols="50"></textarea>-->
+<!--                                    </td>-->
 <!--                                </tr>-->
 <!--                            {% endif %}-->
+
+
+
+<!--                        </tr>-->
 <!--                        {% endfor %}-->
+
 <!--                    {% endfor %}-->
-<!--                </table>-->
-<!--                <br />-->
-<!--                <br />-->
+
+<!--                    </table>-->
+<!--                    <br />-->
+<!--                    <br />-->
+<!--                    <button type="submit" class="btn btn-primary btn-large btn-block">Dotknij tutaj aby przejść dalej</button>-->
+<!--                    <br />-->
+<!--                    <br />-->
+<!--                </form>-->
 
 
-<!--                <button type="submit" class="btn btn-primary btn-large btn-block">Dotknij tutaj aby przejść dalej</button>-->
 
 
-<!--            </form>-->
+
         </div>
         {% elif member.confirmation is True and member.reject is True %}
         <div style="margin: 20px;">

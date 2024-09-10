@@ -3116,8 +3116,18 @@ class VotingSessionSignatureForm(forms.ModelForm):
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
 
 
+# class ChoiceForm(forms.Form):
+#     answer_0 = forms.BooleanField(
+#         required=False,
+#         widget=forms.CheckboxInput(
+#             attrs={
+#                 'class': 'form-control me-2',
+#             }
+#         ),
+#         label='Odpowiedź'
+#     )
+
 class ChoiceForm(forms.Form):
-    # answer = forms.BooleanField(required=False)
     answer_0 = forms.BooleanField(
         required=False,
         widget=forms.CheckboxInput(
@@ -3128,43 +3138,33 @@ class ChoiceForm(forms.Form):
         label='Odpowiedź'
     )
 
+    def __init__(self, *args, **kwargs):
+        poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
+        self.poll = poll  # Save the poll for later use
+        super().__init__(*args, **kwargs)
+        if poll:
+            # Dynamically add fields based on the poll's choices
+            choices = Choice.objects.filter(poll=poll)
+            # for idx, choice in enumerate(choices):
+            for choice in enumerate(choices):
+                self.fields[f'answer_{choice.id}'] = forms.BooleanField(
+                    required=False,
+                    widget=forms.CheckboxInput(attrs={'class': 'form-control me-2'}),
+                    label=choice.answer,  # Adjust based on your Choice model field
+                )
 
-# class VotingAddChoiceForm(forms.Form):
-#
-#     answer_0 = forms.CharField(
-#         widget=forms.TextInput(
-#             attrs={
-#                 'class': 'form-control me-2',
-#                 'type': 'text',
-#                 'id': 'answer_0',
-#                 'placeholder': 'Odpowiedź',
-#                 'aria-label': 'Odpowiedź',
-#                 'list': 'answer_database',
-#                 'autofocus': 'autofocus'
-#             }
-#         ),
-#         validators=[
-#             MinLengthValidator(
-#                 limit_value=2,
-#                 message="Odpowiedź musi zawierać co najmniej 2 znaki."
-#             )
-#         ],
-#         required=False,
-#         max_length=250
-#     )
-#
-#     correct_0 = forms.BooleanField(
-#         required=False,
-#         widget=forms.CheckboxInput(
-#             attrs={
-#                 'class': 'correct'
-#             }
-#         ),
-#         label='Poprawna odpowiedź'
-#     )
-#
-#     open_ended_answer = forms.BooleanField(
-#         label="Pytanie otwarte",
-#         required=False
-#     )
+    def clean(self):
+        cleaned_data = super().clean()
+
+        # Count the selected answers
+        selected_answers = [value for key, value in cleaned_data.items() if key.startswith('answer_') and value]
+
+        # Get the number of required responses from the Poll model
+        required_responses = self.poll.number_of_responses
+
+        # Validate based on the number of required responses
+        if len(selected_answers) != required_responses:
+            raise forms.ValidationError(f'Please select exactly {required_responses} options.')
+
+
 
