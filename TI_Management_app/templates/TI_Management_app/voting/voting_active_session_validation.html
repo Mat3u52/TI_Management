@@ -144,10 +144,50 @@
 <form method="post">
     {% csrf_token %}
     {% for form in forms %}
-        <h3>{{ form.poll.question }}</h3>
-        {{ form.as_p }}
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <p>{{ form.errors }}</p>
+        </div>
+        {% endif %}
+
+
+        <table style="width: 100%;" border="1">
+            <tr><td colspan="2"><b>{{ form.poll.question }}</b></td></tr>
+            <tr><td colspan="2"><em><small>{{ form.poll.description|safe }}</small></em></td></tr>
+            <tr><td colspan="2">Dopuszczalna ilość wyborów: {{ form.poll.number_of_responses }}</td></tr>
+
+            {% for field in form %}
+                {% if field|is_checkbox %}
+                <tr>
+                    <td style="text-align: center; width: 30%">
+                        {{ field.label_tag }}
+                        {{ field }}
+                    </td>
+                    <td style="text-align: right; width: 70%">
+                        {% if field.label|member_full_name_exist %}
+                            {{ field.label|member_full_name_exist }}
+                        {% endif %}
+
+                       {% with field.label|member_img_exist as image_url %}
+                            {% if image_url %}
+                                <img src="{% thumbnail image_url 150x0 quality=100 %}" alt="Image for {{ field.label }}">
+                            {% endif %}
+                        {% endwith %}
+                    </td>
+                </tr>
+                {% endif %}
+            {% endfor %}
+        </table>
+        <br />
+
+
     {% endfor %}
-    <button type="submit">Submit</button>
+
+    <br />
+    <br />
+    <button type="submit" class="btn btn-primary btn-large btn-block">Dotknij tutaj aby przejść dalej</button>
+    <br />
+    <br />
 </form>
 
 

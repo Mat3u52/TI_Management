@@ -4,6 +4,7 @@ from django.contrib.auth.models import User
 from datetime import datetime
 import os
 import calendar
+from django.forms import CheckboxInput
 
 register = template.Library()
 
@@ -122,3 +123,9 @@ def member_full_name_exist(member_nr):
             return ''
     except MembersZZTI.DoesNotExist:
         return ''
+
+
+@register.filter
+def is_checkbox(field):
+    """Returns True if the field's widget is a CheckboxInput."""
+    return isinstance(field.field.widget, CheckboxInput)

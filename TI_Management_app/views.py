@@ -4507,13 +4507,13 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
                 form_is_valid = False
 
         # If all forms are valid, redirect to a success page
-        # if form_is_valid:
-        #     # return redirect('success_url')  # Redirect to a success page or view
-        #     return redirect(
-        #         'TI_Management_app:voting_active_session',
-        #         pk_vote=voting.id,
-        #         pk_kick_off=session_kick_off.id
-        #     )
+        if form_is_valid:
+            # return redirect('success_url')  # Redirect to a success page or view
+            return redirect(
+                'TI_Management_app:voting_active_session',
+                pk_vote=voting.id,
+                pk_kick_off=session_kick_off.id
+            )
 
         # If there are invalid forms, re-render the template with errors
         return render(

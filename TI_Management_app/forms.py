@@ -3128,15 +3128,15 @@ class VotingSessionSignatureForm(forms.ModelForm):
 #     )
 
 class ChoiceForm(forms.Form):
-    answer_0 = forms.BooleanField(
-        required=False,
-        widget=forms.CheckboxInput(
-            attrs={
-                'class': 'form-control me-2',
-            }
-        ),
-        label='Odpowiedź'
-    )
+    # answer_0 = forms.BooleanField(
+    #     required=False,
+    #     widget=forms.CheckboxInput(
+    #         attrs={
+    #             'class': 'form-control me-2',
+    #         }
+    #     ),
+    #     label='Odpowiedź'
+    # )
 
     def __init__(self, *args, **kwargs):
         poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
@@ -3145,13 +3145,19 @@ class ChoiceForm(forms.Form):
         if poll:
             # Dynamically add fields based on the poll's choices
             choices = Choice.objects.filter(poll=poll)
-            # for idx, choice in enumerate(choices):
-            for choice in enumerate(choices):
-                self.fields[f'answer_{choice.id}'] = forms.BooleanField(
-                    required=False,
-                    widget=forms.CheckboxInput(attrs={'class': 'form-control me-2'}),
-                    label=choice.answer,  # Adjust based on your Choice model field
-                )
+            for idx, choice in enumerate(choices):
+                if choice.answer is not None:
+                    self.fields[f'answer_{choice.id}'] = forms.BooleanField(
+                        required=False,
+                        widget=forms.CheckboxInput(attrs={'class': 'form-control me-2'}),
+                        label=choice.answer,  # Adjust based on your Choice model field
+                    )
+                if choice.open_ended_answer is True:
+                    self.fields[f'description_{choice.id}'] = forms.CharField(
+                        required=False,
+                        widget=forms.Textarea(attrs={'rows': 12, 'cols': 50}),
+                        label="Twoja odpowiedź",  # You can customize the label as needed
+                    )
 
     def clean(self):
         cleaned_data = super().clean()
@@ -3164,7 +3170,7 @@ class ChoiceForm(forms.Form):
 
         # Validate based on the number of required responses
         if len(selected_answers) != required_responses:
-            raise forms.ValidationError(f'Please select exactly {required_responses} options.')
+            raise forms.ValidationError(f'Proszę wybierz dokładnie {required_responses} odpowiedzi.')
 
 
 
