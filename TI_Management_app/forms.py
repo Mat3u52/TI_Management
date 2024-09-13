@@ -3086,6 +3086,7 @@ class VotingSessionSignatureForm(forms.ModelForm):
 
     def __init__(self, *args, **kwargs):
         self.vote = kwargs.pop('vote', None)
+        # self.session_signature = kwargs.pop('session_signature', None)
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -3097,6 +3098,7 @@ class VotingSessionSignatureForm(forms.ModelForm):
     def clean_member_signature(self):
         member_signature = self.cleaned_data['member_signature']
         vote = self.vote
+        # session_signature = self.session_signature
 
         if not vote:
             raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
@@ -3104,43 +3106,61 @@ class VotingSessionSignatureForm(forms.ModelForm):
         # vote = voting_session_kick_off.vote
 
         for member in vote.members.all():
+
             if check_password(member_signature, member.card):
                 # Check if the signature already exists for this member in this voting session
-                existing_signature = vote.voteVotingSessionSignature.filter(
-                    member=member).exists()
+                existing_signature = vote.voteVotingSessionSignature.filter(member=member).exists()
                 if existing_signature:
-                    raise ValidationError("Podpis już istnieje.")
+                    raise ValidationError("oddałes juz głos.")
+
+                # if session_signature.filter(member=member, vote=vote).exists():
+                #     raise ValidationError("Podpis już istnieje dla tego członka w tym głosowaniu.")
 
                 return member_signature
 
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
 
 
-# class ChoiceForm(forms.Form):
-#     answer_0 = forms.BooleanField(
-#         required=False,
-#         widget=forms.CheckboxInput(
-#             attrs={
-#                 'class': 'form-control me-2',
-#             }
-#         ),
-#         label='Odpowiedź'
-#     )
+
+
+
+        # vote = voting_session_kick_off.vote
+        #
+        # for member in vote.election_commission.all():
+        #     if check_password(commission_signature, member.card):
+        #         existing_signature = voting_session_kick_off.voteVotingSessionKickOffSignature.filter(
+        #             member=member).exists()
+        #         if existing_signature:
+        #             raise ValidationError("Podpis już istnieje.")
+        #
+        #         return commission_signature
+        #
+        #
+        #
+        #
+        # vote = session_signature.vote
+        # for member in vote.election_commission.all():
+        #
+        #     if check_password(member_signature, member.card):
+        #         # Check if the signature already exists for this member in this voting session
+        #         existing_signature = session_signature.voteVotingSessionSignature.filter(
+        #             member=member).exists()
+        #         if existing_signature:
+        #             raise ValidationError("Podpis już istnieje.")
+        #
+        #         return member_signature
+        #
+        # raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
+
+
 
 class ChoiceForm(forms.Form):
-    # answer_0 = forms.BooleanField(
-    #     required=False,
-    #     widget=forms.CheckboxInput(
-    #         attrs={
-    #             'class': 'form-control me-2',
-    #         }
-    #     ),
-    #     label='Odpowiedź'
-    # )
 
     def __init__(self, *args, **kwargs):
         poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
+        # user = kwargs.pop('user', None)  # Get the specific poll from kwargs if provided
         self.poll = poll  # Save the poll for later use
+        # self.user = user  # Save the poll for later use
         super().__init__(*args, **kwargs)
         if poll:
             # Dynamically add fields based on the poll's choices
@@ -3161,6 +3181,11 @@ class ChoiceForm(forms.Form):
 
     def clean(self):
         cleaned_data = super().clean()
+
+        # if self.poll:
+        #     vote_members = self.poll.members.all()
+        #     if self.user not in vote_members:
+        #         raise forms.ValidationError('You are not allowed to vote in this poll.')
 
         # Count the selected answers
         selected_answers = [value for key, value in cleaned_data.items() if key.startswith('answer_') and value]

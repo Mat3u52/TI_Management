@@ -141,6 +141,7 @@
             <hr>
                 <p><b>Możesz oddać głos poprzez zaznaczenie pola wyboru.</b></p>
 
+
 <form method="post">
     {% csrf_token %}
     {% for form in forms %}
@@ -160,19 +161,26 @@
                 {% if field|is_checkbox %}
                 <tr>
                     <td style="text-align: center; width: 30%">
-                        {{ field.label_tag }}
-                        {{ field }}
+                        {% if field.label|member_full_name_exist %}
+                            {{ field.label_tag }}
+                            {{ field }}
+                        {% else %}
+                            {{ field }}
+                        {% endif %}
                     </td>
                     <td style="text-align: right; width: 70%">
                         {% if field.label|member_full_name_exist %}
                             {{ field.label|member_full_name_exist }}
-                        {% endif %}
 
-                       {% with field.label|member_img_exist as image_url %}
-                            {% if image_url %}
-                                <img src="{% thumbnail image_url 150x0 quality=100 %}" alt="Image for {{ field.label }}">
-                            {% endif %}
-                        {% endwith %}
+
+                            {% with field.label|member_img_exist as image_url %}
+                                {% if image_url %}
+                                    <img src="{% thumbnail image_url 150x0 quality=100 %}" alt="Image for {{ field.label }}">
+                                {% endif %}
+                            {% endwith %}
+                        {% else %}
+                            {{ field.label_tag }}
+                        {% endif %}
                     </td>
                 </tr>
                 {% endif %}

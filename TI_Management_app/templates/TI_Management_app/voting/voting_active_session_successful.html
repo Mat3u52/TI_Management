@@ -1,10 +1,129 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>Title</title>
-</head>
-<body>
+{% load static %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
-</body>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+<!--        <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">-->
+
+        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
+
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+<!--        <script src="{% static 'js/TI_Management_app.js' %}"></script>-->
+        <style>
+            body {
+                font-family: century-gothic, sans-serif;
+            }
+            header {
+                text-align: center; /* Center the image */
+                padding: 0px; /* Optional padding */
+            }
+            header img {
+                max-width: 100%;
+                height: auto;
+            }
+            th img {
+                max-width: 100%;
+                height: auto;
+            }
+            p {
+                margin-left: 10px;
+            }
+
+            .container {
+              position: relative;
+              text-align: center;
+              color: #000000;
+              width: 100%;
+            }
+            .centered {
+                width:50%;
+                height: 100%;
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background-color: #FFFFFF;
+            }
+            @keyframes fadeInUp {
+                0% {
+                    transform: translateY(100%);
+                    opacity: 0;
+                }
+                100% {
+                    transform: translateY(0%);
+                    opacity: 1;
+                }
+            }
+            .fadeInUp-animation {
+                animation: 1.5s fadeInUp;
+            }
+            .full-width {
+                display:block;
+                text-align: center;
+                font-size: 10px;
+            }
+        </style>
+
+        <script type="text/javascript">
+            let countdown = 5;
+
+            function updateCountdown() {
+                if (countdown > 0) {
+                    document.getElementById("countdown").innerHTML = countdown;
+                    countdown--;
+                } else {
+                    clearInterval(interval);
+                    window.location.href = "{% url 'TI_Management_app:voting_active_session' pk_vote=voting.id pk_kick_off=session_kick_off.id %}";
+                }
+            }
+
+            let interval = setInterval(updateCountdown, 1000);
+        </script>
+
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+        <header>
+            <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS">
+        </header>
+        <div style="margin: 20px;">
+            <hr>
+          <h3>
+                {{ member.member.forename }},<br />
+              Twój głos został zapisany:<br />
+              ...
+          </h3>
+            <hr>
+            <table style="width:100%" border="0">
+                <tr>
+                    <th rowspan="2">
+                        <br />
+                        <br />
+                        <h1 class="fadeInUp-animation"><span style="color:green; font-size: 124px;">&#10003;</span></h1>
+                    </th>
+                    <td>
+                        <p>Dziękujemy za udział w głosowaniu: <br />
+                            {{ voting.title }}
+                        <p>
+                    </td>
+                </tr>
+                <tr>
+                    <td><span id="countdown">5</span></td>
+                </tr>
+            </table>
+        </div>
+
+    </body>
 </html>
+

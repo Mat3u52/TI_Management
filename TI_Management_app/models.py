@@ -423,7 +423,7 @@ class VotingSessionSignature(models.Model):
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVotingSessionSignature')
 
     vote = models.ForeignKey(Vote, on_delete=models.CASCADE, null=True, related_name='voteVotingSessionSignature')
-    voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='voteVotingSessionSignature', null=False, blank=False)
+    voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='kickOffVotingSessionSignature', null=False, blank=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionSignature', null=False, blank=False)
     signature = models.BooleanField(default=False)
     confirmation = models.BooleanField(default=False)
