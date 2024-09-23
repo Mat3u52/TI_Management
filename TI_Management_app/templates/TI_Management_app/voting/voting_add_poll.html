@@ -49,26 +49,21 @@
                 <label for="answer_0">Odpowiedź 1:</label>
                 {{ form_choice.answer_0 }}
 
-
                 <datalist id="answer_database">
                     {% for member in members %}
                         <option value="{{ member.member_nr }}">{{ member.forename }} {{ member.surname }}</option>
                     {% endfor %}
                 </datalist>
 
-
                 <label for="correct_0">Poprawna odpowiedź:</label>
                 {{ form_choice.correct_0 }}
-
             </div>
-
         </div>
         <div id="inputButton">
             <button type="button" id="addButton" class="btn btn-primary btn-small pull-left">Dodaj</button>
         </div>
         <br />
         <br />
-
 
         <p><b>Ilość możliwych odpowiedzi:</b></p>
         <p>

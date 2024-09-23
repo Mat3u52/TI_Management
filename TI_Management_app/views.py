@@ -4160,6 +4160,8 @@ def voting_active_session_search(request):
 def voting_active_session_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     sessions = VotingSessionKickOff.objects.filter(vote=voting)
+    member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
+
     # Show only ended sessions
     sessions_status = sessions.filter(
         Q(session_end__lte=timezone.now()) |
@@ -4172,7 +4174,8 @@ def voting_active_session_detail(request, pk):
         {
             'voting': voting,
             'sessions': sessions,
-            'sessions_status': sessions_status
+            'sessions_status': sessions_status,
+            'member_already_participated': member_already_participated
         }
     )
 
@@ -4329,47 +4332,34 @@ def voting_active_session(request, pk_vote, pk_kick_off):
 
 @login_required
 def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
-    # Fetch related objects
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
-
-    # Fetch all polls related to this vote
     polls = Poll.objects.filter(vote=voting)
 
     if request.method == 'POST':
-        forms = []  # Initialize list to store forms
-        form_is_valid = True  # Flag to track if all forms are valid
-        voting_responses = [] # List to store voting responses
+        forms = []
+        form_is_valid = True
+        voting_responses = []
 
         for poll in polls:
-            # Pass the specific poll to the form
             form = ChoiceForm(request.POST, poll=poll)
-            forms.append(form)  # Collect forms for each poll
+            forms.append(form)
 
             if form.is_valid():
-                # Get cleaned data (selected answers)
                 selected_answers = [key for key, value in form.cleaned_data.items() if value]
 
+                # print(selected_answers)
 
-
-                print(selected_answers)
-
-                # Process and save selected choices as voting responses
                 for selected_answer in selected_answers:
 
-
-
-
-                    # Extract choice ID from field name (e.g., 'answer_1')
                     choice_id = selected_answer.split('_')[1]
 
-                    print(choice_id)
-                    print(poll.id)
+                    # print(choice_id)
+                    # print(poll.id)
 
                     choice = get_object_or_404(Choice, pk=choice_id, poll=poll)
 
-                    # Save the voting response
                     voting_response = VotingResponses(
                         author=request.user,
                         vote=voting,
@@ -4377,23 +4367,15 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
                         poll=poll,
                         choice=choice
                     )
-                    # voting_response.save()
                     voting_responses.append(voting_response)
 
             else:
-                # If any form is invalid, mark the flag as False
                 form_is_valid = False
 
-        # If all forms are valid, redirect to a success page
         if form_is_valid:
             for response in voting_responses:
                 response.save()
 
-            # return redirect(
-            #     'TI_Management_app:voting_active_session',
-            #     pk_vote=voting.id,
-            #     pk_kick_off=session_kick_off.id
-            # )
             return redirect(
                 'TI_Management_app:voting_active_session_successful',
                 pk_vote=voting.id,
@@ -4401,12 +4383,11 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
                 pk_member=member.id
             )
 
-        # If there are invalid forms, re-render the template with errors
         return render(
             request,
             'TI_Management_app/voting/voting_active_session_validation.html',
             {
-                'forms': forms,  # Return the list of forms with errors (if any)
+                'forms': forms,
                 'voting': voting,
                 'session_kick_off': session_kick_off,
                 'member': member,
@@ -4415,14 +4396,13 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
         )
 
     else:
-        # In case of GET request, generate empty forms for each poll
         forms = [ChoiceForm(poll=poll) for poll in polls]
 
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_validation.html',
         {
-            'forms': forms,  # A list of forms for each poll
+            'forms': forms,
             'voting': voting,
             'session_kick_off': session_kick_off,
             'member': member,

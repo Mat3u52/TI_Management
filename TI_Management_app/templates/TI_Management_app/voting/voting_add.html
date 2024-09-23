@@ -11,7 +11,6 @@
     <h2 class="fadeInUp-animation">Nowe głosowanie</h2>
     <hr>
     <br />
-
     <form method="post" class="post-form">
         {% csrf_token %}
         {% if form.errors %}
@@ -39,8 +38,6 @@
         <p>Tylko Członkowie:</p>
             {{ form.period }}
             {{ form.date_accede }}
-
-
 
         <div id="participants-section">
             <div id="inputContainer">

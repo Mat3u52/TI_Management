@@ -2,7 +2,6 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
-
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -17,52 +16,48 @@
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
     </head>
-<body>
-<div class="hero-unit">
-  <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
-  <hr>
-  <br />
-    <form method="post">
-        {% csrf_token %}
-        {% if form_signature.errors %}
-            <div class="alert alert-danger">
-                <p>{{ form_signature.errors }}</p>
-            </div>
-        {% endif %}
+    <body>
+        <div class="hero-unit">
+            <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
+            <hr>
+            <br />
+            <form method="post">
+                {% csrf_token %}
+                {% if form_signature.errors %}
+                    <div class="alert alert-danger">
+                        <p>{{ form_signature.errors }}</p>
+                    </div>
+                {% endif %}
 
-        <p><b>Minimalna ilość podpisów Komisji Wyborczej:</b> {{ voting.min_amount_commission }}</p>
-        <br />
-        <ul>
-            {% for commission in voting.election_commission.all %}
-            <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
-            {% endfor %}
-        </ul>
-        <br />
-        <p><b>Obecność:</b> {{voting_session_kick_off_signature|length}}</p>
-        <ul>
-            {% for commission_signed in voting_session_kick_off_signature %}
-            <li>
-                <span style="color:green;">
-                {{ commission_signed.member.member_nr }} -
-                {{ commission_signed.member.forename }}
-                {{ commission_signed.member.surname }}
-                </span>
-            </li>
-            {% endfor %}
-        </ul>
-
-        <br />
-
-        {{ form_signature.commission_signature }}
-
-        <br />
-        <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
-        <br />
-        <br />
-    </form>
-</div>
-
-</body>
+                <p><b>Minimalna ilość podpisów Komisji Wyborczej:</b> {{ voting.min_amount_commission }}</p>
+                <br />
+                <ul>
+                    {% for commission in voting.election_commission.all %}
+                        <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
+                    {% endfor %}
+                </ul>
+                <br />
+                <p><b>Obecność:</b> {{voting_session_kick_off_signature|length}}</p>
+                <ul>
+                    {% for commission_signed in voting_session_kick_off_signature %}
+                    <li>
+                        <span style="color:green;">
+                        {{ commission_signed.member.member_nr }} -
+                        {{ commission_signed.member.forename }}
+                        {{ commission_signed.member.surname }}
+                        </span>
+                    </li>
+                    {% endfor %}
+                </ul>
+                <br />
+                {{ form_signature.commission_signature }}
+                <br />
+                <br />
+                <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+                <br />
+                <br />
+            </form>
+        </div>
+    </body>
 </html>
 

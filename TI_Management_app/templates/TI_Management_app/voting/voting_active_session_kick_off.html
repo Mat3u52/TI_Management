@@ -2,7 +2,6 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
-
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -17,39 +16,39 @@
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
     </head>
-<body>
-<div class="hero-unit">
-  <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
-  <hr>
-  <br />
-    <form method="post">
-        {% csrf_token %}
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                <p>{{ form.errors }}</p>
-            </div>
-        {% endif %}
-        {{ form.title }}
-        <br />
-        <br />
-        <p><b>Zakończenie sesji:</b></p>
-        {{ form.session_end }}
-        <br />
-        <br />
-        <p><b>Wymagane podpisy Członków Komisji Wyborczej:</b></p>
-        <ul>
-            {% for commission in voting.election_commission.all %}
-                <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
-            {% endfor %}
-        </ul>
-        <br />
-        <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Podpisy Komisji Wyborczej</button>
-        <br />
-        <br />
-    </form>
-</div>
 
-</body>
+    <body>
+        <div class="hero-unit">
+            <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
+            <hr>
+            <br />
+            <form method="post">
+                {% csrf_token %}
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <p>{{ form.errors }}</p>
+                    </div>
+                {% endif %}
+                {{ form.title }}
+                <br />
+                <br />
+                <p><b>Zakończenie sesji:</b></p>
+                {{ form.session_end }}
+                <br />
+                <br />
+                <p><b>Wymagane podpisy Członków Komisji Wyborczej:</b></p>
+                <ul>
+                    {% for commission in voting.election_commission.all %}
+                        <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
+                    {% endfor %}
+                </ul>
+                <br />
+                <br />
+                <button type="submit" class="btn btn-primary btn-large pull-right">Podpisy Komisji Wyborczej</button>
+                <br />
+                <br />
+            </form>
+        </div>
+    </body>
 </html>
 

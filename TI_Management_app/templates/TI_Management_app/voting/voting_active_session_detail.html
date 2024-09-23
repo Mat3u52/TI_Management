@@ -2,7 +2,6 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
-
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -11,15 +10,11 @@
         <meta name="description" content="zzti LUMS">
         <meta name="author" content="zzti LUMS">
         <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
-
         <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
         <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
-
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
-
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
-
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
 
@@ -100,31 +95,6 @@
             <h4>{{ poll.question }}</h4>
                 <em><small>{{ poll.description|safe }}</small></em>
             <hr>
-    <!--        <table>-->
-    <!--            {% for choice in poll.pollChoice.all %}-->
-    <!--                    {% if choice.correct %}-->
-    <!--                        <tr>-->
-    <!--                            <td>-->
-    <!--                                <span style="color:green">{{ choice.answer }}</span>-->
-    <!--                            </td>-->
-    <!--                        </tr>-->
-    <!--                    {% else %}-->
-    <!--                        <tr>-->
-    <!--                            <td>-->
-    <!--                                {{ choice.answer }}-->
-    <!--                                {% if choice.answer|member_full_name_exist %}-->
-    <!--                                    {{ choice.answer|member_full_name_exist }}-->
-    <!--                                {% endif %}-->
-    <!--                                {% with choice.answer|member_img_exist as image_url %}-->
-    <!--                                    {% if image_url %}-->
-    <!--                                        <img src="{% thumbnail image_url 150x0  quality=100 %}">-->
-    <!--                                    {% endif %}-->
-    <!--                                {% endwith %}-->
-    <!--                            </td>-->
-    <!--                        </tr>-->
-    <!--                    {% endif %}-->
-    <!--            {% endfor %}-->
-    <!--        </table>-->
             <table>
                 {% for choice in poll.pollChoice.all %}
                     {% if choice.answer is not None %}
@@ -168,16 +138,15 @@
                 </p>
             </div>
 
-                <br />
-                <br />
-                <br />
+            <br />
+            <br />
+            <br />
             {% endfor %}
 
             <p>Zakończone sesje głosowania:</p>
-
+            <br />
             {% for session in sessions_status %}
                 <h4>Session: {{ session }}</h4>
-
                 {% for commission_signature in session.voteVotingSessionKickOffSignature.all %}
                     <ul>
                         <li>
@@ -188,18 +157,21 @@
                     </ul>
                 {% endfor %}
 
-                <hr>
-
-                <!-- Accessing related VotingSessionSignature through the related_name -->
-                {% for signature in session.voteVotingSessionSignature.all %}
-                    <ul>
-                        <li>Członek: {{ signature.member.member_nr }} - {{ signature.member.forename }} {{ signature.member.surname }}</li>
+                {% for signature in session.kickOffVotingSessionSignature.all %}
+                    <ul class="members">
+                        <li>
+                            Członek: {{ signature.member.member_nr }} - {{ signature.member.forename }} {{ signature.member.surname }}
+                        </li>
                     </ul>
                 {% endfor %}
-
+                <br />
             {% endfor %}
 
-
+            <p>Wszystkie osoby, które oddały głos:</p>
+            {% for member in member_already_participated %}
+                <p>{{ member.member.member_nr }}</p>
+            {% endfor %}
+            <hr>
             <br />
 
             <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>

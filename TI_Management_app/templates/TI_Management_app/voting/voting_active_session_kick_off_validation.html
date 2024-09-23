@@ -2,7 +2,6 @@
 {% load static %}
 {% load ti_management_tags %}
 {% load thumbnail %}
-
 <html lang="pl">
     <head>
         <meta charset="UTF-8">
@@ -16,70 +15,61 @@
         <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
         <script src="{% static 'js/jquery.min.js' %}"></script>
         <script src="{% static 'js/TI_Management_app.js' %}"></script>
-<!--        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>-->
-    <script type="text/javascript">
-        let countdown = 5;
+        <script type="text/javascript">
+            let countdown = 5;
 
-        function updateCountdown() {
-            if (countdown > 0) {
-                // document.getElementById("countdown").innerHTML = countdown;
-                countdown--;
-            } else {
-                clearInterval(interval);  // zatrzymuje licznik
-                window.location.reload();  // odświeża stronę
+            function updateCountdown() {
+                if (countdown > 0) {
+                    countdown--;
+                } else {
+                    clearInterval(interval);
+                    window.location.reload();
+                }
             }
-        }
 
-        // Aktualizuj licznik co sekundę
-        let interval = setInterval(updateCountdown, 1000);
-    </script>
+            let interval = setInterval(updateCountdown, 1000);
+        </script>
     </head>
-<body>
-<div class="hero-unit">
-  <h2>Autoryzacja Uczestnika głosowania - {{ voting.title }}</h2>
-  <hr>
-  <br />
-    <p><span id="countdown"></span></p>
-
-
-    {% for session_signature in session_signatures %}
-        {% if session_signature.confirmation is False and session_signature.reject is False %}
-        <div class="notepad">
-
-
-        <div style="height:200px">
-            <div>
-                <img src="{% thumbnail session_signature.member.image 150x0  quality=100 %}">
-            </div>
-            <div>
-                <a href="{{ session_signature.member.get_absolute_url }}" target="_blank"
-                   onclick="window.open('{{ session_signature.member.get_absolute_url }}', 'window15', 'width=800,height=600'); return false;">
-                    {{ session_signature.member.forename }}&nbsp;{{ session_signature.member.surname }} - {{ session_signature.member.member_nr }}
-                </a>
-            </div>
+    <body>
+        <div class="hero-unit">
+            <h2>Autoryzacja Uczestnika głosowania - {{ voting.title }}</h2>
+            <hr>
             <br />
-            <div>
-                <a href="{% url 'TI_Management_app:voting_active_session_approve' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-success btn-large pull-left">
-                    Potwierdzam tożsamość
-                </a>
-            </div>
+                <p><span id="countdown"></span></p>
+                    {% for session_signature in session_signatures %}
+                        {% if session_signature.confirmation is False and session_signature.reject is False %}
+                        <div class="notepad">
+                        <div style="height:200px">
+                            <div>
+                                <img src="{% thumbnail session_signature.member.image 150x0  quality=100 %}">
+                            </div>
+                            <div>
+                                <a href="{{ session_signature.member.get_absolute_url }}" target="_blank"
+                                   onclick="window.open('{{ session_signature.member.get_absolute_url }}', 'window15', 'width=800,height=600'); return false;">
+                                    {{ session_signature.member.forename }}&nbsp;{{ session_signature.member.surname }} - {{ session_signature.member.member_nr }}
+                                </a>
+                            </div>
+                            <br />
+                            <div>
+                                <a href="{% url 'TI_Management_app:voting_active_session_approve' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-success btn-large pull-left">
+                                    Potwierdzam tożsamość
+                                </a>
+                            </div>
+                            <br />
+                            <br />
+                            <div>
+                                <a href="{% url 'TI_Management_app:voting_active_session_disapprove' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-danger btn-large pull-left">
+                                    Odrzuć
+                                </a>
+                            </div>
+                        </div>
+
+                        </div>
+                        <br />
+                        <hr>
+                        {% endif %}
+                    {% endfor %}
             <br />
-            <br />
-            <div>
-                <a href="{% url 'TI_Management_app:voting_active_session_disapprove' pk_vote=voting.id pk_kick_off=session_kick_off.id pk_member=session_signature.id %}" class="btn btn-danger btn-large pull-left">
-                    Odrzuć
-                </a>
-            </div>
         </div>
-
-        </div>
-        <br />
-        <hr>
-        {% endif %}
-    {% endfor %}
-
-    <br />
-</div>
-
-</body>
+    </body>
 </html>

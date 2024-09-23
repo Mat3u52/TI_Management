@@ -439,3 +439,7 @@ table.dataTable thead .sorting_desc_disabled:before {
 .commission-member div {
     text-align: center; /* Centers the name text */
 }
+
+ul.members{
+    list-style-type: circle;
+}

@@ -3152,7 +3152,6 @@ class VotingSessionSignatureForm(forms.ModelForm):
         #
         # raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
 
-
 class ChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided

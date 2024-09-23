@@ -1,23 +1,19 @@
 <!DOCTYPE html>
 <html lang="pl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Redirecting...</title>
-</head>
-<body>
-    <script type="text/javascript">
-        // Open the target URL in a new tab or window
-        // window.open("{{ redirect_url }}", "_blank");
-        // window.open("{{ redirect_url }}", "_blank", "width=800,height=600,scrollbars=yes,resizable=yes");
-        window.open(
-            "{{ redirect_url }}",
-            "_blank",
-            "width=800,height=600,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,status=no,location=no,directories=no"
-        );
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Redirecting...</title>
+    </head>
+    <body>
+        <script type="text/javascript">
+            window.open(
+                "{{ redirect_url }}",
+                "_blank",
+                "width=800,height=600,scrollbars=yes,resizable=yes,toolbar=no,menubar=no,status=no,location=no,directories=no"
+            );
 
-        // Redirect the current page to a safe page
-        window.location.href = "{{ safe_redirect_url }}";
-    </script>
-</body>
+            window.location.href = "{{ safe_redirect_url }}";
+        </script>
+    </body>
 </html>
