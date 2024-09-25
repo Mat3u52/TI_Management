@@ -1,10 +1,45 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load static %}
+{% load ti_management_tags %}
+{% load thumbnail %}
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+        <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
+        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
+        <script src="{% static 'js/jquery.min.js' %}"></script>
+        <script src="{% static 'js/TI_Management_app.js' %}"></script>
+    </head>
+    <body>
+        <div class="hero-unit">
+            <h2>Zamknij sesję głosowania - {{ voting.title }}</h2>
+            <hr>
+            <br />
 
-</body>
+            <form method="post" class="post-form">
+                {% csrf_token %}
+
+                {% if form.errors %}
+                    <div class="alert alert-danger">
+                        <p>{{ form.errors }}</p>
+                    </div>
+                {% endif %}
+
+            <p><b>Czy na pewno chcesz zamknąć sesję głosowania?</b></p>
+                {{ form.session_closed.as_hidden }}
+            <br />
+            <button type="submit" class="btn btn-primary btn-large pull-right" id="closeBtn">Zamknij</button>
+            <br />
+            <br />
+            </form>
+
+            <br />
+        </div>
+    </body>
 </html>

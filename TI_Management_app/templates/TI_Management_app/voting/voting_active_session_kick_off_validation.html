@@ -70,6 +70,13 @@
                         {% endif %}
                     {% endfor %}
             <br />
+            <br />
+            <br />
+            <a href="{% url 'TI_Management_app:voting_active_session_close' pk_vote=voting.id pk_kick_off=session_kick_off.id %}" class="btn btn-primary btn-large pull-right">
+                Zamknij sessję głosowania
+            </a>
+            <br />
+            <br />
         </div>
     </body>
 </html>

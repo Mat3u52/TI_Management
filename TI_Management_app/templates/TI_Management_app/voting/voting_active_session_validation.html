@@ -89,6 +89,9 @@
         {% endif %}
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+
+
         <header class="container">
             <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS" style="width:100%;">
             <div class="centered">
@@ -226,10 +229,13 @@
             </div>
             <script type="text/javascript">
                 setTimeout(function() {
-                    window.location.href = "{% url 'TI_Management_app:voting_active_session' pk_vote=voting.id pk_kick_off=session_kick_off.id %}"; // Replace with the target view's name
+                    window.location.href = "{% url 'TI_Management_app:voting_active_session' pk_vote=voting.id pk_kick_off=session_kick_off.id %}";
                 }, 3000);
             </script>
         {% endif %}
+
+
+
     </body>
 </html>
 

@@ -2903,6 +2903,7 @@ class VotingAddChoiceForm(forms.Form):
 
     correct_0 = forms.BooleanField(
         required=False,
+        disabled=True,
         widget=forms.CheckboxInput(
             attrs={
                 'class': 'correct'
@@ -2913,7 +2914,8 @@ class VotingAddChoiceForm(forms.Form):
 
     open_ended_answer = forms.BooleanField(
         label="Pytanie otwarte",
-        required=False
+        required=False,
+        disabled=True
     )
 
 
@@ -3012,6 +3014,27 @@ class VotingSessionKickOffForm(forms.ModelForm):
                 raise ValidationError("Czas zakończenia sesji nie może być późniejszy niż 8 godzin od teraz.")
 
         return session_end
+
+
+class VotingSessionCloseForm(forms.ModelForm):
+
+    session_closed = forms.BooleanField(
+        widget=forms.CheckboxInput(
+            attrs={
+                'class': 'form-control me-2',
+                'aria-label': 'Zamknięcie sesji głosowania'
+            }
+        ),
+        label='',
+        required=False,
+        initial=True
+    )
+
+    class Meta:
+        model = VotingSessionKickOff
+        fields = [
+            'session_closed'
+        ]
 
 
 class VotingSessionKickOffSignatureForm(forms.ModelForm):
@@ -3151,6 +3174,7 @@ class VotingSessionSignatureForm(forms.ModelForm):
         #         return member_signature
         #
         # raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
+
 
 class ChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):

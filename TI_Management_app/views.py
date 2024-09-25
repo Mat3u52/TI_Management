@@ -90,7 +90,8 @@ from .forms import (
     VotingSessionKickOffForm,
     VotingSessionKickOffSignatureForm,
     VotingSessionSignatureForm,
-    ChoiceForm
+    ChoiceForm,
+    VotingSessionCloseForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -4197,7 +4198,7 @@ def voting_active_session_kick_off(request, pk):
             session_kick_off = form.save(commit=False)
             session_kick_off.author = request.user
             session_kick_off.vote = voting
-            # session_kick_off.session_start = timezone.now()
+            session_kick_off.session_start = timezone.now()
             session_kick_off.save()
 
             messages.success(request, f"Rozpoczęcie sesji głosowania")
@@ -4210,6 +4211,35 @@ def voting_active_session_kick_off(request, pk):
         {
             'form': form,
             'voting': voting
+        }
+    )
+
+
+@login_required
+def voting_active_session_close(request, pk_vote, pk_kick_off):
+    voting = get_object_or_404(Vote, pk=pk_vote)
+    session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+
+    if request.method == "POST":
+        form = VotingSessionCloseForm(request.POST, instance=session_kick_off)
+        if form.is_valid():
+            session_close = form.save(commit=False)
+            session_close.author = request.user
+            session_close.session_closed = True
+            session_close.session_end = timezone.now()
+            session_close.save()
+
+            messages.success(request, f"Sesja głosowania '{session_kick_off.title}' została zakończona")
+            return redirect('TI_Management_app:voting_active_session_detail', pk=pk_vote)
+    else:
+        form = VotingSessionCloseForm(instance=session_kick_off)
+    return render(
+        request,
+        'TI_Management_app/voting/voting_active_session_close.html',
+        {
+            'form': form,
+            'voting': voting,
+            'session_kick_off': session_kick_off
         }
     )
 
@@ -4285,49 +4315,57 @@ def voting_active_session(request, pk_vote, pk_kick_off):
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     session_signature = VotingSessionSignature.objects.filter(vote=voting)
 
-    if request.method == "POST":
-        # form = VotingSessionSignatureForm(request.POST, vote=voting, session_signature=session_signature)
-        form = VotingSessionSignatureForm(request.POST, vote=voting)
-
-        if form.is_valid():
-            member_signature = form.cleaned_data['member_signature']
-
-            # vote = session_signature.vote
-
-            member_checked = None
-            for member in voting.members.all():
-                if check_password(member_signature, member.card):
-                    member_checked = member
-                    break
-
-            if member_checked:
-                session_kick_off_signature = form.save(commit=False)
-                session_kick_off_signature.author = request.user
-                session_kick_off_signature.vote = voting
-                session_kick_off_signature.voting_session_kick_off = session_kick_off
-                session_kick_off_signature.member = member_checked
-                session_kick_off_signature.signature = True
-                session_kick_off_signature.save()
-
-                return redirect(
-                    'TI_Management_app:voting_active_session_validation',
-                    pk_vote=voting.id,
-                    pk_kick_off=session_kick_off.id,
-                    pk_member=session_kick_off_signature.id
-                )
+    if session_kick_off.session_end <= timezone.now() or session_kick_off.session_closed is True:
+        sessions_status = False
+        print("you can not give the vote")
     else:
-        form = VotingSessionSignatureForm(vote=voting)
+        sessions_status = True
+        print("you can give vote")
 
-    return render(
-        request,
-        'TI_Management_app/voting/voting_active_session.html',
-        {
-            'form': form,
-            'voting': voting,
-            'session_kick_off': session_kick_off,
-            'session_signature': session_signature
-        }
-    )
+    if sessions_status:
+        if request.method == "POST":
+            # form = VotingSessionSignatureForm(request.POST, vote=voting, session_signature=session_signature)
+            form = VotingSessionSignatureForm(request.POST, vote=voting)
+
+            if form.is_valid():
+                member_signature = form.cleaned_data['member_signature']
+
+                # vote = session_signature.vote
+
+                member_checked = None
+                for member in voting.members.all():
+                    if check_password(member_signature, member.card):
+                        member_checked = member
+                        break
+
+                if member_checked:
+                    session_kick_off_signature = form.save(commit=False)
+                    session_kick_off_signature.author = request.user
+                    session_kick_off_signature.vote = voting
+                    session_kick_off_signature.voting_session_kick_off = session_kick_off
+                    session_kick_off_signature.member = member_checked
+                    session_kick_off_signature.signature = True
+                    session_kick_off_signature.save()
+
+                    return redirect(
+                        'TI_Management_app:voting_active_session_validation',
+                        pk_vote=voting.id,
+                        pk_kick_off=session_kick_off.id,
+                        pk_member=session_kick_off_signature.id
+                    )
+        else:
+            form = VotingSessionSignatureForm(vote=voting)
+
+        return render(
+            request,
+            'TI_Management_app/voting/voting_active_session.html',
+            {
+                'form': form,
+                'voting': voting,
+                'session_kick_off': session_kick_off,
+                'session_signature': session_signature
+            }
+        )
 
 
 @login_required
@@ -4337,51 +4375,73 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
     polls = Poll.objects.filter(vote=voting)
 
-    if request.method == 'POST':
-        forms = []
-        form_is_valid = True
-        voting_responses = []
+    if session_kick_off.session_end <= timezone.now() or session_kick_off.session_closed:
+        sessions_status = False
+    else:
+        sessions_status = True
 
-        for poll in polls:
-            form = ChoiceForm(request.POST, poll=poll)
-            forms.append(form)
+    if sessions_status:
 
-            if form.is_valid():
-                selected_answers = [key for key, value in form.cleaned_data.items() if value]
+        if request.method == 'POST':
+            forms = []
+            form_is_valid = True
+            voting_responses = []
 
-                # print(selected_answers)
+            for poll in polls:
+                form = ChoiceForm(request.POST, poll=poll)
+                forms.append(form)
 
-                for selected_answer in selected_answers:
+                if form.is_valid():
+                    selected_answers = [key for key, value in form.cleaned_data.items() if value]
 
-                    choice_id = selected_answer.split('_')[1]
+                    # print(selected_answers)
 
-                    # print(choice_id)
-                    # print(poll.id)
+                    for selected_answer in selected_answers:
 
-                    choice = get_object_or_404(Choice, pk=choice_id, poll=poll)
+                        choice_id = selected_answer.split('_')[1]
 
-                    voting_response = VotingResponses(
-                        author=request.user,
-                        vote=voting,
-                        voting_session_kick_off=session_kick_off,
-                        poll=poll,
-                        choice=choice
-                    )
-                    voting_responses.append(voting_response)
+                        # print(choice_id)
+                        # print(poll.id)
 
-            else:
-                form_is_valid = False
+                        choice = get_object_or_404(Choice, pk=choice_id, poll=poll)
 
-        if form_is_valid:
-            for response in voting_responses:
-                response.save()
+                        voting_response = VotingResponses(
+                            author=request.user,
+                            vote=voting,
+                            voting_session_kick_off=session_kick_off,
+                            poll=poll,
+                            choice=choice
+                        )
+                        voting_responses.append(voting_response)
 
-            return redirect(
-                'TI_Management_app:voting_active_session_successful',
-                pk_vote=voting.id,
-                pk_kick_off=session_kick_off.id,
-                pk_member=member.id
+                else:
+                    form_is_valid = False
+
+            if form_is_valid:
+                for response in voting_responses:
+                    response.save()
+
+                return redirect(
+                    'TI_Management_app:voting_active_session_successful',
+                    pk_vote=voting.id,
+                    pk_kick_off=session_kick_off.id,
+                    pk_member=member.id
+                )
+
+            return render(
+                request,
+                'TI_Management_app/voting/voting_active_session_validation.html',
+                {
+                    'forms': forms,
+                    'voting': voting,
+                    'session_kick_off': session_kick_off,
+                    'member': member,
+                    'polls': polls,
+                }
             )
+
+        else:
+            forms = [ChoiceForm(poll=poll) for poll in polls]
 
         return render(
             request,
@@ -4391,24 +4451,9 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
                 'voting': voting,
                 'session_kick_off': session_kick_off,
                 'member': member,
-                'polls': polls,
+                'polls': polls
             }
         )
-
-    else:
-        forms = [ChoiceForm(poll=poll) for poll in polls]
-
-    return render(
-        request,
-        'TI_Management_app/voting/voting_active_session_validation.html',
-        {
-            'forms': forms,
-            'voting': voting,
-            'session_kick_off': session_kick_off,
-            'member': member,
-            'polls': polls,
-        }
-    )
 
 
 @login_required

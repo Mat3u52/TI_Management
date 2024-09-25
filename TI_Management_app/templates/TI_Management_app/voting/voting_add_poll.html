@@ -232,6 +232,7 @@ document.addEventListener('DOMContentLoaded', function () {
         newCheckbox.setAttribute('type', 'checkbox');
         newCheckbox.setAttribute('id', `correct_${fieldCount}`);
         newCheckbox.setAttribute('name', `correct_${fieldCount}`);
+        newCheckbox.setAttribute('disabled', ``);
         newCheckbox.classList.add('correct');
 
         newCheckbox.addEventListener('change', updateNumberOfResponses);
@@ -254,7 +255,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const openEndedAnswerCheckbox = document.querySelector('#id_open_ended_answer');
     if (openEndedAnswerCheckbox) {
         openEndedAnswerCheckbox.addEventListener('change', toggleInputContainer);
-        toggleInputContainer();  // Initialize on page load
+        toggleInputContainer();
     }
 
     updateNumberOfResponses();
