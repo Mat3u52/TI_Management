@@ -4369,6 +4369,16 @@ def voting_active_session(request, pk_vote, pk_kick_off):
 
 
 @login_required
+def check_session_status(request, pk_kick_off):
+    session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+
+    if session_kick_off.session_end <= timezone.now() or session_kick_off.session_closed:
+        return JsonResponse({'session_status': False})
+    else:
+        return JsonResponse({'session_status': True})
+
+
+@login_required
 def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4530,5 +4540,107 @@ def voting_active_session_successful(request, pk_vote, pk_kick_off, pk_member):
             'voting': voting,
             'session_kick_off': session_kick_off,
             'member': member
+        }
+    )
+
+
+@login_required
+def voting_history_and_reports_list(request):
+
+    voting_obj = Vote.objects.filter(Q(date_end__lte=timezone.now()))
+
+    paginator = Paginator(voting_obj, 50)
+    page = request.GET.get('page')
+    try:
+        voting = paginator.page(page)
+    except PageNotAnInteger:
+        voting = paginator.page(1)
+    except EmptyPage:
+        voting = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_history_and_reports_list.html',
+        {
+            'page': page,
+            'voting': voting
+        }
+    )
+
+
+@login_required
+def voting_history_and_reports_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        voting = Vote.objects.filter(
+            Q(title__icontains=searched) &
+            Q(date_end__lte=timezone.now())
+        )
+        return render(
+            request,
+            'TI_Management_app/voting/voting_history_and_reports_search.html',
+            {
+                'searched': searched,
+                'voting': voting
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/voting/voting_history_and_reports_search.html',
+            {}
+        )
+
+
+@login_required
+def voting_history_and_reports_detail(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+    member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
+    member_rejected = VotingSessionSignature.objects.filter(vote=voting, reject=True)
+    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
+
+    poll = Poll.objects.filter(vote=voting)
+
+    polls_with_responses = []
+
+    # Loop through each poll and count how many times each choice was selected
+    for poll_one in poll:
+        voting_responses = VotingResponses.objects.filter(poll=poll_one)
+        choice_counts = voting_responses.values('choice__answer').annotate(choice_count=Count('choice'))
+
+        polls_with_responses.append({
+            'poll_one': poll_one,
+            'choice_counts': choice_counts
+        })
+
+    if voting.members.count() > 0:
+        min_attendance = (voting.min_amount_commission / voting.members.count()) * 100
+    else:
+        min_attendance = 0
+
+    if member_already_participated.count() > 0:
+        attendance = (member_already_participated.count() / voting.members.count()) * 100
+    else:
+        attendance = 0
+
+    if attendance > voting.turnout:
+        grant = True
+    else:
+        grant = False
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_history_and_reports_detail.html',
+        {
+            'voting': voting,
+            'min_attendance': min_attendance,
+            'attendance': attendance,
+            'grant': grant,
+            'member_already_participated': member_already_participated,
+            'member_rejected': member_rejected,
+            'member_accepted': member_accepted,
+            # 'choices': choices,
+            'poll': poll,
+            'polls_with_responses': polls_with_responses,
         }
     )

@@ -33,6 +33,26 @@
                 margin-left: 10px;
             }
         </style>
+<script>
+    function checkSessionStatus() {
+        $.ajax({
+            url: '{% url "TI_Management_app:check_session_status" pk_kick_off=session_kick_off.id %}', // Adjust the URL to your view
+            type: 'GET',
+            success: function(response) {
+                if (response.session_status === false) {
+                    alert("Session has ended. Closing the window...");
+                    window.close();
+                }
+            },
+            error: function() {
+                console.error("Error checking session status.");
+            }
+        });
+    }
+
+    // Poll every second (1000 milliseconds)
+    setInterval(checkSessionStatus, 1000);
+</script>
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
         <header>

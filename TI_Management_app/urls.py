@@ -629,5 +629,25 @@ urlpatterns = [
         views.voting_active_session_close,
         name='voting_active_session_close'
     ),
+    path(
+        'TI_Management_app/voting/check_session_status/<int:pk_kick_off>/',
+        views.check_session_status,
+        name='check_session_status'
+    ),
+    path(
+        'TI_Management_app/voting/voting_history_and_reports_list/',
+        views.voting_history_and_reports_list,
+        name='voting_history_and_reports_list'
+    ),
+    path(
+        'TI_Management_app/voting/voting-history-and-reports-search/',
+        views.voting_history_and_reports_search,
+        name='voting_history_and_reports_search'
+    ),
+    path(
+        'TI_Management_app/voting/voting-history-and-reports-detail/<int:pk>/',
+        views.voting_history_and_reports_detail,
+        name='voting_history_and_reports_detail'
+    ),
 ]
 

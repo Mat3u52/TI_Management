@@ -169,7 +169,7 @@
 
             <p>Wszystkie osoby, które oddały głos:</p>
             {% for member in member_already_participated %}
-                <p>{{ member.member.member_nr }}</p>
+                <p>{{ member.member.member_nr }} {% if member.reject %}<span style="color:red">nie ważny</span>{% else %}<span style="color:green">ważny</span>{% endif %}</p>
             {% endfor %}
             <hr>
             <br />

@@ -1,10 +1,67 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_list' %}"><b> / Głosowania </b></a>
+<a href="{% url 'TI_Management_app:voting_history_and_reports_detail' voting.pk %}"><b> / {{ voting.title|truncatewords:5 }} </b></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Protokół z głosowania</h2>
+    <hr>
+    <br />
+    <div class="notepad">
+        <p><b>{{ voting.title }}</b><p>
+        <p>Rodzaj głosowania: {% if voting.vote_type == 'confidential' %}Tajne{% endif %}</p>
+        <p>Wybory odbyły się w dniach: {{voting.date_start}} - {{voting.date_end}}</p>
+        <p>Sesje głosowania: {{ voting.voteVotingSessionKickOff.count }}</p>
+            <ul>
+                {% for session_kick_off in voting.voteVotingSessionKickOff.all %}
+                    <li>{{ session_kick_off.title }}</li>
+                {% endfor %}
+            </ul>
+        <p>
+        <p>Skład Komisji Wyborczej: {% for commission in voting.election_commission.all %}{{commission.forename}} {{commission.surname}} - MNo. {{commission.member_nr}}, {% endfor %}</p>
+        <p>Wyniki:</p>
+        <p>Frekwencja minimalna: {{min_attendance}}% Frekwencja w trakcie wyborów: {{attendance}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nie ważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
+        <p>Próg wyborczy: {{voting.turnout}} + 1</p>
+        <p>Uzyskane głosy:</p>
+
+            {% for poll_one in poll%}
+            <ol>
+                {% for choice in poll_one.pollChoice.all %}
+                    <li>
+                        {{choice.answer}}
+                        {% if poll_one in polls_with_responses %}
+                            {% if choice.answer in poll_with_response.choice_counts %}
+
+                    </li>
+                {% endfor %}
+            </ol>
+
+            {% endfor %}
+
+        {% for poll_with_response in polls_with_responses %}
+        <p>{{ poll_with_response.poll_one }}</p>
+        <ol>
+            {% for choice in poll_with_response.choice_counts %}
+                <li>{{ choice.choice__answer }}: {{ choice.choice_count }} votes</li>
+            {% endfor %}
+        </ol>
+    {% endfor %}
+        {{ polls_with_responses }}
+
+
+
+        <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_history_and_reports_list' %}
+{% endblock %}
