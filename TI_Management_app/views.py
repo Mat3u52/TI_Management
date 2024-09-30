@@ -4602,15 +4602,29 @@ def voting_history_and_reports_detail(request, pk):
     poll = Poll.objects.filter(vote=voting)
 
     polls_with_responses = []
+    accepted_count = member_accepted.count()
 
     # Loop through each poll and count how many times each choice was selected
     for poll_one in poll:
+        all_choices = poll_one.pollChoice.all()
+
         voting_responses = VotingResponses.objects.filter(poll=poll_one)
         choice_counts = voting_responses.values('choice__answer').annotate(choice_count=Count('choice'))
 
+        choice_counts_dict = {item['choice__answer']: item['choice_count'] for item in choice_counts}
+        final_choice_counts = []
+        for choice in all_choices:
+            count = choice_counts_dict.get(choice.answer, 0)
+            percentage = (count / accepted_count * 100) if accepted_count > 0 else 0
+            final_choice_counts.append({
+                'choice__answer': choice.answer,
+                'choice_count': choice_counts_dict.get(choice.answer, 0),  # Default to 0 if not found
+                'percentage': round(percentage, 2)
+            })
+
         polls_with_responses.append({
             'poll_one': poll_one,
-            'choice_counts': choice_counts
+            'choice_counts': final_choice_counts
         })
 
     if voting.members.count() > 0:

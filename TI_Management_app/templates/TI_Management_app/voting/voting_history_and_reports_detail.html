@@ -30,31 +30,27 @@
         <p>Próg wyborczy: {{voting.turnout}} + 1</p>
         <p>Uzyskane głosy:</p>
 
-            {% for poll_one in poll%}
+        {% for poll_with_response in polls_with_responses %}
+            <p>{{ poll_with_response.poll_one }}</p>
             <ol>
-                {% for choice in poll_one.pollChoice.all %}
-                    <li>
-                        {{choice.answer}}
-                        {% if poll_one in polls_with_responses %}
-                            {% if choice.answer in poll_with_response.choice_counts %}
+                {% for choice in poll_with_response.choice_counts %}
+                    <li>{{ choice.choice__answer }}, {{ choice.choice_count }}
 
+                        {% if choice.choice_count == 0 %}
+                            głosów
+                        {% elif choice.choice_count == 1 %}
+                            głos
+                        {% elif choice.choice_count > 1 and choice.choice_count < 5 %}
+                            głosy
+                        {% else %}
+                            głosów
+                        {% endif %},
+
+                        {{ choice.percentage }}%
                     </li>
                 {% endfor %}
             </ol>
-
-            {% endfor %}
-
-        {% for poll_with_response in polls_with_responses %}
-        <p>{{ poll_with_response.poll_one }}</p>
-        <ol>
-            {% for choice in poll_with_response.choice_counts %}
-                <li>{{ choice.choice__answer }}: {{ choice.choice_count }} votes</li>
-            {% endfor %}
-        </ol>
-    {% endfor %}
-        {{ polls_with_responses }}
-
-
+        {% endfor %}
 
         <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
     </div>
