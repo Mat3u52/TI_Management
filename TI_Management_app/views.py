@@ -4598,8 +4598,10 @@ def voting_history_and_reports_detail(request, pk):
     member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
     member_rejected = VotingSessionSignature.objects.filter(vote=voting, reject=True)
     member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
-
     poll = Poll.objects.filter(vote=voting)
+
+    assigned_members = voting.members.all()
+    unsigned_members = assigned_members.exclude(id__in=member_already_participated)
 
     polls_with_responses = []
     accepted_count = member_accepted.count()
@@ -4634,10 +4636,12 @@ def voting_history_and_reports_detail(request, pk):
 
     if member_already_participated.count() > 0:
         attendance = (member_already_participated.count() / voting.members.count()) * 100
+        if member_accepted.count() > 0:
+            attendance_only_accepted = (member_accepted.count() / voting.members.count()) * 100
     else:
         attendance = 0
 
-    if attendance > voting.turnout:
+    if attendance_only_accepted > voting.turnout:
         grant = True
     else:
         grant = False
@@ -4656,5 +4660,6 @@ def voting_history_and_reports_detail(request, pk):
             # 'choices': choices,
             'poll': poll,
             'polls_with_responses': polls_with_responses,
+            'unsigned_members': unsigned_members
         }
     )
