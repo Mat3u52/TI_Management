@@ -429,9 +429,11 @@ class VotingSessionSignature(models.Model):
     confirmation = models.BooleanField(default=False)
     reject = models.BooleanField(default=False)
 
+    # session_end = models.DateTimeField(default=None, blank=True, null=True)
+
     history = HistoricalRecords()
 
-    objects = models.Manager()  # default manager
+    objects = models.Manager()
 
     class Meta:
         verbose_name_plural = 'Podpisy uczestników sesji '

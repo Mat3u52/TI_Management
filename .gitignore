@@ -12,7 +12,8 @@ db.sqlite3
 mydb.py
 .env
 /staticfiles/*
-/TI_Management/settings.py
+/TI_Management/settings/settings.py
+/TI_Management/settings/*
 /TI_Management_app/migrations
 /media/images/*
 /media/uploads/*

@@ -1,10 +1,87 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% load static %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
-</body>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>zzti LUMS</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta name="description" content="zzti LUMS">
+        <meta name="author" content="zzti LUMS">
+        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+
+    </head>
+    <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
+
+    <div class="hero-unit">
+<!--        <h2 class="fadeInUp-animation">Protokół z głosowania</h2>-->
+<!--        <hr>-->
+<!--        <br />-->
+        <div class="notepad">
+            <p><b>{{ voting.title }}</b><p>
+            <p>Rodzaj głosowania: {% if voting.vote_type == 'confidential' %}Tajne{% endif %}</p>
+            <p>Wybory odbyły się w dniach: {{voting.date_start}} - {{voting.date_end}}</p>
+            <p>Skład Komisji Wyborczej: {% for commission in voting.election_commission.all %}{{commission.forename}} {{commission.surname}} - MNo. {{commission.member_nr}}, {% endfor %}</p>
+            <p>Wyniki:</p>
+            <p>Frekwencja minimalna: {{min_attendance}}% Frekwencja w trakcie wyborów: {{attendance}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nie ważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
+            <p>Próg wyborczy: {{voting.turnout}}% + 1</p>
+            <p>Uzyskane głosy:</p>
+
+            {% for poll_with_response in polls_with_responses %}
+                <p>{{ poll_with_response.poll_one }}</p>
+                <ol>
+                    {% for choice in poll_with_response.choice_counts %}
+                        <li>{{ choice.choice__answer }}, {{ choice.choice_count }}
+
+                            {% if choice.choice_count == 0 %}
+                                głosów
+                            {% elif choice.choice_count == 1 %}
+                                głos
+                            {% elif choice.choice_count > 1 and choice.choice_count < 5 %}
+                                głosy
+                            {% else %}
+                                głosów
+                            {% endif %},
+
+                            {{ choice.percentage }}%
+                        </li>
+                    {% endfor %}
+                </ol>
+            {% endfor %}
+            <p>Próg wyborczy {% if grant %}<span style="color:green">został spełniony</span>{% else %}<span style="color:red">nie został spełniony</span>{% endif %} - głosowanie {% if grant %}<span style="color:green">wiążące</span>{% else %}<span style="color:red">nieważne</span>{% endif %}</p>
+            <p>Głosowanie zostało potwierdzone przez:
+            {% for commission in voting.election_commission.all %}
+                {{ commission.forename }} {{ commission.surname }} - MNo. {{ commission.member_nr }},
+            {% endfor %}
+            </p>
+            <p>Sesje głosowania: {{ voting.voteVotingSessionKickOff.count }}</p>
+                <ul>
+                    {% for session_kick_off in voting.voteVotingSessionKickOff.all %}
+                        <li>
+                            {{ session_kick_off.session_start }} {{ session_kick_off.title }} przez:
+                            {% for commission_signature in session_kick_off.voteVotingSessionKickOffSignature.all %}
+
+                                {{ commission_signature.member.forename }} {{ commission_signature.member.surname }} g. {{ commission_signature.created_date }} | Oddano {{ session_kick_off.kickOffVotingSessionSignature.count}}
+
+                            {% endfor %}
+                        </li>
+                    {% endfor %}
+                </ul>
+            <p>
+            <p>Lista obecności:</p>
+            {% for member in member_already_participated %}
+                    <p>{{ member.member.forename }} {{ member.member.surname }} - rozpoczęcie sessji: {{ member.created_date }} {% if member.reject %}<span style="color:red">głos nieważny</span>{% else %}<span style="color:green">głos ważny</span>{% endif %}</p>
+            {% endfor %}
+            {% for unsigned_member in unsigned_members %}
+                <p>{{ unsigned_member.forename }} {{ unsigned_member.surname }} - nie wziął udziału w głosowaniu</p>
+            {% endfor %}
+
+
+            <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
+        </div>
+    </div>
+
+    </body>
 </html>

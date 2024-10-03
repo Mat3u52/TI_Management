@@ -1196,16 +1196,22 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
 #             Q(member_nr__contains=searched) |
 #             Q(phone_number__contains=searched)
 #         )
-#         return render(request,
-#                       'TI_Management_app/loyalty_card_member_file_order_search.html',
-#                       {'searched': searched,
-#                        'loyalty_card_member': loyalty_card_member,
-#                        'loyalty_card': loyalty_card,
-#                        'loyalty_card_validator': loyalty_card_validator})
+#         return render(
+#             request,
+#             'TI_Management_app/loyalty_card/loyalty_card_member_file_order_search.html',
+#             {
+#                 'searched': searched,
+#                 'loyalty_card_member': loyalty_card_member,
+#                 'loyalty_card': loyalty_card,
+#                 'loyalty_card_validator': loyalty_card_validator
+#             }
+#         )
 #     else:
-#         return render(request,
-#                       'TI_Management_app/loyalty_card_member_file_order_search.html',
-#                       {})
+#         return render(
+#             request,
+#             'TI_Management_app/loyalty_card/loyalty_card_member_file_order_search.html',
+#             {}
+#         )
 
 
 # @login_required
@@ -4657,9 +4663,86 @@ def voting_history_and_reports_detail(request, pk):
             'member_already_participated': member_already_participated,
             'member_rejected': member_rejected,
             'member_accepted': member_accepted,
-            # 'choices': choices,
             'poll': poll,
             'polls_with_responses': polls_with_responses,
             'unsigned_members': unsigned_members
         }
     )
+
+
+@login_required
+def voting_history_and_reports_detail_pdf_advance(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+    member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
+    member_rejected = VotingSessionSignature.objects.filter(vote=voting, reject=True)
+    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
+    poll = Poll.objects.filter(vote=voting)
+
+    assigned_members = voting.members.all()
+    unsigned_members = assigned_members.exclude(id__in=member_already_participated)
+
+    polls_with_responses = []
+    accepted_count = member_accepted.count()
+
+    # Loop through each poll and count how many times each choice was selected
+    for poll_one in poll:
+        all_choices = poll_one.pollChoice.all()
+
+        voting_responses = VotingResponses.objects.filter(poll=poll_one)
+        choice_counts = voting_responses.values('choice__answer').annotate(choice_count=Count('choice'))
+
+        choice_counts_dict = {item['choice__answer']: item['choice_count'] for item in choice_counts}
+        final_choice_counts = []
+        for choice in all_choices:
+            count = choice_counts_dict.get(choice.answer, 0)
+            percentage = (count / accepted_count * 100) if accepted_count > 0 else 0
+            final_choice_counts.append({
+                'choice__answer': choice.answer,
+                'choice_count': choice_counts_dict.get(choice.answer, 0),  # Default to 0 if not found
+                'percentage': round(percentage, 2)
+            })
+
+        polls_with_responses.append({
+            'poll_one': poll_one,
+            'choice_counts': final_choice_counts
+        })
+
+    if voting.members.count() > 0:
+        min_attendance = (voting.min_amount_commission / voting.members.count()) * 100
+    else:
+        min_attendance = 0
+
+    if member_already_participated.count() > 0:
+        attendance = (member_already_participated.count() / voting.members.count()) * 100
+        if member_accepted.count() > 0:
+            attendance_only_accepted = (member_accepted.count() / voting.members.count()) * 100
+    else:
+        attendance = 0
+
+    if attendance_only_accepted > voting.turnout:
+        grant = True
+    else:
+        grant = False
+
+    html = render_to_string(
+        'TI_Management_app/voting/voting_history_and_reports_detail_pdf_advance.html',
+        {
+            'voting': voting,
+            'min_attendance': min_attendance,
+            'attendance': attendance,
+            'grant': grant,
+            'member_already_participated': member_already_participated,
+            'member_rejected': member_rejected,
+            'member_accepted': member_accepted,
+            'poll': poll,
+            'polls_with_responses': polls_with_responses,
+            'unsigned_members': unsigned_members
+        }
+    )
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = f'filename="voting_report_{pk}.pdf"'
+    weasyprint.HTML(string=html).write_pdf(
+        response,
+        stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
+    )
+    return response

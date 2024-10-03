@@ -1,4 +1,11 @@
 services:
   web:
     build: .
-    command: python /TI_Management/manage.py runserver 0.0.0.0:8000
+    command: python /code/TI_Management/manage.py runserver 0.0.0.0:8000
+    restart: always
+    volumes:
+      - .:/code
+    ports:
+      - "8000:8000"
+    environment:
+      - DJANGO_SETTINGS_MODULE=TI_Management.settings.prod

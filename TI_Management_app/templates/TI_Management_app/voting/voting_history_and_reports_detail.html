@@ -20,7 +20,7 @@
         <p>Skład Komisji Wyborczej: {% for commission in voting.election_commission.all %}{{commission.forename}} {{commission.surname}} - MNo. {{commission.member_nr}}, {% endfor %}</p>
         <p>Wyniki:</p>
         <p>Frekwencja minimalna: {{min_attendance}}% Frekwencja w trakcie wyborów: {{attendance}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nie ważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
-        <p>Próg wyborczy: {{voting.turnout}} + 1</p>
+        <p>Próg wyborczy: {{voting.turnout}}% + 1</p>
         <p>Uzyskane głosy:</p>
 
         {% for poll_with_response in polls_with_responses %}
@@ -72,8 +72,16 @@
             <p>{{ unsigned_member.forename }} {{ unsigned_member.surname }} - nie wziął udziału w głosowaniu</p>
         {% endfor %}
 
+        <br />
+        <br />
+        <a href="{% url 'TI_Management_app:voting_history_and_reports_detail_pdf_advance' pk=voting.pk %}" class="btn btn-primary btn-large pull-right">
+            PDF / Drukuj protokół
+        </a>
+        <br />
+
 
         <div class="date"><p>Data dodania: {{voting.created_date}} przez: {{ voting.author }}</p></div>
+
     </div>
 </div>
 

@@ -271,7 +271,7 @@ urlpatterns = [
     #     name='loyalty_cards_add_member_file_order'
     # ),
     # path(
-    #     'TI_Management_app/loyalty-cards-add-member-file-order-search/<int:pk>/',
+    #     'TI_Management_app/loyalty-card/loyalty-cards-add-member-file-order-search/<int:pk>/',
     #     views.loyalty_card_member_file_order_search,
     #     name='loyalty_card_member_file_order_search'
     # ),
@@ -648,6 +648,11 @@ urlpatterns = [
         'TI_Management_app/voting/voting-history-and-reports-detail/<int:pk>/',
         views.voting_history_and_reports_detail,
         name='voting_history_and_reports_detail'
+    ),
+    path(
+        'TI_Management_app/voting/voting-history-and-reports-detail-pdf-advance/<int:pk>/',
+        views.voting_history_and_reports_detail_pdf_advance,
+        name='voting_history_and_reports_detail_pdf_advance'
     ),
 ]
 

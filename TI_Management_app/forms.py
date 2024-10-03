@@ -1322,6 +1322,26 @@ class GroupAddMemberForm(forms.ModelForm):
 
 
 class LoyaltyCardForm(forms.ModelForm):
+    card_name = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa Karty',
+                'aria-label': 'Nazwa Karty',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa karty musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
     class Meta:
 
         model = Cards
