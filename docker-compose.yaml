@@ -1,11 +1,55 @@
 services:
+  db:
+    image: mariadb:11.4.3
+    container_name: my_database
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: toor
+      MYSQL_DATABASE: ti_management
+      MYSQL_USER: root
+      MYSQL_PASSWORD: toor
+    ports:
+      - "3307:3306"
+    volumes:
+#      - ./data/db:/var/lib/mysql
+      - db_data:/var/lib/mysql
+    healthcheck:
+      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+
+  cache:
+    image: redis:7.0.4
+    restart: always
+    volumes:
+      - cache_data:/data
+
   web:
     build: .
-    command: python /code/TI_Management/manage.py runserver 0.0.0.0:8000
+#    command: ["./wait-for-it.sh", "db:3306", "-t", "30", "--", "python", "/code/TI_Management/manage.py", "runserver", "0.0.0.0:8000"]
+    command: ["./wait-for-it.sh", "db:3306", "-t", "30", "--", "uwsgi", "--ini", "/code/config/uwsgi/uwsgi.ini"]
     restart: always
     volumes:
       - .:/code
-    ports:
-      - "8000:8000"
+#    ports:
+#      - "8000:8000"
     environment:
       - DJANGO_SETTINGS_MODULE=TI_Management.settings.prod
+    depends_on:
+      - db
+      - cache
+
+  nginx:
+    image: nginx:1.23.1
+    restart: always
+    volumes:
+      - ./config/nginx:/etc/nginx/templates
+      - .:/code
+    ports:
+      - "80:80"
+#      - "443:443"
+
+volumes:
+  db_data:
+  cache_data:

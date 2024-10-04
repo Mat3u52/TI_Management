@@ -1459,7 +1459,14 @@ class LoyaltyCardsAddMemberFileOrderForm(forms.ModelForm):
     class Meta:
         model = CardStatus
 
-        fields = ['ordered_doc', 'member', 'card', 'file_name', 'file', 'file_date']
+        fields = [
+            'ordered_doc',
+            'member',
+            'card',
+            'file_name',
+            'file',
+            'file_date'
+        ]
 
         widgets = {
             'file_date': forms.TextInput(attrs={'type': 'datetime-local'}),
