@@ -25,7 +25,7 @@
             <p>Wybory odbyły się w dniach: {{voting.date_start}} - {{voting.date_end}}</p>
             <p>Skład Komisji Wyborczej: {% for commission in voting.election_commission.all %}{{commission.forename}} {{commission.surname}} - MNo. {{commission.member_nr}}, {% endfor %}</p>
             <p>Wyniki:</p>
-            <p>Frekwencja minimalna: {{min_attendance}}% Frekwencja w trakcie wyborów: {{attendance}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nie ważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
+            <p>Frekwencja minimalna: {{min_attendance|floatformat:2}}% Frekwencja w trakcie wyborów: {{attendance|floatformat:2}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nie ważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
             <p>Próg wyborczy: {{voting.turnout}}% + 1</p>
             <p>Uzyskane głosy:</p>
 

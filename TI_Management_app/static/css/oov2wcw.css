@@ -1,0 +1,54 @@
+/*
+ * The Typekit service used to deliver this font or fonts for use on websites
+ * is provided by Adobe and is subject to these Terms of Use
+ * http://www.adobe.com/products/eulas/tou_typekit. For font license
+ * information, see the list below.
+ *
+ * century-gothic:
+ *   - http://typekit.com/eulas/00000000000000003b9b1f23
+ *
+ * © 2009-2024 Adobe Systems Incorporated. All Rights Reserved.
+ */
+/*{"last_published":"2021-09-06 05:08:57 UTC"}*/
+
+/*
+@import url("https://p.typekit.net/p.css?s=1&k=oov2wcw&ht=tk&f=39203&a=85994746&app=typekit&e=css");
+
+@font-face {
+font-family:"century-gothic";
+src:url("https://use.typekit.net/af/afc5c6/00000000000000003b9b1f23/27/l?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff2"),url("https://use.typekit.net/af/afc5c6/00000000000000003b9b1f23/27/d?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("woff"),url("https://use.typekit.net/af/afc5c6/00000000000000003b9b1f23/27/a?primer=7cdcb44be4a7db8877ffa5c0007b8dd865b3bbc383831fe2ea177f62257a9191&fvd=n4&v=3") format("opentype");
+font-display:auto;font-style:normal;font-weight:400;font-stretch:normal;
+}
+
+.tk-century-gothic { font-family: "century-gothic",sans-serif; }
+*/
+/*
+@font-face {
+    font-family: "century-gothic";
+    src: url("{% static '../font/century-gothic/afc5c6.woff2' %}") format("woff2"),
+         url("{% static '../font/century-gothic/afc5c6.woff' %}") format("woff"),
+         url("{% static '../font/century-gothic/afc5c6.otf' %}") format("opentype");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+.tk-century-gothic {
+    font-family: "century-gothic", sans-serif;
+}
+*/
+@font-face {
+    font-family: "century-gothic";
+    src: url("../font/century-gothic/afc5c6.woff2") format("woff2"),
+         url("../font/century-gothic/afc5c6.woff") format("woff"),
+         url("../font/century-gothic/afc5c6.otf") format("opentype");
+    font-display: auto;
+    font-style: normal;
+    font-weight: 400;
+    font-stretch: normal;
+}
+
+.tk-century-gothic {
+    font-family: "century-gothic", sans-serif;
+}

@@ -139,6 +139,7 @@ from django.utils.decorators import method_decorator
 import redis
 
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+# r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
 
 
 ALLOWED_TAGS = list(bleach.sanitizer.ALLOWED_TAGS) + [
@@ -3598,7 +3599,7 @@ def finance_file_edit(request, pk):
     )
 
 
-# @cache_page(60*15)
+
 @login_required
 def voting_add(request):
     # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
@@ -3798,7 +3799,7 @@ def voting_add_poll(request, pk):
     )
 
 
-# @cache_page(60*15)
+
 @login_required
 def voting_add_recap(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
