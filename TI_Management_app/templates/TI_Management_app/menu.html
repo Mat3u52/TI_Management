@@ -2,7 +2,16 @@
 <ul class="nav nav-list">
     <li class="nav-header">Panel</li>
     <hr>
-    <li><a href="#"><h4><b>Dashboard</b></h4></a></li>
+    <li class="{% if active_tab == 'dashboard' %} active {% endif %}">
+        <a href="#">
+            <h4><b>Dashboard</b></h4>
+        </a>
+    </li>
+    <li class="{% if active_tab == 'dashboard_add' %} active {% endif %}">
+        <a href="#">
+            <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;zadanie</b>
+        </a>
+    </li>
     <hr>
     <li class="{% if active_tab == 'members_list' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:members_list' %}">
@@ -43,8 +52,8 @@
         </a>
     </li>
     <hr>
-    <li class="{% if active_tab == 'participation_tools_list' %} active {% endif %}">
-        <a href="#"><h4><b>Głosowania, ankiety i konkursy</b></h4></a>
+    <li class="{% if active_tab == 'voting_polls_competitions_list' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:voting_polls_competitions_list' %}"><h4><b>Głosowania, ankiety i konkursy</b></h4></a>
     </li>
     <li class="{% if active_tab == 'voting_list' %} active {% endif %}">
         <a href="{% url 'TI_Management_app:voting_list' %}"><b>&#160;&#160;&#8226;&nbsp;Głosowania</b></a>

@@ -40,7 +40,8 @@ from .models import (
     VotingSessionKickOff,
     VotingSessionKickOffSignature,
     VotingSessionSignature,
-    VotingResponses
+    VotingResponses,
+    VoteFile
 )
 from django.http import HttpResponse
 
@@ -1433,6 +1434,38 @@ class VotingResponsesAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'slug',
+    )
+    actions = [export_to_csv]
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(VoteFile)
+class VoteFileAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'voting',
+        'title',
+        'file',
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
+    )
+    list_filter = (
+        'voting',
+        'title',
+        'file',
+        'created_date',
+        'slug',
+        'author',
+        'updated_date'
+    )
+    search_fields = (
+        'title',
     )
     actions = [export_to_csv]
     # date_hierarchy = 'created_date'

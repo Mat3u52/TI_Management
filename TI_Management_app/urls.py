@@ -6,6 +6,11 @@ app_name = 'TI_Management_app'
 
 urlpatterns = [
     path(
+        '',
+        views.dashboard,
+        name='dashboard'
+    ),
+    path(
         'TI_Management_app/members/members-list/',
         views.members_list,
         name='members_list'
@@ -653,6 +658,16 @@ urlpatterns = [
         'TI_Management_app/voting/voting-history-and-reports-detail-pdf-advance/<int:pk>/',
         views.voting_history_and_reports_detail_pdf_advance,
         name='voting_history_and_reports_detail_pdf_advance'
+    ),
+    path(
+        'TI_Management_app/voting/voting_polls_competitions_list/',
+        views.voting_polls_competitions_list,
+        name='voting_polls_competitions_list'
+    ),
+    path(
+        'TI_Management_app/voting/voting_polls_competitions_search/',
+        views.voting_polls_competitions_search,
+        name='voting_polls_competitions_search'
     ),
 ]
 

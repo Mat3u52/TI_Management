@@ -33,7 +33,8 @@ from .models import (
     Choice,
     VotingSessionKickOff,
     VotingSessionKickOffSignature,
-    VotingSessionSignature
+    VotingSessionSignature,
+    VoteFile
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -3171,38 +3172,6 @@ class VotingSessionSignatureForm(forms.ModelForm):
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
 
 
-
-
-
-        # vote = voting_session_kick_off.vote
-        #
-        # for member in vote.election_commission.all():
-        #     if check_password(commission_signature, member.card):
-        #         existing_signature = voting_session_kick_off.voteVotingSessionKickOffSignature.filter(
-        #             member=member).exists()
-        #         if existing_signature:
-        #             raise ValidationError("Podpis już istnieje.")
-        #
-        #         return commission_signature
-        #
-        #
-        #
-        #
-        # vote = session_signature.vote
-        # for member in vote.election_commission.all():
-        #
-        #     if check_password(member_signature, member.card):
-        #         # Check if the signature already exists for this member in this voting session
-        #         existing_signature = session_signature.voteVotingSessionSignature.filter(
-        #             member=member).exists()
-        #         if existing_signature:
-        #             raise ValidationError("Podpis już istnieje.")
-        #
-        #         return member_signature
-        #
-        # raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
-
-
 class ChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
@@ -3246,4 +3215,42 @@ class ChoiceForm(forms.Form):
             raise forms.ValidationError(f'Proszę wybierz dokładnie {required_responses} odpowiedzi.')
 
 
+class VoteFileForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Nazwa dokumentu',
+                'aria-label': 'Nazwa dokumentu',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Nazwa dokumentu musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150,
+        required=True
+    )
+
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=True
+    )
+
+    class Meta:
+        model = VoteFile
+        fields = [
+            'title',
+            'file'
+        ]
 

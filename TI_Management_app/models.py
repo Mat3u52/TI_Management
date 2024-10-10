@@ -10,6 +10,54 @@ from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 
 
+class DashboardCategories(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroups')
+    title = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    weight = models.IntegerField(null=False, blank=False, default=0)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Dashboard'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+class Dashboard(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroups')
+    title = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    the_end_date = models.DateTimeField(blank=True, null=True)
+    category = models.ForeignKey(DashboardCategories, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    assigned_member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='task', null=True, blank=True)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Dashboard'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+
 class Groups(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -481,6 +529,31 @@ class VotingResponses(models.Model):
     def save(self, *args, **kwargs):
         if not self.slug:
             self.slug = slugify(f"{self.created_date}")
+        super().save(*args, **kwargs)
+
+
+class VoteFile(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorVoteFile')
+    voting = models.ForeignKey(Vote, on_delete=models.CASCADE, related_name='votingVoteFile', null=True, blank=True)
+    title = models.CharField(max_length=250, null=False, blank=False)
+    file = models.FileField(null=False, blank=False, upload_to='uploadsVoteFile/%Y/%m/%d/%H%M%S/')
+    history = HistoricalRecords()
+
+    ordering = ('-created_date',)
+
+    class Meta:
+        verbose_name_plural = 'Głosowanie Pliki'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
 

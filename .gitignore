@@ -11,6 +11,7 @@ db.json
 db.sqlite3
 mydb.py
 .env
+/ssl/*
 /staticfiles/*
 /TI_Management/settings/settings.py
 /TI_Management/settings/*
@@ -19,6 +20,7 @@ mydb.py
 /media/uploads/*
 /media/uploadsGroup/*
 /media/uploadsMember/*
+/media/uploadsVoteFile/*
 /media/uploadsNotepad/*
 /media/uploadsLoyaltyCards/*
 /media/uploadsLoyaltyCards_a/*

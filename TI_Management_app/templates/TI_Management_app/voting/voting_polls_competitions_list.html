@@ -1,10 +1,59 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:voting_polls_competitions_list' %}"><b> / Głosowania, Ankiety i Konkursy </b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Głosowania, Ankiety i Konkursy</h2>
+    <hr>
+    <br />
+    <form class="d-flex" method=POST action="{% url 'TI_Management_app:voting_polls_competitions_search' %}">
+        {% csrf_token %}
+        <input
+                class="form-control me-2"
+                style="min-width: 100%!important; min-height: 35px"
+                type="search"
+                placeholder="Szukaj Głosowania, Ankiety lub Konkursu"
+                aria-label="Search"
+                name="searched"
+                autofocus="autofocus">
+        <br />
+        <br />
+        <button class="btn btn-primary btn-large pull-right" type="submit">Szukaj</button>
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    <p><b>Głosowania:</b></p>
+    <br />
+    {% for vote in voting %}
+    <h3>
+        <a href="{% url 'TI_Management_app:voting_history_and_reports_detail' pk=vote.pk %}">
+            {{vote.title}}
+        </a>
+    </h3>
+    <hr>
+    <div class="notepad">
+        <p><b>Ilość sesji:</b> {{ vote.voteVotingSessionKickOff.count }}</p>
+        <p>
+            <a href="{% url 'TI_Management_app:voting_history_and_reports_detail' pk=vote.pk %}" class="btn btn-primary btn-large pull-right">
+                Więcej informacji
+            </a>
+        </p>
+        <div class="date"><p>Data dodania: {{vote.created_date}} przez: {{ vote.author }}</p></div>
+    </div>
+    <br />
+    {% endfor %}
+</div>
+
+
+{% include 'TI_Management_app/pagination.html' with page=voting %}
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='voting_polls_competitions_list' %}
+{% endblock %}

@@ -33,7 +33,8 @@ from .models import (
     VotingSessionKickOff,
     VotingSessionKickOffSignature,
     VotingSessionSignature,
-    VotingResponses
+    VotingResponses,
+    VoteFile
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
@@ -91,7 +92,8 @@ from .forms import (
     VotingSessionKickOffSignatureForm,
     VotingSessionSignatureForm,
     ChoiceForm,
-    VotingSessionCloseForm
+    VotingSessionCloseForm,
+    VoteFileForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -4653,10 +4655,22 @@ def voting_history_and_reports_detail(request, pk):
     else:
         grant = False
 
+    if request.method == "POST":
+        form = VoteFileForm(request.POST, request.FILES)  # , instance = member
+        if form.is_valid():
+            voting_file = form.save(commit=False)
+            voting_file.author = request.user
+            voting_file.voting = voting
+            voting_file.save()
+            messages.success(request, f"Dodano dokument {voting_file.title}!")
+            return redirect('TI_Management_app:voting_history_and_reports_detail', pk=voting.pk)
+    else:
+        form = MemberFileForm()
     return render(
         request,
         'TI_Management_app/voting/voting_history_and_reports_detail.html',
         {
+            'form': form,
             'voting': voting,
             'min_attendance': min_attendance,
             'attendance': attendance,
@@ -4747,3 +4761,52 @@ def voting_history_and_reports_detail_pdf_advance(request, pk):
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
     )
     return response
+
+
+@login_required
+def voting_polls_competitions_list(request):
+
+    voting_obj = Vote.objects.filter(Q(date_end__lte=timezone.now()))
+
+    paginator = Paginator(voting_obj, 50)
+    page = request.GET.get('page')
+    try:
+        voting = paginator.page(page)
+    except PageNotAnInteger:
+        voting = paginator.page(1)
+    except EmptyPage:
+        voting = paginator.page(paginator.num_pages)
+
+    return render(
+        request,
+        'TI_Management_app/voting/voting_polls_competitions_list.html',
+        {
+            'page': page,
+            'voting': voting
+        }
+    )
+
+
+@login_required
+def voting_polls_competitions_search(request):
+    if request.method == "POST":
+        searched = request.POST.get('searched', False)
+        voting = Vote.objects.filter(
+            Q(title__icontains=searched) &
+            Q(date_end__lte=timezone.now())
+        )
+        return render(
+            request,
+            'TI_Management_app/voting/voting_polls_competitions_search.html',
+            {
+                'searched': searched,
+                'voting': voting
+            }
+        )
+    else:
+        return render(
+            request,
+            'TI_Management_app/voting/voting_polls_competitions_search.html',
+            {}
+        )
+

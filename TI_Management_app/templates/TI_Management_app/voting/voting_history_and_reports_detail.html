@@ -19,7 +19,7 @@
         <p>Wybory odbyły się w dniach: {{voting.date_start}} - {{voting.date_end}}</p>
         <p>Skład Komisji Wyborczej: {% for commission in voting.election_commission.all %}{{commission.forename}} {{commission.surname}} - MNo. {{commission.member_nr}}, {% endfor %}</p>
         <p>Wyniki:</p>
-        <p>Frekwencja minimalna: {{min_attendance|floatformat:2}}% Frekwencja w trakcie wyborów: {{attendance|floatformat:2}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nie ważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
+        <p>Frekwencja minimalna: {{min_attendance|floatformat:2}}% Frekwencja w trakcie wyborów: {{attendance|floatformat:2}}% - Głosowanie było {% if grant %}<span style="color:green">ważne</span>{% else %}<span style="color:red">nieważne</span>{% endif %} Liczba uprawnionych: {{voting.members.count}} w głosowaniu wzięło udział: {{member_already_participated.count}} głosów ważnych: {{member_accepted.count}} nieważnych: {{member_rejected.count}}</p>
         <p>Próg wyborczy: {{voting.turnout}}% + 1</p>
         <p>Uzyskane głosy:</p>
 
@@ -71,6 +71,44 @@
         {% for unsigned_member in unsigned_members %}
             <p>{{ unsigned_member.forename }} {{ unsigned_member.surname }} - nie wziął udziału w głosowaniu</p>
         {% endfor %}
+
+        <br />
+        <p><b>Dokumenty:</b></p>
+        {% for file in voting.votingVoteFile.all %}
+            <p>{{ file.title }}: <a href="{{ file.file.url }}">{{ file.file.url|filename }}</a></p>
+        {% endfor %}
+        <br />
+
+
+        <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.non_field_errors }}</p>
+            </div>
+        {% endif %}
+
+        <div>
+            <div {% if form.title.errors %} class="hint" {% endif %}>
+                {{form.title}}
+            </div>
+            {% if form.title.errors %}
+                <div class="alert alert-danger">
+                    {{ form.title.errors }}
+                </div>
+            {% endif %}
+        </div>
+        <label class="custom-file-upload">
+            Wybierz dokument
+            {{form.file}}
+        </label>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-left">Dodaj dokument</button>
+        <br />
+        <br />
+        </form>
 
         <br />
         <br />
