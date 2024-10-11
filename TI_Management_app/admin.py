@@ -41,7 +41,9 @@ from .models import (
     VotingSessionKickOffSignature,
     VotingSessionSignature,
     VotingResponses,
-    VoteFile
+    VoteFile,
+    DashboardCategories,
+    Dashboard
 )
 from django.http import HttpResponse
 
@@ -1463,6 +1465,80 @@ class VoteFileAdmin(admin.ModelAdmin):
         'slug',
         'author',
         'updated_date'
+    )
+    search_fields = (
+        'title',
+    )
+    actions = [export_to_csv]
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(DashboardCategories)
+class DashboardCategoriesAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'weight'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'title',
+        'weight'
+    )
+    search_fields = (
+        'title',
+    )
+    actions = [export_to_csv]
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(Dashboard)
+class DashboardAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'suitor',
+        'title',
+        'dashboard_categories',
+        'start_date',
+        'the_end_date',
+        'assigned_member',
+        'done',
+        'frozen',
+        'canceled'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'suitor',
+        'title',
+        'dashboard_categories',
+        'start_date',
+        'the_end_date',
+        'assigned_member',
+        'done',
+        'frozen',
+        'canceled'
     )
     search_fields = (
         'title',

@@ -5,11 +5,11 @@ from TI_Management_app.views import VotingActiveSessionMemberDetail
 app_name = 'TI_Management_app'
 
 urlpatterns = [
-    path(
-        '',
-        views.dashboard,
-        name='dashboard'
-    ),
+    # path(
+    #     '',
+    #     views.dashboard,
+    #     name='dashboard'
+    # ),
     path(
         'TI_Management_app/members/members-list/',
         views.members_list,

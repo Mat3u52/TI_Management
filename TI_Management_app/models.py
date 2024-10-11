@@ -10,54 +10,6 @@ from django.utils.text import slugify
 from django_ckeditor_5.fields import CKEditor5Field
 
 
-class DashboardCategories(models.Model):
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroups')
-    title = models.CharField(max_length=250, blank=False, default=None, unique=True)
-    weight = models.IntegerField(null=False, blank=False, default=0)
-
-    objects = models.Manager()  # default manager
-
-    class Meta:
-        verbose_name_plural = 'Dashboard'
-        ordering = ('-created_date',)
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-
-class Dashboard(models.Model):
-    created_date = models.DateTimeField(auto_now_add=True)
-    updated_date = models.DateTimeField(auto_now=True)
-    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
-    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorGroups')
-    title = models.CharField(max_length=250, blank=False, default=None, unique=True)
-    start_date = models.DateTimeField(blank=True, null=True)
-    the_end_date = models.DateTimeField(blank=True, null=True)
-    category = models.ForeignKey(DashboardCategories, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    assigned_member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='task', null=True, blank=True)
-
-    objects = models.Manager()  # default manager
-
-    class Meta:
-        verbose_name_plural = 'Dashboard'
-        ordering = ('-created_date',)
-
-    def __str__(self):
-        return self.title
-
-    def save(self, *args, **kwargs):
-        if not self.slug:
-            self.slug = slugify(self.title)
-        super().save(*args, **kwargs)
-
-
 class Groups(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -1210,6 +1162,59 @@ class CardStatus(models.Model):
         self.card_identity = self.card_identity or None
         if not self.slug:
             self.slug = slugify(f"{self.card}")
+        super().save(*args, **kwargs)
+
+
+class DashboardCategories(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorDashboardCategories')
+    title = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    weight = models.IntegerField(null=False, blank=False, default=0)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Dashboard - kategorie'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
+
+
+class Dashboard(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorDashboard')
+    suitor = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    title = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    start_date = models.DateTimeField(blank=True, null=True)
+    the_end_date = models.DateTimeField(blank=True, null=True)
+    assigned_member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='assignedMemberDashboard', null=True, blank=True)
+    dashboard_categories = models.ForeignKey(DashboardCategories, on_delete=models.CASCADE, related_name='dashboardCategoriesDashboard', null=True, blank=True)
+    done = models.BooleanField(default=False)
+    frozen = models.BooleanField(default=False)
+    canceled = models.BooleanField(default=False)
+
+    objects = models.Manager()  # default manager
+
+    class Meta:
+        verbose_name_plural = 'Dashboard'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.title
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
         super().save(*args, **kwargs)
 
 
