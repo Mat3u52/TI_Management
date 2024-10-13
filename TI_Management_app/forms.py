@@ -34,7 +34,8 @@ from .models import (
     VotingSessionKickOff,
     VotingSessionKickOffSignature,
     VotingSessionSignature,
-    VoteFile
+    VoteFile,
+    DashboardCategories
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -3254,3 +3255,54 @@ class VoteFileForm(forms.ModelForm):
             'file'
         ]
 
+
+class DashboardCategoriesForm(forms.ModelForm):
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Nazwa ketegorii',
+                'aria-label': 'Kategoria',
+                'list': 'kategoria_database',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Kategoria musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
+    weight = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Ilość punktów',
+                'type': 'number',
+                'aria-label': 'Ilość punktów'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Maksymalna ilość punktów to 99."
+            ),
+            RegexValidator(
+                regex=r'^\d{0,10}$',
+                message="To pole musi być liczbą."
+            )
+        ],
+        max_length=100
+    )
+
+    class Meta:
+        model = DashboardCategories
+        fields = [
+            'title',
+            'weight'
+        ]

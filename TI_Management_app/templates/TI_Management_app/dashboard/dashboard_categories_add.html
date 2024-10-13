@@ -1,0 +1,54 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"><b> / Dashboard </b></a>
+<a href="{% url 'TI_Management_app:dashboard_categories_add' %}"><b> / Dodaj kategorie</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodawanie ketegorii</h2>
+    <hr>
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
+        {% endif %}
+        <h4>Kategoria:</h4>
+        {{form.title}}
+        <br />
+        {{form.weight}}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    {% for category in categories %}
+        <div class="notepad">
+            <h3>
+                <a href="#">
+                    {{category.title}}
+                </a>
+            </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{category.created_date}}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='dashboard_categories_add' %}
+{% endblock %}

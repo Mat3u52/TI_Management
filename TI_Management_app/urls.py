@@ -11,6 +11,11 @@ urlpatterns = [
     #     name='dashboard'
     # ),
     path(
+        'TI_Management_app/dashboard/dashboard-categories-add/',
+        views.dashboard_categories_add,
+        name='dashboard_categories_add'
+    ),
+    path(
         'TI_Management_app/members/members-list/',
         views.members_list,
         name='members_list'

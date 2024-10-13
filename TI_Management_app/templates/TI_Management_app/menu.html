@@ -12,8 +12,8 @@
             <b>&#160;&#160;&#8226;&nbsp;dodaj&nbsp;zadanie</b>
         </a>
     </li>
-        <li class="{% if active_tab == 'dashboard_add_category' %} active {% endif %}">
-        <a href="#">
+        <li class="{% if active_tab == 'dashboard_categories_add' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:dashboard_categories_add' %}">
             &#160;&#160;&#160;&#160;&#8728;&nbsp;dodaj&nbsp;kategorie
         </a>
     </li>

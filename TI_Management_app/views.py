@@ -34,7 +34,8 @@ from .models import (
     VotingSessionKickOffSignature,
     VotingSessionSignature,
     VotingResponses,
-    VoteFile
+    VoteFile,
+    DashboardCategories
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
@@ -93,7 +94,8 @@ from .forms import (
     VotingSessionSignatureForm,
     ChoiceForm,
     VotingSessionCloseForm,
-    VoteFileForm
+    VoteFileForm,
+    DashboardCategoriesForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -365,7 +367,6 @@ def member_deactivate(request, pk):
 def error_404_view(request, exception):
     data = {"name": "TI_Management"}
     return render(request, 'TI_Management_app/404.html', data)
-
 
 
 @login_required
@@ -4810,3 +4811,25 @@ def voting_polls_competitions_search(request):
             {}
         )
 
+
+@login_required
+def dashboard_categories_add(request):
+    categories = DashboardCategories.objects.all()
+    if request.method == "POST":
+        form = DashboardCategoriesForm(request.POST)
+        if form.is_valid():
+            category = form.save(commit=False)
+            category.author = request.user
+            category.save()
+            messages.success(request, f"Dodano nową kategorie {category.title}!")
+            return redirect('TI_Management_app:dashboard_categories_add')
+    else:
+        form = DashboardCategoriesForm()
+    return render(
+        request,
+        'TI_Management_app/dashboard/dashboard_categories_add.html',
+        {
+            'form': form,
+            'categories': categories
+        }
+    )
