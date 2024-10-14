@@ -1,0 +1,57 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="#"><b> / Dashboard </b></a>
+<a href="{% url 'TI_Management_app:dashboard_categories_edit' pk=category.pk %}"><b> / Zaktualizuj kategorie</b></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja kategorii</h2>
+    <hr>
+    <br />
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
+        {% endif %}
+        <H4>Kategoria:</H4>
+        {{form.title}}
+        <br />
+        {{form.weight}}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Zaktualizuj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+
+<div class="hero-unit">
+    {% for h in category.history.all %}
+    <div class="notepad">
+        <table width="100%">
+            <tr>
+                <td>{{ h.history_id }}</td>
+                <td>{{ h.history_type }}</td>
+                <td>{{ h.history_user }}</td>
+                <td>{{ h.history_date }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">{{ h.title }}</td>
+                <td colspan="2">{{ h.weight }}</td>
+            </tr>
+        </table>
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='dashboard_categories_add' %}
+{% endblock %}

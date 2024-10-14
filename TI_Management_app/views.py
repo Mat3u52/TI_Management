@@ -4833,3 +4833,28 @@ def dashboard_categories_add(request):
             'categories': categories
         }
     )
+
+
+@login_required
+def dashboard_categories_edit(request, pk):
+    # all_functions = MemberFunction.objects.all()
+    category = get_object_or_404(DashboardCategories, pk=pk)
+    if request.method == "POST":
+        form = DashboardCategoriesForm(request.POST, instance=category)
+        if form.is_valid():
+            one_function = form.save(commit=False)
+            one_function.author = request.user
+            one_function.save()
+            messages.success(request, "Zaktualizowano kategorie!")
+            return redirect('TI_Management_app:dashboard_categories_add')
+    else:
+        form = DashboardCategoriesForm(instance=category)
+    return render(
+        request,
+        'TI_Management_app/dashboard/dashboard_categories_edit.html',
+        {
+            'form': form,
+            # 'all_functions': all_functions,
+            'category': category
+        }
+    )

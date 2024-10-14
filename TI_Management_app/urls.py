@@ -16,6 +16,11 @@ urlpatterns = [
         name='dashboard_categories_add'
     ),
     path(
+        'TI_Management_app/dashboard/dashboard-categories-edit/<int:pk>/',
+        views.dashboard_categories_edit,
+        name='dashboard_categories_edit'
+    ),
+    path(
         'TI_Management_app/members/members-list/',
         views.members_list,
         name='members_list'

@@ -34,10 +34,11 @@
     {% for category in categories %}
         <div class="notepad">
             <h3>
-                <a href="#">
+                <a href="{% url 'TI_Management_app:dashboard_categories_edit' pk=category.pk %}">
                     {{category.title}}
                 </a>
             </h3>
+            <p>{{category.weight}}pk</p>
             <div class="date">
                 <p>
                     Data dodania: {{category.created_date}}

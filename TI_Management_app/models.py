@@ -1173,6 +1173,7 @@ class DashboardCategories(models.Model):
     title = models.CharField(max_length=250, blank=False, default=None, unique=True)
     weight = models.IntegerField(null=False, blank=False, default=0)
 
+    history = HistoricalRecords()
     objects = models.Manager()  # default manager
 
     class Meta:
@@ -1203,6 +1204,7 @@ class Dashboard(models.Model):
     frozen = models.BooleanField(default=False)
     canceled = models.BooleanField(default=False)
 
+    history = HistoricalRecords()
     objects = models.Manager()  # default manager
 
     class Meta:
