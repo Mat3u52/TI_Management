@@ -35,7 +35,8 @@ from .models import (
     VotingSessionKickOffSignature,
     VotingSessionSignature,
     VoteFile,
-    DashboardCategories
+    DashboardCategories,
+    Dashboard
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -3305,4 +3306,56 @@ class DashboardCategoriesForm(forms.ModelForm):
         fields = [
             'title',
             'weight'
+        ]
+
+
+class DashboardForm(forms.ModelForm):
+
+    suitor = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Petent',
+                'aria-label': 'Petent',
+                'list': 'suitor_database'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Petent musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
+    title = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Tytuł',
+                'aria-label': 'Tytuł',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Tytuł zadania musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
+    class Meta:
+        model = Dashboard
+        fields = [
+            'suitor',
+            'title',
+            'start_date',
+            'the_end_date',
+            'assigned_member',
+            'dashboard_categories'
         ]
