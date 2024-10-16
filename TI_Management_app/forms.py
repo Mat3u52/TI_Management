@@ -3359,3 +3359,18 @@ class DashboardForm(forms.ModelForm):
             'assigned_member',
             'dashboard_categories'
         ]
+
+        widgets = {
+            'start_date': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'the_end_date': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+
+        }
+

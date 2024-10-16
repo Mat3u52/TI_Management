@@ -142,8 +142,8 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 import redis
 
-r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
-# r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
+# r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
 
 
 ALLOWED_TAGS = list(bleach.sanitizer.ALLOWED_TAGS) + [
