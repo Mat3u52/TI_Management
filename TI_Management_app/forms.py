@@ -1063,6 +1063,13 @@ class CardStatusEditForm(forms.ModelForm):
         cleaned_data = super().clean()
         member = cleaned_data.get('member')
         confirmed_hid = cleaned_data.get('confirmed_hid')
+        card_status = cleaned_data.get('card_status')
+
+        # Check if card_status is "aktywna"
+        print(card_status)
+        if card_status == "active":
+            if not confirmed_hid:
+                self.add_error('confirmed_hid', "Pole 'confirmed_hid' jest wymagane, gdy status karty to 'aktywna'.")
 
         if member and confirmed_hid:
             try:
@@ -3371,6 +3378,5 @@ class DashboardForm(forms.ModelForm):
                     'type': 'date'
                 }
             ),
-
         }
 
