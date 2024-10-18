@@ -32,6 +32,40 @@ class Groups(models.Model):
         super().save(*args, **kwargs)
 
 
+class MemberHeadquarters(models.Model):
+    created_date = models.DateTimeField(auto_now_add=True)
+    updated_date = models.DateTimeField(auto_now=True)
+    slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
+    author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMemberHeadquarters')
+    member_headquarters = models.CharField(max_length=250, blank=False, default=None, unique=True)
+
+    street = models.CharField(max_length=250, blank=True, null=True, default='')
+    city = models.CharField(max_length=250, blank=True, null=True, default='')
+    postcode = models.CharField(max_length=250, blank=True, null=True, default='')
+    house_number = models.CharField(max_length=50, blank=True, null=True, default='')
+    float_number = models.CharField(max_length=50, blank=True, null=True, default='')
+
+    national_court_register = models.IntegerField(unique=True)  # KRS
+    tax_number = models.IntegerField(unique=True)  # NIP
+    national_business_registry_number = models.IntegerField(unique=True)  # REGON
+
+    history = HistoricalRecords()
+
+    objects = models.Manager()
+
+    class Meta:
+        verbose_name_plural = 'Siedziby'
+        ordering = ('-created_date',)
+
+    def __str__(self):
+        return self.member_headquarters
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.member_headquarters)
+        super().save(*args, **kwargs)
+
+
 class MemberFunction(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
@@ -186,6 +220,7 @@ class MembersZZTI(models.Model):
 
     role = models.ForeignKey(MemberFunction, on_delete=models.CASCADE, null=True, blank=True, default=None)
     occupation = models.ForeignKey(MemberOccupation, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    headquarters = models.ForeignKey(MemberHeadquarters, on_delete=models.CASCADE, null=True, blank=True, default=None)
     member_nr = models.CharField(max_length=250, blank=False, null=False, unique=True)
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, blank=True, null=True, default=None)
     birthday = models.DateTimeField(default=None, blank=True, null=True)

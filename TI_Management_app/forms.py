@@ -3356,6 +3356,25 @@ class DashboardForm(forms.ModelForm):
         max_length=250
     )
 
+    assigned_member = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Osoba odpowiedzialna',
+                'aria-label': 'Osoba odpowiedzialna',
+                'list': 'assigned_database',
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Przypisana osoba musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=250
+    )
+
     class Meta:
         model = Dashboard
         fields = [
@@ -3370,12 +3389,17 @@ class DashboardForm(forms.ModelForm):
         widgets = {
             'start_date': forms.TextInput(
                 attrs={
-                    'type': 'date'
+                    'type': 'datetime-local'
                 }
             ),
             'the_end_date': forms.TextInput(
                 attrs={
-                    'type': 'date'
+                    'type': 'datetime-local'
+                }
+            ),
+            'dashboard_categories': forms.Select(
+                attrs={
+                    'class': 'form-control select'
                 }
             ),
         }
