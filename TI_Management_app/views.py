@@ -35,7 +35,8 @@ from .models import (
     VotingSessionSignature,
     VotingResponses,
     VoteFile,
-    DashboardCategories
+    DashboardCategories,
+    Headquarters
 )
 from django.http import HttpResponseRedirect
 from django.urls import reverse_lazy, reverse
@@ -579,6 +580,29 @@ def member_occupation_edit(request, pk):
             'form': form,
             'all_occupation': all_occupation,
             'occupation': occupation
+        }
+    )
+
+
+@login_required
+def headquarters_add(request):
+    headquarters = Headquarters.objects.all()
+    if request.method == "POST":
+        form = HeadquartersForm(request.POST)
+        if form.is_valid():
+            headquarter = form.save(commit=False)
+            headquarter.author = request.user
+            headquarter.save()
+            messages.success(request, f"Dodano nową siedzibę {headquarter.headquarters}!")
+            return redirect('TI_Management_app:headquarters_add')
+    else:
+        form = HeadquartersForm()
+    return render(
+        request,
+        'TI_Management_app/members/headquarters_add.html',
+        {
+            'form': form,
+            'headquarters': headquarters
         }
     )
 

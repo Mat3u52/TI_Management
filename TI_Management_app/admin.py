@@ -43,7 +43,8 @@ from .models import (
     VotingResponses,
     VoteFile,
     DashboardCategories,
-    Dashboard
+    Dashboard,
+    Headquarters
 )
 from django.http import HttpResponse
 
@@ -418,7 +419,8 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'updated_date',
         'slug',
         'author',
-        'recommended_by'
+        'recommended_by',
+        'headquarters'
     )
     list_filter = (
         'id',
@@ -450,7 +452,8 @@ class MembersZZTIAdmin(admin.ModelAdmin):
         'updated_date',
         'slug',
         'author',
-        'recommended_by'
+        'recommended_by',
+        'headquarters'
     )
     search_fields = (
         'surname',
@@ -1542,6 +1545,50 @@ class DashboardAdmin(admin.ModelAdmin):
     )
     search_fields = (
         'title',
+    )
+    actions = [export_to_csv]
+    # date_hierarchy = 'created_date'
+
+
+@admin.register(Headquarters)
+class HeadquartersAdmin(admin.ModelAdmin):
+    def get_readonly_fields(self, request, obj=None):
+        if obj:
+            return ['created_date']
+        return self.readonly_fields
+
+    list_display = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'headquarters',
+        'street',
+        'city',
+        'postcode',
+        'house_number',
+        'float_number',
+        'national_court_register',
+        'tax_number',
+        'national_business_registry_number'
+    )
+    list_filter = (
+        'created_date',
+        'updated_date',
+        'slug',
+        'author',
+        'headquarters',
+        'street',
+        'city',
+        'postcode',
+        'house_number',
+        'float_number',
+        'national_court_register',
+        'tax_number',
+        'national_business_registry_number'
+    )
+    search_fields = (
+        'headquarters',
     )
     actions = [export_to_csv]
     # date_hierarchy = 'created_date'

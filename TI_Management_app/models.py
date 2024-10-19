@@ -32,12 +32,12 @@ class Groups(models.Model):
         super().save(*args, **kwargs)
 
 
-class MemberHeadquarters(models.Model):
+class Headquarters(models.Model):
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMemberHeadquarters')
-    member_headquarters = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    headquarters = models.CharField(max_length=250, blank=False, default=None, unique=True)
 
     street = models.CharField(max_length=250, blank=True, null=True, default='')
     city = models.CharField(max_length=250, blank=True, null=True, default='')
@@ -58,11 +58,11 @@ class MemberHeadquarters(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return self.member_headquarters
+        return self.headquarters
 
     def save(self, *args, **kwargs):
         if not self.slug:
-            self.slug = slugify(self.member_headquarters)
+            self.slug = slugify(self.headquarters)
         super().save(*args, **kwargs)
 
 
@@ -220,7 +220,7 @@ class MembersZZTI(models.Model):
 
     role = models.ForeignKey(MemberFunction, on_delete=models.CASCADE, null=True, blank=True, default=None)
     occupation = models.ForeignKey(MemberOccupation, on_delete=models.CASCADE, null=True, blank=True, default=None)
-    headquarters = models.ForeignKey(MemberHeadquarters, on_delete=models.CASCADE, null=True, blank=True, default=None)
+    headquarters = models.ForeignKey(Headquarters, on_delete=models.CASCADE, null=True, blank=True, default=None)
     member_nr = models.CharField(max_length=250, blank=False, null=False, unique=True)
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, blank=True, null=True, default=None)
     birthday = models.DateTimeField(default=None, blank=True, null=True)
