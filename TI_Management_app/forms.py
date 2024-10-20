@@ -36,7 +36,8 @@ from .models import (
     VotingSessionSignature,
     VoteFile,
     DashboardCategories,
-    Dashboard
+    Dashboard,
+    Headquarters
 )
 from django.utils import timezone
 from django.forms.widgets import DateInput
@@ -795,6 +796,157 @@ class MemberDeactivateForm(forms.ModelForm):
     class Meta:
         model = MembersZZTI
         fields = ['deactivate']
+
+
+class HeadquartersForm(forms.ModelForm):
+
+    headquarters = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Siedziba',
+                'aria-label': 'Siedziba',
+                'list': 'headquarters_database',
+                'autofocus': 'autofocus'
+            }
+        ),
+        required=True,
+        max_length=250
+    )
+    city = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Miasto',
+                'aria-label': 'Miasto',
+                'required': 'required',
+                'autofocus': 'autofocus'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Miasto musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150
+    )
+    street = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Ulica',
+                'aria-label': 'Ulica',
+                'required': 'required'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Ulica musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        max_length=150
+    )
+    postcode = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Kod pocztowy',
+                'aria-label': 'Kod pocztowy',
+                'required': 'required'
+            }
+        )
+    )
+    house_number = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'text',
+                'placeholder': 'Numer domu',
+                'aria-label': 'Numer domu',
+                'required': 'required'
+            }
+        )
+    )
+    float_number = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'placeholder': 'Numer mieszkania',
+                'aria-label': 'Numer mieszkania'
+            }
+        )
+    )
+    national_court_register = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'placeholder': 'KRS',
+                'aria-label': 'KRS'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=9,
+                message="KRS musi zawierać 9-14 znaków."
+            )
+        ],
+        max_length=14
+    )
+    tax_number = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'placeholder': 'NIP',
+                'aria-label': 'NIP'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=10,
+                message="NIP musi zawierać 10 znaków."
+            )
+        ],
+        max_length=10
+    )
+    national_business_registry_number = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'type': 'number',
+                'placeholder': 'REGON',
+                'aria-label': 'REGON'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=9,
+                message="REGON musi zawierać 9 znaków."
+            )
+        ],
+        max_length=9
+    )
+
+    class Meta:
+        model = MemberFunction
+        fields = [
+            'headquarters',
+            'street',
+            'city',
+            'postcode',
+            'house_number',
+            'float_number',
+            'national_court_register',
+            'tax_number',
+            'national_business_registry_number'
+        ]
 
 
 class MemberFunctionForm(forms.ModelForm):
