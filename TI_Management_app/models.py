@@ -45,9 +45,9 @@ class Headquarters(models.Model):
     house_number = models.CharField(max_length=50, blank=True, null=True, default='')
     float_number = models.CharField(max_length=50, blank=True, null=True, default='')
 
-    national_court_register = models.IntegerField(unique=True)  # KRS
-    tax_number = models.IntegerField(unique=True)  # NIP
-    national_business_registry_number = models.IntegerField(unique=True)  # REGON
+    national_court_register = models.IntegerField(null=True, blank=True)  # KRS
+    tax_number = models.IntegerField(null=True, blank=True)  # NIP
+    national_business_registry_number = models.IntegerField(null=True, blank=True)  # REGON
 
     history = HistoricalRecords()
 

@@ -1,10 +1,60 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_headquarters_add' %}"><b> / Dodaj siedzibę</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Dodawanie siedziby</h2>
+    <hr>
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
+        {% endif %}
+        <h4>Siedziba:</h4>
+        {{form.headquarters}}
+        {{form.street}}
+        {{form.city}}
+        {{form.postcode}}
+        {{form.house_number}}
+        {{form.float_number}}
+        {{form.national_court_register}}
+        {{form.tax_number}}
+        {{form.national_business_registry_number}}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+<div class="hero-unit">
+    {% for headquarter in headquarters %}
+        <div class="notepad">
+            <h3>
+                <a href="{% url 'TI_Management_app:member_headquarters_edit' pk=headquarter.pk %}">
+                    {{headquarter}}
+                </a>
+            </h3>
+            <div class="date">
+                <p>
+                    Data dodania: {{headquarter.created_date}}
+                </p>
+            </div>
+        </div>
+    {% endfor %}
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='member_headquarters_add' %}
+{% endblock %}

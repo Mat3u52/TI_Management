@@ -66,9 +66,14 @@ urlpatterns = [
         name='member_occupation_edit'
     ),
     path(
-        'TI_Management_app/members/headquarters-add/',
-        views.headquarters_add,
-        name='headquarters_add'
+        'TI_Management_app/members/member-headquarters-add/',
+        views.member_headquarters_add,
+        name='member_headquarters_add'
+    ),
+    path(
+        'TI_Management_app/members/member-headquarters-edit/',
+        views.member_headquarters_edit,
+        name='member_headquarters_edit'
     ),
     path(
         'TI_Management_app/members/<int:pk>/edit/',

@@ -830,6 +830,7 @@ class HeadquartersForm(forms.ModelForm):
                 message="Miasto musi zawierać co najmniej 2 znaki."
             )
         ],
+        required=False,
         max_length=150
     )
     street = forms.CharField(
@@ -848,6 +849,7 @@ class HeadquartersForm(forms.ModelForm):
                 message="Ulica musi zawierać co najmniej 2 znaki."
             )
         ],
+        required=False,
         max_length=150
     )
     postcode = forms.CharField(
@@ -859,7 +861,8 @@ class HeadquartersForm(forms.ModelForm):
                 'aria-label': 'Kod pocztowy',
                 'required': 'required'
             }
-        )
+        ),
+        required=False,
     )
     house_number = forms.CharField(
         widget=forms.TextInput(
@@ -870,7 +873,8 @@ class HeadquartersForm(forms.ModelForm):
                 'aria-label': 'Numer domu',
                 'required': 'required'
             }
-        )
+        ),
+        required=False,
     )
     float_number = forms.CharField(
         widget=forms.TextInput(
@@ -880,7 +884,8 @@ class HeadquartersForm(forms.ModelForm):
                 'placeholder': 'Numer mieszkania',
                 'aria-label': 'Numer mieszkania'
             }
-        )
+        ),
+        required=False,
     )
     national_court_register = forms.CharField(
         widget=forms.TextInput(
@@ -897,6 +902,7 @@ class HeadquartersForm(forms.ModelForm):
                 message="KRS musi zawierać 9-14 znaków."
             )
         ],
+        required=False,
         max_length=14
     )
     tax_number = forms.CharField(
@@ -914,6 +920,7 @@ class HeadquartersForm(forms.ModelForm):
                 message="NIP musi zawierać 10 znaków."
             )
         ],
+        required=False,
         max_length=10
     )
     national_business_registry_number = forms.CharField(
@@ -931,11 +938,12 @@ class HeadquartersForm(forms.ModelForm):
                 message="REGON musi zawierać 9 znaków."
             )
         ],
+        required=False,
         max_length=9
     )
 
     class Meta:
-        model = MemberFunction
+        model = Headquarters
         fields = [
             'headquarters',
             'street',

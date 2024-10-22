@@ -96,7 +96,8 @@ from .forms import (
     ChoiceForm,
     VotingSessionCloseForm,
     VoteFileForm,
-    DashboardCategoriesForm
+    DashboardCategoriesForm,
+    HeadquartersForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -143,8 +144,8 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 import redis
 
-# r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
-r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
+r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
+# r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
 
 
 ALLOWED_TAGS = list(bleach.sanitizer.ALLOWED_TAGS) + [
@@ -585,7 +586,7 @@ def member_occupation_edit(request, pk):
 
 
 @login_required
-def headquarters_add(request):
+def member_headquarters_add(request):
     headquarters = Headquarters.objects.all()
     if request.method == "POST":
         form = HeadquartersForm(request.POST)
@@ -594,15 +595,40 @@ def headquarters_add(request):
             headquarter.author = request.user
             headquarter.save()
             messages.success(request, f"Dodano nową siedzibę {headquarter.headquarters}!")
-            return redirect('TI_Management_app:headquarters_add')
+            return redirect('TI_Management_app:member_headquarters_add')
     else:
         form = HeadquartersForm()
     return render(
         request,
-        'TI_Management_app/members/headquarters_add.html',
+        'TI_Management_app/members/member_headquarters_add.html',
         {
             'form': form,
             'headquarters': headquarters
+        }
+    )
+
+
+@login_required
+def member_headquarters_edit(request, pk):
+    headquarters = Headquarters.objects.all()
+    headquarter = get_object_or_404(Headquarters, pk=pk)
+    if request.method == "POST":
+        form = HeadquartersForm(request.POST, instance=headquarter)
+        if form.is_valid():
+            headquarter = form.save(commit=False)
+            headquarter.author = request.user
+            headquarter.save()
+            messages.success(request, f"Zaktualizowano {headquarter.headquarter}!")
+            return redirect('TI_Management_app:member_headquarters_add')
+    else:
+        form = HeadquartersForm(instance=headquarter)
+    return render(
+        request,
+        'TI_Management_app/members/member_headquarters_edit.html',
+        {
+            'form': form,
+            'headquarters': headquarters,
+            'headquarter': headquarter
         }
     )
 
