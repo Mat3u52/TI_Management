@@ -18,15 +18,24 @@
                 <p>{{form.errors}}</p>
             </div>
         {% endif %}
-        <h4>Siedziba:</h4>
+        <p><b>Siedziba:</b></p>
         {{form.headquarters}}
-        {{form.street}}
+        <hr>
+        <p>Miasto:</p>
         {{form.city}}
+        <p>Ulica:</p>
+        {{form.street}}
+        <p>Kod pocztowy</p>
         {{form.postcode}}
+        <p>Numer domu:</p>
         {{form.house_number}}
+        <p>Numer mieszkania:</p>
         {{form.float_number}}
+        <p>KRS:</p>
         {{form.national_court_register}}
+        <p>NIP:</p>
         {{form.tax_number}}
+        <p>REGON:</p>
         {{form.national_business_registry_number}}
         <br />
         <br />

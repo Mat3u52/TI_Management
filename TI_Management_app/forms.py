@@ -819,9 +819,7 @@ class HeadquartersForm(forms.ModelForm):
                 'class': 'form-control me-2',
                 'type': 'text',
                 'placeholder': 'Miasto',
-                'aria-label': 'Miasto',
-                'required': 'required',
-                'autofocus': 'autofocus'
+                'aria-label': 'Miasto'
             }
         ),
         validators=[
@@ -839,8 +837,7 @@ class HeadquartersForm(forms.ModelForm):
                 'class': 'form-control me-2',
                 'type': 'text',
                 'placeholder': 'Ulica',
-                'aria-label': 'Ulica',
-                'required': 'required'
+                'aria-label': 'Ulica'
             }
         ),
         validators=[
@@ -858,8 +855,7 @@ class HeadquartersForm(forms.ModelForm):
                 'class': 'form-control me-2',
                 'type': 'text',
                 'placeholder': 'Kod pocztowy',
-                'aria-label': 'Kod pocztowy',
-                'required': 'required'
+                'aria-label': 'Kod pocztowy'
             }
         ),
         required=False,
@@ -870,8 +866,7 @@ class HeadquartersForm(forms.ModelForm):
                 'class': 'form-control me-2',
                 'type': 'text',
                 'placeholder': 'Numer domu',
-                'aria-label': 'Numer domu',
-                'required': 'required'
+                'aria-label': 'Numer domu'
             }
         ),
         required=False,
