@@ -375,6 +375,7 @@ def error_404_view(request, exception):
 def member_new(request):
     roles = MemberFunction.objects.all()
     occupations = MemberOccupation.objects.all()
+    headquarters = Headquarters.objects.all()
     members = MembersZZTI.objects.all().order_by('member_nr')
 
     if request.method == "POST":
@@ -459,6 +460,7 @@ def member_new(request):
             # 'form_occupation': form_occupation,
             'roles': roles,
             'occupations': occupations,
+            'headquarters': headquarters,
             'members': members
         }
     )
@@ -593,6 +595,12 @@ def member_headquarters_add(request):
         if form.is_valid():
             headquarter = form.save(commit=False)
             headquarter.author = request.user
+            if headquarters.national_court_register == '':
+                headquarters.national_court_register = None
+            if headquarters.tax_number == '':
+                headquarters.tax_number = None
+            if headquarters.national_business_registry_number == '':
+                headquarters.national_business_registry_number = None
             headquarter.save()
             messages.success(request, f"Dodano nową siedzibę {headquarter.headquarters}!")
             return redirect('TI_Management_app:member_headquarters_add')

@@ -157,6 +157,28 @@
                 </td>
             </tr>
             <tr>
+                <td width="30%"><p class="tableCredential"><b>Siedziba: </b></p></td>
+                <td width="70%">
+                    <div>
+                        <div>
+                            <div {% if form.headquarters.errors %} class="hint" {% endif %}>
+                                {{form.headquarters}}
+                            </div>
+                            {% if form.headquarters.errors %}
+                                <div class="alert alert-danger">
+                                    {{ form.headquarters.errors }}
+                                </div>
+                            {% endif %}
+                        </div>
+                        <datalist id="headquarters_database">
+                            {% for headquarter in headquarters %}
+                                <option value="{{ headquarter }}"></option>
+                            {% endfor %}
+                        </datalist>
+                    </div>
+                </td>
+            </tr>
+            <tr>
                 <td width="30%"><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
                 <td width="70%">
                     {% if form.phone_number.errors %}
@@ -247,7 +269,6 @@
 <!--                    <p>{{form.card}}</p>-->
 <!--                </td>-->
 <!--            </tr>-->
-
             <tr>
                 <td width="30%">
                     <p class="tableCredential"><b>Rekomendacja? </b>{{ form.recommendation }}</p>
@@ -266,7 +287,6 @@
 
                 </td>
             </tr>
-
             <tr>
                 <td width="30%"><p><b>Zdjęcie: </b></p></td>
                 <td width="70%">

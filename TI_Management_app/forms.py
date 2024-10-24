@@ -257,6 +257,25 @@ class MemberForm(forms.ModelForm):
         max_length=150
     )
 
+    headquarters = forms.CharField(
+        widget=forms.TextInput(
+            attrs={
+                'class': 'form-control me-2',
+                'placeholder': 'Siedziba',
+                'aria-label': 'Siedziba',
+                'list': 'headquarters_database'
+            }
+        ),
+        validators=[
+            MinLengthValidator(
+                limit_value=2,
+                message="Siedziba musi zawierać co najmniej 2 znaki."
+            )
+        ],
+        required=True,
+        max_length=150
+    )
+
     class Meta:
         model = MembersZZTI
         fields = [
