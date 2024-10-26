@@ -595,17 +595,21 @@ def member_headquarters_add(request):
         if form.is_valid():
             headquarter = form.save(commit=False)
             headquarter.author = request.user
-            if headquarters.national_court_register == '':
-                headquarters.national_court_register = None
-            if headquarters.tax_number == '':
-                headquarters.tax_number = None
-            if headquarters.national_business_registry_number == '':
-                headquarters.national_business_registry_number = None
+
+            if not headquarter.national_court_register:
+                headquarter.national_court_register = None
+            if not headquarter.tax_number:
+                headquarter.tax_number = None
+            if not headquarter.national_business_registry_number:
+                headquarter.national_business_registry_number = None
+
             headquarter.save()
+
             messages.success(request, f"Dodano nową siedzibę {headquarter.headquarters}!")
             return redirect('TI_Management_app:member_headquarters_add')
     else:
         form = HeadquartersForm()
+
     return render(
         request,
         'TI_Management_app/members/member_headquarters_add.html',
@@ -625,6 +629,14 @@ def member_headquarters_edit(request, pk):
         if form.is_valid():
             headquarter = form.save(commit=False)
             headquarter.author = request.user
+
+            if not headquarter.national_court_register:
+                headquarter.national_court_register = None
+            if not headquarter.tax_number:
+                headquarter.tax_number = None
+            if not headquarter.national_business_registry_number:
+                headquarter.national_business_registry_number = None
+
             headquarter.save()
             messages.success(request, f"Zaktualizowano {headquarter.headquarter}!")
             return redirect('TI_Management_app:member_headquarters_add')

@@ -1,10 +1,72 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_headquarters_edit' pk=headquarter.pk %}"><b> / Aktualizacja siedziby</b></a>
+{% endblock %}
+
+{% block content %}
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Aktualizacja siedziby</h2>
+    <hr>
+    <br />
+
+    <form method="post" class="post-form">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
+        {% endif %}
+        <p><b>Siedziba:</b></p>
+        {{form.headquarters}}
+        <hr>
+        <p>Miasto:</p>
+        {{form.city}}
+        <p>Ulica:</p>
+        {{form.street}}
+        <p>Kod pocztowy</p>
+        {{form.postcode}}
+        <p>Numer domu:</p>
+        {{form.house_number}}
+        <p>Numer mieszkania:</p>
+        {{form.float_number}}
+        <p>KRS:</p>
+        {{form.national_court_register}}
+        <p>NIP:</p>
+        {{form.tax_number}}
+        <p>REGON:</p>
+        {{form.national_business_registry_number}}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Aktualizuj</button>
+        <br />
+        <br />
+    </form>
+
+    {% for h in headquarter.history.all %}
+        <div class="notepad">
+            <table width="100%" border="0">
+                <tr>
+                    <td>{{ h.history_id }}</td>
+                    <td>{{ h.history_type }}</td>
+                    <td>{{ h.history_user }}</td>
+                    <td>{{ h.history_date }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4">{{ h.history_object.headquarters }}</td>
+                </tr>
+                <tr>
+                    <td colspan="4">{{ h.history_object.street }} {{ h.history_object.city }}  {{ h.history_object.postcode }}</td>
+                </tr>
+            </table>
+        </div>
+    {% endfor %}
+
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='member_headquarters_add' %}
+{% endblock %}

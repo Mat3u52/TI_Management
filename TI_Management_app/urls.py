@@ -71,7 +71,7 @@ urlpatterns = [
         name='member_headquarters_add'
     ),
     path(
-        'TI_Management_app/members/member-headquarters-edit/',
+        'TI_Management_app/members/member-headquarters-edit/<int:pk>/',
         views.member_headquarters_edit,
         name='member_headquarters_edit'
     ),
