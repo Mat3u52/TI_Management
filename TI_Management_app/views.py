@@ -1,3 +1,6 @@
+import io
+import os
+import re
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import (
@@ -111,8 +114,6 @@ from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 
 from django.http import HttpResponse  # txt file
 from django.http import FileResponse  # pdf file
-import io
-import os
 from reportlab.pdfgen import canvas
 from reportlab.lib.units import inch
 from reportlab.lib.pagesizes import letter
@@ -2092,9 +2093,96 @@ def member_notepad_history_pdf_advance(request, pk, title):
     return response
 
 
+# @login_required
+# def member_notepad_history_pdf(request, pk, title):
+#     member = MembersZZTI.objects.get(id=pk)
+#     member_notepad_history_obj = member.notepad.filter(
+#         Q(published_date__lte=timezone.now()) &
+#         Q(title__contains=title)
+#     ).order_by('-published_date')
+#
+#     buf = io.BytesIO()
+#     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
+#
+#     # c.beginText()
+#     # c.setFont("Verdana", 14)
+#     # textob = c.beginText()
+#     # textob.setTextOrigin(inch, inch)
+#     pdfmetrics.registerFont(TTFont('Verdana', 'TI_Management_app/static/font/verdana.ttf'))
+#     # textob.setFont("Verdana", 14)
+#
+#
+#     # lines = [
+#     #     "this is line 1",
+#     #     "this is line 2",
+#     #     "this is line 3",
+#     # ]
+#     lines = []
+#
+#     for history in member_notepad_history_obj:
+#         lines.append(f"Tytuł: {history.title}")
+#         lines.append(" ")
+#         lines.append("Opis:")
+#         lines.append(" ")
+#         description = wrap(history.content, 65)
+#         for i in description:
+#             lines.append(f"{i}")
+#             lines.append(" ")
+#         lines.append(f"Data: {history.published_date.isoformat()}")
+#         lines.append(" ")
+#         lines.append(f"Ważność: {history.importance}")
+#         lines.append(" ")
+#         lines.append(f"Sposób zgłoszenia: {history.method}")
+#         lines.append(" ")
+#         lines.append(f"Nadano status: {history.status}")
+#         lines.append(" ")
+#         lines.append(f"Prowadzący: {history.responsible}")
+#         lines.append(" ")
+#         if history.file:
+#             lines.append("Plik")
+#         lines.append(" ")
+#
+#         # lines.append(history.file)
+#         # lines.append(" ")
+#         if history.confirmed:
+#             confirm = "Podpisano: Tak"
+#         else:
+#             confirm = "Podpisano: Nie"
+#         lines.append(confirm)
+#         lines.append("--------------------------------------------------------------------")
+#         lines.append(" ")
+#
+#     y = 10
+#
+#     for line in lines:
+#         c.beginText()
+#         c.setFont("Verdana", 14)
+#
+#         y += 10
+#         c.drawString(10, y, line)
+#         c.getPageNumber()
+#         # c.showPage()
+#         if "-------" in line:
+#             c.showPage()
+#             y = 0
+#
+#     c.save()
+#     buf.seek(0)
+#
+#     return FileResponse(
+#         buf,
+#         as_attachment=True,
+#         filename=f"HistoriaKomunikacji-{member.forename} {member.surname}.pdf"
+#     )
+# Function to remove HTML tags
+def strip_html_tags(text):
+    clean = re.compile('<.*?>')
+    return re.sub(clean, '', text)
+
+
 @login_required
 def member_notepad_history_pdf(request, pk, title):
-    member = MembersZZTI.objects.get(id=pk)
+    member = get_object_or_404(MembersZZTI, id=pk)
     member_notepad_history_obj = member.notepad.filter(
         Q(published_date__lte=timezone.now()) &
         Q(title__contains=title)
@@ -2103,19 +2191,8 @@ def member_notepad_history_pdf(request, pk, title):
     buf = io.BytesIO()
     c = canvas.Canvas(buf, pagesize=letter, bottomup=0)
 
-    # c.beginText()
-    # c.setFont("Verdana", 14)
-    # textob = c.beginText()
-    # textob.setTextOrigin(inch, inch)
     pdfmetrics.registerFont(TTFont('Verdana', 'TI_Management_app/static/font/verdana.ttf'))
-    # textob.setFont("Verdana", 14)
 
-
-    # lines = [
-    #     "this is line 1",
-    #     "this is line 2",
-    #     "this is line 3",
-    # ]
     lines = []
 
     for history in member_notepad_history_obj:
@@ -2123,10 +2200,13 @@ def member_notepad_history_pdf(request, pk, title):
         lines.append(" ")
         lines.append("Opis:")
         lines.append(" ")
-        description = wrap(history.content, 65)
-        for i in description:
-            lines.append(f"{i}")
+
+        # Remove HTML tags from content
+        description = wrap(strip_html_tags(history.content), 65)
+        for line in description:
+            lines.append(line)
             lines.append(" ")
+
         lines.append(f"Data: {history.published_date.isoformat()}")
         lines.append(" ")
         lines.append(f"Ważność: {history.importance}")
@@ -2141,12 +2221,7 @@ def member_notepad_history_pdf(request, pk, title):
             lines.append("Plik")
         lines.append(" ")
 
-        # lines.append(history.file)
-        # lines.append(" ")
-        if history.confirmed:
-            confirm = "Podpisano: Tak"
-        else:
-            confirm = "Podpisano: Nie"
+        confirm = "Podpisano: Tak" if history.confirmed else "Podpisano: Nie"
         lines.append(confirm)
         lines.append("--------------------------------------------------------------------")
         lines.append(" ")
@@ -2156,11 +2231,9 @@ def member_notepad_history_pdf(request, pk, title):
     for line in lines:
         c.beginText()
         c.setFont("Verdana", 14)
-
         y += 10
         c.drawString(10, y, line)
-        c.getPageNumber()
-        # c.showPage()
+
         if "-------" in line:
             c.showPage()
             y = 0

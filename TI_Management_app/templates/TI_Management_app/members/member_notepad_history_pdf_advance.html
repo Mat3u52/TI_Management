@@ -11,44 +11,52 @@
         <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
 
         <style>
+            @page {
+                margin-left: 10px; /* Set to 0 or your preferred margin size */
+                margin-right: 10px; /* Set to 0 or your preferred margin size */
+                margin-top: 10; /* Set to 0 or your preferred margin size */
+                margin-bottom: 10; /* Set to 0 or your preferred margin size */
+            }
             html, body {
-                margin: 0;  /* Remove margin for the whole document */
+                margin: 0;
                 padding: 0;
                 background-color: white;
-                font-size: 12px;  /* Reduced font size for the entire document */
-                line-height: 1; /* Reduce space between lines */
+                font-size: 12px;
+                line-height: 1;
             }
             .notepad {
                 background-color: white;
                 padding: 5px;
-                margin: 5px 0;  /* Reduced margins between notepad elements */
+                margin: 5px 0;
                 border: 1px solid #ccc;
                 border-radius: 5px;
             }
+            /*
             .notepad-head {
                 background-color: white;
                 padding: 5px;
-                font-size: 16px; /* Slightly larger font for titles */
+                font-size: 16px;
                 font-weight: bold;
                 margin: 0;
             }
+            */
             .notepad-history-head {
                 margin: 0;
                 padding: 5px;
             }
             table {
-                width: 100%;  /* Ensure table takes full width */
+                width: 100%;
                 border-spacing: 0;
             }
             td, th {
-                padding: 3px;  /* Reduced padding for table cells */
-                font-size: 14px;  /* Uniform font size */
+                padding: 3px;
+                font-size: 14px;
             }
             h5 {
-                margin: 5px 0;  /* Reduced margins for headers */
+                margin: 5px 0;
             }
             p {
-                margin: 5px 0;  /* Reduced margins for paragraphs */
+                margin: 5px 0;
             }
         </style>
 

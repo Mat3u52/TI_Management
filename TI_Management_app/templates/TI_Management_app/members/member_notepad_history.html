@@ -38,7 +38,18 @@
        </p>
        <nav class="menu menu-1">
           <ul>
-
+              <li>
+              <a onclick="openNewWindow()" style="cursor: pointer;">[&#10138;]</a>
+                <script>
+                    function openNewWindow() {
+                        window.open(
+                            "{% url 'TI_Management_app:member_notepad_history_pdf_advance' pk=member.pk title=title %}",
+                            "_blank",
+                            "width=800,height=600,scrollbars=yes,resizable=yes"
+                        );
+                    }
+                </script>
+              </li>
               <li>
                   <a href="{% url 'TI_Management_app:member_notepad_history_pdf_advance' pk=member.pk title=title %}" target="_blank">
                     Wygeneruj zaawansowany PDF
