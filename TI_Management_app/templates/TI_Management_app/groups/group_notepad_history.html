@@ -27,9 +27,22 @@
        </p>
        <nav class="menu menu-1">
           <ul>
+              <li>
+              <a onclick="openNewWindow()" style="cursor: pointer;">[&#10138;]</a>
+                <script>
+                    function openNewWindow() {
+                        window.open(
+                            "{% url 'TI_Management_app:group_notepad_history_pdf_advance' pk=group.pk pk1=notepad.pk %}",
+                            "_blank",
+                            "width=800,height=600,scrollbars=yes,resizable=yes"
+                        );
+                    }
+                </script>
+              </li>
+              <li>
 
               <li>
-                  <a href="{% url 'TI_Management_app:group_notepad_history_pdf_advance' pk=group.pk pk1=notepad.pk %}">
+                  <a href="{% url 'TI_Management_app:group_notepad_history_pdf_advance' pk=group.pk pk1=notepad.pk %}" target="_blank">
                     Wygeneruj zaawansowany PDF
                   </a>
               </li>
@@ -136,7 +149,19 @@
             </table>
             <div class="no-print">
             <br />
-            <a href="{% url 'TI_Management_app:group_notepad_history_pdf_one_advance' pk=group.pk pk1=notepad.pk pk2=note.pk %}" class="btn btn-info btn-sm pull-right">
+            <a onclick="openNewWindowOne()" class="btn btn-info btn-sm pull-right">
+                [&#10138;]
+            </a>
+               <script>
+                    function openNewWindowOne() {
+                        window.open(
+                            "{% url 'TI_Management_app:group_notepad_history_pdf_one_advance' pk=group.pk pk1=notepad.pk pk2=note.pk %}",
+                            "_blank",
+                            "width=800,height=600,scrollbars=yes,resizable=yes"
+                        );
+                    }
+                </script>
+            <a href="{% url 'TI_Management_app:group_notepad_history_pdf_one_advance' pk=group.pk pk1=notepad.pk pk2=note.pk %}" target="_blank" class="btn btn-primary btn-sm pull-right">
                 Eksport PDF
             </a>
             <br />

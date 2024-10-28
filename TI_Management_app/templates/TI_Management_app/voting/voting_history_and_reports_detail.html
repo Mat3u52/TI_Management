@@ -112,7 +112,19 @@
 
         <br />
         <br />
-        <a href="{% url 'TI_Management_app:voting_history_and_reports_detail_pdf_advance' pk=voting.pk %}" class="btn btn-primary btn-large pull-right">
+        <a onclick="openNewWindow()" class="btn btn-info btn-sm pull-right">
+                [&#10138;]
+        </a>
+           <script>
+                function openNewWindow() {
+                    window.open(
+                        "{% url 'TI_Management_app:voting_history_and_reports_detail_pdf_advance' pk=voting.pk %}",
+                        "_blank",
+                        "width=800,height=600,scrollbars=yes,resizable=yes"
+                    );
+                }
+            </script>
+        <a href="{% url 'TI_Management_app:voting_history_and_reports_detail_pdf_advance' pk=voting.pk %}" target="_blank" class="btn btn-primary btn-sm pull-right">
             PDF / Drukuj protokół
         </a>
         <br />

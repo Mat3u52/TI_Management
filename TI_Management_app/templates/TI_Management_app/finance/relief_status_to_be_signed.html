@@ -19,28 +19,33 @@
     <nav class="menu menu-1">
       <ul>
           <li>
-              <a href="{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}">
-                Wygeneruj PDF
-              </a>
+              <a onclick="openNewWindow()" style="cursor: pointer;">[&#10138;]</a>
+                <script>
+                    function openNewWindow() {
+                        window.open(
+                            "{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}",
+                            "_blank",
+                            "width=800,height=600,scrollbars=yes,resizable=yes"
+                        );
+                    }
+                </script>
           </li>
           <li>
-              <a href="#" onclick="window.print()">
-                Drukuj
+              <a href="{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}" target="_blank">
+                Wygeneruj PDF / drukuj
               </a>
           </li>
+<!--          <li>-->
+<!--              <a href="#" onclick="window.print()">-->
+<!--                Drukuj-->
+<!--              </a>-->
+<!--          </li>-->
       </ul>
     </nav>
     </div>
     <div class="notepad">
         <div class="no-print">
-<!--            <img-->
-<!--                src="{{ relief_to_be_signed.member.image.url }}"-->
-<!--                alt="image"-->
-<!--                style='display: block; float: right; margin-left: auto; width: 150px;'>-->
             <img src="{% thumbnail relief_to_be_signed.member.image 150x0  quality=100 %}" style='display: block; float: right; margin-left: auto;'>
-<!--            <button class="btn btn-info btn-sm pull-left" onclick="window.print()">-->
-<!--                Drukuj-->
-<!--            </button>-->
             <br />
             <br />
             <br />
