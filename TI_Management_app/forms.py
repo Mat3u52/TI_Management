@@ -591,6 +591,7 @@ class MemberEditForm(forms.ModelForm):
             'surname',
             'role',
             'occupation',
+            'headquarters',
             'member_nr',
             'sex',
             'birthday',
@@ -664,7 +665,11 @@ class MemberEditForm(forms.ModelForm):
                     'class': 'form-control select'
                 }
             ),
-
+            'headquarters': forms.Select(
+                attrs={
+                    'class': 'form-control select'
+                }
+            ),
         }
 
     def __init__(self, *args, **kwargs):

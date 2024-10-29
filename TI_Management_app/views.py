@@ -417,6 +417,15 @@ def member_new(request):
                     )
                     member_occupation.save()
 
+            headquarters = form.cleaned_data['headquarters']
+            if headquarters:
+                if not Headquarters.objects.filter(headquarters=headquarters).exists():
+                    headquarters = Headquarters.objects.create(
+                        author=request.user,
+                        headquarters=headquarters
+                    )
+                    headquarters.save()
+
             forename = form.cleaned_data['forename']
             surname = form.cleaned_data['surname']
             birthplace = form.cleaned_data['birthplace']
@@ -425,12 +434,15 @@ def member_new(request):
             member.author = request.user
             member.forename = forename.title()
             member.surname = surname.title()
+
             if birthplace:
                 member.birthplace = birthplace.title()
             if role:
                 member.role = MemberFunction.objects.filter(member_function=role).latest('id')
             if occupation:
                 member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
+            if headquarters:
+                member.headquarters = Headquarters.objects.filter(headquarters=headquarters).latest('id')
 
             card = form.cleaned_data.get('card')
             if card:
