@@ -430,10 +430,24 @@ class MemberCardEditForm(forms.ModelForm):
     def clean_card(self):
         card = self.cleaned_data.get('card')
         if card:
-            # Exclude the current instance from the check (if it exists)
-            if MembersZZTI.objects.filter(card=card).exclude(id=self.instance.id).exists():
-                raise ValidationError(f"Karta jest już przypisana do innego Członka.")
+            # Check if any existing entry matches the hashed version of the input card
+            existing_card = MembersZZTI.objects.exclude(id=self.instance.id).filter(card__isnull=False)
+            for entry in existing_card:
+                if check_password(card, entry.card):
+                    raise ValidationError("Karta jest już przypisana do innego Członka.")
+
+            # Optionally, you could hash the card before saving if desired
+            # self.cleaned_data['card'] = make_password(card)
+
         return card
+
+    # def clean_card(self):
+    #     card = self.cleaned_data.get('card')
+    #     if card:
+    #         # Exclude the current instance from the check (if it exists)
+    #         if MembersZZTI.objects.filter(card=card).exclude(id=self.instance.id).exists():
+    #             raise ValidationError(f"Karta jest już przypisana do innego Członka.")
+    #     return card
     # def clean_card(self):
     #     card = self.cleaned_data.get('card')
     #     if card:
@@ -444,7 +458,7 @@ class MemberCardEditForm(forms.ModelForm):
     #             raise ValidationError("Karta jest już przypisana do innego Członka.")
     #
     #         # Replace the raw card data with the hashed version
-    #         self.cleaned_data['card'] = hashed_card
+    #         # self.cleaned_data['card'] = hashed_card
     #
     #     return card
 

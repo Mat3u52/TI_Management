@@ -16,6 +16,11 @@
         {% csrf_token %}
         <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} {{member.member_nr}}</a></h3>
         <p>Karta</p>
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{ form.errors }}</p>
+            </div>
+        {% endif %}
         <input class="form-control me-2" style="min-width: 100%!important; min-height: 35px"
                type="password" placeholder="Przyłóż kartę do czytnika" value="{{ member.card }}" aria-label="card" name="card" autofocus="autofocus">
         <br />

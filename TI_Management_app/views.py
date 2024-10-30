@@ -666,7 +666,6 @@ def member_headquarters_edit(request, pk):
     )
 
 
-@cache_page(60*15)
 @login_required
 def member_card_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
