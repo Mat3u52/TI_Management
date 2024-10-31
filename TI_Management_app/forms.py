@@ -1005,10 +1005,18 @@ class MemberFunctionForm(forms.ModelForm):
         required=True,
         max_length=250
     )
+    is_user = forms.BooleanField(
+        required=False,
+        widget=forms.CheckboxInput(),
+        label='Podwyższone uprawnienia'
+    )
 
     class Meta:
         model = MemberFunction
-        fields = ['member_function',]
+        fields = [
+            'member_function',
+            'is_user'
+        ]
 
 
 class MemberOccupationForm(forms.ModelForm):

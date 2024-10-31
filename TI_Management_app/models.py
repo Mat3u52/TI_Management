@@ -72,6 +72,7 @@ class MemberFunction(models.Model):
     slug = models.SlugField(max_length=250, unique_for_date='created_date', default=None, blank=False)
     author = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, related_name='authorMemberFunction')
     member_function = models.CharField(max_length=250, blank=False, default=None, unique=True)
+    is_user = models.BooleanField(default=False)
 
     objects = models.Manager()
 

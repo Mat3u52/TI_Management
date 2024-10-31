@@ -107,7 +107,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic import TemplateView
 from django.views.generic.edit import CreateView
 from django.db.models.query_utils import Q
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.hashers import make_password, check_password
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
@@ -164,7 +164,8 @@ ALLOWED_ATTRIBUTES = {
 }
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def members_list(request):
     members_obj = MembersZZTI.objects.all().order_by('-created_date')
 
@@ -196,7 +197,8 @@ def members_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def members_table_list(request):
     order_by = request.GET.get('order_by', '-forename')
     members_obj = MembersZZTI.objects.all().order_by(order_by)
@@ -219,7 +221,7 @@ def members_table_list(request):
         }
     )
 
-
+@user_passes_test(lambda user: user.is_superuser)
 def member_export_csv(request):
     response = HttpResponse(content_type='text/csv')
     response['Content-Disposition'] = 'attachment; filename="members.csv"'
@@ -273,7 +275,8 @@ def member_export_csv(request):
     return response
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_detail(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     accessible = Cards.objects.all()
@@ -329,7 +332,8 @@ def member_detail(request, pk):
 
 
 @cache_page(60*15)
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_deactivate(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_cards = CardStatus.objects.filter(member=member)
@@ -372,7 +376,8 @@ def error_404_view(request, exception):
     return render(request, 'TI_Management_app/404.html', data)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_new(request):
     roles = MemberFunction.objects.all()
     occupations = MemberOccupation.objects.all()
@@ -479,7 +484,8 @@ def member_new(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
@@ -504,7 +510,8 @@ def member_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_function_add(request):
     all_functions = MemberFunction.objects.all()
     if request.method == "POST":
@@ -527,7 +534,8 @@ def member_function_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_function_edit(request, pk):
     all_functions = MemberFunction.objects.all()
     function = get_object_or_404(MemberFunction, pk=pk)
@@ -552,7 +560,8 @@ def member_function_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_occupation_add(request):
     all_occupation = MemberOccupation.objects.all()
     if request.method == "POST":
@@ -575,7 +584,8 @@ def member_occupation_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_occupation_edit(request, pk):
     all_occupation = MemberOccupation.objects.all()
     occupation = get_object_or_404(MemberOccupation, pk=pk)
@@ -600,7 +610,8 @@ def member_occupation_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_headquarters_add(request):
     headquarters = Headquarters.objects.all()
     if request.method == "POST":
@@ -633,7 +644,8 @@ def member_headquarters_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_headquarters_edit(request, pk):
     headquarters = Headquarters.objects.all()
     headquarter = get_object_or_404(Headquarters, pk=pk)
@@ -666,7 +678,8 @@ def member_headquarters_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_card_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
@@ -692,7 +705,8 @@ def member_card_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -716,7 +730,8 @@ def member_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_file_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
@@ -740,7 +755,8 @@ def member_file_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_file_delete(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_file = get_object_or_404(MembersFile, pk=pk1)
@@ -751,7 +767,8 @@ def member_file_delete(request, pk, pk1):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_list(request):
     loyalty_card_obj = Cards.objects.annotate(member_count=Count('loyaltyCardStatus')).order_by('-created_date')
     # loyalty_card_obj = Cards.objects.all()
@@ -775,7 +792,8 @@ def loyalty_card_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -796,7 +814,8 @@ def loyalty_card_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_member_search(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     loyalty_card_validator = CardStatus.objects.all()
@@ -837,7 +856,8 @@ def loyalty_card_member_search(request, pk):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_detail(request, pk, category):
     category = category
     loyalty_card = get_object_or_404(Cards, pk=pk)
@@ -1107,7 +1127,8 @@ def loyalty_card_detail(request, pk, category):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_add(request):
     if request.method == "POST":
         form = LoyaltyCardForm(request.POST)
@@ -1128,7 +1149,8 @@ def loyalty_card_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_edit(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     if request.method == "POST":
@@ -1151,7 +1173,8 @@ def loyalty_card_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_add_member(request, pk, pk1):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     loyalty_card_member_add = get_object_or_404(MembersZZTI, pk=pk1)
@@ -1191,7 +1214,8 @@ def loyalty_card_add_member(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_cards_add_file_order(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     if request.method == "POST":
@@ -1221,7 +1245,8 @@ def loyalty_cards_add_file_order(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_cards_add_file_to_be_picked_up(request, pk):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     if request.method == "POST":
@@ -1341,7 +1366,8 @@ def loyalty_cards_add_file_to_be_picked_up(request, pk):
 #                       {})
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def loyalty_card_delete_member(request, pk, pk1):
     loyalty_card = get_object_or_404(Cards, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
@@ -1360,7 +1386,8 @@ def loyalty_card_delete_member(request, pk, pk1):
 #     return redirect('TI_Management_app:loyalty_card_detail')
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_loyalty_card_edit(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
@@ -1397,7 +1424,8 @@ def member_loyalty_card_edit(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_loyalty_card_id_edit(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
@@ -1423,7 +1451,8 @@ def member_loyalty_card_id_edit(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_loyalty_card_add(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     card_add = get_object_or_404(Cards, pk=pk1)
@@ -1461,7 +1490,8 @@ def member_loyalty_card_add(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_loyalty_card_delete(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_loyalty_card = get_object_or_404(CardStatus, pk=pk1)
@@ -1473,7 +1503,8 @@ def member_loyalty_card_delete(request, pk, pk1):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def groups_list(request):
     # groups_obj = Groups.objects.all()
     groups_obj = Groups.objects.annotate(member_count=Count('groupsGroup')).order_by('-created_date')
@@ -1497,7 +1528,8 @@ def groups_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_member_search(request, pk):
     group_available = get_object_or_404(Groups, pk=pk)
     group_validator = GroupsMember.objects.all()
@@ -1530,7 +1562,8 @@ def group_member_search(request, pk):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def groups_add(request):
     if request.method == "POST":
         form = GroupsForm(request.POST)
@@ -1551,7 +1584,8 @@ def groups_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def groups_edit(request, pk):
     group = get_object_or_404(Groups, pk=pk)
     if request.method == "POST":
@@ -1574,7 +1608,8 @@ def groups_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_detail(request, pk):
     group = get_object_or_404(Groups, pk=pk)
 
@@ -1665,7 +1700,8 @@ def group_detail(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_file_edit(request, pk):
     group = get_object_or_404(Groups, pk=pk)
     if request.method == "POST":
@@ -1689,7 +1725,8 @@ def group_file_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_file_delete(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     group_file = get_object_or_404(GroupsFile, pk=pk1)
@@ -1700,7 +1737,8 @@ def group_file_delete(request, pk, pk1):
     return redirect('TI_Management_app:group_detail', pk=group.pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_notepad_add(request, pk):
     group = get_object_or_404(Groups, pk=pk)
 
@@ -1730,7 +1768,8 @@ def group_notepad_add(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_notepad_edit(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     notepad = get_object_or_404(GroupsNotepad, pk=pk1)
@@ -1761,7 +1800,8 @@ def group_notepad_edit(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_notepad_history(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     notepad = get_object_or_404(GroupsNotepad, pk=pk1)
@@ -1778,7 +1818,8 @@ def group_notepad_history(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_notepad_history_pdf_advance(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     notepad = get_object_or_404(GroupsNotepad, pk=pk1)
@@ -1802,7 +1843,8 @@ def group_notepad_history_pdf_advance(request, pk, pk1):
     return response
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_notepad_history_pdf_one_advance(request, pk, pk1, pk2):
     group = get_object_or_404(Groups, pk=pk)
     notepad = get_object_or_404(GroupsNotepad, pk=pk1)
@@ -1826,7 +1868,8 @@ def group_notepad_history_pdf_one_advance(request, pk, pk1, pk2):
     return response
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_notepad_history_pdf(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     notepad = get_object_or_404(GroupsNotepad, pk=pk1)
@@ -1899,7 +1942,8 @@ def group_notepad_history_pdf(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -1920,7 +1964,8 @@ def group_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_group_add(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     group = get_object_or_404(Groups, pk=pk1)
@@ -1947,7 +1992,8 @@ def member_group_add(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_add_member(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     member = get_object_or_404(MembersZZTI, pk=pk1)
@@ -1974,7 +2020,8 @@ def group_add_member(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_group_delete(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member_group = get_object_or_404(GroupsMember, pk=pk1)
@@ -1983,7 +2030,8 @@ def member_group_delete(request, pk, pk1):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_delete_member(request, pk, pk1):
     group = get_object_or_404(Groups, pk=pk)
     member_group = get_object_or_404(GroupsMember, pk=pk1)
@@ -1992,7 +2040,8 @@ def group_delete_member(request, pk, pk1):
     return redirect('TI_Management_app:group_detail', pk=group.pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def group_delete_all(request, pk):
     group = get_object_or_404(Groups, pk=pk)
     group.author = request.user
@@ -2000,7 +2049,8 @@ def group_delete_all(request, pk):
     return redirect('TI_Management_app:groups_list')
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_notepad_add(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
@@ -2029,7 +2079,8 @@ def member_notepad_add(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_notepad_edit(request, pk, pk1):
     member = get_object_or_404(MembersZZTI, pk=pk)
     notepad = get_object_or_404(Notepad, pk=pk1)
@@ -2059,7 +2110,8 @@ def member_notepad_edit(request, pk, pk1):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_notepad_history(request, pk, title):
     member = MembersZZTI.objects.get(id=pk)
     member_notepad_history_obj = (member.notepad.filter(
@@ -2078,7 +2130,8 @@ def member_notepad_history(request, pk, title):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_notepad_history_pdf_advance(request, pk, title):
     member = MembersZZTI.objects.get(id=pk)
     member_notepad_history_obj = member.notepad.filter(
@@ -2191,7 +2244,8 @@ def strip_html_tags(text):
     return re.sub(clean, '', text)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_notepad_history_pdf(request, pk, title):
     member = get_object_or_404(MembersZZTI, id=pk)
     member_notepad_history_obj = member.notepad.filter(
@@ -2259,7 +2313,8 @@ def member_notepad_history_pdf(request, pk, title):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def member_notepad_delete_all(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     member.author = request.user
@@ -2272,7 +2327,8 @@ def member_notepad_delete_all(request, pk):
     return redirect('TI_Management_app:member_detail', pk=member.pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database_category(request):
     categories = DocumentsDatabaseCategory.objects.all()
     if request.method == "POST":
@@ -2300,7 +2356,8 @@ def documents_database_category(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database_category_edit(request, pk):
     category = get_object_or_404(DocumentsDatabaseCategory, pk=pk)
 
@@ -2330,7 +2387,8 @@ def documents_database_category_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database_category_delete(request, pk):
     category = get_object_or_404(DocumentsDatabaseCategory, pk=pk)
     category.author = request.user
@@ -2348,7 +2406,8 @@ def documents_database_category_delete(request, pk):
     return redirect('TI_Management_app:documents_database_category')
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database(request):
     documents = DocumentsDatabase.objects.all()
 
@@ -2377,7 +2436,8 @@ def documents_database(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database_edit(request, pk):
     document = get_object_or_404(DocumentsDatabase, pk=pk)
 
@@ -2407,7 +2467,8 @@ def documents_database_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -2432,7 +2493,8 @@ def documents_database_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def documents_database_delete(request, pk):
     documents = get_object_or_404(DocumentsDatabase, pk=pk)
     documents.author = request.user
@@ -2448,7 +2510,8 @@ def documents_database_delete(request, pk):
     return redirect('TI_Management_app:documents_database')
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_figure_add(request):
     all_relief = Relief.objects.all().order_by('-created_date')
     if request.method == "POST":
@@ -2477,7 +2540,8 @@ def relief_figure_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_figure_edit(request, pk):
     one_relief = get_object_or_404(Relief, pk=pk)
     if request.method == "POST":
@@ -2506,7 +2570,8 @@ def relief_figure_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_figure_delete(request, pk):
     one_relief = get_object_or_404(Relief, pk=pk)
     one_relief.author = request.user
@@ -2515,7 +2580,8 @@ def relief_figure_delete(request, pk):
     return redirect('TI_Management_app:relief_figure_add')
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relation_register_relief_add(request):
     all_relation_register_relief = RelationRegisterRelief.objects.all().order_by('-created_date')
     if request.method == "POST":
@@ -2538,7 +2604,8 @@ def relation_register_relief_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relation_register_relief_edit(request, pk):
     one_relation_register_relief = get_object_or_404(RelationRegisterRelief, pk=pk)
     if request.method == "POST":
@@ -2561,7 +2628,8 @@ def relation_register_relief_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relation_register_relief_delete(request, pk):
     one_relation = get_object_or_404(RelationRegisterRelief, pk=pk)
     one_relation.author = request.user
@@ -2570,7 +2638,8 @@ def relation_register_relief_delete(request, pk):
     return redirect('TI_Management_app:relation_register_relief_add')
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_one(request):
     relief_process_ongoing = RegisterRelief.objects.filter(complete=False).order_by('-created_date')
 
@@ -2583,7 +2652,8 @@ def register_relief_step_one(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_one_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -2607,7 +2677,8 @@ def register_relief_step_one_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_two(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     if request.method == "POST":
@@ -2638,7 +2709,8 @@ def register_relief_step_two(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def get_relief_details(request):
     relief_id = request.GET.get('relief_id')
     if relief_id:
@@ -2660,7 +2732,8 @@ def get_relief_details(request):
     return JsonResponse({'error': 'Relief not found'}, status=400)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_three(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
     all_relief = Relief.objects.all().order_by('-created_date')
@@ -2693,7 +2766,8 @@ def register_relief_step_three(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_four(request, pk):
     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
 
@@ -2761,7 +2835,8 @@ def register_relief_step_four(request, pk):
 #             'one_registered_relife': one_registered_relife
 #         }
 #     )
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_five(request, pk):
     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
     member = one_registered_relife.member
@@ -2799,7 +2874,8 @@ def register_relief_step_five(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_valid(request, pk):
     validation_register_relief = get_object_or_404(RegisterRelief, pk=pk)
 
@@ -2812,7 +2888,8 @@ def register_relief_valid(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_status_list(request):
     relief_list = RegisterRelief.objects.filter(complete=True).order_by('-created_date')
     active_admin = User.objects.filter(is_active=True)
@@ -2837,7 +2914,8 @@ def relief_status_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_status_list_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -2928,7 +3006,8 @@ def relief_status_list_search(request):
 #             'relief_to_be_signed': relief_to_be_signed
 #         }
 #     )
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_status_to_be_signed(request, pk):
     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
 
@@ -2995,7 +3074,8 @@ def relief_status_to_be_signed(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_status_to_be_signed_pdf_advance(request, pk):
     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
 
@@ -3014,7 +3094,8 @@ def relief_status_to_be_signed_pdf_advance(request, pk):
     return response
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_confirmed_list(request):
     relief_list = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-created_date')
 
@@ -3054,7 +3135,8 @@ def relief_confirmed_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def relief_confirmed_list_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -3083,7 +3165,8 @@ def relief_confirmed_list_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_list(request):
     scholarships_all = Scholarships.objects.order_by('-created_date')
 
@@ -3106,7 +3189,8 @@ def scholarships_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_list_search(request):
 
     if request.method == "POST":
@@ -3133,8 +3217,9 @@ def scholarships_list_search(request):
         )
 
 
-@login_required
+# @login_required
 # @require_POST #  I have to start before using the slug
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_average_salary_add(request):
     scholarships_average_salary_list = AverageSalary.objects.order_by('-created_date')
 
@@ -3170,8 +3255,9 @@ def scholarships_average_salary_add(request):
     )
 
 
-@login_required
+# @login_required
 # @require_POST
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_add(request, pk):
 
     # scholarship_rate = models.FloatField(null=False, blank=False)
@@ -3207,7 +3293,8 @@ def scholarships_add(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_add_search(request):
     # verification whether the record is added in AvaregeSalary
     try:
@@ -3246,8 +3333,9 @@ def scholarships_add_search(request):
         )
 
 
-@login_required
+# @login_required
 # @require_POST
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_edit(request, pk):
     one_scholarship = get_object_or_404(Scholarships, pk=pk)
 
@@ -3282,8 +3370,9 @@ def scholarships_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
 # @require_POST
+@user_passes_test(lambda user: user.is_superuser)
 def scholarships_delete(request, pk):
     scholarship = get_object_or_404(Scholarships, pk=pk)
     scholarship.author = request.user
@@ -3299,7 +3388,8 @@ def scholarships_delete(request, pk):
 
 
 @ajax_required
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def get_member_details(request, member_nr):
     try:
         member = get_object_or_404(MembersZZTI, member_nr=member_nr, card__isnull=False, deactivate=False)
@@ -3316,8 +3406,9 @@ def get_member_details(request, member_nr):
         return JsonResponse({'error': str(e)}, status=500)
 
 
-@login_required
+# @login_required
 # @require_POST
+@user_passes_test(lambda user: user.is_superuser)
 def finance_file_add(request):
     kind_of_finance_document = KindOfFinanceDocument.objects.all()
     doc_database = DocumentsDatabase.objects.filter(Q(category__title__icontains='Uchwały'))
@@ -3384,7 +3475,8 @@ def finance_file_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def finance_list(request):
     finance_obj = FileFinance.objects.all().order_by('-payment_date')
     register_relief_obj = RegisterRelief.objects.filter(payment_confirmation=True).order_by('-date_of_payment_confirmation')
@@ -3550,7 +3642,8 @@ def finance_list(request):
 #     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def finance_reporting_doc(request):
     current_date = datetime.now()
     current_year = current_date.year
@@ -3580,7 +3673,8 @@ def finance_reporting_doc(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def finance_detail(request, year, month):
 
     tz = pytz.timezone('Europe/Warsaw')
@@ -3674,7 +3768,8 @@ def finance_detail(request, year, month):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def finance_file_detail(request, pk):
     finance_file_details = get_object_or_404(FileFinance, pk=pk)
 
@@ -3687,7 +3782,8 @@ def finance_file_detail(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def finance_file_edit(request, pk):
     finance_file_details = get_object_or_404(FileFinance, pk=pk)
     kind_of_finance_document = KindOfFinanceDocument.objects.all()
@@ -3756,8 +3852,8 @@ def finance_file_edit(request, pk):
     )
 
 
-
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_add(request):
     # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
     members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
@@ -3880,7 +3976,8 @@ def voting_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_add_poll(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     poll_exist = voting.votePoll.exists()
@@ -3956,8 +4053,8 @@ def voting_add_poll(request, pk):
     )
 
 
-
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_add_recap(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
 
@@ -3994,7 +4091,8 @@ def voting_add_recap(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_list(request):
     # vote_obj = Vote.objects.all().order_by('-created_date')
     vote_obj = Vote.objects.filter(date_start__gte=timezone.now()).order_by('-created_date')
@@ -4022,7 +4120,8 @@ def voting_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -4046,7 +4145,8 @@ def voting_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
 
@@ -4059,7 +4159,8 @@ def voting_detail(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_edit(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
@@ -4149,7 +4250,8 @@ def voting_edit(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def remove_member_from_vote(request, vote_pk, member_pk):
     vote_instance = get_object_or_404(Vote, pk=vote_pk)
     member_instance = get_object_or_404(MembersZZTI, pk=member_pk)
@@ -4159,7 +4261,8 @@ def remove_member_from_vote(request, vote_pk, member_pk):
     return redirect('TI_Management_app:voting_edit', pk=vote_pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def remove_election_commission_from_vote(request, vote_pk, member_pk):
     vote_instance = get_object_or_404(Vote, pk=vote_pk)
     election_commission_instance = get_object_or_404(MembersZZTI, pk=member_pk)
@@ -4169,7 +4272,8 @@ def remove_election_commission_from_vote(request, vote_pk, member_pk):
     return redirect('TI_Management_app:voting_edit', pk=vote_pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_edit_poll_remove(request, vote_pk, poll_pk):
     # vote_instance = get_object_or_404(Vote, pk=vote_pk)
     poll_instance = get_object_or_404(Poll, pk=poll_pk)
@@ -4179,7 +4283,8 @@ def voting_edit_poll_remove(request, vote_pk, poll_pk):
     return redirect('TI_Management_app:voting_detail', pk=vote_pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_edit_poll(request, pk, poll_pk):
     voting = get_object_or_404(Vote, pk=pk)
     poll = get_object_or_404(Poll, pk=poll_pk)
@@ -4251,14 +4356,16 @@ def voting_edit_poll(request, pk, poll_pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def remove_choice_from_poll(request, pk, vote_pk, poll_pk):
     choice = get_object_or_404(Choice, pk=pk)
     choice.delete()
     return redirect('TI_Management_app:voting_edit_poll', pk=vote_pk, poll_pk=poll_pk)
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_list(request):
     vote_obj = Vote.objects.filter(
         date_start__lte=timezone.now(),
@@ -4296,7 +4403,8 @@ def voting_active_session_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -4321,7 +4429,8 @@ def voting_active_session_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     sessions = VotingSessionKickOff.objects.filter(vote=voting)
@@ -4351,7 +4460,8 @@ class VotingActiveSessionMemberDetail(LoginRequiredMixin, DetailView):
     context_object_name = 'member'
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_kick_off(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     now = timezone.now()
@@ -4379,7 +4489,8 @@ def voting_active_session_kick_off(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_close(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4408,7 +4519,8 @@ def voting_active_session_close(request, pk_vote, pk_kick_off):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4473,7 +4585,8 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4532,7 +4645,8 @@ def voting_active_session(request, pk_vote, pk_kick_off):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def check_session_status(request, pk_kick_off):
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
 
@@ -4542,7 +4656,8 @@ def check_session_status(request, pk_kick_off):
         return JsonResponse({'session_status': True})
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4630,7 +4745,8 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4647,7 +4763,8 @@ def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_approve(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4669,7 +4786,8 @@ def voting_active_session_approve(request, pk_vote, pk_kick_off, pk_member):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_disapprove(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4691,7 +4809,8 @@ def voting_active_session_disapprove(request, pk_vote, pk_kick_off, pk_member):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_successful(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
@@ -4708,7 +4827,8 @@ def voting_active_session_successful(request, pk_vote, pk_kick_off, pk_member):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_history_and_reports_list(request):
 
     voting_obj = Vote.objects.filter(Q(date_end__lte=timezone.now()))
@@ -4732,7 +4852,8 @@ def voting_history_and_reports_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_history_and_reports_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -4756,7 +4877,8 @@ def voting_history_and_reports_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_history_and_reports_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
@@ -4840,7 +4962,8 @@ def voting_history_and_reports_detail(request, pk):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_history_and_reports_detail_pdf_advance(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
@@ -4918,7 +5041,8 @@ def voting_history_and_reports_detail_pdf_advance(request, pk):
     return response
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_polls_competitions_list(request):
 
     voting_obj = Vote.objects.filter(Q(date_end__lte=timezone.now()))
@@ -4942,7 +5066,8 @@ def voting_polls_competitions_list(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def voting_polls_competitions_search(request):
     if request.method == "POST":
         searched = request.POST.get('searched', False)
@@ -4966,7 +5091,8 @@ def voting_polls_competitions_search(request):
         )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def dashboard_categories_add(request):
     categories = DashboardCategories.objects.all()
     if request.method == "POST":
@@ -4989,7 +5115,8 @@ def dashboard_categories_add(request):
     )
 
 
-@login_required
+# @login_required
+@user_passes_test(lambda user: user.is_superuser)
 def dashboard_categories_edit(request, pk):
     # all_functions = MemberFunction.objects.all()
     category = get_object_or_404(DashboardCategories, pk=pk)
