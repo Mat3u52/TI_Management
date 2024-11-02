@@ -189,14 +189,16 @@ class MemberFunctionAdmin(admin.ModelAdmin):
         'created_date',
         'updated_date',
         'slug',
-        'author'
+        'author',
+        'is_user'
     )
     list_filter = (
         'member_function',
         'created_date',
         'updated_date',
         'slug',
-        'author'
+        'author',
+        'is_user'
     )
     search_fields = (
         'member_function',

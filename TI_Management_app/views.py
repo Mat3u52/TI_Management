@@ -407,6 +407,7 @@ def member_new(request):
                     member_function.save()
 
 
+
             # occupation = form_occupation.cleaned_data['member_occupation']
             occupation = form.cleaned_data['member_occupation']
 
@@ -444,6 +445,16 @@ def member_new(request):
                 member.birthplace = birthplace.title()
             if role:
                 member.role = MemberFunction.objects.filter(member_function=role).latest('id')
+
+                member_function_instance = MemberFunction.objects.filter(member_function=role, is_user=True).order_by(
+                    '-id').first()
+                if member_function_instance:
+                    User.objects.create_user(
+                        username=member.member_nr,
+                        password='default_password',
+                        is_active=True
+                    )
+
             if occupation:
                 member.occupation = MemberOccupation.objects.filter(member_occupation=occupation).latest('id')
             if headquarters:
@@ -494,6 +505,20 @@ def member_edit(request, pk):
             member = form.save(commit=False)
             member.author = request.user
             # member.save(update_fields=['forename'])
+
+            role = form.cleaned_data['member_function']
+            member_function_instance = MemberFunction.objects.filter(member_function=role, is_user=True).order_by(
+                '-id').first()
+            if member_function_instance:
+                User.objects.create_user(
+                    username=member.member_nr,
+                    password='default_password',
+                    is_active=True
+                )
+            # else:
+                # todo - if exist to remove is ont to add
+
+
             member.save()
             messages.success(request, "Zaktualizowano!")
             return redirect('TI_Management_app:member_detail', pk=member.pk)

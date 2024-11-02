@@ -18,8 +18,10 @@
                 <p>{{form.errors}}</p>
             </div>
         {% endif %}
-        <H4>Funkcja Członka:</H4>
+        <h4>Funkcja Członka:</h4>
         {{form.member_function}}
+        <p>Podwyższone uprawnienia:</p>
+        {{form.is_user}}
         <br />
         <br />
         <button type="submit" class="btn btn-primary btn-large pull-right">Zapisz</button>

@@ -6,6 +6,7 @@
 {% endblock %}
 
 {% block content %}
+
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">Dodawanie funkcji Członka</h2>
     <hr>
@@ -38,6 +39,7 @@
                     {{function}}
                 </a>
             </h3>
+            <p>{% if function.is_user %}<span class="label label-info pull-left">Administrator</span>{% endif %}</p>
             <div class="date">
                 <p>
                     Data dodania: {{function.created_date}}
