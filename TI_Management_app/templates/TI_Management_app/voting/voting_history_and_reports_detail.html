@@ -57,7 +57,7 @@
                         {{ session_kick_off.session_start }} {{ session_kick_off.title }} przez:
                         {% for commission_signature in session_kick_off.voteVotingSessionKickOffSignature.all %}
 
-                            {{ commission_signature.member.forename }} {{ commission_signature.member.surname }} g. {{ commission_signature.created_date }} | Oddano {{ session_kick_off.kickOffVotingSessionSignature.count}}
+                            {{ commission_signature.member.forename }} {{ commission_signature.member.surname }} g. {{ commission_signature.created_date }} - {{session_kick_off.session_end}} | Oddano {{ session_kick_off.kickOffVotingSessionSignature.count}}
 
                         {% endfor %}
                     </li>

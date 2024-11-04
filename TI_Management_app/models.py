@@ -694,6 +694,9 @@ class Notepad(models.Model):
     responsible = models.CharField(max_length=250, null=True, blank=True)
     file = models.FileField(null=True, blank=True, upload_to='uploadsNotepad/%Y/%m/%d/%H%M%S/')
     confirmed = models.BooleanField(default=False)
+    hidden = models.BooleanField(default=False)
+    hidden_content = CKEditor5Field(null=True, blank=True)
+
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager

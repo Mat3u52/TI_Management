@@ -33,6 +33,81 @@
 <!--        </p>-->
 <!--    </div>-->
     <div class="no-print">
+            <div class="notepad">
+                <div class="notepad-head"><h3>{{ member_notepad_history_one.title }}</h3> </div>
+                <div class="notepad-history-head">
+                    <div class="notepad-status-left">
+                        <p># {{ forloop.revcounter }}</p>
+                    </div>
+                    <div class="notepad-status-right">
+                        <p>Data: {{ member_notepad_history_one.published_date }} Przez: {{ member_notepad_history_one.responsible }}</p>
+                    </div>
+                </div>
+
+                <table>
+                    <tr>
+                        <td><h5>Sposób zgłoszenia: </h5></td>
+                        <td>
+                            {% if member_notepad_history_one.method == 'personally' %} Osobiście
+                            {% elif member_notepad_history_one.method == 'email' %} E-mail
+                            {% elif member_notepad_history_one.method == 'telephone' %} Telefonicznie
+                            {% elif member_notepad_history_one.method == 'zoom' %} ZOOM
+                            {% elif member_notepad_history_one.method == 'whatsapp' %} WhatsApp
+                            {% elif member_notepad_history_one.method == 'facebook' %} Facebook
+                            {% elif member_notepad_history_one.method == 'other' %} Inny
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h5>Ważnośc: </h5></td>
+                        <td>
+                            {% if member_notepad_history_one.importance == 'low' %} Niski
+                            {% elif member_notepad_history_one.importance == 'standard' %} Umiarkowany
+                            {% elif member_notepad_history_one.importance == 'important' %} Ważny
+                            {% elif member_notepad_history_one.importance == 'veryImportant' %} Bardzo ważny
+                            {% elif member_notepad_history_one.importance == 'critical' %} Krytyczny
+                            {% elif member_notepad_history_one.importance == 'none' %} Nie dotyczy
+                            {% else %} None
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td colspan="2">
+                            <h5>Opis: </h5>
+                            {{ member_notepad_history_one.content|safe }}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h5>Nadano status: </h5></td>
+                        <td>
+                            {% if member_notepad_history_one.status == 'ongoing' %}
+                                W trakcie
+                            {% elif member_notepad_history_one.status == 'closed' %}
+                                Zamknięty
+                            {% endif %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td><h5>Podpisano: </h5></td>
+                        <td>{{ member_notepad_history_one.confirmed }}</td>
+                    </tr>
+
+                    <tr>
+
+                        <td><h5>Plik: </h5></td>
+                        <td>
+                            <div class="no-print">
+                            {% if member_notepad_history_one.file %}
+                                <a href="{{ note.file.url }}">{{ member_notepad_history_one.file|filename }}</a>
+                            {% else %}
+                                -
+                            {% endif %}
+                            </div>
+                        </td>
+                    </tr>
+                </table>
+            </div>
+        <hr>
        <p>
            Historia komunikacji:
        </p>

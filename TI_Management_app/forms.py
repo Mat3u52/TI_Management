@@ -49,8 +49,10 @@ from django.core.exceptions import ValidationError
 from django.core.validators import MinLengthValidator, MinValueValidator, MaxValueValidator
 from phone_field import PhoneField
 from django_ckeditor_5.widgets import CKEditor5Widget
+from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password, check_password
 # from django.contrib.auth.hashers import check_password
+
 
 
 def validate_phone_number(value):
@@ -1465,6 +1467,35 @@ class NotepadMemberForm(forms.ModelForm):
                 }
             )
         }
+
+
+class NotepadMemberHiddenForm(forms.ModelForm):
+    password = forms.CharField(
+        widget=forms.PasswordInput(),
+        help_text="Podaj hasło."
+    )
+    class Meta:
+        model = Notepad
+        fields = [
+            'hidden_content', 'password'
+        ]
+
+        widgets = {
+            'hidden_content': CKEditor5Widget(
+                config_name='default'
+            )
+        }
+
+    def __init__(self, *args, **kwargs):
+        # Capture the user instance when initializing the form
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+    def clean_password(self):
+        password = self.cleaned_data.get("password")
+        if not self.user or not check_password(password, self.user.password):
+            raise forms.ValidationError("Podaj poprawne hasło!")
+        return password
 
 
 class GroupsForm(forms.ModelForm):

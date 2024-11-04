@@ -585,7 +585,8 @@ class NotepadAdmin(admin.ModelAdmin):
         'responsible',
         'file',
         'created_date',
-        'confirmed'
+        'confirmed',
+        'hidden'
     )
     list_filter = (
         'title',
@@ -597,7 +598,8 @@ class NotepadAdmin(admin.ModelAdmin):
         'responsible',
         'file',
         'created_date',
-        'confirmed'
+        'confirmed',
+        'hidden'
     )
     search_fields = (
         'title',

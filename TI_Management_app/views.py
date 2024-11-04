@@ -100,7 +100,8 @@ from .forms import (
     VotingSessionCloseForm,
     VoteFileForm,
     DashboardCategoriesForm,
-    HeadquartersForm
+    HeadquartersForm,
+    NotepadMemberHiddenForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -221,6 +222,7 @@ def members_table_list(request):
         }
     )
 
+
 @user_passes_test(lambda user: user.is_superuser)
 def member_export_csv(request):
     response = HttpResponse(content_type='text/csv')
@@ -271,6 +273,26 @@ def member_export_csv(request):
 
     for member in members:
         writer.writerow(member)
+
+    return response
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def member_recommender_export_csv(request):
+    response = HttpResponse(content_type='text/csv')
+    response['Content-Disposition'] = 'attachment; filename="membersRecommender.csv"'
+
+    writer = csv.writer(response)
+    writer.writerow(['Name', 'Forename', 'Recommended By'])
+
+    members = MembersZZTI.objects.all()
+
+    for member in members:
+        writer.writerow([
+            member.surname,
+            member.forename,
+            member.recommended_by or ''  # Directly use the recommended_by string
+        ])
 
     return response
 
@@ -451,7 +473,7 @@ def member_new(request):
                 if member_function_instance:
                     User.objects.create_user(
                         username=member.member_nr,
-                        password='default_password',
+                        password='123456*a',
                         is_active=True
                     )
 
@@ -495,7 +517,7 @@ def member_new(request):
     )
 
 
-# @login_required
+@login_required
 @user_passes_test(lambda user: user.is_superuser)
 def member_edit(request, pk):
     member = get_object_or_404(MembersZZTI, pk=pk)
@@ -504,20 +526,30 @@ def member_edit(request, pk):
         if form.is_valid():
             member = form.save(commit=False)
             member.author = request.user
-            # member.save(update_fields=['forename'])
 
-            role = form.cleaned_data['member_function']
-            member_function_instance = MemberFunction.objects.filter(member_function=role, is_user=True).order_by(
-                '-id').first()
-            if member_function_instance:
-                User.objects.create_user(
-                    username=member.member_nr,
-                    password='default_password',
-                    is_active=True
-                )
-            # else:
-                # todo - if exist to remove is ont to add
+            # role = form.cleaned_data['member_function']
+            role = form.cleaned_data.get('role')
+            # member_function_instance = MemberFunction.objects.filter(member_function=role, is_user=True).order_by(
+            #     '-id').first()
 
+            if role:
+                member_function_instance = MemberFunction.objects.filter(member_function=role, is_user=True).order_by(
+                    '-id').first()
+
+                if member_function_instance:
+                    if not User.objects.filter(username=member.member_nr).exists():
+                        User.objects.create_user(
+                            username=member.member_nr,
+                            password='123456*a',
+                            is_active=True
+                        )
+
+                else:
+                    print("nie jest")
+                    existing_user = User.objects.filter(username=member.member_nr).first()
+                    if existing_user:
+                        existing_user.delete()
+                        messages.info(request, "Konto Administratora zostało usunięte.")
 
             member.save()
             messages.success(request, "Zaktualizowano!")
@@ -2135,6 +2167,36 @@ def member_notepad_edit(request, pk, pk1):
     )
 
 
+@user_passes_test(lambda user: user.is_superuser)
+def member_notepad_hide(request, pk, pk1):
+    member = get_object_or_404(MembersZZTI, pk=pk)
+    notepad = get_object_or_404(Notepad, pk=pk1)
+    if request.method == "POST":
+        form = NotepadMemberHiddenForm(request.POST, instance=notepad, user=request.user)
+        if form.is_valid():
+            hidden_content = form.cleaned_data['hidden_content']
+            sanitized_content = bleach.clean(hidden_content, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+            notepad = form.save(commit=False)
+            notepad.author = request.user
+            notepad.hidden = True
+            notepad.content = sanitized_content
+            notepad.member = member
+            notepad.save()
+            messages.success(request, f"Zaktualizowano notatkę {notepad.title}!")
+            return redirect('TI_Management_app:member_detail', pk=member.pk)
+    else:
+        form = NotepadMemberHiddenForm(instance=notepad, user=request.user)
+    return render(
+        request,
+        'TI_Management_app/members/member_notepad_hide.html',
+        {
+            'form': form,
+            'member': member,
+            'notepad': notepad
+        }
+    )
+
+
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def member_notepad_history(request, pk, title):
@@ -2143,6 +2205,10 @@ def member_notepad_history(request, pk, title):
         Q(published_date__lte=timezone.now()) &
         Q(title__contains=title)
     ).order_by('-published_date'))
+    member_notepad_history_one = (member.notepad.filter(
+        Q(published_date__lte=timezone.now()) &
+        Q(title__contains=title)
+    ).order_by('published_date').first)
 
     return render(
         request,
@@ -2150,6 +2216,7 @@ def member_notepad_history(request, pk, title):
         {
             'member': member,
             'member_notepad_history_obj': member_notepad_history_obj,
+            'member_notepad_history_one': member_notepad_history_one,
             'title': title
         }
     )

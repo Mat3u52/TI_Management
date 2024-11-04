@@ -36,6 +36,11 @@ urlpatterns = [
         name='member_export_csv'
     ),
     path(
+        'TI_Management_app/members/members-recommender-list-export-csv/',
+        views.member_recommender_export_csv,
+        name='member_recommender_export_csv'
+    ),
+    path(
         'TI_Management_app/members/<int:pk>/',
         views.member_detail,
         name='member_detail'
@@ -154,6 +159,11 @@ urlpatterns = [
         'TI_Management_app/members/<int:pk>/edit-member-notepad-history-pdf/<str:title>/',
         views.member_notepad_history_pdf,
         name='member_notepad_history_pdf'
+    ),
+    path(
+        'TI_Management_app/members/member-notepad-hide/<int:pk>/<int:pk1>/',
+        views.member_notepad_hide,
+        name='member_notepad_hide'
     ),
     path(
         'TI_Management_app/members/<int:pk>/edit-member-notepad-delete-all/',

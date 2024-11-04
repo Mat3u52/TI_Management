@@ -470,7 +470,23 @@
                 {% for note in note_entries %}
                     {% if note.title in seen_note %}
                       <div class="notepad">
-
+                      {% if note.hidden %}
+                        <p><b>Sprawa: </b>{{ note.title }}</p>
+<!--                        {% for note_date in member.notepad.all|slice:"1" %}-->
+<!--                          <p><b>Data dodania:</b> {{ note_date.published_date }}</p>-->
+<!--                        {% endfor %}-->
+                       {% member_notepad_history member note.title as notepad_history %}
+                        {% if notepad_history %}
+                            <div>
+                                <p><b>Data dodania:</b> {{ notepad_history.published_date }}</p>
+                            </div>
+                        {% endif %}
+                        <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>
+                        <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
+                        <div class="notepad-comment">
+                          <p><em>{{note.hidden_content|safe}}</em></p>
+                        </div>
+                      {% else %}
                           <p><a href="{% url 'TI_Management_app:member_notepad_edit' pk=member.pk pk1=note.pk %}" class="btn btn-primary btn-large pull-right">
                             Aktualizuj
                           </a></p>
@@ -478,9 +494,17 @@
                           <br />
                           <p><b>Sprawa: </b><a href="{% url 'TI_Management_app:member_notepad_history' pk=member.pk title=note.title %}">{{ note.title }}</a></p>
 
-                        {% for note_date in member.notepad.all|slice:"1" %}
-                          <p><b>Data dodanie:</b> {{ note_date.created_date }}</p>
-                        {% endfor %}
+<!--                        {% for note_date in member.notepad.all|slice:":1" %}-->
+<!--                          <p><b>Data dodania:</b> {{ note_date.updated_date }}</p>-->
+
+<!--                        {% endfor %}-->
+
+                        {% member_notepad_history member note.title as notepad_history %}
+                        {% if notepad_history %}
+                            <div>
+                                <p><b>Data dodania:</b> {{ notepad_history.published_date }}</p>
+                            </div>
+                        {% endif %}
 
                         <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>
                           {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>
@@ -498,17 +522,20 @@
                              <b>Status:</b> Zamknięty</p>
                           {% endif %}
 
+                        <p>
+                          <a href="{% url 'TI_Management_app:member_notepad_hide' pk=member.pk pk1=note.pk %}" class="btn btn-danger btn-sm pull-right">usuń</a>
+                        </p>
                         <p><b>Odpowiedzialny:</b> {{ note.responsible }}</p>
 
-
+                    {% endif %}
 
                       </div>
                     {% endif %}
                 {% endfor %}
-                <br />
-                <p>
-                <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń całą komunikacje</a>
-                </p>
+<!--                <br />-->
+<!--                <p>-->
+<!--                <a href="{% url 'TI_Management_app:member_notepad_delete_all' pk=member.pk %}" class="btn btn-danger btn-sm pull-right">usuń całą komunikacje</a>-->
+<!--                </p>-->
                 <br />
                 <br />
               </li>

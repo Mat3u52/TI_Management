@@ -1,10 +1,48 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:members_list' %}"><b> / Baza Członków </b></a>
+<a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}"><b> / {{member.forename}} {{member.surname}} - {{member.member_nr}}</b></a>
+<a href="{% url 'TI_Management_app:member_notepad_hide' pk=member.pk pk1=notepad.pk %}"><b> / Usuń sprawe</b></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+<h2 class="fadeInUp-animation">Usuń sprawe</h2>
+<hr>
+<br />
+{% if form.errors %}
+    <div class="alert alert-danger">
+        <p>{{form.errors}}</p>
+    </div>
+{% endif %}
+
+    <h3><a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">{{member.forename}} {{member.surname}} - {{member.member_nr}}</a></h3>
+    <p>Komunikacja</p>
+    <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        <table width="100%">
+            <tr>
+                <td>
+                    <b>Opis:</b>
+                    <br/>
+                        {{ form.media }}
+                        {{ form.hidden_content }}
+                </td>
+            </tr>
+        </table>
+        <br />
+        {{ form.password }}
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">Usuń</button>
+        <br />
+        <br />
+    </form>
+</div>
+
+{% endblock %}
+{% block menu %}
+    {% include 'TI_Management_app/menu.html' with active_tab='members_list' %}
+{% endblock %}

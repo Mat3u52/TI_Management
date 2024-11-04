@@ -5,6 +5,8 @@ from datetime import datetime
 import os
 import calendar
 from django.forms import CheckboxInput
+from django.utils import timezone
+from django.db.models import Q
 
 register = template.Library()
 
@@ -129,3 +131,13 @@ def member_full_name_exist(member_nr):
 def is_checkbox(field):
     """Returns True if the field's widget is a CheckboxInput."""
     return isinstance(field.field.widget, CheckboxInput)
+
+
+@register.simple_tag
+def member_notepad_history(member, title=""):
+    # Filtering member's notepad history based on conditions
+    history = member.notepad.filter(
+        Q(published_date__lte=timezone.now()) &
+        Q(title__contains=title)
+    ).order_by('published_date').first()
+    return history
