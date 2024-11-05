@@ -54,7 +54,6 @@ from django.contrib.auth.hashers import make_password, check_password
 # from django.contrib.auth.hashers import check_password
 
 
-
 def validate_phone_number(value):
     phone_pattern = re.compile(r'^\+?1?\d{9,15}$')
     if not phone_pattern.match(value):
@@ -150,8 +149,8 @@ class MemberForm(forms.ModelForm):
         ),
         validators=[
             MinLengthValidator(
-                limit_value=6,
-                message="Numer Członka musi zawierać 6 znaków."
+                limit_value=7,
+                message="Numer Członka musi zawierać 7 znaków."
             ),
             RegexValidator(
                 regex=r'^\d{0,10}$',
@@ -357,7 +356,7 @@ class MemberForm(forms.ModelForm):
 
         self.fields['forename'].widget.attrs['placeholder'] = 'Imię'
         self.fields['surname'].widget.attrs['placeholder'] = 'Nazwisko'
-        self.fields['member_nr'].widget.attrs['placeholder'] = '6 znaków: 000000'
+        self.fields['member_nr'].widget.attrs['placeholder'] = '7 znaków: 0000000'
         eighteen_years_ago = date.today() - timedelta(days=18 * 365)
         eighteen_years_ago_str = eighteen_years_ago.strftime('%Y-%m-%d')
         self.fields['birthday'].initial = eighteen_years_ago_str
@@ -529,8 +528,8 @@ class MemberEditForm(forms.ModelForm):
         ),
         validators=[
             MinLengthValidator(
-                limit_value=6,
-                message="Numer Członka musi zawierać 6 znaków."
+                limit_value=7,
+                message="Numer Członka musi zawierać 7 znaków."
             ),
             RegexValidator(
                 regex=r'^\d{0,10}$',
@@ -694,7 +693,7 @@ class MemberEditForm(forms.ModelForm):
 
         self.fields['forename'].widget.attrs['placeholder'] = 'Imię'
         self.fields['surname'].widget.attrs['placeholder'] = 'Nazwisko'
-        self.fields['member_nr'].widget.attrs['placeholder'] = '6 znaków: 000000'
+        self.fields['member_nr'].widget.attrs['placeholder'] = '7 znaków: 0000000'
         eighteen_years_ago = date.today() - timedelta(days=18 * 365)
         eighteen_years_ago_str = eighteen_years_ago.strftime('%Y-%m-%d')
         self.fields['birthday'].initial = eighteen_years_ago_str

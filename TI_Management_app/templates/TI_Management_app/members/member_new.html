@@ -306,24 +306,32 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-    const typeOfContractField = document.querySelector('#id_type_of_contract');
-    const expirationDateFieldWrapper = document.querySelector('tr:has(#id_expiration_date_contract)');
+    document.addEventListener("DOMContentLoaded", function () {
+        const memberField = document.getElementById("id_member_nr");
 
-    function toggleExpirationDateField() {
-        if (typeOfContractField.value === 'limited_duration') {
-            expirationDateFieldWrapper.style.display = '';
-        } else {
-            expirationDateFieldWrapper.style.display = 'none';
-        }
-    }
-
-    typeOfContractField.addEventListener('change', toggleExpirationDateField);
-
-    // Initial check
-    toggleExpirationDateField();
-});
+        memberField.addEventListener("input", function () {
+            let value = memberField.value.replace(/^0+/, ''); // Remove leading zeros
+            if (value.length > 0 && value.length < 7) {
+                memberField.value = value.padStart(7, '0'); // Pad with zeros to a length of 7
+            }
+        });
+    });
 </script>
+
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const memberField = document.getElementById("id_member_nr");
+
+        memberField.addEventListener("input", function () {
+            let value = memberField.value.replace(/^0+/, ''); // Remove leading zeros
+            if (value.length > 0 && value.length < 8) {
+                memberField.value = value.padStart(7, '0'); // Pad with zeros to a length of 7
+            }
+        });
+    });
+</script>
+
 
 <script>
     const baseUrl = '{% url "TI_Management_app:get_member_details" "dummy_member_nr" %}'.replace('dummy_member_nr/', '');
