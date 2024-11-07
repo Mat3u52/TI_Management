@@ -449,3 +449,15 @@ table.dataTable thead .sorting_desc_disabled:before {
 ul.members{
     list-style-type: circle;
 }
+
+
+
+
+#signature-pad {
+    border: 1px solid #000;
+    width: 400px;
+    height: 200px;
+}
+.button-container {
+    margin-top: 10px;
+}
