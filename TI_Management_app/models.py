@@ -947,6 +947,7 @@ class RegisterRelief(models.Model):
     agreement = models.BooleanField(default=False)  # min 3 signed
     payment_confirmation = models.BooleanField(default=False)  # min 3 signed
     date_of_payment_confirmation = models.DateTimeField(blank=True, null=True)
+    signature_image = models.ImageField(upload_to="uploadsRegisterReliefSignatures/%Y/%m/%d/%H%M%S/", null=True, blank=True)
     # reason = models.TextField(null=True, blank=True, default=None)
     reason = models.TextField(null=True, blank=True, default=None)
 

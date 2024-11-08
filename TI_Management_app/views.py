@@ -1,6 +1,11 @@
 import io
 import os
 import re
+
+import json
+import base64
+from django.core.files.base import ContentFile
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import (
@@ -145,6 +150,7 @@ import weasyprint
 from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 import redis
+from django.views.decorators.csrf import csrf_exempt
 
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 # r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
@@ -2929,6 +2935,7 @@ def register_relief_step_four(request, pk):
 #     )
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
+@csrf_exempt
 def register_relief_step_five(request, pk):
     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
     member = one_registered_relife.member
@@ -2945,6 +2952,16 @@ def register_relief_step_five(request, pk):
             is_correct = check_password(form.cleaned_data['card'], member_card)
 
             if is_correct:
+
+                signature_data = json.loads(request.body).get("signature", None)
+
+                if signature_data:
+                    # Process and save the signature
+                    format, imgstr = signature_data.split(';base64,')
+                    ext = format.split('/')[-1]
+                    img_data = ContentFile(base64.b64decode(imgstr), name=f"signature_{pk}.{ext}")
+                    one_registered_relife.signature_image = img_data
+
                 one_registered_relife.complete = True
                 one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
                 one_registered_relife.save()
