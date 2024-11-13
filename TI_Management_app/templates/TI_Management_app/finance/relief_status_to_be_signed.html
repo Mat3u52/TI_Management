@@ -311,9 +311,10 @@
                         {% if relief_to_be_signed.complete is True %}
                             {{relief_to_be_signed.member.forename}}
                             {{relief_to_be_signed.member.surname}}
-                            {{relief_to_be_signed.member.member_nr}}
+                            {{relief_to_be_signed.member.member_nr}}<br />
                             Data: {{relief_to_be_signed.date_of_signed_by_the_applicant}}
-                            <span style="color: green"><b>&#9745;</b></span>
+                            <span style="color: green"><b>&#9745;</b></span><br />
+                            <img src="{% thumbnail relief_to_be_signed.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
                         {% else %}
                             {{relief_to_be_signed.complete}}
                         {% endif %}
@@ -350,13 +351,53 @@
                     </p>
                 </td>
                 <td>
-                    {% for signature in  relief_to_be_signed.registerReliefSignatureRelief.all %}
-                        <p>
+                    {% for signature in relief_to_be_signed.registerReliefSignatureRelief.all %}
+                    <table width="100%" border="1">
+                        <tr>
+                            <td>
+
+
+                            <p>
                             {{ signature.member.forename }}
                             {{ signature.member.surname }}
                             {{ signature.member.member_nr }}
                             Dnia: {{ signature.member.created_date }} <span style="color: green"><b>&#9745;</b></span>
-                        </p>
+                            </p>
+                            {% if signature.signature_image %}
+                                <h5>Podpis:</h5>
+<!--                                <img src="{{ signature.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 300px; display: block; margin-top: 10px;">-->
+                                <img src="{% thumbnail signature.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                                <form method="post" action="{% url 'TI_Management_app:relief_status_to_be_signed_remove_signature' pk=signature.pk pk1=relief_to_be_signed.pk %}" style="display:inline;">
+                                    {% csrf_token %}
+                                    <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
+                                </form>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                    <br/>
+                            {% else %}
+                                <p><em style="color:red;">Podpis nie został jeszcze dodany.</em></p>
+                                <p>
+                                    <a href="{% url 'TI_Management_app:relief_status_to_be_signed_signature' pk=signature.pk %}"
+                                        onclick="openSignatureWindow(event)"
+                                        class="btn btn-primary btn-sm pull-left">
+                                        Okno podpisu
+                                    </a>
+                                </p>
+                                <br/>
+                                <script>
+                                    function openSignatureWindow(event) {
+                                        event.preventDefault(); // Prevent the default anchor click behavior
+                                        const url = event.currentTarget.href;
+                                        window.open(url, 'SignatureWindow', 'width=600,height=600,resizable=yes,scrollbars=yes');
+                                    }
+                                </script>
+                            {% endif %}
+                            </td>
+                        </tr>
+                    </table><br />
                     {% endfor %}
                 </td>
             </tr>
@@ -426,7 +467,6 @@
         <div class="no-print">
         <div class="notepad">
             <H4>Dodaj Podpis:</H4>
-
             <form method="post" class="post-form">
                 {% csrf_token %}
                 {% if form.errors %}

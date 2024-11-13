@@ -20,104 +20,50 @@
     <br />
     <div class="notepad">
         <h4>Krok 4/4 - Podpis Wnioskującego:</h4>
-        <form method="post" class="post-form">
-        {% csrf_token %}
-        {% if form.errors %}
-            <div class="alert alert-danger">
-                <p>{{form.errors}}</p>
-            </div>
+        {% if one_registered_relife.signature_image %}
+            {% if form.errors %}
+                <div class="alert alert-danger">
+                    <p>{{form.errors}}</p>
+                </div>
+            {% endif %}
+            <h5>Podpis:</h5>
+            <img src="{{ one_registered_relife.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 300px; display: block; margin-top: 10px;">
+
+            <form method="post" action="{% url 'TI_Management_app:register_relief_step_five_remove_signature' pk=one_registered_relife.pk %}" style="display:inline;">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
+            </form>
+            <form method="post" class="post-form">
+                {% csrf_token %}
+
+                <br />
+                <br />
+                {{form.card}}
+                <br />
+                <br />
+                <button type="submit" class="btn btn-primary btn-large pull-right">
+                    Zapisz
+                </button>
+                <br />
+            </form>
+        {% else %}
+            <p><em>Podpis nie został jeszcze dodany.</em></p>
+            <p>
+                <a href="{% url 'TI_Management_app:register_relief_step_five_signature' pk=one_registered_relife.pk %}"
+                    onclick="openSignatureWindow(event)"
+                    class="btn btn-primary btn-sm pull-left">
+                    Okno podpisu
+                </a>
+            </p>
+            <br/>
+            <script>
+                function openSignatureWindow(event) {
+                    event.preventDefault(); // Prevent the default anchor click behavior
+                    const url = event.currentTarget.href;
+                    window.open(url, 'SignatureWindow', 'width=600,height=600,resizable=yes,scrollbars=yes');
+                }
+            </script>
         {% endif %}
-        <br />
-        <canvas id="signature-pad" style="border: 1px solid #000; display: block; margin: 10px auto;"></canvas>
-        <br />
-        <button type="button" id="clear-signature" class="btn btn-secondary">Wyczyść</button>
-        <br />
-        <br />
-        {{form.card}}
-        <br />
-        <br />
-        <button type="submit" id="save-signature" class="btn btn-primary btn-large pull-right">
-            Zapisz
-        </button>
-        <br />
-        </form>
-
-
-
-
-        <script>
-    const canvas = document.getElementById("signature-pad");
-    const ctx = canvas.getContext("2d");
-    let drawing = false;
-
-    // Set canvas size
-    canvas.width = 400;
-    canvas.height = 200;
-
-    // Drawing functions
-    ctx.strokeStyle = "black";
-    ctx.lineWidth = 2;
-
-    function startDrawing(e) {
-        drawing = true;
-        draw(e);
-    }
-
-    function stopDrawing() {
-        drawing = false;
-        ctx.beginPath();
-    }
-
-    function draw(e) {
-        if (!drawing) return;
-        ctx.lineTo(e.offsetX, e.offsetY);
-        ctx.stroke();
-        ctx.beginPath();
-        ctx.moveTo(e.offsetX, e.offsetY);
-    }
-
-    // Clear the canvas
-    document.getElementById("clear-signature").addEventListener("click", () => {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    });
-
-    // Send form and signature data
-    document.getElementById("save-signature").addEventListener("click", (event) => {
-        event.preventDefault();
-
-        // Get signature data
-        const signatureData = canvas.toDataURL("image/png");
-
-        // Fetch card value from form data
-        const cardData = document.querySelector("input[name='card']").value;
-
-        fetch("{% url 'TI_Management_app:register_relief_step_five' pk=one_registered_relife.pk %}", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                "X-CSRFToken": "{{ csrf_token }}"
-            },
-            body: JSON.stringify({ card: cardData, signature: signatureData })
-        })
-        .then(response => response.json())
-        .then(data => alert("Signature and data saved successfully!"));
-    });
-
-    // Event listeners for drawing
-    canvas.addEventListener("mousedown", startDrawing);
-    canvas.addEventListener("mouseup", stopDrawing);
-    canvas.addEventListener("mousemove", draw);
-</script>
-
-
-
-
-
-
-
-
-
-
 
     </div>
 

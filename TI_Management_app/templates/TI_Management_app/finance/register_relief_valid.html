@@ -254,6 +254,20 @@
                     {% endfor %}
                 </td>
             </tr>
+            <tr>
+                <td>
+                    <p class="tableCredential">
+                        <b>
+                            Podpis:
+                        </b>
+                    </p>
+                </td>
+                <td>
+                    {% if validation_register_relief.complete %}
+                        <img src="{% thumbnail validation_register_relief.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                    {% endif %}
+                </td>
+            </tr>
         </table>
         <div class="date">
             <p>

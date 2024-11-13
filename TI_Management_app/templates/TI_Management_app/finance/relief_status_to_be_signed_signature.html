@@ -1,10 +1,118 @@
 <!DOCTYPE html>
-<html lang="en">
+{% load static %}
+<html lang="pl">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>zzti LUMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="zzti LUMS">
+    <meta name="author" content="zzti LUMS">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+    <style>
+        #signature-canvas {
+            border: 2px solid #000;
+            border-radius: 5px;
+            width: 100%; /* Set width to fill the container */
+            max-width: 400px; /* Limit the maximum width */
+            height: auto; /* Set height based on width */
+            touch-action: none;
+        }
+    </style>
 </head>
 <body>
+
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Podpis</h2>
+    <hr>
+    <br/>
+    <div class="notepad">
+        <canvas id="signature-canvas"></canvas>
+        <br />
+        <br />
+        <button onclick="clearCanvas()">Wyczyść</button>
+        <button onclick="submitSignature()">Potwierdzam</button>
+
+        <form id="signature-form" method="post" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="signature_data" id="signature_data">
+        </form>
+
+        <script>
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.width * 0.75; // Adjust height ratio as needed (e.g., 0.75 for a 4:3 ratio)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas); // Resize when window size changes
+    resizeCanvas(); // Initial resize
+
+
+            let drawing = false;
+
+            // Offset calculation for accurate mouse position
+            const rect = canvas.getBoundingClientRect();
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+
+            function startDrawing(e) {
+                drawing = true;
+                draw(e);
+            }
+
+            function stopDrawing() {
+                drawing = false;
+                ctx.beginPath();
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = 'black';
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            }
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function submitSignature() {
+                const signatureData = canvas.toDataURL('image/png');
+                document.getElementById('signature_data').value = signatureData;
+
+                // AJAX POST request with CSRF token included
+                fetch("{% url 'TI_Management_app:relief_status_to_be_signed_signature' pk=one_registered_relife.pk %}", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',  // Adding CSRF token in headers
+                    },
+                    body: new FormData(document.getElementById('signature-form')),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        if (window.opener) {
+                            window.opener.location.reload();
+                        }
+                        window.close(); // Close the window after successful submission
+                    } else {
+                        alert("Problem z wysłaniem podpisu.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        </script>
+    </div>
+</div>
 
 </body>
 </html>

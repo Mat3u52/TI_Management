@@ -2190,8 +2190,32 @@ class RegisterReliefForm(forms.ModelForm):
         return cleaned_data
 
 
+# class MultipleFileInput(forms.ClearableFileInput):
+#     allow_multiple_selected = True
+#
+#
+# class MultipleFileField(forms.FileField):
+#     def __init__(self, *args, **kwargs):
+#         kwargs.setdefault("widget", MultipleFileInput())
+#         super().__init__(*args, **kwargs)
+#
+#     def clean(self, data, initial=None):
+#         single_file_clean = super().clean
+#         if isinstance(data, (list, tuple)):
+#             result = [single_file_clean(d, initial) for d in data]
+#         else:
+#             result = single_file_clean(data, initial)
+#         return result
+
+
 class MultipleFileInput(forms.ClearableFileInput):
-    allow_multiple_selected = True
+    allow_multiple_selected = True  # Enable multiple file selection
+
+    def __init__(self, attrs=None):
+        super().__init__(attrs)
+        if attrs is None:
+            attrs = {}
+        attrs['accept'] = 'application/pdf,image/jpeg'  # Limit file types
 
 
 class MultipleFileField(forms.FileField):
@@ -2201,24 +2225,24 @@ class MultipleFileField(forms.FileField):
 
     def clean(self, data, initial=None):
         single_file_clean = super().clean
+        allowed_types = ['application/pdf', 'image/jpeg']
+
         if isinstance(data, (list, tuple)):
-            result = [single_file_clean(d, initial) for d in data]
+            result = []
+            for file in data:
+                cleaned_file = single_file_clean(file, initial)
+                if cleaned_file.content_type not in allowed_types:
+                    raise forms.ValidationError("Tylko PDF i JPEG są dozwolone.")
+                result.append(cleaned_file)
         else:
             result = single_file_clean(data, initial)
+            if result.content_type not in allowed_types:
+                raise forms.ValidationError("Tylko PDF i JPEG sa dozwolone.")
         return result
 
 
 class FileRegisterReliefForm(forms.ModelForm):
     file = MultipleFileField(label='Select files', required=True)
-    # file = MultipleFileField(
-    #     label='Select files',
-    #     widget=forms.FileInput(
-    #         attrs={
-    #             'accept': 'application/pdf,image/jpeg,image/png'
-    #         }
-    #     ),
-    #     required=True
-    # )
 
     class Meta:
         model = FileRegisterRelief

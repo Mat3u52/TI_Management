@@ -976,6 +976,7 @@ class SignatureRelief(models.Model):
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberSignatureRelief', null=False, blank=False)
     register_relief = models.ForeignKey(RegisterRelief, on_delete=models.CASCADE, related_name='registerReliefSignatureRelief', null=False, blank=False)
     signature = models.BooleanField(default=False)
+    signature_image = models.ImageField(upload_to="uploadsSignatureReliefSignatures/%Y/%m/%d/%H%M%S/", null=True, blank=True)
     history = HistoricalRecords()
 
     objects = models.Manager()  # default manager
@@ -985,7 +986,7 @@ class SignatureRelief(models.Model):
         ordering = ('-created_date',)
 
     def __str__(self):
-        return self.register_relief
+        return str(self.register_relief)
 
     def save(self, *args, **kwargs):
         if not self.slug:

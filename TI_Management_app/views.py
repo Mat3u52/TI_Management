@@ -2,7 +2,7 @@ import io
 import os
 import re
 
-import json
+# import json
 import base64
 from django.core.files.base import ContentFile
 
@@ -2935,7 +2935,7 @@ def register_relief_step_four(request, pk):
 #     )
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
-@csrf_exempt
+# @csrf_exempt
 def register_relief_step_five(request, pk):
     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
     member = one_registered_relife.member
@@ -2952,15 +2952,6 @@ def register_relief_step_five(request, pk):
             is_correct = check_password(form.cleaned_data['card'], member_card)
 
             if is_correct:
-
-                signature_data = json.loads(request.body).get("signature", None)
-
-                if signature_data:
-                    # Process and save the signature
-                    format, imgstr = signature_data.split(';base64,')
-                    ext = format.split('/')[-1]
-                    img_data = ContentFile(base64.b64decode(imgstr), name=f"signature_{pk}.{ext}")
-                    one_registered_relife.signature_image = img_data
 
                 one_registered_relife.complete = True
                 one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
@@ -2981,6 +2972,41 @@ def register_relief_step_five(request, pk):
             'one_registered_relife': one_registered_relife
         }
     )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def register_relief_step_five_signature(request, pk):
+    one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+    if request.method == 'POST':
+        signature_data = request.POST.get('signature_data')
+        if signature_data:
+            format, imgstr = signature_data.split(';base64,')
+            ext = format.split('/')[-1]
+            signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
+
+            instance = get_object_or_404(RegisterRelief, pk=pk)
+            instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
+            instance.save()
+
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_five_signature.html',
+        {
+            'one_registered_relife': one_registered_relife
+        }
+    )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def register_relief_step_five_remove_signature(request, pk):
+    instance = get_object_or_404(RegisterRelief, pk=pk)
+    if instance.signature_image:
+        instance.signature_image.delete()
+        instance.save()
+        messages.success(request, "Podpis został usunięty.")
+    else:
+        messages.warning(request, "Nie ma podpisu do usunięcia.")
+    return redirect('TI_Management_app:register_relief_step_five', pk=pk)
 
 
 # @login_required
@@ -3183,6 +3209,44 @@ def relief_status_to_be_signed(request, pk):
     )
 
 
+@user_passes_test(lambda user: user.is_superuser)
+def relief_status_to_be_signed_signature(request, pk):
+    # one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+    one_registered_relife = get_object_or_404(SignatureRelief, pk=pk)
+    if request.method == 'POST':
+        signature_data = request.POST.get('signature_data')
+        if signature_data:
+            format, imgstr = signature_data.split(';base64,')
+            ext = format.split('/')[-1]
+            signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
+
+            instance = get_object_or_404(SignatureRelief, pk=pk)
+            # instance.register_relief = one_registered_relife
+            instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
+            instance.save()
+
+    return render(
+        request,
+        'TI_Management_app/finance/relief_status_to_be_signed_signature.html',
+        {
+            'one_registered_relife': one_registered_relife
+        }
+    )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def relief_status_to_be_signed_remove_signature(request, pk, pk1):
+    # instance = get_object_or_404(RegisterRelief, pk=pk1)
+    instance = get_object_or_404(SignatureRelief, pk=pk)
+    if instance.signature_image:
+        instance.signature_image.delete()
+        instance.save()
+        messages.success(request, "Podpis został usunięty.")
+    else:
+        messages.warning(request, "Nie ma podpisu do usunięcia.")
+    return redirect('TI_Management_app:relief_status_to_be_signed', pk=pk1)
+
+
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def relief_status_to_be_signed_pdf_advance(request, pk):
@@ -3196,7 +3260,8 @@ def relief_status_to_be_signed_pdf_advance(request, pk):
     )
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'filename="relief_{pk}.pdf"'
-    weasyprint.HTML(string=html).write_pdf(
+    base_url = request.build_absolute_uri('/')
+    weasyprint.HTML(string=html, base_url=base_url).write_pdf(
         response,
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
     )

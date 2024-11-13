@@ -1,334 +1,118 @@
-{% extends 'TI_Management_app/base.html' %}
-{% load ti_management_tags %}
-{% load thumbnail %}
-
-{% block breadcrumbs %}
-<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
-<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
-<a href="{% url 'TI_Management_app:register_relief_step_one' %}"><b> / Rejestrowanie zapomogi</b></a>
-<a href="{% url 'TI_Management_app:register_relief_step_two' pk=one_registered_relife.member.pk %}"><b> / Krok [1/4]</b></a>
-<a href="{% url 'TI_Management_app:register_relief_step_three' pk=one_registered_relife.member.pk %}"><b> / Krok [2/4]</b></a>
-<a href="{% url 'TI_Management_app:register_relief_step_four' pk=one_registered_relife.pk %}"><b> / Krok [3/4]</b></a>
-<a href="{% url 'TI_Management_app:register_relief_step_five' pk=one_registered_relife.pk %}"><b> / Krok [4/4]</b></a>
-{% endblock %}
-
-{% block content %}
+<!DOCTYPE html>
+{% load static %}
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <title>zzti LUMS</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="zzti LUMS">
+    <meta name="author" content="zzti LUMS">
+    <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
+    <style>
+        #signature-canvas {
+            border: 2px solid #000;
+            border-radius: 5px;
+            width: 100%; /* Set width to fill the container */
+            max-width: 400px; /* Limit the maximum width */
+            height: auto; /* Set height based on width */
+            touch-action: none;
+        }
+    </style>
+</head>
+<body>
 
 <div class="hero-unit">
-    <h2 class="fadeInUp-animation">Krok 4 / 4</h2>
+    <h2 class="fadeInUp-animation">Podpis</h2>
     <hr>
-    <br />
+    <br/>
     <div class="notepad">
-        <h4>Krok 4/4 - Podpis Wnioskującego odręczny:</h4>
-    <canvas id="signature-pad"></canvas>
-    <div class="button-container">
-        <button id="clear-signature">Clear</button>
-        <button id="save-signature">Save Signature</button>
-    </div>
-
-    <script>
-        const canvas = document.getElementById("signature-pad");
-        const ctx = canvas.getContext("2d");
-        let drawing = false;
-
-        // Set canvas size
-        canvas.width = 400;
-        canvas.height = 200;
-
-        // Set up drawing styles
-        ctx.strokeStyle = "black";
-        ctx.lineWidth = 2;
-
-        // Start drawing
-        function startDrawing(e) {
-            drawing = true;
-            draw(e);
-        }
-
-        // Stop drawing
-        function stopDrawing() {
-            drawing = false;
-            ctx.beginPath();  // Resets the path for a clean start
-        }
-
-        // Draw on the canvas
-        function draw(e) {
-            if (!drawing) return;
-            ctx.lineTo(e.offsetX, e.offsetY);
-            ctx.stroke();
-            ctx.beginPath();
-            ctx.moveTo(e.offsetX, e.offsetY);
-        }
-
-        // Clear the canvas
-        document.getElementById("clear-signature").addEventListener("click", () => {
-            ctx.clearRect(0, 0, canvas.width, canvas.height);
-        });
-
-        // Save the signature
-        document.getElementById("save-signature").addEventListener("click", () => {
-            const signatureData = canvas.toDataURL("image/png");
-            fetch("{% url 'save_signature' %}", {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    "X-CSRFToken": "{{ csrf_token }}"
-                },
-                body: JSON.stringify({ signature: signatureData })
-            })
-            .then(response => response.json())
-            .then(data => alert("Signature saved successfully!"));
-        });
-
-        // Event listeners for drawing on the canvas
-        canvas.addEventListener("mousedown", startDrawing);
-        canvas.addEventListener("mouseup", stopDrawing);
-        canvas.addEventListener("mousemove", draw);
-    </script>
-    </div>
-
-    <div class="notepad">
-<!--        <img src="{{ one_registered_relife.member.image.url }}" alt="image" style='display: block; float: right; margin-left: auto; width: 150px'>-->
-        <a href="{% url 'TI_Management_app:member_detail' pk=one_registered_relife.member.pk %}">
-            <img src="{% thumbnail one_registered_relife.member.image 150x0  quality=100 %}" style='display: block; float: right; margin-left: auto;'>
-        </a>
-        <table style="margin-left: auto; margin-right: auto;">
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Nr Uczestnika:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.member.member_nr}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Imię i nazwisko:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        <a href="{% url 'TI_Management_app:member_detail' pk=one_registered_relife.member.pk %}">
-                            {{one_registered_relife.member.forename}} {{one_registered_relife.member.surname}}
-                        </a>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Adres:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        ul. {{one_registered_relife.member.street}}
-                        {{one_registered_relife.member.house_number}}
-                        {% if not one_registered_relife.member.float_number|default_if_none:"--" %}
-                            m. {{one_registered_relife.member.float_number}}
-                        {% endif %}
-                        {{one_registered_relife.member.postcode}}
-                        {{one_registered_relife.member.city}}
-
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Data wypełnienia wniosku:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.date_of_completing_the_application}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Data wpłynięcia wniosku:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.date_of_receipt_the_application}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Data zdarzenia, którego dotyczy wniosek:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.date_of_accident}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Rodzaj zapomogi:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.relief.title}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Imię osoby powiązanej z wnioskiem:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.associate_forename}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Nazwisko osoby powiązanej z wnioskiem:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.associate_surname}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Uzasadnienie:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.reason|safe}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Relacja:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.relation}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Kwota:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.relief.figure}} zł
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Nr konta:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.account_number}}
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Karencja:
-                        </b>
-                    </p>
-                </td>
-                <td>
-                    <p>
-                        {{one_registered_relife.relief.grace}} miesiąc/e
-
-                        <span style="color: green"><b>&#9745;</b></span>
-                    </p>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <p class="tableCredential">
-                        <b>
-                            Dokumenty:
-                        </b>
-                    </p>
-                </td>
-                <td>
-<!--                    {% for file in one_registered_relife.registerReliefFileRegisterRelief.all  %}-->
-<!--                        {{file.title}}-->
-<!--                    {% endfor %}-->
-                    {% for file in one_registered_relife.registerReliefFileRegisterRelief.all  %}
-                        <a href="{{ file.file.url }}">
-                            {{file.title}}
-                        </a><br/>
-                    {% endfor %}
-                </td>
-            </tr>
-        </table>
+        <canvas id="signature-canvas"></canvas>
         <br />
         <br />
-        <br />
-        <br />
+        <button onclick="clearCanvas()">Wyczyść</button>
+        <button onclick="submitSignature()">Potwierdzam</button>
+
+        <form id="signature-form" method="post" enctype="multipart/form-data" style="display: none;">
+            {% csrf_token %}
+            <input type="hidden" name="signature_data" id="signature_data">
+        </form>
+
+        <script>
+            const canvas = document.getElementById('signature-canvas');
+            const ctx = canvas.getContext('2d');
+
+            function resizeCanvas() {
+        const rect = canvas.getBoundingClientRect();
+        canvas.width = rect.width;
+        canvas.height = rect.width * 0.75; // Adjust height ratio as needed (e.g., 0.75 for a 4:3 ratio)
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas); // Resize when window size changes
+    resizeCanvas(); // Initial resize
+
+
+            let drawing = false;
+
+            // Offset calculation for accurate mouse position
+            const rect = canvas.getBoundingClientRect();
+
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mousemove', draw);
+
+            function startDrawing(e) {
+                drawing = true;
+                draw(e);
+            }
+
+            function stopDrawing() {
+                drawing = false;
+                ctx.beginPath();
+            }
+
+            function draw(e) {
+                if (!drawing) return;
+                ctx.lineWidth = 2;
+                ctx.lineCap = 'round';
+                ctx.strokeStyle = 'black';
+                ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+            }
+
+            function clearCanvas() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
+
+            function submitSignature() {
+                const signatureData = canvas.toDataURL('image/png');
+                document.getElementById('signature_data').value = signatureData;
+
+                // AJAX POST request with CSRF token included
+                fetch("{% url 'TI_Management_app:register_relief_step_five_signature' pk=one_registered_relife.pk %}", {
+                    method: "POST",
+                    headers: {
+                        'X-CSRFToken': '{{ csrf_token }}',  // Adding CSRF token in headers
+                    },
+                    body: new FormData(document.getElementById('signature-form')),
+                })
+                .then(response => {
+                    if (response.ok) {
+                        if (window.opener) {
+                            window.opener.location.reload();
+                        }
+                        window.close(); // Close the window after successful submission
+                    } else {
+                        alert("Problem z wysłaniem podpisu.");
+                    }
+                })
+                .catch(error => console.error('Error:', error));
+            }
+        </script>
     </div>
 </div>
 
-{% endblock %}
-
-{% block menu %}
-{% include 'TI_Management_app/menu.html' with active_tab='register_relief_step_one' %}
-{% endblock %}
+</body>
+</html>
