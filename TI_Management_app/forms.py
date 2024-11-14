@@ -182,7 +182,7 @@ class MemberForm(forms.ModelForm):
                 message="To pole musi być liczbą."
             )
         ],
-        required=True
+        required=False
     )
 
     image = forms.FileField(
@@ -363,19 +363,22 @@ class MemberForm(forms.ModelForm):
         self.fields['birthplace'].widget.attrs['placeholder'] = 'Miejsce urodzenia'
         self.fields['pin'].widget.attrs['placeholder'] = '4 znaki: 0000'
         self.fields['email'].widget.attrs['placeholder'] = 'user@user.com'
+        self.fields['email'].required = False
         current_data = date.today()
         current_data_str = current_data.strftime('%Y-%m-%d')
         self.fields['date_of_accession'].initial = current_data_str
         one_year_later = date.today().replace(year=date.today().year + 1)
         one_year_later_str = one_year_later.strftime('%Y-%m-%d')
         self.fields['date_of_abandonment'].initial = one_year_later_str
-        today_str = date.today().strftime('%Y-%m-%d')
-        self.fields['date_of_contract'].initial = today_str
+        # today_str = date.today().strftime('%Y-%m-%d')
+        # self.fields['date_of_contract'].initial = today_str
+        self.fields['date_of_contract'].initial = '1970-01-01'
         three_year_later = date.today().replace(year=date.today().year + 3)
         three_year_later_str = three_year_later.strftime('%Y-%m-%d')
         self.fields['expiration_date_contract'].initial = three_year_later_str
         self.fields['recommended_member_nr'].widget.attrs['placeholder'] = 'Nr Członka'
-        self.fields['type_of_contract'].required = True
+        # self.fields['type_of_contract'].required = True
+        self.fields['type_of_contract'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
