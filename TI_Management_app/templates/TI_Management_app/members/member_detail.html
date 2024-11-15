@@ -75,11 +75,23 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>PIN: </b></p></td>
-            <td><p>{{member.pin}}</p></td>
+            <td>
+              {% if member.pin is None %}
+                <p><span style="color:red;">Brak informacji</span></p>
+              {% else %}
+                <p>{{member.pin}}</p>
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-            <td><p>{{member.phone_number|phone_number}}</p></td>
+            <td>
+              {% if member.phone_number is None %}
+                <p><div class="red-circle">!</div></p>
+              {% else %}
+                <p>{{member.phone_number|phone_number}}</p>
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>E-mail: </b></p></td>

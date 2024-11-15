@@ -404,6 +404,33 @@ class MemberForm(forms.ModelForm):
 
         return cleaned_data
 
+    def clean_pin(self):
+        pin = self.cleaned_data.get('pin')
+
+        # Allow pin to be None
+        if pin is None:
+            return pin
+
+        # Check for uniqueness of pin
+        if MembersZZTI.objects.filter(pin=pin).exists():
+            raise ValidationError("Ten PIN już istnieje. Wprowadź unikalny PIN lub pozostaw pole puste.")
+
+        return pin
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+
+        # Allow email to be None or empty
+        if not email:
+            return email
+
+        # Check for uniqueness of email
+        if MembersZZTI.objects.filter(email=email).exists():
+            raise ValidationError(
+                "Ten adres email już istnieje. Wprowadź unikalny adres email lub pozostaw pole puste.")
+
+        return email
+
 
 class MemberCardEditForm(forms.ModelForm):
 
@@ -564,7 +591,7 @@ class MemberEditForm(forms.ModelForm):
                 message="To pole musi być liczbą."
             )
         ],
-        required=True
+        required=False
     )
 
     phone_number = forms.CharField(
@@ -703,6 +730,7 @@ class MemberEditForm(forms.ModelForm):
         self.fields['birthplace'].widget.attrs['placeholder'] = 'Miejsce urodzenia'
         self.fields['pin'].widget.attrs['placeholder'] = '4 znaki: 0000'
         self.fields['email'].widget.attrs['placeholder'] = 'user@user.com'
+        self.fields['email'].required = False
         current_data = date.today()
         current_data_str = current_data.strftime('%Y-%m-%d')
         self.fields['date_of_accession'].initial = current_data_str
@@ -714,7 +742,8 @@ class MemberEditForm(forms.ModelForm):
         three_year_later = date.today().replace(year=date.today().year + 3)
         three_year_later_str = three_year_later.strftime('%Y-%m-%d')
         self.fields['expiration_date_contract'].initial = three_year_later_str
-        self.fields['type_of_contract'].required = True
+        # self.fields['type_of_contract'].required = True
+        self.fields['type_of_contract'].required = False
 
     def clean(self):
         cleaned_data = super().clean()
@@ -722,7 +751,7 @@ class MemberEditForm(forms.ModelForm):
         date_of_abandonment = cleaned_data.get("date_of_abandonment")
         date_of_contract = cleaned_data.get("date_of_contract")
         expiration_date_contract = cleaned_data.get("expiration_date_contract")
-        pin = cleaned_data.get("pin")
+        # pin = cleaned_data.get("pin")
 
         if date_of_accession and date_of_abandonment:
             if date_of_accession >= date_of_abandonment:
@@ -741,6 +770,34 @@ class MemberEditForm(forms.ModelForm):
         # PhoneField().clean(phone_number, None)
 
         return cleaned_data
+
+    def clean_card(self):
+        card = self.cleaned_data.get('card')
+        if card:
+            # Check if any existing entry matches the hashed version of the input card
+            existing_card = MembersZZTI.objects.exclude(id=self.instance.id).filter(card__isnull=False)
+            for entry in existing_card:
+                if check_password(card, entry.card):
+                    raise ValidationError("Karta jest już przypisana do innego Członka.")
+
+            # Optionally, you could hash the card before saving if desired
+            # self.cleaned_data['card'] = make_password(card)
+
+        return card
+
+    def clean_email(self):
+        email = self.cleaned_data.get('email')
+
+        # Allow email to be None or empty
+        if not email:
+            return email
+
+        # Check for uniqueness of email
+        if MembersZZTI.objects.filter(email=email).exists():
+            raise ValidationError(
+                "Ten adres email już istnieje. Wprowadź unikalny adres email lub pozostaw pole puste.")
+
+        return email
 
 
 class MemberEditReliefForm(forms.ModelForm):

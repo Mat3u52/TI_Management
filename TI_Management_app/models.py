@@ -202,6 +202,7 @@ class MembersZZTI(models.Model):
         ('male', 'Mężczyzna'),
     )
     CONTRACT_CHOICES = (
+        ('none', 'Brak informacji'),
         ('indefinite_period_of_time', 'Na czas nieokreślony'),
         ('limited_duration', 'Na czas określony'),
     )
@@ -226,12 +227,14 @@ class MembersZZTI(models.Model):
     sex = models.CharField(max_length=250, choices=SEX_CHOICES, blank=True, null=True, default=None)
     birthday = models.DateTimeField(default=None, blank=True, null=True)
     birthplace = models.CharField(max_length=250, blank=True, null=True, default=None)
-    pin = models.IntegerField(blank=False, null=False, unique=True)
+    # pin = models.IntegerField(blank=False, null=False, unique=True)
+    pin = models.IntegerField(blank=True, null=True, default=None)
     phone_number = PhoneField(max_length=12, blank=True, null=True, default=None, help_text='Contact phone number')
-    email = models.EmailField(max_length=250, blank=False, null=False, unique=True, help_text='user@user.com')
+    # email = models.EmailField(max_length=250, blank=False, null=False, unique=True, help_text='user@user.com')
+    email = models.EmailField(max_length=250, blank=True, null=True, default=None, help_text='user@user.com')
     date_of_accession = models.DateTimeField(default=timezone.now, blank=False, null=False)
     date_of_abandonment = models.DateTimeField(default=None, blank=True, null=True)
-    type_of_contract = models.CharField(max_length=250, choices=CONTRACT_CHOICES, blank=True, null=True, default='indefinite_period_of_time')
+    type_of_contract = models.CharField(max_length=250, choices=CONTRACT_CHOICES, blank=True, null=True, default='none')
     date_of_contract = models.DateTimeField(default=None, blank=True, null=True)
     expiration_date_contract = models.DateTimeField(default=None, blank=True, null=True)
     group = models.ForeignKey(Groups, on_delete=models.CASCADE, null=True, blank=True, default=None)
