@@ -67,7 +67,7 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Data urodzenia: </b></p></td>
-            <td><p>{{member.birthday}}</p></td>
+            <td><p>{{member.birthday|date:"d.m.Y"}}</p></td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Miejsce urodzenia: </b></p></td>
@@ -87,7 +87,7 @@
             <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
             <td>
               {% if member.phone_number is None %}
-                <p><div class="red-circle">!</div></p>
+                <p><span style="color:red;">Brak informacji</span></p>
               {% else %}
                 <p>{{member.phone_number|phone_number}}</p>
               {% endif %}
@@ -95,31 +95,49 @@
           </tr>
           <tr>
             <td><p class="tableCredential"><b>E-mail: </b></p></td>
-            <td><p>{{member.email}}</p></td>
+            <td>
+              {% if member.email is None %}
+                <p><span style="color:red;">Brak informacji</span></p>
+              {% else %}
+                <p>{{member.email}}</p>
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Data przystąpienia: </b></p></td>
-            <td><p>{{member.date_of_accession}}</p></td>
+            <td><p>{{member.date_of_accession|date:"d.m.Y"}}</p></td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Data wystąpienia: </b></p></td>
-            <td><p>{{member.date_of_abandonment}}</p></td>
+            <td><p>{{member.date_of_abandonment|date:"d.m.Y"}}</p></td>
           </tr>
           <tr>
             <td><p class="tableCredential"><b>Rodzaj umowy: </b></p></td>
             <td>
               {% if member.type_of_contract == 'indefinite_period_of_time' %}<p>Na czas nieokreślony</p>
               {% elif member.type_of_contract == 'limited_duration' %}<p>Na czas określony</p>
-              {% else %}<p>None</p>{% endif %}
+              {% else %}<span style="color:red;">Brak informacji</span></p>{% endif %}
             </td>
           </tr>
           <tr>
             <td class="tableCredential"><p><b>Data zatrudnienia: </b></p></td>
-            <td><p>{{member.date_of_contract}}</p></td>
+            <td>
+              {% if member.date_of_contract|date:"Ymd" < "19800101" %}
+                <p><span style="color:red;">Brak informacji</span></p>
+              {% else %}
+                <p>{{member.date_of_contract|date:"d.m.Y"}}</p>
+              {% endif %}
+            </td>
           </tr>
           <tr>
             <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
-            <td><p>{{member.expiration_date_contract}}</p></td>
+            <td>
+              {% if member.date_of_contract|date:"Ymd" < "19800101" or member.expiration_date_contract is None%}
+                <p><span style="color:red;">Brak informacji</span></p>
+              {% else %}
+                <p>{{member.expiration_date_contract|date:"d.m.Y"}}</p>
+              {% endif %}
+            </td>
           </tr>
         </table>
   </div>

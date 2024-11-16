@@ -311,6 +311,12 @@
                             {{relief_to_be_signed.complete}}
                         {% endif %}
                     </p>
+                    {% if relief_to_be_signed.signature_image %}
+                        <h5>Podpis:</h5>
+                        <img src="{% thumbnail relief_to_be_signed.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                    {% else %}
+                        <p><em style="color:red;">Podpis nie został jeszcze dodany.</em></p>
+                    {% endif %}
                 </td>
             </tr>
 

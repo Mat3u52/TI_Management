@@ -551,7 +551,6 @@ def member_edit(request, pk):
                         )
 
                 else:
-                    print("nie jest")
                     existing_user = User.objects.filter(username=member.member_nr).first()
                     if existing_user:
                         existing_user.delete()

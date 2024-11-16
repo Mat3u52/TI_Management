@@ -450,20 +450,6 @@ ul.members{
     list-style-type: circle;
 }
 
-
-.red-circle {
-width: 25px;             /* Width of the circle */
-height: 25px;            /* Height of the circle */
-background-color: red;   /* Circle color */
-color: white;            /* Exclamation mark color */
-border-radius: 50%;      /* Makes the div a circle */
-display: flex;
-justify-content: center;
-align-items: center;
-font-size: 24px;         /* Font size of the exclamation mark */
-font-weight: bold;
-}
-
 #signature-canvas {
     border: 2px solid #000; /* Thicker border for canvas */
     border-radius: 5px; /* Optional: Rounded corners */

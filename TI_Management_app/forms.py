@@ -785,15 +785,33 @@ class MemberEditForm(forms.ModelForm):
 
         return card
 
+    # def clean_email(self):
+    #     email = self.cleaned_data.get('email')
+    #
+    #     # Allow email to be None or empty
+    #     if not email:
+    #         return email
+    #
+    #     # Check for uniqueness of email
+    #     if MembersZZTI.objects.filter(email=email).exists():
+    #         raise ValidationError(
+    #             "Ten adres email już istnieje. Wprowadź unikalny adres email lub pozostaw pole puste.")
+    #
+    #     return email
+
     def clean_email(self):
         email = self.cleaned_data.get('email')
+
+        print("Instance PK:", self.instance.pk)
+        print(email)
 
         # Allow email to be None or empty
         if not email:
             return email
 
         # Check for uniqueness of email
-        if MembersZZTI.objects.filter(email=email).exists():
+        # if MembersZZTI.objects.filter(email=email).exists():
+        if MembersZZTI.objects.filter(email=email).exclude(pk=self.instance.pk).exists():
             raise ValidationError(
                 "Ten adres email już istnieje. Wprowadź unikalny adres email lub pozostaw pole puste.")
 
