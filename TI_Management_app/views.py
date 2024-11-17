@@ -1,10 +1,7 @@
 import io
 import os
 import re
-
-# import json
 import base64
-from django.core.files.base import ContentFile
 
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
@@ -46,7 +43,7 @@ from .models import (
     DashboardCategories,
     Headquarters
 )
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, Http404
 from django.urls import reverse_lazy, reverse
 from .forms import (
     MemberForm,
@@ -151,6 +148,11 @@ from django.views.decorators.cache import cache_page
 from django.utils.decorators import method_decorator
 import redis
 from django.views.decorators.csrf import csrf_exempt
+from django.core.files.base import ContentFile
+
+
+
+
 
 r = redis.Redis(host=settings.REDIS_HOST, port=settings.REDIS_PORT, db=settings.REDIS_DB)
 # r = redis.Redis(host='pythondeveloper-cache-1', port=6379, decode_responses=True)
@@ -2562,6 +2564,41 @@ def documents_database_edit(request, pk):
             'document': document
         }
     )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def documents_database_signature(request, pk):
+    document_signature = get_object_or_404(DocumentsDatabase, pk=pk)
+    if request.method == 'POST':
+        signature_data = request.POST.get('signature_data')
+        if signature_data:
+            format, imgstr = signature_data.split(';base64,')
+            ext = format.split('/')[-1]
+            signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
+
+            instance = get_object_or_404(DocumentsDatabase, pk=pk)
+            instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
+            instance.save()
+
+    return render(
+        request,
+        'TI_Management_app/documents/documents_database_signature.html',
+        {
+            'document_signature': document_signature
+        }
+    )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def documents_database_remove_signature(request, pk):
+    instance = get_object_or_404(DocumentsDatabase, pk=pk)
+    if instance.signature_image:
+        instance.signature_image.delete()
+        instance.save()
+        messages.success(request, "Podpis został usunięty.")
+    else:
+        messages.warning(request, "Nie ma podpisu do usunięcia.")
+    return redirect('TI_Management_app:documents_database_edit', pk=pk)
 
 
 # @login_required

@@ -104,7 +104,7 @@
                 const signatureData = canvas.toDataURL('image/png');
                 document.getElementById('signature_data').value = signatureData;
 
-                fetch("{% url 'TI_Management_app:register_relief_step_five_signature' pk=one_registered_relife.pk %}", {
+                fetch("{% url 'TI_Management_app:documents_database_signature' pk=document_signature.pk %}", {
                     method: "POST",
                     headers: {
                         'X-CSRFToken': '{{ csrf_token }}',

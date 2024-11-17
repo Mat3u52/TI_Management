@@ -341,6 +341,16 @@ urlpatterns = [
         name='documents_database_edit'
     ),
     path(
+        'TI_Management_app/documents/documents-database-signature/<int:pk>/',
+        views.documents_database_signature,
+        name='documents_database_signature'
+    ),
+    path(
+        'TI_Management_app/documents/documents-database-remove-signature/<int:pk>/',
+        views.documents_database_remove_signature,
+        name='documents_database_remove_signature'
+    ),
+    path(
         'TI_Management_app/documents/documents-database-delete/<int:pk>/',
         views.documents_database_delete,
         name='documents_database_delete'

@@ -1,6 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
-{% load thumbnail %}
+
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
@@ -314,7 +314,7 @@
                             {{relief_to_be_signed.member.member_nr}}<br />
                             Data: {{relief_to_be_signed.date_of_signed_by_the_applicant}}
                             <span style="color: green"><b>&#9745;</b></span><br />
-                            <img src="{% thumbnail relief_to_be_signed.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                            <img src="{{ relief_to_be_signed.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
                         {% else %}
                             {{relief_to_be_signed.complete}}
                         {% endif %}
@@ -365,8 +365,7 @@
                             </p>
                             {% if signature.signature_image %}
                                 <h5>Podpis:</h5>
-<!--                                <img src="{{ signature.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 300px; display: block; margin-top: 10px;">-->
-                                <img src="{% thumbnail signature.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                                <img src="{{ signature.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
                                 <form method="post" action="{% url 'TI_Management_app:relief_status_to_be_signed_remove_signature' pk=signature.pk pk1=relief_to_be_signed.pk %}" style="display:inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>

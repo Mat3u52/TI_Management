@@ -12,10 +12,13 @@
         #signature-canvas {
             border: 2px solid #000;
             border-radius: 5px;
-            width: 100%; /* Set width to fill the container */
-            max-width: 400px; /* Limit the maximum width */
-            height: auto; /* Set height based on width */
+            width: 100%;
+            max-width: 400px;
+            height: auto;
             touch-action: none;
+        }
+        .regulation {
+            margin-top: 20px;
         }
     </style>
 </head>
@@ -28,33 +31,44 @@
     <div class="notepad">
         <canvas id="signature-canvas"></canvas>
         <br />
-        <br />
         <button onclick="clearCanvas()">Wyczyść</button>
-        <button onclick="submitSignature()">Potwierdzam</button>
+        <button id="confirm-button" onclick="submitSignature()" disabled>Potwierdzam</button>
 
         <form id="signature-form" method="post" enctype="multipart/form-data" style="display: none;">
             {% csrf_token %}
             <input type="hidden" name="signature_data" id="signature_data">
         </form>
 
+        <div class="regulation">
+            <input type="checkbox" id="rodo-checkbox">
+            <label for="rodo-checkbox">
+                Zapoznałem/am się z <a href="/regulamin-rodo/" target="_blank">Regulaminem RODO</a> dotyczącym przechowywania podpisu elektronicznego i wyrażam na to zgodę.
+            </label>
+        </div>
+
         <script>
             const canvas = document.getElementById('signature-canvas');
             const ctx = canvas.getContext('2d');
+            const checkbox = document.getElementById('rodo-checkbox');
+            const confirmButton = document.getElementById('confirm-button');
+
+            // Enable/disable confirm button based on checkbox state
+            checkbox.addEventListener('change', function () {
+                confirmButton.disabled = !this.checked;
+            });
 
             function resizeCanvas() {
-        const rect = canvas.getBoundingClientRect();
-        canvas.width = rect.width;
-        canvas.height = rect.width * 0.75; // Adjust height ratio as needed (e.g., 0.75 for a 4:3 ratio)
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-    }
+                const rect = canvas.getBoundingClientRect();
+                canvas.width = rect.width;
+                canvas.height = rect.width * 0.75;
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            }
 
-    window.addEventListener('resize', resizeCanvas); // Resize when window size changes
-    resizeCanvas(); // Initial resize
-
+            window.addEventListener('resize', resizeCanvas);
+            resizeCanvas();
 
             let drawing = false;
 
-            // Offset calculation for accurate mouse position
             const rect = canvas.getBoundingClientRect();
 
             canvas.addEventListener('mousedown', startDrawing);
@@ -90,11 +104,10 @@
                 const signatureData = canvas.toDataURL('image/png');
                 document.getElementById('signature_data').value = signatureData;
 
-                // AJAX POST request with CSRF token included
                 fetch("{% url 'TI_Management_app:relief_status_to_be_signed_signature' pk=one_registered_relife.pk %}", {
                     method: "POST",
                     headers: {
-                        'X-CSRFToken': '{{ csrf_token }}',  // Adding CSRF token in headers
+                        'X-CSRFToken': '{{ csrf_token }}',
                     },
                     body: new FormData(document.getElementById('signature-form')),
                 })
@@ -103,7 +116,7 @@
                         if (window.opener) {
                             window.opener.location.reload();
                         }
-                        window.close(); // Close the window after successful submission
+                        window.close();
                     } else {
                         alert("Problem z wysłaniem podpisu.");
                     }

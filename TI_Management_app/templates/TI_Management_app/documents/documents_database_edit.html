@@ -1,4 +1,5 @@
 {% extends 'TI_Management_app/base.html' %}
+{% load static %}
 {% load ti_management_tags %}
 
 {% block breadcrumbs %}
@@ -37,6 +38,159 @@
         <br />
         <br />
     </form>
+    {% if document.signature_image %}
+    <h5>Podpis:</h5>
+        <img src="{{ document.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
+        <form method="post" action="{% url 'TI_Management_app:documents_database_remove_signature' pk=document.pk %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
+        </form>
+
+
+
+
+
+
+
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+        <br/>
+
+
+
+<!-- Include jsPDF and pdf.js -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+
+<script>
+    function addSignatureToPdf() {
+        const signatureImageUrl = "{{ document.signature_image.url }}";  // URL of the signature image
+        const pdfUrl = "{{ document.file.url }}"; // URL of the PDF file
+
+        // Fetch the PDF and signature image
+        Promise.all([
+            fetch(pdfUrl).then(res => res.blob()),  // Fetch the PDF as a Blob
+            fetch(signatureImageUrl).then(res => res.blob()) // Fetch the signature image as a Blob
+        ]).then(([pdfBlob, signatureBlob]) => {
+            // Create a jsPDF instance
+            const { jsPDF } = window.jspdf;
+            const pdf = new jsPDF();
+
+            // Load the PDF with pdf.js
+            const fileReader = new FileReader();
+            fileReader.onload = function(event) {
+                const pdfData = new Uint8Array(event.target.result);
+
+                // Initialize pdf.js
+                const loadingTask = pdfjsLib.getDocument(pdfData);
+                loadingTask.promise.then(function(pdfDoc) {
+                    // Get the first page of the PDF
+                    pdfDoc.getPage(1).then(function(page) {
+                        const viewport = page.getViewport({ scale: 1 });  // No scaling
+
+                        // Prepare the canvas to render the PDF page
+                        const canvas = document.createElement('canvas');
+                        const context = canvas.getContext('2d');
+                        canvas.height = viewport.height;
+                        canvas.width = viewport.width;
+
+                        // Render the page onto the canvas
+                        page.render({
+                            canvasContext: context,
+                            viewport: viewport
+                        }).promise.then(function() {
+                            // Once the page is rendered, create the final PDF
+
+                            // Convert canvas to image
+                            const imgData = canvas.toDataURL('image/png');
+
+                            // Create a new jsPDF document with the exact same size as the original PDF
+                            const pdfWidth = canvas.width / 3; // Calculate based on 72 dpi (standard for jsPDF)
+                            const pdfHeight = canvas.height / 3; // 72 dpi is the default in jsPDF
+                            const pdf = new jsPDF({
+                                unit: 'mm',
+                                format: [pdfWidth, pdfHeight] // Set size to match the canvas size (PDF dimensions)
+                            });
+
+                            // Add the rendered image to the new PDF (without rescaling)
+                            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+                            // Now load the signature image and add it to the PDF
+                            const signatureImage = new Image();
+                            signatureImage.src = URL.createObjectURL(signatureBlob);
+
+                            signatureImage.onload = function() {
+                                // Adjust the size of the signature
+                                const signatureWidth = 50;  // Adjust the width
+                                const signatureHeight = 30;  // Adjust the height
+
+                                // Position the signature in the bottom-right corner
+                                const signatureX = pdfWidth - signatureWidth - 10; // 10mm margin from the right
+                                const signatureY = pdfHeight - signatureHeight - 10; // 10mm margin from the bottom
+
+                                // Add the signature image to the PDF at the new position
+                                pdf.addImage(signatureImage, 'PNG', signatureX, signatureY, signatureWidth, signatureHeight);
+
+                                // Save the updated PDF
+                                pdf.save('updated_document.pdf');
+                            };
+                        });
+                    });
+                });
+            };
+            fileReader.readAsArrayBuffer(pdfBlob);
+        }).catch(error => {
+            console.error('Error loading PDF or signature image:', error);
+        });
+    }
+</script>
+
+<!-- Button to trigger the signature adding process -->
+<button onclick="addSignatureToPdf()" class="btn btn-success btn-sm">
+    Dodaj podpis do PDF
+</button>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    {% else %}
+        <p>
+            <a href="{% url 'TI_Management_app:documents_database_signature' pk=document.pk %}"
+                onclick="openSignatureWindow(event)"
+                class="btn btn-primary btn-sm pull-left">
+                Okno podpisu
+            </a>
+        </p>
+        <br />
+        <br />
+        <script>
+            function openSignatureWindow(event) {
+                event.preventDefault(); // Prevent the default anchor click behavior
+                const url = event.currentTarget.href;
+                window.open(url, 'SignatureWindow', 'width=600,height=600,resizable=yes,scrollbars=yes');
+            }
+        </script>
+    {% endif %}
 </div>
 
 <div class="hero-unit">
@@ -68,11 +222,13 @@
                             {{ h.title }}
                     <br />
                         {% if h.file %}
-                            <a href="../../media/{{ h.file|escape }}">
 <!--                            <a href="../../media/{{ h.file|escape }}">-->
-<!--                               {{ h.file|cut:'documentsDatabase/' }}-->
-                               {{ h.file|filename }}
-                            </a>
+<!--                            <a href="{{ h.file.url }}">-->
+<!--                            <a href="{{ h.file }}">-->
+<!--                            <a href="{{ MEDIA_URL }}{{ h.file }}">-->
+                            {{ h.file|filename }}
+<!--                            </a>-->
+<!--                        <p>{{ MEDIA_URL }}{{ h.file }}</p>-->
                         {% else %}
 <!--                            {{ h.file|cut:'documentsDatabase/' }}-->
                             {{ h.file|filename }}
@@ -85,9 +241,16 @@
         </div>
     {% endfor %}
 </div>
-
 {% endblock %}
 
 {% block menu %}
 {% include 'TI_Management_app/menu.html' with active_tab='documents_database' %}
 {% endblock %}
+
+
+
+
+
+
+
+
