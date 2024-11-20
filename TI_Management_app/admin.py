@@ -130,7 +130,8 @@ class DocumentsDatabaseAdmin(admin.ModelAdmin):
         'responsible',
         'slug',
         'author',
-        'updated_date'
+        'updated_date',
+        'signature_image'
     )
     list_filter = (
         'title',
@@ -140,7 +141,8 @@ class DocumentsDatabaseAdmin(admin.ModelAdmin):
         'responsible',
         'slug',
         'author',
-        'updated_date'
+        'updated_date',
+        'signature_image'
     )
     search_fields = (
         'title',
