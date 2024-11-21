@@ -27,6 +27,7 @@ mydb.py
 /media/orderedCardDocument/*
 /media/toBePickedUpCardDocument/*
 /media/documentsDatabase/*
+/media/documentsDatabaseSigned/*
 /media/uploadsDocumentsDatabaseSignatures/*
 /media/uploadsRegisterRelief/*
 /media/uploadsRegisterReliefSignatures/*
