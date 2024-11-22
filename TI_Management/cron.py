@@ -34,7 +34,7 @@ def ti_management_backup():
         # Cleanup old signature images
         logger.info("Starting cleanup of old signature images...")
         old_documents = DocumentsDatabase.objects.filter(
-            created_date__lt=now() - timedelta(hours=1),
+            created_date__lt=now() - timedelta(hours=1),  # only 1 hour !!!!
             signature_image__isnull=False
         )
         deleted_count = 0
@@ -87,3 +87,5 @@ def ti_management_backup():
         logger.error(f"Backup command failed: {e}")
     except Exception as e:
         logger.exception("An unexpected error occurred during the backup or cleanup process.")
+
+
