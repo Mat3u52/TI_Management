@@ -177,7 +177,8 @@ class DocumentsDatabase(models.Model):
     category = models.ForeignKey(DocumentsDatabaseCategory, on_delete=models.CASCADE, related_name='documentsDatabaseCategpry', null=True, blank=True)
     title = models.CharField(max_length=250, null=False, blank=False)
     file = models.FileField(null=False, blank=False, upload_to='documentsDatabase/%Y/%m/%d/%H%M%S/')
-    signature_image = models.ImageField(upload_to="uploadsDocumentsDatabaseSignatures/%Y/%m/%d/%H%M%S/", null=True, blank=True)
+    signature_image = models.ImageField(upload_to='uploadsDocumentsDatabaseSignatures/', max_length=250, null=True, blank=True)
+    signature_file = models.FileField(null=True, blank=True, max_length=250, upload_to='documentsDatabaseSigned/')
     responsible = models.CharField(max_length=250, null=True, blank=True)
     history = HistoricalRecords()
 
