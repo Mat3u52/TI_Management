@@ -11,6 +11,8 @@ db.json
 db.sqlite3
 mydb.py
 .env
+docker-compose.yaml
+Dockerfile
 /ssl/*
 /staticfiles/*
 /TI_Management/settings/settings.py
