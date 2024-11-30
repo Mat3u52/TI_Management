@@ -2268,22 +2268,68 @@ class RegisterReliefForm(forms.ModelForm):
         return cleaned_data
 
 
-# class MultipleFileInput(forms.ClearableFileInput):
-#     allow_multiple_selected = True
-#
-#
-# class MultipleFileField(forms.FileField):
-#     def __init__(self, *args, **kwargs):
-#         kwargs.setdefault("widget", MultipleFileInput())
-#         super().__init__(*args, **kwargs)
-#
-#     def clean(self, data, initial=None):
-#         single_file_clean = super().clean
-#         if isinstance(data, (list, tuple)):
-#             result = [single_file_clean(d, initial) for d in data]
-#         else:
-#             result = single_file_clean(data, initial)
-#         return result
+class RegisterReliefEditForm(forms.ModelForm):
+    class Meta:
+        model = RegisterRelief
+        fields = [
+            'relief',
+            'relation',
+            'associate_forename',
+            'associate_surname',
+            'account_number',
+            'date_of_completing_the_application',
+            'date_of_receipt_the_application',
+            'date_of_accident',
+            'reason',
+            'file'
+        ]
+        widgets = {
+            'date_of_completing_the_application': forms.DateInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'date_of_receipt_the_application': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'date_of_accident': forms.TextInput(
+                attrs={
+                    'type': 'date'
+                }
+            ),
+            'reason': CKEditor5Widget(
+                config_name='default'
+            ),
+        }
+
+    def clean(self):
+        cleaned_data = super().clean()
+        date_of_accident = cleaned_data.get('date_of_accident')
+
+        if not date_of_accident:
+            raise forms.ValidationError("Podaj datę zdarzenia.")
+
+        relief = cleaned_data.get('relief')
+        if relief:
+            grace_period = relief.grace
+            grace_period = grace_period*30
+        else:
+            raise forms.ValidationError("Nie można pobrać czasu karencji dla tej zapomogi.")
+
+        waiting_period_end = date_of_accident + timezone.timedelta(days=grace_period)
+
+        if timezone.now() < waiting_period_end:
+            remaining_days = (waiting_period_end - timezone.now()).days
+            raise forms.ValidationError(f"Czas karencji {relief.grace} nie minął. Pozostało {remaining_days} dni.")
+
+        bank_account = cleaned_data.get('account_number')
+        if bank_account:
+            if not re.match(r'^\d{26}$', bank_account):
+                raise forms.ValidationError("Nieprawidłowy numer konta bankowego.")
+
+        return cleaned_data
 
 
 class MultipleFileInput(forms.ClearableFileInput):
