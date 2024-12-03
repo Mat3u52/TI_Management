@@ -52,7 +52,7 @@ from django_ckeditor_5.widgets import CKEditor5Widget
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password, check_password
 # from django.contrib.auth.hashers import check_password
-
+from django.contrib import messages
 
 def validate_phone_number(value):
     phone_pattern = re.compile(r'^\+?1?\d{9,15}$')
@@ -2269,6 +2269,16 @@ class RegisterReliefForm(forms.ModelForm):
 
 
 class RegisterReliefEditForm(forms.ModelForm):
+    file = forms.FileField(
+        label='Select a PDF file',
+        widget=forms.FileInput(
+            attrs={
+                'accept': 'application/pdf'
+            }
+        ),
+        required=False
+    )
+
     class Meta:
         model = RegisterRelief
         fields = [
@@ -2280,8 +2290,7 @@ class RegisterReliefEditForm(forms.ModelForm):
             'date_of_completing_the_application',
             'date_of_receipt_the_application',
             'date_of_accident',
-            'reason',
-            'file'
+            'reason'
         ]
         widgets = {
             'date_of_completing_the_application': forms.DateInput(
@@ -3526,6 +3535,7 @@ class VotingSessionSignatureForm(forms.ModelForm):
     def __init__(self, *args, **kwargs):
         self.vote = kwargs.pop('vote', None)
         # self.session_signature = kwargs.pop('session_signature', None)
+        self.request = kwargs.pop('request', None)  # Pop the request object
         super().__init__(*args, **kwargs)
 
     class Meta:
@@ -3540,6 +3550,8 @@ class VotingSessionSignatureForm(forms.ModelForm):
         # session_signature = self.session_signature
 
         if not vote:
+            if self.request:
+                messages.error(self.request, "Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
             raise ValidationError("Nie można zweryfikować podpisu, ponieważ głosowanie nie jest powiązane.")
 
         # vote = voting_session_kick_off.vote
@@ -3550,6 +3562,8 @@ class VotingSessionSignatureForm(forms.ModelForm):
                 # Check if the signature already exists for this member in this voting session
                 existing_signature = vote.voteVotingSessionSignature.filter(member=member).exists()
                 if existing_signature:
+                    if self.request:
+                        messages.error(self.request, "oddałes juz głos.")
                     raise ValidationError("oddałes juz głos.")
 
                 # if session_signature.filter(member=member, vote=vote).exists():
@@ -3557,12 +3571,15 @@ class VotingSessionSignatureForm(forms.ModelForm):
 
                 return member_signature
 
+        if self.request:
+            messages.error(self.request, "Podpis nie istnieje na liście uprawnionych do głosowania.")
         raise ValidationError("Podpis nie istnieje na liście uprawnionych do głosowania.")
 
 
 class ChoiceForm(forms.Form):
     def __init__(self, *args, **kwargs):
         poll = kwargs.pop('poll', None)  # Get the specific poll from kwargs if provided
+        self.request = kwargs.pop('request', None)
         # user = kwargs.pop('user', None)  # Get the specific poll from kwargs if provided
         self.poll = poll  # Save the poll for later use
         # self.user = user  # Save the poll for later use
@@ -3600,6 +3617,8 @@ class ChoiceForm(forms.Form):
 
         # Validate based on the number of required responses
         if len(selected_answers) != required_responses:
+            if self.request:
+                messages.error(self.request, f"Proszę wybierz dokładnie {required_responses} odpowiedzi.")
             raise forms.ValidationError(f'Proszę wybierz dokładnie {required_responses} odpowiedzi.')
 
 
