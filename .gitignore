@@ -23,6 +23,7 @@ Dockerfile
 /media/uploadsGroup/*
 /media/uploadsMember/*
 /media/uploadsVoteFile/*
+/media/uploadsVotingSessionKickOffSignature/*
 /media/uploadsNotepad/*
 /media/uploadsLoyaltyCards/*
 /media/uploadsLoyaltyCards_a/*
