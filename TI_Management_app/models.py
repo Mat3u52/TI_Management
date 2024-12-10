@@ -439,6 +439,7 @@ class VotingSessionKickOffSignature(models.Model):
     voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='voteVotingSessionKickOffSignature', null=False, blank=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionKickOffSignature', null=False, blank=False)
     signature = models.BooleanField(default=False)
+    signature_image = models.ImageField(upload_to="uploadsVotingSessionKickOffSignature/%Y/%m/%d/%H%M%S/", null=True, blank=True)
 
     history = HistoricalRecords()
 
@@ -467,8 +468,11 @@ class VotingSessionSignature(models.Model):
     voting_session_kick_off = models.ForeignKey(VotingSessionKickOff, on_delete=models.CASCADE, related_name='kickOffVotingSessionSignature', null=False, blank=False)
     member = models.ForeignKey(MembersZZTI, on_delete=models.CASCADE, related_name='memberVotingSessionSignature', null=False, blank=False)
     signature = models.BooleanField(default=False)
+    signature_image = models.ImageField(upload_to="uploadsVotingSessionSignature/%Y/%m/%d/%H%M%S/", null=True, blank=True)
     confirmation = models.BooleanField(default=False)
     reject = models.BooleanField(default=False)
+    complete = models.BooleanField(default=False)
+    date_complete = models.DateTimeField(default=None, blank=True, null=True)
 
     # session_end = models.DateTimeField(default=None, blank=True, null=True)
 
@@ -953,6 +957,7 @@ class RegisterRelief(models.Model):
     payment_confirmation = models.BooleanField(default=False)  # min 3 signed
     date_of_payment_confirmation = models.DateTimeField(blank=True, null=True)
     signature_image = models.ImageField(upload_to="uploadsRegisterReliefSignatures/%Y/%m/%d/%H%M%S/", null=True, blank=True)
+    # date_of_signature = models.DateTimeField(blank=True, null=True)
     # reason = models.TextField(null=True, blank=True, default=None)
     reason = models.TextField(null=True, blank=True, default=None)
 
