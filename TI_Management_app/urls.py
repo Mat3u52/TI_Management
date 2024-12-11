@@ -340,15 +340,29 @@ urlpatterns = [
         views.documents_database_edit,
         name='documents_database_edit'
     ),
+    path('TI_Management_app/documents/documents-database-save-signature-file/<int:pk>/save-signature/',
+         views.documents_database_save_signature_file,
+         name='documents_database_save_signature_file'
+    ),
     path(
         'TI_Management_app/documents/documents-database-signature/<int:pk>/',
         views.documents_database_signature,
         name='documents_database_signature'
     ),
     path(
+        'TI_Management_app/documents/documents-decrypt-signature/<int:pk>/',
+        views.documents_decrypt_signature,
+        name='documents_decrypt_signature'
+    ),
+    path(
         'TI_Management_app/documents/documents-database-remove-signature/<int:pk>/',
         views.documents_database_remove_signature,
         name='documents_database_remove_signature'
+    ),
+    path(
+        'TI_Management_app/documents/documents-database-encrypt-signature<int:pk>/',
+        views.documents_database_encrypt_signature,
+        name='documents_database_encrypt_signature'
     ),
     path(
         'TI_Management_app/documents/documents-database-delete/<int:pk>/',
@@ -421,6 +435,11 @@ urlpatterns = [
         name='register_relief_step_one_search'
     ),
     path(
+        'TI_Management_app/finance/register-relief-step-one-remove/<int:pk>/',
+        views.register_relief_step_one_remove,
+        name='register_relief_step_one_remove'
+    ),
+    path(
         'TI_Management_app/finance/register-relief-step-two/<int:pk>/',
         views.register_relief_step_two,
         name='register_relief_step_two'
@@ -444,6 +463,11 @@ urlpatterns = [
         name='register_relief_step_five'
     ),
     path(
+        'TI_Management_app/finance/register-relief-step-five-edit/<int:pk>/',
+        views.register_relief_step_five_edit,
+        name='register_relief_step_five_edit'
+    ),
+    path(
         'TI_Management_app/finance/register-relief-step-five-signature/<int:pk>/',
         views.register_relief_step_five_signature,
         name='register_relief_step_five_signature'
@@ -454,9 +478,29 @@ urlpatterns = [
         name='register_relief_step_five_remove_signature'
     ),
     path(
+        'TI_Management_app/finance/register-relief-step-five-decrypt-signature/<int:pk>/',
+        views.register_relief_step_five_decrypt_signature,
+        name='register_relief_step_five_decrypt_signature'
+    ),
+    path(
+        'TI_Management_app/finance/register-relief-step-five-encrypt-signature/<int:pk>/',
+        views.register_relief_step_five_encrypt_signature,
+        name='register_relief_step_five_encrypt_signature'
+    ),
+    path(
         'TI_Management_app/finance/register-relief-valid/<int:pk>/',
         views.register_relief_valid,
         name='register_relief_valid'
+    ),
+    path(
+        'TI_Management_app/finance/register-relief-valid-decrypt-signature/<int:pk>/',
+        views.register_relief_valid_decrypt_signature,
+        name='register_relief_valid_decrypt_signature'
+    ),
+    path(
+        'TI_Management_app/finance/register-relief-valid-encrypt-signature/<int:pk>/',
+        views.register_relief_valid_encrypt_signature,
+        name='register_relief_valid_encrypt_signature'
     ),
     path(
         'TI_Management_app/finance/relief-status-list/',
@@ -472,6 +516,16 @@ urlpatterns = [
         'TI_Management_app/finance/relief-status-to-be-signed/<int:pk>/',
         views.relief_status_to_be_signed,
         name='relief_status_to_be_signed'
+    ),
+    path(
+        'TI_Management_app/finance/relief-status-to-be-signed-decrypt-signature/<int:pk>/',
+        views.relief_status_to_be_signed_decrypt_signature,
+        name='relief_status_to_be_signed_decrypt_signature'
+    ),
+    path(
+        'TI_Management_app/finance/relief-status-to-be-signed-encrypt-signature/<int:pk>/',
+        views.relief_status_to_be_signed_encrypt_signature,
+        name='relief_status_to_be_signed_encrypt_signature'
     ),
     path(
         'TI_Management_app/finance/relief-status-to-be-signed-signature/<int:pk>/',
@@ -645,6 +699,11 @@ urlpatterns = [
         name='voting_active_session_detail'
     ),
     path(
+        'TI_Management_app/voting/voting-active-session-detail-remove/<int:pk_vote>/<int:pk_kick_off>/<int:pk>/',
+        views.voting_active_session_detail_remove,
+        name='voting_active_session_detail_remove'
+    ),
+    path(
         'voting-active-session-member-detail/<slug:slug>/',
         VotingActiveSessionMemberDetail.as_view(),
         name='voting_active_session_member_detail'
@@ -713,6 +772,16 @@ urlpatterns = [
         'TI_Management_app/voting/voting-history-and-reports-detail/<int:pk>/',
         views.voting_history_and_reports_detail,
         name='voting_history_and_reports_detail'
+    ),
+    path(
+        'TI_Management_app/voting/voting-history-and-reports-detail-decrypt-signature/<int:pk>/',
+        views.voting_history_and_reports_detail_decrypt_signature,
+        name='voting_history_and_reports_detail_decrypt_signature'
+    ),
+    path(
+        'TI_Management_app/voting/voting-history-and-reports-detail-encrypt-signature/<int:pk>/',
+        views.voting_history_and_reports_detail_encrypt_signature,
+        name='voting_history_and_reports_detail_encrypt_signature'
     ),
     path(
         'TI_Management_app/voting/voting-history-and-reports-detail-pdf-advance/<int:pk>/',
