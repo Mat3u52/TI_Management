@@ -3,6 +3,12 @@ import os
 import re
 import base64
 
+
+from PIL import Image
+from io import BytesIO
+from PyPDF2 import PdfReader, PdfWriter
+from django.core.files import File
+
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from .models import (
@@ -103,7 +109,8 @@ from .forms import (
     VoteFileForm,
     DashboardCategoriesForm,
     HeadquartersForm,
-    NotepadMemberHiddenForm
+    NotepadMemberHiddenForm,
+    RegisterReliefEditForm
 )
 from django.views.decorators.http import require_POST
 from django.views.generic.detail import DetailView
@@ -149,7 +156,18 @@ from django.utils.decorators import method_decorator
 import redis
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
+# from bleach.css_sanitizer import CSSSanitizer
 
+from django.db import transaction
+
+from cryptography.fernet import Fernet
+import os
+SIGNATURE_KEY = os.getenv('DJANGO_SIGNATURE_KEY')
+if not SIGNATURE_KEY:
+    raise ValueError("Signature encryption key not found. Please set 'DJANGO_SIGNATURE_KEY'.")
+
+cipher_suite = Fernet(SIGNATURE_KEY)
+# from django.contrib.auth.decorators import user_passes_test
 
 
 
@@ -255,7 +273,8 @@ def member_export_csv(request):
             'Rodzaj umowy',
             'Data zatrudnienia',
             'Data rozwiązania umowy',
-            'Dezaktywacja'
+            'Dezaktywacja',
+            'HID'
         ]
     )
 
@@ -276,11 +295,16 @@ def member_export_csv(request):
         'type_of_contract',
         'date_of_contract',
         'expiration_date_contract',
-        'deactivate'
+        'deactivate',
+        'card'
     )
 
+    # for member in members:
+    #     writer.writerow(member)
     for member in members:
-        writer.writerow(member)
+        member_list = list(member)
+        member_list[-1] = 'Dodana' if member_list[-1] else 'Brak'
+        writer.writerow(member_list)
 
     return response
 
@@ -2486,26 +2510,72 @@ def documents_database_category_edit(request, pk):
     )
 
 
-# @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def documents_database_category_delete(request, pk):
     category = get_object_or_404(DocumentsDatabaseCategory, pk=pk)
     category.author = request.user
-    # category.documentsDatabaseCategory.file.delete()
+
+    # Deleting files associated with documents in this category
     documents = DocumentsDatabase.objects.filter(category=category)
 
     for document in documents:
-        for file_path in document.history.values_list('file', flat=True):
-            absolute_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
-            if os.path.exists(absolute_file_path):
-                os.remove(absolute_file_path)
-        # document.file.delete()
+        # Deleting files in history (if applicable)
+        if hasattr(document, 'history'):
+            for file_path in document.history.values_list('file', flat=True):
+                absolute_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+                if os.path.exists(absolute_file_path):
+                    try:
+                        os.remove(absolute_file_path)
+                    except OSError as e:
+                        print(f"Error deleting file {absolute_file_path}: {e}")
 
+        # Deleting document's files
+        if document.file:
+            document.file.delete(save=False)
+        if document.signature_image:
+            document.signature_image.delete(save=False)
+        if document.signature_file:
+            document.signature_file.delete(save=False)
+
+        # Delete the document record
+        document.delete()
+
+    # Delete the category
     category.delete()
+
     return redirect('TI_Management_app:documents_database_category')
 
 
 # @login_required
+# @user_passes_test(lambda user: user.is_superuser)
+# def documents_database(request):
+#     documents = DocumentsDatabase.objects.all()
+#
+#     if request.method == "POST":
+#         form = DocumentsDatabaseForm(request.POST, request.FILES)
+#         if form.is_valid():
+#             doc = form.save(commit=False)
+#             doc.author = request.user
+#             doc.save()
+#             messages.success(request, f"Dodano nowy dokument {doc.title}!")
+#             return redirect('TI_Management_app:documents_database')
+#     else:
+#         username = request.user.username
+#         form = DocumentsDatabaseForm(
+#             initial={
+#                 'responsible': username
+#             }
+#         )
+#     return render(
+#         request,
+#         'TI_Management_app/documents/documents_database.html',
+#         {
+#             'form': form,
+#             'documents': documents
+#         }
+#     )
+
+
 @user_passes_test(lambda user: user.is_superuser)
 def documents_database(request):
     documents = DocumentsDatabase.objects.all()
@@ -2515,6 +2585,29 @@ def documents_database(request):
         if form.is_valid():
             doc = form.save(commit=False)
             doc.author = request.user
+
+            # Encrypt the PDF file before saving
+            if doc.file.name.endswith('.pdf'):
+                # Read the uploaded PDF file
+                input_pdf = request.FILES['file']
+                reader = PdfReader(input_pdf)
+                writer = PdfWriter()
+
+                # Add all pages to the writer
+                for page_num in range(len(reader.pages)):
+                    writer.add_page(reader.pages[page_num])
+
+                # Encrypt the PDF with a password
+                output_pdf = io.BytesIO()
+                writer.encrypt('qwertytimanagement')  # Replace with your actual password
+
+                # Write the encrypted PDF to the output stream
+                writer.write(output_pdf)
+                output_pdf.seek(0)
+
+                # Wrap the BytesIO object with Django's File class
+                doc.file = File(output_pdf, name=input_pdf.name)
+
             doc.save()
             messages.success(request, f"Dodano nowy dokument {doc.title}!")
             return redirect('TI_Management_app:documents_database')
@@ -2525,6 +2618,7 @@ def documents_database(request):
                 'responsible': username
             }
         )
+
     return render(
         request,
         'TI_Management_app/documents/documents_database.html',
@@ -2535,7 +2629,36 @@ def documents_database(request):
     )
 
 
-# @login_required
+# @user_passes_test(lambda user: user.is_superuser)
+# def documents_database_edit(request, pk):
+#     document = get_object_or_404(DocumentsDatabase, pk=pk)
+#
+#     if request.method == "POST":
+#         form = DocumentsDatabaseForm(request.POST, request.FILES, instance=document)
+#         if form.is_valid():
+#             doc = form.save(commit=False)
+#             doc.author = request.user
+#             doc.save()
+#             messages.success(request, f"Zaktualizowano dokument {document.title}!")
+#             return redirect('TI_Management_app:documents_database')
+#     else:
+#         username = request.user.username
+#         form = DocumentsDatabaseForm(
+#             instance=document,
+#             initial={
+#                 'responsible': username
+#             }
+#         )
+#
+#     return render(
+#         request,
+#         'TI_Management_app/documents/documents_database_edit.html',
+#         {
+#             'form': form,
+#             'document': document
+#         }
+#     )
+
 @user_passes_test(lambda user: user.is_superuser)
 def documents_database_edit(request, pk):
     document = get_object_or_404(DocumentsDatabase, pk=pk)
@@ -2545,6 +2668,29 @@ def documents_database_edit(request, pk):
         if form.is_valid():
             doc = form.save(commit=False)
             doc.author = request.user
+
+            # Encrypt the PDF file before saving
+            if 'file' in request.FILES and request.FILES['file'].name.endswith('.pdf'):
+                # Read the uploaded PDF file
+                input_pdf = request.FILES['file']
+                reader = PdfReader(input_pdf)
+                writer = PdfWriter()
+
+                # Add all pages to the writer
+                for page_num in range(len(reader.pages)):
+                    writer.add_page(reader.pages[page_num])
+
+                # Encrypt the PDF with a password
+                output_pdf = io.BytesIO()
+                writer.encrypt('qwertytimanagement')  # Replace with your actual password
+
+                # Write the encrypted PDF to the output stream
+                writer.write(output_pdf)
+                output_pdf.seek(0)
+
+                # Wrap the BytesIO object with Django's File class
+                doc.file = File(output_pdf, name=input_pdf.name)
+
             doc.save()
             messages.success(request, f"Zaktualizowano dokument {document.title}!")
             return redirect('TI_Management_app:documents_database')
@@ -2556,6 +2702,7 @@ def documents_database_edit(request, pk):
                 'responsible': username
             }
         )
+
     return render(
         request,
         'TI_Management_app/documents/documents_database_edit.html',
@@ -2569,24 +2716,213 @@ def documents_database_edit(request, pk):
 @user_passes_test(lambda user: user.is_superuser)
 def documents_database_signature(request, pk):
     document_signature = get_object_or_404(DocumentsDatabase, pk=pk)
+
     if request.method == 'POST':
         signature_data = request.POST.get('signature_data')
         if signature_data:
-            format, imgstr = signature_data.split(';base64,')
-            ext = format.split('/')[-1]
-            signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
+            try:
+                # Decode the new signature data from the POST request
+                format, imgstr = signature_data.split(';base64,')
+                ext = format.split('/')[-1]
+                new_signature_data = base64.b64decode(imgstr)
 
-            instance = get_object_or_404(DocumentsDatabase, pk=pk)
-            instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
-            instance.save()
+                # Open the new signature as an image
+                new_signature = Image.open(BytesIO(new_signature_data))
+
+                # Check if an existing signature exists
+                if document_signature.signature_image:
+
+                    # Delete the previous file if it exists
+                    # if document_signature.signature_image.name:
+                    #     old_file_path = os.path.join(settings.MEDIA_ROOT, document_signature.signature_image.name)
+                    #     if os.path.exists(old_file_path):
+                    #         os.remove(old_file_path)
+
+                    # Decrypt the existing signature image
+                    encrypted_data = document_signature.signature_image.read()
+                    decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+                    document_signature.signature_image.delete()
+
+                    # Open the decrypted image
+                    existing_signature = Image.open(BytesIO(decrypted_data))
+
+                    # Get the dimensions of both images (old and new)
+                    existing_width, existing_height = existing_signature.size
+                    new_width, new_height = new_signature.size
+
+                    # Create a new blank image large enough to contain both signatures side by side
+                    total_width = existing_width + new_width
+                    max_height = max(existing_height, new_height)
+                    combined_image = Image.new('RGBA', (total_width, max_height))
+
+                    # Paste the old and new signature images into the combined image
+                    combined_image.paste(existing_signature, (0, 0))
+                    combined_image.paste(new_signature, (existing_width, 0))
+
+                    # Save the combined image into a new in-memory file
+                    combined_image_file = BytesIO()
+                    combined_image.save(combined_image_file, format='PNG')
+                    combined_image_file.seek(0)
+
+                    # Encrypt the combined signature image
+                    encrypted_data = cipher_suite.encrypt(combined_image_file.read())
+
+                    # Save the encrypted image file
+                    # signature_file = ContentFile(encrypted_data, name=f'signature_{pk}_combined.png')
+                    signature_file = ContentFile(encrypted_data, name=f'signature_{pk}.png')
+                    # document_signature.signature_image.save(f'signature_{pk}_encrypted_combined.png', signature_file)
+                    document_signature.signature_image.save(f'signature_{pk}_encrypted.png', signature_file)
+                    document_signature.save()
+
+                else:
+                    # If no existing signature, just encrypt the new one and save it
+                    encrypted_data = cipher_suite.encrypt(new_signature_data)
+
+                    # signature_file = ContentFile(encrypted_data, name=f'signature_{pk}_new.png')
+                    signature_file = ContentFile(encrypted_data, name=f'signature_{pk}.png')
+                    # document_signature.signature_image.save(f'signature_{pk}_encrypted_new.png', signature_file)
+                    document_signature.signature_image.save(f'signature_{pk}_encrypted.png', signature_file)
+                    document_signature.save()
+
+                return render(
+                    request,
+                    'TI_Management_app/documents/documents_database_signature.html',
+                    {
+                        'document_signature': document_signature,
+                        'success_message': "Signature saved successfully and encrypted.",
+                    }
+                )
+            except Exception as e:
+                return render(
+                    request,
+                    'TI_Management_app/documents/documents_database_signature.html',
+                    {
+                        'document_signature': document_signature,
+                        'error_message': f"An error occurred while processing the signature: {str(e)}",
+                    }
+                )
 
     return render(
         request,
         'TI_Management_app/documents/documents_database_signature.html',
         {
-            'document_signature': document_signature
+            'document_signature': document_signature,
         }
     )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def documents_database_encrypt_signature(request, pk):
+    document_signature = get_object_or_404(DocumentsDatabase, pk=pk)
+    showed = False
+    if request.method == 'POST':
+        try:
+            # Retrieve the existing signature image
+            if not document_signature.signature_image:
+                return JsonResponse({'success': False, 'error_message': 'No signature image found'})
+
+            # Read the binary content of the signature file
+            signature_path = document_signature.signature_image.path
+            with open(signature_path, 'rb') as f:
+                binary_data = f.read()
+
+            # Encrypt the binary data
+            encrypted_data = cipher_suite.encrypt(binary_data)
+
+            # Overwrite the existing file with the encrypted data
+            with open(signature_path, 'wb') as f:
+                f.write(encrypted_data)
+
+            # return JsonResponse({'success': True})
+            return redirect(f'{reverse("TI_Management_app:documents_database_edit", args=[pk])}?showed={bool(showed)}')
+        except Exception as e:
+            return JsonResponse({'success': False, 'error_message': f"An error occurred: {str(e)}"})
+
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
+    # return redirect(f'{reverse("TI_Management_app:documents_database_edit", args=[pk])}?showed={bool(showed)}')
+
+
+@user_passes_test(lambda user: user.is_superuser)
+@csrf_exempt
+def documents_database_save_signature_file(request, pk):
+    if request.method == 'POST':
+        document = get_object_or_404(DocumentsDatabase, pk=pk)
+        if 'signature_file' in request.FILES:
+            file = request.FILES['signature_file']
+
+            if document.signature_file:
+                document.signature_file.delete()
+
+            # Read the uploaded file
+            pdf_reader = PdfReader(file)
+            pdf_writer = PdfWriter()
+
+            # Add all pages to the writer
+            for page_num in range(len(pdf_reader.pages)):
+                pdf_writer.add_page(pdf_reader.pages[page_num])
+
+            # Encrypt the PDF (replace 'your_password' with the desired password)
+            password = 'qwertytimanagement'
+            pdf_writer.encrypt(password)
+
+            # Save the encrypted PDF to a BytesIO object
+            encrypted_pdf = BytesIO()
+            pdf_writer.write(encrypted_pdf)
+            encrypted_pdf.seek(0)
+
+            # Save the encrypted file to the model field
+            document.signature_file.save(f'{document.pk}_{file.name}', encrypted_pdf)  # Save the encrypted file
+            document.save()
+
+            return JsonResponse({'success': True})
+
+        return JsonResponse({'success': False, 'error': 'No file uploaded'})
+
+    return JsonResponse({'success': False, 'error': 'Invalid request method'})
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def documents_decrypt_signature(request, pk):
+    document = get_object_or_404(DocumentsDatabase, pk=pk)
+    showed = True
+
+    # Decrypt the signature if it exists
+    if document.signature_image:
+        try:
+            # Ensure the file name is valid
+            signature_name = document.signature_image.name
+            if signature_name is None:
+                raise ValueError("No signature file available to decrypt.")
+
+            # Initialize the encryption/decryption cipher suite
+            cipher_suite = Fernet(SIGNATURE_KEY.encode())  # Initialize Fernet with the key
+            encrypted_data = document.signature_image.read()  # Read the encrypted data from the image file
+
+            # Decrypt the signature
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+            # If the document has a signature, delete the existing file before saving the decrypted file
+            if signature_name:
+                document.signature_image.delete(save=False)  # Delete the old signature file
+
+            # Correct the file path and save the decrypted signature
+            # Ensure that the signature is saved in the correct directory, without extra subdirectories
+            file_path = signature_name.split('/')[-1]  # Extract the filename without path
+
+            document.signature_image.save(
+                file_path,  # Save the file with just the file name, no additional directories
+                ContentFile(decrypted_data)  # Save the decrypted data as a new file
+            )
+            document.save()
+
+            messages.success(request, f"Wyświetlono podpis {document.title}!")
+            # showed = True
+        except Exception as e:
+            messages.error(request, f"Error decrypting the signature: {str(e)}")
+
+    # return redirect('TI_Management_app:documents_database_edit', pk=pk)
+    return redirect(f'{reverse("TI_Management_app:documents_database_edit", args=[pk])}?showed={bool(showed)}')
 
 
 @user_passes_test(lambda user: user.is_superuser)
@@ -2627,18 +2963,29 @@ def documents_database_search(request):
         )
 
 
-# @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def documents_database_delete(request, pk):
     documents = get_object_or_404(DocumentsDatabase, pk=pk)
-    documents.author = request.user
 
-    for file_path in documents.history.values_list('file', flat=True):
-        absolute_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
-        if os.path.exists(absolute_file_path):
-            os.remove(absolute_file_path)
+    # Deleting files in history (if applicable)
+    if hasattr(documents, 'history'):
+        for file_path in documents.history.values_list('file', flat=True):
+            absolute_file_path = os.path.join(settings.MEDIA_ROOT, file_path)
+            if os.path.exists(absolute_file_path):
+                try:
+                    os.remove(absolute_file_path)
+                except OSError as e:
+                    print(f"Error deleting file {absolute_file_path}: {e}")
 
-    # documents.file.delete()
+    # Delete associated files
+    if documents.file:
+        documents.file.delete(save=False)
+    if documents.signature_image:
+        documents.signature_image.delete(save=False)
+    if documents.signature_file:
+        documents.signature_file.delete(save=False)
+
+    # Delete the database record
     documents.delete()
 
     return redirect('TI_Management_app:documents_database')
@@ -2811,6 +3158,32 @@ def register_relief_step_one_search(request):
         )
 
 
+@user_passes_test(lambda user: user.is_superuser)  # Ensure only superusers can delete
+def register_relief_step_one_remove(request, pk):
+    relief = get_object_or_404(RegisterRelief, pk=pk)
+    relief_process_ongoing = RegisterRelief.objects.filter(complete=False).order_by('-created_date')
+
+    # Delete related files
+    related_files = FileRegisterRelief.objects.filter(register_relief=relief)
+    for file in related_files:
+        file_path = os.path.join(settings.MEDIA_ROOT, str(file.file))
+        if os.path.isfile(file_path):
+            os.remove(file_path)  # Remove the file from the filesystem
+        file.delete()  # Delete the file record from the database
+
+    # if request.method == "POST":
+    relief.delete()
+    messages.success(request, "Zapomoga została usunięta.")
+
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_one.html',
+        {
+            'relief_process_ongoing': relief_process_ongoing
+        }
+    )
+
+
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_two(request, pk):
@@ -2933,43 +3306,6 @@ def register_relief_step_four(request, pk):
     )
 
 
-# @login_required
-# def register_relief_step_five(request, pk):
-#     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
-#     member = one_registered_relife.member
-#
-#     if request.method == "POST":
-#         form = CardRegisterReliefForm(request.POST, instance=member)
-#         # form = CardRegisterReliefForm(request.POST)
-#
-#         if form.is_valid():
-#             # if member.card is form.cleaned_data['card']:
-#             if RegisterRelief.objects.filter(member__card=form.cleaned_data['card']).exists():
-#
-#                 member_card = str(member.card)
-#
-#                 is_correct = check_password(form.cleaned_data['card'], member_card)
-#
-#                 # if form.cleaned_data['card'] == one_registered_relife.member.card:
-#                 if is_correct:
-#                     one_registered_relife.complete = True
-#                     one_registered_relife.date_of_signed_by_the_applicant = timezone.now()
-#                     one_registered_relife.save()
-#
-#                     messages.success(request, "4/4 - Podpisano!")
-#                     return redirect('TI_Management_app:register_relief_valid', pk=one_registered_relife.pk)
-#     else:
-#         # form = CardRegisterReliefForm(instance=member)
-#         form = CardRegisterReliefForm()
-#     return render(
-#         request,
-#         'TI_Management_app/finance/register_relief_step_five.html',
-#         {
-#             'form': form,
-#             'one_registered_relife': one_registered_relife
-#         }
-#     )
-# @login_required
 @user_passes_test(lambda user: user.is_superuser)
 # @csrf_exempt
 def register_relief_step_five(request, pk):
@@ -3011,18 +3347,76 @@ def register_relief_step_five(request, pk):
 
 
 @user_passes_test(lambda user: user.is_superuser)
+def register_relief_step_five_edit(request, pk):
+    one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+    member = one_registered_relife.member
+    all_relief = Relief.objects.all().order_by('-created_date')
+    all_relation = RelationRegisterRelief.objects.all().order_by('-created_date')
+
+    if request.method == "POST":
+        form = RegisterReliefEditForm(request.POST, request.FILES, instance=one_registered_relife)
+        if form.is_valid():
+            reason = form.cleaned_data['reason']
+            sanitized_description = bleach.clean(reason, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+
+            one_registered_relife = form.save(commit=False)
+            one_registered_relife.author = request.user
+            one_registered_relife.reason = sanitized_description
+            one_registered_relife.member = member
+            one_registered_relife.save()
+            messages.success(request, "Wniosek został poprawiony!")
+            return redirect('TI_Management_app:register_relief_step_five', pk=one_registered_relife.pk)
+    else:
+        form = RegisterReliefEditForm(instance=one_registered_relife)
+
+    return render(
+        request,
+        'TI_Management_app/finance/register_relief_step_five_edit.html',
+        {
+            'form': form,
+            'one_registered_relife': one_registered_relife,
+            'member': member,
+            'all_relief': all_relief,
+            'all_relation': all_relation
+        }
+    )
+
+
+@user_passes_test(lambda user: user.is_superuser)
 def register_relief_step_five_signature(request, pk):
     one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+
     if request.method == 'POST':
         signature_data = request.POST.get('signature_data')
-        if signature_data:
-            format, imgstr = signature_data.split(';base64,')
-            ext = format.split('/')[-1]
-            signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
 
-            instance = get_object_or_404(RegisterRelief, pk=pk)
-            instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
-            instance.save()
+        if signature_data:
+            try:
+                # Split the data URL to get the base64 string
+                format, imgstr = signature_data.split(';base64,')
+                ext = format.split('/')[-1]
+
+                # Decode the base64 image data
+                decoded_img = base64.b64decode(imgstr)
+
+                # Encrypt the signature data
+                encrypted_signature = cipher_suite.encrypt(decoded_img)
+
+                # Save the encrypted signature as a file
+                signature_file = ContentFile(encrypted_signature, name=f'signature_{pk}.{ext}')
+
+                # Retrieve the instance and remove the previous signature if it exists
+                instance = get_object_or_404(RegisterRelief, pk=pk)
+
+                if instance.signature_image:
+                    # Check if a previous signature exists and delete it
+                    instance.signature_image.delete(save=False)
+
+                # Save the new encrypted signature
+                instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
+                instance.save()
+            except (ValueError, IndexError, base64.binascii.Error, Exception) as e:
+                # Handle any issues with decoding, encryption, or saving
+                print(f"Error processing signature data: {e}")
 
     return render(
         request,
@@ -3045,18 +3439,172 @@ def register_relief_step_five_remove_signature(request, pk):
     return redirect('TI_Management_app:register_relief_step_five', pk=pk)
 
 
+@user_passes_test(lambda user: user.is_superuser)
+def register_relief_step_five_decrypt_signature(request, pk):
+    relief = get_object_or_404(RegisterRelief, pk=pk)
+    showed = True
+
+    # Decrypt the signature if it exists
+    if relief.signature_image:
+        try:
+            # Ensure the file name is valid
+            signature_name = relief.signature_image.name
+            if signature_name is None:
+                raise ValueError("No signature file available to decrypt.")
+
+            # Initialize the encryption/decryption cipher suite
+            cipher_suite = Fernet(SIGNATURE_KEY.encode())  # Initialize Fernet with the key
+            encrypted_data = relief.signature_image.read()  # Read the encrypted data from the image file
+
+            # Decrypt the signature
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+            # If the document has a signature, delete the existing file before saving the decrypted file
+            if signature_name:
+                relief.signature_image.delete(save=False)  # Delete the old signature file
+
+            # Correct the file path and save the decrypted signature
+            # Ensure that the signature is saved in the correct directory, without extra subdirectories
+            file_path = signature_name.split('/')[-1]  # Extract the filename without path
+
+            relief.signature_image.save(
+                file_path,  # Save the file with just the file name, no additional directories
+                ContentFile(decrypted_data)  # Save the decrypted data as a new file
+            )
+            relief.save()
+
+            messages.success(request, f"Wyświetlono podpis!")
+            # showed = True
+        except Exception as e:
+            messages.error(request, f"Error decrypting the signature: {str(e)}")
+
+    # return redirect('TI_Management_app:documents_database_edit', pk=pk)
+    return redirect(f'{reverse("TI_Management_app:register_relief_step_five", args=[pk])}?showed={bool(showed)}')
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def register_relief_step_five_encrypt_signature(request, pk):
+    relief_signature = get_object_or_404(RegisterRelief, pk=pk)
+    showed = False
+    if request.method == 'POST':
+        try:
+            # Retrieve the existing signature image
+            if not relief_signature.signature_image:
+                return JsonResponse({'success': False, 'error_message': 'No signature image found'})
+
+            # Read the binary content of the signature file
+            signature_path = relief_signature.signature_image.path
+            with open(signature_path, 'rb') as f:
+                binary_data = f.read()
+
+            # Encrypt the binary data
+            encrypted_data = cipher_suite.encrypt(binary_data)
+
+            # Overwrite the existing file with the encrypted data
+            with open(signature_path, 'wb') as f:
+                f.write(encrypted_data)
+
+            # return JsonResponse({'success': True})
+            return redirect(f'{reverse("TI_Management_app:register_relief_step_five", args=[pk])}?showed={bool(showed)}')
+        except Exception as e:
+            return JsonResponse({'success': False, 'error_message': f"An error occurred: {str(e)}"})
+
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
+    # return redirect(f'{reverse("TI_Management_app:documents_database_edit", args=[pk])}?showed={bool(showed)}')
+
+
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def register_relief_valid(request, pk):
     validation_register_relief = get_object_or_404(RegisterRelief, pk=pk)
+    # validation_register_relief
+    if validation_register_relief.complete:
+        return render(
+            request,
+            'TI_Management_app/finance/register_relief_valid.html',
+            {
+                'validation_register_relief': validation_register_relief
+            }
+        )
+    else:
+        return redirect(
+            'TI_Management_app:register_relief_step_five',
+            pk=validation_register_relief.pk
+        )
 
-    return render(
-        request,
-        'TI_Management_app/finance/register_relief_valid.html',
-        {
-            'validation_register_relief': validation_register_relief
-        }
-    )
+
+@user_passes_test(lambda user: user.is_superuser)
+def register_relief_valid_decrypt_signature(request, pk):
+    relief = get_object_or_404(RegisterRelief, pk=pk)
+    showed = True
+
+    # Decrypt the signature if it exists
+    if relief.signature_image:
+        try:
+            # Ensure the file name is valid
+            signature_name = relief.signature_image.name
+            if signature_name is None:
+                raise ValueError("No signature file available to decrypt.")
+
+            # Initialize the encryption/decryption cipher suite
+            cipher_suite = Fernet(SIGNATURE_KEY.encode())  # Initialize Fernet with the key
+            encrypted_data = relief.signature_image.read()  # Read the encrypted data from the image file
+
+            # Decrypt the signature
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+            # If the document has a signature, delete the existing file before saving the decrypted file
+            if signature_name:
+                relief.signature_image.delete(save=False)  # Delete the old signature file
+
+            # Correct the file path and save the decrypted signature
+            # Ensure that the signature is saved in the correct directory, without extra subdirectories
+            file_path = signature_name.split('/')[-1]  # Extract the filename without path
+
+            relief.signature_image.save(
+                file_path,  # Save the file with just the file name, no additional directories
+                ContentFile(decrypted_data)  # Save the decrypted data as a new file
+            )
+            relief.save()
+
+            messages.success(request, f"Wyświetlono podpis!")
+            # showed = True
+        except Exception as e:
+            messages.error(request, f"Error decrypting the signature: {str(e)}")
+
+    # return redirect('TI_Management_app:documents_database_edit', pk=pk)
+    return redirect(f'{reverse("TI_Management_app:register_relief_valid", args=[pk])}?showed={bool(showed)}')
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def register_relief_valid_encrypt_signature(request, pk):
+    relief_signature = get_object_or_404(RegisterRelief, pk=pk)
+    showed = False
+    if request.method == 'POST':
+        try:
+            # Retrieve the existing signature image
+            if not relief_signature.signature_image:
+                return JsonResponse({'success': False, 'error_message': 'No signature image found'})
+
+            # Read the binary content of the signature file
+            signature_path = relief_signature.signature_image.path
+            with open(signature_path, 'rb') as f:
+                binary_data = f.read()
+
+            # Encrypt the binary data
+            encrypted_data = cipher_suite.encrypt(binary_data)
+
+            # Overwrite the existing file with the encrypted data
+            with open(signature_path, 'wb') as f:
+                f.write(encrypted_data)
+
+            # return JsonResponse({'success': True})
+            return redirect(f'{reverse("TI_Management_app:register_relief_valid", args=[pk])}?showed={bool(showed)}')
+        except Exception as e:
+            return JsonResponse({'success': False, 'error_message': f"An error occurred: {str(e)}"})
+
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
+    # return redirect(f'{reverse("TI_Management_app:documents_database_edit", args=[pk])}?showed={bool(showed)}')
 
 
 # @login_required
@@ -3114,69 +3662,6 @@ def relief_status_list_search(request):
             {}
         )
 
-
-# @login_required
-# def relief_status_to_be_signed(request, pk):
-#     relief_to_be_signed = get_object_or_404(RegisterRelief, pk=pk)
-#
-#     if request.method == "POST":
-#         form = SignatureReliefForm(relief_to_be_signed, request.POST)
-#         form_confirmation = PaymentConfirmationReliefForm(request.POST)
-#         if form.is_valid():
-#             card = form.cleaned_data['card']
-#             member = MembersZZTI.objects.filter(card=card).first()
-#             if member and User.objects.filter(username=member.member_nr, is_active=True).exists():
-#                 existing_signature = relief_to_be_signed.registerReliefSignatureRelief.filter(member=member).exists()
-#
-#                 if not existing_signature:
-#
-#                     signature = SignatureRelief.objects.create(
-#                         author=request.user,
-#                         member=member,
-#                         register_relief=relief_to_be_signed,
-#                         signature=True
-#                     )
-#                     signature.save()
-#
-#                     messages.success(
-#                         request,
-#                         f"Dodano podpis {member.forename} {member.surname} {member.member_nr}!"
-#                     )
-#                     return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
-#
-#         if form_confirmation.is_valid():
-#             confirmation = form_confirmation.cleaned_data['payment_confirmation']
-#             if confirmation is True:
-#
-#                 relief_to_be_signed.agreement = True
-#                 relief_to_be_signed.payment_confirmation = True
-#                 relief_to_be_signed.date_of_payment_confirmation = timezone.now()
-#                 relief_to_be_signed.save()
-#
-#                 messages.success(
-#                     request,
-#                     f"Potwierdzenie wypłaty"
-#                 )
-#                 return redirect('TI_Management_app:relief_status_to_be_signed', pk=relief_to_be_signed.pk)
-#             else:
-#                 messages.error(
-#                     request,
-#                     "Error!"
-#                 )
-#
-#     else:
-#         form = SignatureReliefForm(relief_to_be_signed)
-#         form_confirmation = PaymentConfirmationReliefForm()
-#
-#     return render(
-#         request,
-#         'TI_Management_app/finance/relief_status_to_be_signed.html',
-#         {
-#             'form': form,
-#             'form_confirmation': form_confirmation,
-#             'relief_to_be_signed': relief_to_be_signed
-#         }
-#     )
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def relief_status_to_be_signed(request, pk):
@@ -3245,21 +3730,67 @@ def relief_status_to_be_signed(request, pk):
     )
 
 
+# @user_passes_test(lambda user: user.is_superuser)
+# def relief_status_to_be_signed_signature(request, pk):
+#     # one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+#     one_registered_relife = get_object_or_404(SignatureRelief, pk=pk)
+#     if request.method == 'POST':
+#         signature_data = request.POST.get('signature_data')
+#         if signature_data:
+#             format, imgstr = signature_data.split(';base64,')
+#             ext = format.split('/')[-1]
+#             signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
+#
+#             instance = get_object_or_404(SignatureRelief, pk=pk)
+#             # instance.register_relief = one_registered_relife
+#             instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
+#             instance.save()
+#
+#     return render(
+#         request,
+#         'TI_Management_app/finance/relief_status_to_be_signed_signature.html',
+#         {
+#             'one_registered_relife': one_registered_relife
+#         }
+#     )
+
 @user_passes_test(lambda user: user.is_superuser)
 def relief_status_to_be_signed_signature(request, pk):
-    # one_registered_relife = get_object_or_404(RegisterRelief, pk=pk)
+    """Handle submission and encryption of a signature for a specific relief record."""
     one_registered_relife = get_object_or_404(SignatureRelief, pk=pk)
+
     if request.method == 'POST':
-        signature_data = request.POST.get('signature_data')
-        if signature_data:
+        try:
+            # Retrieve the signature data from the POST request
+            signature_data = request.POST.get('signature_data')
+            if not signature_data:
+                return JsonResponse({'success': False, 'error_message': 'No signature data provided.'})
+
+            # Decode the base64 signature data
             format, imgstr = signature_data.split(';base64,')
             ext = format.split('/')[-1]
             signature_file = ContentFile(base64.b64decode(imgstr), name=f'signature_{pk}.{ext}')
 
+            # Save the signature file
             instance = get_object_or_404(SignatureRelief, pk=pk)
-            # instance.register_relief = one_registered_relife
             instance.signature_image.save(f'signature_{pk}.{ext}', signature_file)
             instance.save()
+
+            # Encrypt the saved signature file
+            signature_path = instance.signature_image.path
+            with open(signature_path, 'rb') as file:
+                binary_data = file.read()
+
+            encrypted_data = cipher_suite.encrypt(binary_data)
+
+            # Overwrite the file with encrypted data
+            with open(signature_path, 'wb') as file:
+                file.write(encrypted_data)
+
+            return JsonResponse({'success': True})
+
+        except Exception as e:
+            return JsonResponse({'success': False, 'error_message': f"An error occurred: {str(e)}"})
 
     return render(
         request,
@@ -3281,6 +3812,132 @@ def relief_status_to_be_signed_remove_signature(request, pk, pk1):
     else:
         messages.warning(request, "Nie ma podpisu do usunięcia.")
     return redirect('TI_Management_app:relief_status_to_be_signed', pk=pk1)
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def relief_status_to_be_signed_decrypt_signature(request, pk):
+    relief = get_object_or_404(RegisterRelief, pk=pk)
+    signatures = relief.registerReliefSignatureRelief.all()
+    showed = True
+
+    # Decrypt the signature if it exists
+    if relief.signature_image:
+        try:
+            # Ensure the file name is valid
+            signature_name = relief.signature_image.name
+            if signature_name is None:
+                raise ValueError("No signature file available to decrypt.")
+
+            # Initialize the encryption/decryption cipher suite
+            # cipher_suite = Fernet(SIGNATURE_KEY.encode())  # Initialize Fernet with the key
+            encrypted_data = relief.signature_image.read()  # Read the encrypted data from the image file
+
+            # Decrypt the signature
+            decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+            # If the document has a signature, delete the existing file before saving the decrypted file
+            if signature_name:
+                relief.signature_image.delete(save=False)  # Delete the old signature file
+
+            # Correct the file path and save the decrypted signature
+            # Ensure that the signature is saved in the correct directory, without extra subdirectories
+            file_path = signature_name.split('/')[-1]  # Extract the filename without path
+
+            relief.signature_image.save(
+                file_path,  # Save the file with just the file name, no additional directories
+                ContentFile(decrypted_data)  # Save the decrypted data as a new file
+            )
+            relief.save()
+
+            # messages.success(request, f"Wyświetlono podpis!")
+            # showed = True
+
+            for signature in signatures:
+                if signature.signature_image:
+                    try:
+                        signature_name = signature.signature_image.name
+                        if signature_name is None:
+                            raise ValueError("No signature file available to decrypt.")
+
+                        # Initialize the encryption/decryption cipher suite
+                        # cipher_suite = Fernet(SIGNATURE_KEY.encode())  # Initialize Fernet with the key
+                        # encrypted_data = signature.signature_image.read()  # Read the encrypted data from the image file
+
+                        # Open the encrypted image
+                        encrypted_image_path = signature.signature_image.path
+                        with open(encrypted_image_path, 'rb') as encrypted_file:
+                            encrypted_data = encrypted_file.read()
+
+                        # Decrypt the image data
+                        decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+                        if signature_name:
+                            signature.signature_image.delete(save=False)  # Delete the old signature file
+
+                        file_path = signature_name.split('/')[-1]  # Extract the filename without path
+
+                        signature.signature_image.save(
+                            file_path,  # Save the file with just the file name, no additional directories
+                            ContentFile(decrypted_data)  # Save the decrypted data as a new file
+                        )
+                        signature.save()
+
+                    except Exception as e:
+                        print(f"Error processing signature image for {signature}: {e}")
+                else:
+                    print(f"No signature image for {signature}")
+
+                messages.success(request, f"Wyświetlono podpis!")
+
+        except Exception as e:
+            messages.error(request, f"Error decrypting the signature: {str(e)}")
+
+    # return redirect('TI_Management_app:documents_database_edit', pk=pk)
+    return redirect(f'{reverse("TI_Management_app:relief_status_to_be_signed", args=[pk])}?showed={bool(showed)}')
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def relief_status_to_be_signed_encrypt_signature(request, pk):
+    relief_signature = get_object_or_404(RegisterRelief, pk=pk)
+    signatures = relief_signature.registerReliefSignatureRelief.all()
+    showed = False
+
+    if request.method == 'POST':
+        try:
+            # Encrypt the main signature image
+            if not relief_signature.signature_image:
+                return JsonResponse({'success': False, 'error_message': 'No signature image found'})
+
+            signature_path = relief_signature.signature_image.path
+            with open(signature_path, 'rb') as f:
+                binary_data = f.read()
+            encrypted_data = cipher_suite.encrypt(binary_data)
+
+            with open(signature_path, 'wb') as f:
+                f.write(encrypted_data)
+
+            # Encrypt all related signatures
+            for signature in signatures:
+                if signature.signature_image:
+                    try:
+                        encrypted_image_path = signature.signature_image.path
+                        with open(encrypted_image_path, 'rb') as encrypted_file:
+                            binary_data = encrypted_file.read()
+                        encrypted_data = cipher_suite.encrypt(binary_data)
+                        with open(encrypted_image_path, 'wb') as f:
+                            f.write(encrypted_data)
+                    except Exception as e:
+                        messages.error(request, f"Error processing signature image for {signature}: {e}")
+                else:
+                    messages.warning(request, f"No signature image for {signature}")
+
+            messages.success(request, "Podpis został ukryty!")
+            # return redirect('TI_Management_app:relief_status_to_be_signed', pk=pk)
+            return redirect(f'{reverse("TI_Management_app:relief_status_to_be_signed", args=[pk])}?showed={bool(showed)}')
+        except Exception as e:
+            return JsonResponse({'success': False, 'error_message': f"An error occurred: {str(e)}"})
+
+    return JsonResponse({'success': False, 'error_message': 'Invalid request method'})
 
 
 # @login_required
@@ -4065,15 +4722,20 @@ def finance_file_edit(request, pk):
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def voting_add(request):
-    # members = MembersZZTI.objects.filter(card__isnull=False, deactivate=False)
-    members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
+    # members = MembersZZTI.objects.filter(card__isnull=False).exclude(card='').filter(deactivate=False)
+    members = MembersZZTI.objects.filter(deactivate=False)
 
     if request.method == "POST":
         form = VotingAddForm(request.POST or None)
         if form.is_valid():
 
             description = form.cleaned_data['description']
-            sanitized_description = bleach.clean(description, tags=ALLOWED_TAGS, attributes=ALLOWED_ATTRIBUTES)
+            sanitized_description = bleach.clean(
+                description,
+                tags=ALLOWED_TAGS,
+                attributes=ALLOWED_ATTRIBUTES
+            )
+
 
             participants_all = form.cleaned_data['participants_all']
             # vote_method_online = form.cleaned_data['vote_method_online']
@@ -4645,12 +5307,27 @@ def voting_active_session_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     sessions = VotingSessionKickOff.objects.filter(vote=voting)
     member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
+    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False, complete=True)
 
     # Show only ended sessions
     sessions_status = sessions.filter(
         Q(session_end__lte=timezone.now()) |
         Q(session_closed=True)
     )
+
+    # Default values
+    attendance = 0
+    attendance_only_accepted = 0
+
+    accepted_count = member_accepted.count()
+    if member_already_participated.count() > 0:
+        attendance = (member_already_participated.count() / voting.members.count()) * 100
+        if member_accepted.count() > 0:
+            attendance_only_accepted = (member_accepted.count() / voting.members.count()) * 100
+    #     else:
+    #         attendance_only_accepted = 0
+    # else:
+    #     attendance = 0
 
     return render(
         request,
@@ -4659,7 +5336,10 @@ def voting_active_session_detail(request, pk):
             'voting': voting,
             'sessions': sessions,
             'sessions_status': sessions_status,
-            'member_already_participated': member_already_participated
+            'member_already_participated': member_already_participated,
+            'accepted_count': accepted_count,
+            'attendance': attendance,
+            'attendance_only_accepted': attendance_only_accepted
         }
     )
 
@@ -4730,22 +5410,216 @@ def voting_active_session_close(request, pk_vote, pk_kick_off):
 
 
 # @login_required
+# @user_passes_test(lambda user: user.is_superuser)
+# def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
+#     voting = get_object_or_404(Vote, pk=pk_vote)
+#     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+#     voting_session_kick_off_signature = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off=session_kick_off_edit)
+#
+#     if request.method == "POST":
+#         form_signature = VotingSessionKickOffSignatureForm(request.POST, voting_session_kick_off=session_kick_off_edit)
+#
+#         if form_signature.is_valid():
+#             commission_signature = form_signature.cleaned_data['commission_signature']
+#             vote = session_kick_off_edit.vote
+#
+#             for member in vote.election_commission.all():
+#                 if check_password(commission_signature, member.card):
+#                     member_id = member
+#
+#             if member_id:
+#                 session_kick_off_signature = form_signature.save(commit=False)
+#                 session_kick_off_signature.author = request.user
+#                 session_kick_off_signature.voting_session_kick_off = session_kick_off_edit
+#                 session_kick_off_signature.member = member_id
+#                 session_kick_off_signature.signature = True
+#                 session_kick_off_signature.save()
+#
+#                 # messages.success(request, "Dodano podpis Członka komisji")
+#                 if int(voting.min_amount_commission) > len(voting_session_kick_off_signature):
+#                     return redirect(
+#                         'TI_Management_app:voting_active_session_kick_off_edit',
+#                         pk_vote=voting.id,
+#                         pk_kick_off=session_kick_off_edit.id
+#                     )
+#                 else:
+#                     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+#                     session_kick_off_edit.commission_confirmed = True
+#                     session_kick_off_edit.save()
+#
+#                     return render(
+#                         request,
+#                         'TI_Management_app/voting/new_window_redirect.html',
+#                         {
+#                             'redirect_url': reverse(
+#                                 'TI_Management_app:voting_active_session',
+#                                 args=[voting.id, session_kick_off_edit.id]
+#                             ),
+#                             'safe_redirect_url': reverse(
+#                                 'TI_Management_app:voting_active_session_kick_off_validation',
+#                                 args=[voting.id, session_kick_off_edit.id]
+#                             )
+#                         }
+#                     )
+#     else:
+#         form_signature = VotingSessionKickOffSignatureForm(voting_session_kick_off=session_kick_off_edit)
+#
+#     return render(
+#         request,
+#         'TI_Management_app/voting/voting_active_session_kick_off_edit.html',
+#         {
+#             'form_signature': form_signature,
+#             'voting': voting,
+#             'voting_session_kick_off_signature': voting_session_kick_off_signature
+#         }
+#     )
+
+# @user_passes_test(lambda user: user.is_superuser)
+# def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
+#     voting = get_object_or_404(Vote, pk=pk_vote)
+#     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+#     voting_session_kick_off_signatures = VotingSessionKickOffSignature.objects.filter(
+#         voting_session_kick_off=session_kick_off_edit
+#     )
+#
+#     if request.method == "POST":
+#         form_signature = VotingSessionKickOffSignatureForm(
+#             request.POST,
+#             voting_session_kick_off=session_kick_off_edit
+#         )
+#         signature_data = request.POST.get('signature_data')
+#         print(signature_data)
+#
+#         if form_signature.is_valid():
+#             commission_signature = form_signature.cleaned_data['commission_signature']
+#             vote = session_kick_off_edit.vote
+#             member_id = None
+#
+#             # Verify the commission signature
+#             for member in vote.election_commission.all():
+#                 if check_password(commission_signature, member.card):
+#                     member_id = member
+#                     break
+#
+#             if member_id:
+#                 session_kick_off_signature = form_signature.save(commit=False)
+#                 session_kick_off_signature.author = request.user
+#                 session_kick_off_signature.voting_session_kick_off = session_kick_off_edit
+#                 session_kick_off_signature.member = member_id
+#                 session_kick_off_signature.signature = True
+#
+#                 # Save the signature image if provided
+#                 if signature_data:
+#                     print("yes")
+#                     try:
+#                         # Split the data URL to extract the base64 string
+#                         format, imgstr = signature_data.split(';base64,')
+#                         ext = format.split('/')[-1]
+#
+#                         # Decode and encrypt the signature data
+#                         decoded_img = base64.b64decode(imgstr)
+#                         encrypted_signature = cipher_suite.encrypt(decoded_img)
+#
+#                         # Create a file object for the encrypted signature
+#                         signature_file = ContentFile(encrypted_signature, name=f'signature_{pk_kick_off}.{ext}')
+#
+#                         # Save or update the signature instance
+#                         # session_kick_off_signature, created = VotingSessionKickOffSignature.objects.get_or_create(
+#                         #     voting_session_kick_off=session_kick_off_edit,
+#                         #     author=request.user,
+#                         #     defaults={'signature': True}
+#                         # )
+#
+#                         # Remove the old signature image if it exists
+#                         if not created and session_kick_off_signature.signature_image:
+#                             session_kick_off_signature.signature_image.delete(save=False)
+#                         #
+#                         # # Save the new signature image
+#                         # session_kick_off_signature.signature_image.save(
+#                         #     f'signature_{pk_kick_off}.{ext}',
+#                         #     signature_file
+#                         # )
+#                         # Overwrite the existing file with the encrypted data
+#                         with open(signature_path, 'wb') as f:
+#                             f.write(encrypted_data)
+#
+#                     except Exception as e:
+#                         form_signature.add_error(None, f"Błąd podczas zapisywania podpisu: {str(e)}")
+#
+#                 session_kick_off_signature.save()
+#
+#                 # Redirect based on minimum signatures
+#                 if len(voting_session_kick_off_signatures) < int(voting.min_amount_commission):
+#                     return redirect(
+#                         'TI_Management_app:voting_active_session_kick_off_edit',
+#                         pk_vote=voting.id,
+#                         pk_kick_off=session_kick_off_edit.id
+#                     )
+#                 else:
+#                     # Confirm the commission and redirect to a new window
+#                     session_kick_off_edit.commission_confirmed = True
+#                     session_kick_off_edit.save()
+#
+#                     return render(
+#                         request,
+#                         'TI_Management_app/voting/new_window_redirect.html',
+#                         {
+#                             'redirect_url': reverse(
+#                                 'TI_Management_app:voting_active_session',
+#                                 args=[voting.id, session_kick_off_edit.id]
+#                             ),
+#                             'safe_redirect_url': reverse(
+#                                 'TI_Management_app:voting_active_session_kick_off_validation',
+#                                 args=[voting.id, session_kick_off_edit.id]
+#                             )
+#                         }
+#                     )
+#             else:
+#                 form_signature.add_error(
+#                     'commission_signature',
+#                     "Nieprawidłowy podpis członka komisji wyborczej."
+#                 )
+#         else:
+#             form_signature.add_error(None, "Podpis cyfrowy jest wymagany.")
+#
+#     else:
+#         form_signature = VotingSessionKickOffSignatureForm(voting_session_kick_off=session_kick_off_edit)
+#
+#     return render(
+#         request,
+#         'TI_Management_app/voting/voting_active_session_kick_off_edit.html',
+#         {
+#             'form_signature': form_signature,
+#             'voting': voting,
+#             'voting_session_kick_off_signature': voting_session_kick_off_signatures
+#         }
+#     )
+
 @user_passes_test(lambda user: user.is_superuser)
 def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
-    voting_session_kick_off_signature = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off=session_kick_off_edit)
+    voting_session_kick_off_signatures = VotingSessionKickOffSignature.objects.filter(
+        voting_session_kick_off=session_kick_off_edit
+    )
 
     if request.method == "POST":
-        form_signature = VotingSessionKickOffSignatureForm(request.POST, voting_session_kick_off=session_kick_off_edit)
+        form_signature = VotingSessionKickOffSignatureForm(
+            request.POST,
+            voting_session_kick_off=session_kick_off_edit
+        )
+        signature_data = request.POST.get('signature_data')
 
         if form_signature.is_valid():
             commission_signature = form_signature.cleaned_data['commission_signature']
             vote = session_kick_off_edit.vote
+            member_id = None
 
+            # Verify the commission signature
             for member in vote.election_commission.all():
                 if check_password(commission_signature, member.card):
                     member_id = member
+                    break
 
             if member_id:
                 session_kick_off_signature = form_signature.save(commit=False)
@@ -4753,20 +5627,43 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
                 session_kick_off_signature.voting_session_kick_off = session_kick_off_edit
                 session_kick_off_signature.member = member_id
                 session_kick_off_signature.signature = True
+
+                # Handle the signature image
+                if signature_data:
+                    try:
+                        format, imgstr = signature_data.split(';base64,')
+                        ext = format.split('/')[-1]
+                        decoded_img = base64.b64decode(imgstr)
+                        encrypted_signature = cipher_suite.encrypt(decoded_img)
+
+                        # Save the encrypted signature as a file
+                        signature_file = ContentFile(encrypted_signature, name=f'signature_{pk_kick_off}.{ext}')
+
+                        # Check for existing signature and replace if needed
+                        if session_kick_off_signature.signature_image:
+                            session_kick_off_signature.signature_image.delete(save=False)
+
+                        session_kick_off_signature.signature_image.save(
+                            f'signature_{pk_kick_off}.{ext}',
+                            signature_file
+                        )
+                    except ValueError as e:
+                        form_signature.add_error(None, f"Błąd w przetwarzaniu podpisu: {str(e)}")
+                    except Exception as e:
+                        form_signature.add_error(None, f"Błąd podczas zapisywania podpisu: {str(e)}")
+
                 session_kick_off_signature.save()
 
-                # messages.success(request, "Dodano podpis Członka komisji")
-                if int(voting.min_amount_commission) > len(voting_session_kick_off_signature):
+                # Check if required signatures are met
+                if len(voting_session_kick_off_signatures) < int(voting.min_amount_commission):
                     return redirect(
                         'TI_Management_app:voting_active_session_kick_off_edit',
                         pk_vote=voting.id,
                         pk_kick_off=session_kick_off_edit.id
                     )
                 else:
-                    session_kick_off_edit = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
                     session_kick_off_edit.commission_confirmed = True
                     session_kick_off_edit.save()
-
                     return render(
                         request,
                         'TI_Management_app/voting/new_window_redirect.html',
@@ -4781,6 +5678,13 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
                             )
                         }
                     )
+            else:
+                form_signature.add_error(
+                    'commission_signature',
+                    "Nieprawidłowy podpis członka komisji wyborczej."
+                )
+        else:
+            form_signature.add_error(None, "Podpis cyfrowy jest wymagany.")
     else:
         form_signature = VotingSessionKickOffSignatureForm(voting_session_kick_off=session_kick_off_edit)
 
@@ -4790,7 +5694,7 @@ def voting_active_session_kick_off_edit(request, pk_vote, pk_kick_off):
         {
             'form_signature': form_signature,
             'voting': voting,
-            'voting_session_kick_off_signature': voting_session_kick_off_signature
+            'voting_session_kick_off_signature': voting_session_kick_off_signatures
         }
     )
 
@@ -4812,7 +5716,9 @@ def voting_active_session(request, pk_vote, pk_kick_off):
     if sessions_status:
         if request.method == "POST":
             # form = VotingSessionSignatureForm(request.POST, vote=voting, session_signature=session_signature)
-            form = VotingSessionSignatureForm(request.POST, vote=voting)
+            form = VotingSessionSignatureForm(request.POST, vote=voting, request=request)
+
+            signature_data = request.POST.get('signature_data')
 
             if form.is_valid():
                 member_signature = form.cleaned_data['member_signature']
@@ -4832,6 +5738,32 @@ def voting_active_session(request, pk_vote, pk_kick_off):
                     session_kick_off_signature.voting_session_kick_off = session_kick_off
                     session_kick_off_signature.member = member_checked
                     session_kick_off_signature.signature = True
+                    # session_kick_off_signature.save()
+
+                    # Handle the signature image
+                    if signature_data:
+                        try:
+                            format, imgstr = signature_data.split(';base64,')
+                            ext = format.split('/')[-1]
+                            decoded_img = base64.b64decode(imgstr)
+                            encrypted_signature = cipher_suite.encrypt(decoded_img)
+
+                            # Save the encrypted signature as a file
+                            signature_file = ContentFile(encrypted_signature, name=f'signature_{pk_kick_off}.{ext}')
+
+                            # Check for existing signature and replace if needed
+                            if session_kick_off_signature.signature_image:
+                                session_kick_off_signature.signature_image.delete(save=False)
+
+                            session_kick_off_signature.signature_image.save(
+                                f'signature_{pk_kick_off}.{ext}',
+                                signature_file
+                            )
+                        except ValueError as e:
+                            form.add_error(None, f"Błąd w przetwarzaniu podpisu: {str(e)}")
+                        except Exception as e:
+                            form.add_error(None, f"Błąd podczas zapisywania podpisu: {str(e)}")
+
                     session_kick_off_signature.save()
 
                     return redirect(
@@ -4887,7 +5819,7 @@ def voting_active_session_validation(request, pk_vote, pk_kick_off, pk_member):
             voting_responses = []
 
             for poll in polls:
-                form = ChoiceForm(request.POST, poll=poll)
+                form = ChoiceForm(request.POST, poll=poll, request=request)
                 forms.append(form)
 
                 if form.is_valid():
@@ -4962,15 +5894,69 @@ def voting_active_session_kick_off_validation(request, pk_vote, pk_kick_off):
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     session_signatures = VotingSessionSignature.objects.filter(vote=voting)
 
+    member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
+    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False, complete=True)
+    accepted_count = member_accepted.count()
+
+    # Default values
+    attendance = 0
+    attendance_only_accepted = 0
+
+    if member_already_participated.count() > 0:
+        attendance = (member_already_participated.count() / voting.members.count()) * 100
+        if member_accepted.count() > 0:
+            attendance_only_accepted = (member_accepted.count() / voting.members.count()) * 100
+    #     else:
+    #         attendance_only_accepted = 0
+    # else:
+    #     attendance = 0
+
     return render(
         request,
         'TI_Management_app/voting/voting_active_session_kick_off_validation.html',
         {
             'voting': voting,
             'session_kick_off': session_kick_off,
-            'session_signatures': session_signatures
+            'session_signatures': session_signatures,
+            'accepted_count': accepted_count,
+            'attendance': attendance,
+            'attendance_only_accepted': attendance_only_accepted
         }
     )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def voting_active_session_detail_remove(request, pk_vote, pk_kick_off, pk):
+    try:
+        voting = get_object_or_404(Vote, pk=pk_vote)
+        session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+        session_signatures = VotingSessionSignature.objects.filter(vote=voting)
+
+        signature = get_object_or_404(VotingSessionSignature, pk=pk)
+        signature.delete()
+        messages.success(request, "Podpis usunięty")
+        return render(
+            request,
+            'TI_Management_app/voting/voting_active_session_kick_off_validation.html',
+            {
+                'voting': voting,
+                'session_kick_off': session_kick_off,
+                'session_signatures': session_signatures
+            }
+        )
+    except Exception as e:
+        voting = get_object_or_404(Vote, pk=pk_vote)
+        session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
+        session_signatures = VotingSessionSignature.objects.filter(vote=voting)
+        return render(
+            request,
+            'TI_Management_app/voting/voting_active_session_kick_off_validation.html',
+            {
+                'voting': voting,
+                'session_kick_off': session_kick_off,
+                'session_signatures': session_signatures
+            }
+        )
 
 
 # @login_required
@@ -4980,6 +5966,7 @@ def voting_active_session_approve(request, pk_vote, pk_kick_off, pk_member):
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
     session_signatures = VotingSessionSignature.objects.filter(vote=voting)
+    session_signatures_current = VotingSessionSignature.objects.filter(voting_session_kick_off=session_kick_off)
 
     member.confirmation = True
     member.reject = False
@@ -4991,7 +5978,8 @@ def voting_active_session_approve(request, pk_vote, pk_kick_off, pk_member):
         {
             'voting': voting,
             'session_kick_off': session_kick_off,
-            'session_signatures': session_signatures
+            'session_signatures': session_signatures,
+            'session_signatures_current': session_signatures_current
         }
     )
 
@@ -5025,6 +6013,10 @@ def voting_active_session_successful(request, pk_vote, pk_kick_off, pk_member):
     voting = get_object_or_404(Vote, pk=pk_vote)
     session_kick_off = get_object_or_404(VotingSessionKickOff, pk=pk_kick_off)
     member = get_object_or_404(VotingSessionSignature, pk=pk_member)
+
+    member.complete = True
+    member.date_complete = timezone.now()
+    member.save()
 
     return render(
         request,
@@ -5093,7 +6085,8 @@ def voting_history_and_reports_detail(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
     member_rejected = VotingSessionSignature.objects.filter(vote=voting, reject=True)
-    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
+    # member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
+    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False, complete=True)
     poll = Poll.objects.filter(vote=voting)
 
     assigned_members = voting.members.all()
@@ -5130,12 +6123,18 @@ def voting_history_and_reports_detail(request, pk):
     else:
         min_attendance = 0
 
+    # Default values
+    attendance = 0
+    attendance_only_accepted = 0
+
     if member_already_participated.count() > 0:
         attendance = (member_already_participated.count() / voting.members.count()) * 100
         if member_accepted.count() > 0:
             attendance_only_accepted = (member_accepted.count() / voting.members.count()) * 100
-    else:
-        attendance = 0
+    #     else:
+    #         attendance_only_accepted = 0
+    # else:
+    #     attendance = 0
 
     if attendance_only_accepted > voting.turnout:
         grant = True
@@ -5143,14 +6142,46 @@ def voting_history_and_reports_detail(request, pk):
         grant = False
 
     if request.method == "POST":
-        form = VoteFileForm(request.POST, request.FILES)  # , instance = member
+        form = VoteFileForm(request.POST, request.FILES)
         if form.is_valid():
+            # Save the form instance but don't commit it to the database yet
             voting_file = form.save(commit=False)
             voting_file.author = request.user
             voting_file.voting = voting
+
+            # Get the uploaded file
+            uploaded_file = form.cleaned_data['file']
+            uploaded_file.open()  # Open the file for reading
+
+            # Encrypt the PDF using PyPDF2
+            reader = PdfReader(uploaded_file)
+            writer = PdfWriter()
+
+            for page in reader.pages:
+                writer.add_page(page)
+
+            # Set the password for encryption
+            password = "qwertytimanagement"
+            writer.encrypt(password)
+
+            # Save the encrypted PDF to memory
+            encrypted_pdf = BytesIO()
+            writer.write(encrypted_pdf)
+            encrypted_pdf.seek(0)
+
+            # Replace the original file with the encrypted file
+            voting_file.file.save(
+                uploaded_file.name,
+                ContentFile(encrypted_pdf.read())
+            )
+            uploaded_file.close()
+
+            # Save the instance with the encrypted file
             voting_file.save()
-            messages.success(request, f"Dodano dokument {voting_file.title}!")
+
+            messages.success(request, f"Dodano i zaszyfrowano dokument {voting_file.title}!")
             return redirect('TI_Management_app:voting_history_and_reports_detail', pk=voting.pk)
+
     else:
         form = MemberFileForm()
     return render(
@@ -5172,13 +6203,178 @@ def voting_history_and_reports_detail(request, pk):
     )
 
 
+@user_passes_test(lambda user: user.is_superuser)
+def voting_history_and_reports_detail_decrypt_signature(request, pk):
+    # voting = get_object_or_404(Vote, pk=pk)
+    # member_participated = VotingSessionSignature.objects.filter(vote=voting)
+    # session = VotingSessionKickOff.objects.filter(vote=voting)
+    # commission_participated = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off=session)
+    # showed = True
+    voting = get_object_or_404(Vote, pk=pk)
+    member_participated = VotingSessionSignature.objects.filter(vote=voting)
+
+    # Handle multiple sessions if they exist
+    sessions = VotingSessionKickOff.objects.filter(vote=voting)
+    commission_participated = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off__in=sessions)
+
+    showed = True
+
+    try:
+        for signature in member_participated:
+            if not signature.signature_image or not signature.signature_image.name:
+                continue
+
+            encrypted_image_path = signature.signature_image.path
+
+            try:
+                # Read the encrypted image file
+                with open(encrypted_image_path, 'rb') as encrypted_file:
+                    encrypted_data = encrypted_file.read()
+
+                # Decrypt the image data
+                decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+                # Save the decrypted image file
+                file_name = signature.signature_image.name.split('/')[-1]
+                signature.signature_image.delete(save=False)  # Delete the old encrypted file
+                signature.signature_image.save(
+                    file_name,
+                    ContentFile(decrypted_data)
+                )
+                signature.save()
+                messages.success(request, f"Signature decrypted for {signature}.")
+
+            except Exception as e:
+                messages.error(request, f"Error decrypting signature {signature}: {str(e)}")
+                print(f"Error decrypting signature {signature}: {e}")
+
+    except Exception as e:
+        messages.error(request, f"Unexpected error: {str(e)}")
+
+    try:
+        for signature in commission_participated:
+            if not signature.signature_image or not signature.signature_image.name:
+                continue
+
+            encrypted_image_path = signature.signature_image.path
+
+            try:
+                # Read the encrypted image file
+                with open(encrypted_image_path, 'rb') as encrypted_file:
+                    encrypted_data = encrypted_file.read()
+
+                # Decrypt the image data
+                decrypted_data = cipher_suite.decrypt(encrypted_data)
+
+                # Save the decrypted image file
+                file_name = signature.signature_image.name.split('/')[-1]
+                signature.signature_image.delete(save=False)  # Delete the old encrypted file
+                signature.signature_image.save(
+                    file_name,
+                    ContentFile(decrypted_data)
+                )
+                signature.save()
+                messages.success(request, f"Signature decrypted for {signature}.")
+
+            except Exception as e:
+                messages.error(request, f"Error decrypting signature {signature}: {str(e)}")
+                print(f"Error decrypting signature {signature}: {e}")
+
+    except Exception as e:
+        messages.error(request, f"Unexpected error: {str(e)}")
+
+    return redirect(f'{reverse("TI_Management_app:voting_history_and_reports_detail", args=[pk])}?showed={bool(showed)}')
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def voting_history_and_reports_detail_encrypt_signature(request, pk):
+    voting = get_object_or_404(Vote, pk=pk)
+    member_participated = VotingSessionSignature.objects.filter(vote=voting)
+
+    # Handle multiple sessions if they exist
+    sessions = VotingSessionKickOff.objects.filter(vote=voting)
+    commission_participated = VotingSessionKickOffSignature.objects.filter(voting_session_kick_off__in=sessions)
+
+    showed = False
+
+    try:
+        for signature in member_participated:
+            if not signature.signature_image or not signature.signature_image.name:
+                continue
+
+            image_path = signature.signature_image.path
+
+            try:
+                # Read the original image file
+                with open(image_path, 'rb') as image_file:
+                    original_data = image_file.read()
+
+                # Encrypt the image data
+                encrypted_data = cipher_suite.encrypt(original_data)
+
+                # Save the encrypted image file
+                file_name = signature.signature_image.name.split('/')[-1]
+                signature.signature_image.delete(save=False)  # Delete the old file
+                signature.signature_image.save(
+                    file_name,
+                    ContentFile(encrypted_data)
+                )
+                signature.save()
+                messages.success(request, f"Signature encrypted for {signature}.")
+
+            except Exception as e:
+                messages.error(request, f"Error encrypting signature {signature}: {str(e)}")
+                print(f"Error encrypting signature {signature}: {e}")
+
+    except Exception as e:
+        messages.error(request, f"Unexpected error: {str(e)}")
+
+
+    try:
+        for signature in commission_participated:
+            if not signature.signature_image or not signature.signature_image.name:
+                continue
+
+            image_path = signature.signature_image.path
+
+            try:
+                # Read the original image file
+                with open(image_path, 'rb') as image_file:
+                    original_data = image_file.read()
+
+                # Encrypt the image data
+                encrypted_data = cipher_suite.encrypt(original_data)
+
+                # Save the encrypted image file
+                file_name = signature.signature_image.name.split('/')[-1]
+                signature.signature_image.delete(save=False)  # Delete the old file
+                signature.signature_image.save(
+                    file_name,
+                    ContentFile(encrypted_data)
+                )
+                signature.save()
+                messages.success(request, f"Signature encrypted for {signature}.")
+
+            except Exception as e:
+                messages.error(request, f"Error encrypting signature {signature}: {str(e)}")
+                print(f"Error encrypting signature {signature}: {e}")
+
+    except Exception as e:
+        messages.error(request, f"Unexpected error: {str(e)}")
+
+
+    return redirect(f'{reverse("TI_Management_app:voting_history_and_reports_detail", args=[pk])}?showed={bool(showed)}')
+
+
+
 # @login_required
 @user_passes_test(lambda user: user.is_superuser)
 def voting_history_and_reports_detail_pdf_advance(request, pk):
     voting = get_object_or_404(Vote, pk=pk)
     member_already_participated = VotingSessionSignature.objects.filter(vote=voting)
     member_rejected = VotingSessionSignature.objects.filter(vote=voting, reject=True)
-    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
+    # member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False)
+    member_accepted = VotingSessionSignature.objects.filter(vote=voting, reject=False, complete=True)
     poll = Poll.objects.filter(vote=voting)
 
     assigned_members = voting.members.all()
@@ -5215,12 +6411,16 @@ def voting_history_and_reports_detail_pdf_advance(request, pk):
     else:
         min_attendance = 0
 
+    # Default values
+    attendance = 0
+    attendance_only_accepted = 0
+
     if member_already_participated.count() > 0:
         attendance = (member_already_participated.count() / voting.members.count()) * 100
         if member_accepted.count() > 0:
             attendance_only_accepted = (member_accepted.count() / voting.members.count()) * 100
-    else:
-        attendance = 0
+    # else:
+    #     attendance = 0
 
     if attendance_only_accepted > voting.turnout:
         grant = True
@@ -5244,7 +6444,8 @@ def voting_history_and_reports_detail_pdf_advance(request, pk):
     )
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = f'filename="voting_report_{pk}.pdf"'
-    weasyprint.HTML(string=html).write_pdf(
+    base_url = request.build_absolute_uri('/')
+    weasyprint.HTML(string=html, base_url=base_url).write_pdf(
         response,
         stylesheets=[weasyprint.CSS(settings.STATIC_ROOT + '/css/TI_Management_app.css')]
     )
