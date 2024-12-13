@@ -38,158 +38,522 @@
         <br />
         <br />
     </form>
+    <hr>
+    <p>
+        <a href="{% url 'TI_Management_app:documents_database_signature' pk=document.pk %}"
+            onclick="openSignatureWindow(event)"
+            class="btn btn-primary btn-large pull-left">
+            Okno podpisu
+        </a>
+    </p>
+    <br />
+    <br />
+    <script>
+        function openSignatureWindow(event) {
+            event.preventDefault();
+            const url = event.currentTarget.href;
+            window.open(url, 'SignatureWindow', 'width=600,height=600,resizable=yes,scrollbars=yes');
+        }
+    </script>
     {% if document.signature_image %}
     <h5>Podpis:</h5>
-        <img src="{{ document.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
+    {% if request.GET.showed == 'True' %}
+        <form method="POST" action="{% url 'TI_Management_app:documents_database_encrypt_signature' pk=document.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary">Ukryj podpis</button>
+        </form>
+        <a href="{{ document.signature_image.url }}" target="_blank">
+            <img src="{{ document.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 350px; display: block; margin-top: 10px;">
+        </a>
+    {% else %}
+        <form method="POST" action="{% url 'TI_Management_app:documents_decrypt_signature' pk=document.pk %}">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary" >Zobacz podpis</button>
+        </form>
+    {% endif %}
         <form method="post" action="{% url 'TI_Management_app:documents_database_remove_signature' pk=document.pk %}" style="display:inline;">
             {% csrf_token %}
-            <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
+            <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
         </form>
+    <br />
+    <br />
+
+
+<!--        <script>-->
+<!--            document.addEventListener('DOMContentLoaded', () => {-->
+<!--                // Get the query parameters from the current URL-->
+<!--                const urlParams = new URLSearchParams(window.location.search);-->
+<!--                const addSignatureButton = document.getElementById('addSignatureButton');-->
+
+<!--                // Check if the 'showed' parameter exists and is 'True'-->
+<!--                if (urlParams.get('showed') === 'True') {-->
+<!--                    addSignatureButton.disabled = false;-->
+<!--                    // Wait for 5 seconds and then invoke the encryption function-->
+<!--                    setTimeout(() => {-->
+<!--                        // Create a form dynamically for the POST request-->
+<!--                        const form = document.createElement('form');-->
+<!--                        form.method = 'POST';-->
+<!--                        form.action = "{% url 'TI_Management_app:documents_database_encrypt_signature' pk=document.pk %}";-->
+
+<!--                        // Add the CSRF token as a hidden input-->
+<!--                        const csrfTokenInput = document.createElement('input');-->
+<!--                        csrfTokenInput.type = 'hidden';-->
+<!--                        csrfTokenInput.name = 'csrfmiddlewaretoken';-->
+<!--                        csrfTokenInput.value = '{{ csrf_token }}';-->
+<!--                        form.appendChild(csrfTokenInput);-->
+
+<!--                        // Append the form to the body and submit it-->
+<!--                        document.body.appendChild(form);-->
+<!--                        try {-->
+<!--                            form.submit();-->
+<!--                        } catch (error) {-->
+<!--                            console.error("Error submitting the form:", error);-->
+<!--                        }-->
+<!--                    }, 10000); // Delay of 10000ms (10 seconds)-->
+<!--                } else {-->
+<!--                    addSignatureButton.disabled = true;-->
+<!--                }-->
+<!--            });-->
+<!--        </script>-->
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const addSignatureButton = document.getElementById('addSignatureButton');
+                    const countdownElement = document.getElementById('countdown');
+
+                    // Check if the 'showed' parameter exists and is 'True'
+                    if (urlParams.get('showed') === 'True') {
+                        addSignatureButton.disabled = false;
+
+                        // Set countdown duration in seconds
+                        let countdown = 10;
+
+                        // Update the countdown text every second
+                        const countdownInterval = setInterval(() => {
+                            countdownElement.textContent = `Możliwość podpisania dokumentu jest dostępna jeszcze przez  ${countdown}  sekund...`;
+                            countdown--;
+
+                            if (countdown < 0) {
+                                clearInterval(countdownInterval);
+
+                                // Create a form dynamically for the POST request
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = "{% url 'TI_Management_app:documents_database_encrypt_signature' pk=document.pk %}";
+
+                                // Add the CSRF token as a hidden input
+                                const csrfTokenInput = document.createElement('input');
+                                csrfTokenInput.type = 'hidden';
+                                csrfTokenInput.name = 'csrfmiddlewaretoken';
+                                csrfTokenInput.value = '{{ csrf_token }}';
+                                form.appendChild(csrfTokenInput);
+
+                                // Append the form to the body and submit it
+                                document.body.appendChild(form);
+                                try {
+                                    form.submit();
+                                } catch (error) {
+                                    console.error("Error submitting the form:", error);
+                                }
+                            }
+                        }, 1000); // Update every second
+                    } else {
+                        addSignatureButton.disabled = true;
+                        countdownElement.textContent = "Kliknij przycisk 'Zobacz podpis' żeby podpisać dokument.";
+                    }
+                });
+            </script>
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
+            <br />
 
 
 
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>-->
+<!--<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>-->
 
 
+<script src="{% static 'js/jspdf.umd.min.js' %}"></script>
+<script src="{% static 'js/pdf.min.js' %}"></script>
+<script src="{% static 'js/pdf.worker.min.js' %}"></script>
 
+<!--<script>-->
+<!--    function addSignatureToPdf() {-->
+<!--        const signatureImageUrl = "{{ document.signature_image.url }}"; // URL of the signature image-->
+<!--        const pdfUrl = "{{ document.file.url }}"; // URL of the PDF file-->
 
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
-        <br/>
+<!--        // Fetch the PDF and signature image-->
+<!--        Promise.all([-->
+<!--            fetch(pdfUrl).then(res => res.blob()),  // Fetch the PDF as a Blob-->
+<!--            fetch(signatureImageUrl).then(res => res.blob()) // Fetch the signature image as a Blob-->
+<!--        ])-->
+<!--        .then(([pdfBlob, signatureBlob]) => {-->
+<!--            console.log("PDF and signature blobs fetched successfully.");-->
 
+<!--            // Read the PDF using FileReader-->
+<!--            const fileReader = new FileReader();-->
+<!--            fileReader.onload = function(event) {-->
+<!--                const pdfData = new Uint8Array(event.target.result);-->
 
+<!--                // Prompt for password if necessary-->
+<!--                let password = null;-->
 
-<!-- Include jsPDF and pdf.js -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.10.377/pdf.min.js"></script>
+<!--                function loadPdfWithPassword() {-->
+<!--                    const loadingTask = pdfjsLib.getDocument({-->
+<!--                        data: pdfData,-->
+<!--                        password: password-->
+<!--                    });-->
+
+<!--                    loadingTask.promise.then(function(pdfDoc) {-->
+<!--                        console.log("PDF loaded successfully.");-->
+<!--                        pdfDoc.getPage(1).then(function(page) {-->
+<!--                            const viewport = page.getViewport({ scale: 1 });-->
+
+<!--                            // Prepare a canvas to render the PDF page-->
+<!--                            const canvas = document.createElement('canvas');-->
+<!--                            const context = canvas.getContext('2d');-->
+<!--                            canvas.width = viewport.width;-->
+<!--                            canvas.height = viewport.height;-->
+
+<!--                            page.render({-->
+<!--                                canvasContext: context,-->
+<!--                                viewport: viewport-->
+<!--                            }).promise.then(function() {-->
+<!--                                console.log("Page rendered successfully onto canvas.");-->
+
+<!--                                // Convert the rendered PDF page to an image-->
+<!--                                const pageImage = canvas.toDataURL('image/png');-->
+
+<!--                                // Create a jsPDF instance-->
+<!--                                const { jsPDF } = window.jspdf;-->
+<!--                                const pdf = new jsPDF({-->
+<!--                                    unit: 'mm',-->
+<!--                                    format: [canvas.width / 3, canvas.height / 3] // Adjust size to match the canvas-->
+<!--                                });-->
+
+<!--                                // Add the rendered PDF page as an image to jsPDF-->
+<!--                                pdf.addImage(pageImage, 'PNG', 0, 0, canvas.width / 3, canvas.height / 3);-->
+
+<!--                                // Add the signature to the PDF-->
+<!--                                const signatureImage = new Image();-->
+<!--                                signatureImage.src = URL.createObjectURL(signatureBlob);-->
+<!--                                signatureImage.onload = function() {-->
+<!--                                    console.log("Signature image loaded successfully.");-->
+<!--                                    const signatureWidth = 50;  // Adjust as needed-->
+<!--                                    const signatureHeight = 30; // Adjust as needed-->
+<!--                                    const signatureX = canvas.width / 3 - signatureWidth - 10; // Bottom-right-->
+<!--                                    const signatureY = canvas.height / 3 - signatureHeight - 10;-->
+
+<!--                                    pdf.addImage(signatureImage, 'PNG', signatureX, signatureY, signatureWidth, signatureHeight);-->
+<!--                                    console.log("Signature added to PDF.");-->
+
+<!--                                    // Output the PDF as a Blob-->
+<!--                                    const updatedPdfBlob = pdf.output('blob');-->
+<!--                                    console.log("PDF saved successfully. Preparing to upload...");-->
+
+<!--                                    // Create FormData for upload-->
+<!--                                    const formData = new FormData();-->
+<!--                                    formData.append('signature_file', updatedPdfBlob, 'updated_document.pdf');-->
+
+<!--                                    // Upload the signed PDF-->
+<!--                                    fetch("{% url 'TI_Management_app:documents_database_save_signature_file' pk=document.pk %}", {-->
+<!--                                        method: 'POST',-->
+<!--                                        headers: {-->
+<!--                                            'X-CSRFToken': getCookie('csrftoken'),-->
+<!--                                        },-->
+<!--                                        body: formData,-->
+<!--                                    })-->
+<!--                                    .then(response => {-->
+<!--                                        console.log('Server response:', response);-->
+<!--                                        if (!response.ok) throw new Error('Server error during upload');-->
+<!--                                        return response.json();-->
+<!--                                    })-->
+<!--                                    .then(data => {-->
+<!--                                        if (data.success) {-->
+<!--                                            console.log('Signature saved successfully.');-->
+<!--                                            location.reload();-->
+<!--                                        } else {-->
+<!--                                            console.error('Error saving signature:', data.error);-->
+<!--                                        }-->
+<!--                                    })-->
+<!--                                    .catch(error => {-->
+<!--                                        console.error('Error uploading the signature file:', error);-->
+<!--                                    });-->
+<!--                                };-->
+<!--                            });-->
+<!--                        });-->
+<!--                    }).catch(function(error) {-->
+<!--                        if (error.name === 'PasswordException') {-->
+<!--                            console.error('The PDF is password-protected.');-->
+<!--                            password = prompt('Dokument PDF jest chroniony hasłem. Proszę podaj hasło:');-->
+<!--                            if (password) {-->
+<!--                                loadPdfWithPassword(); // Retry with the provided password-->
+<!--                            } else {-->
+<!--                                console.error('No password provided. Cannot process the PDF.');-->
+<!--                            }-->
+<!--                        } else {-->
+<!--                            console.error('Error loading the PDF:', error);-->
+<!--                        }-->
+<!--                    });-->
+<!--                }-->
+
+<!--                loadPdfWithPassword();-->
+<!--            };-->
+<!--            fileReader.readAsArrayBuffer(pdfBlob);-->
+<!--        }).catch(error => {-->
+<!--            console.error('Error loading PDF or signature image:', error);-->
+<!--        });-->
+<!--    }-->
+
+<!--    // Function to get CSRF token from cookies (to use in fetch requests)-->
+<!--    function getCookie(name) {-->
+<!--        let cookieValue = null;-->
+<!--        if (document.cookie && document.cookie !== '') {-->
+<!--            const cookies = document.cookie.split(';');-->
+<!--            for (let i = 0; i < cookies.length; i++) {-->
+<!--                const cookie = cookies[i].trim();-->
+<!--                if (cookie.substring(0, name.length + 1) === (name + '=')) {-->
+<!--                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));-->
+<!--                    break;-->
+<!--                }-->
+<!--            }-->
+<!--        }-->
+<!--        return cookieValue;-->
+<!--    }-->
+<!--</script>-->
 
 <script>
     function addSignatureToPdf() {
-        const signatureImageUrl = "{{ document.signature_image.url }}";  // URL of the signature image
+        const signatureImageUrl = "{{ document.signature_image.url }}"; // URL of the signature image
         const pdfUrl = "{{ document.file.url }}"; // URL of the PDF file
 
         // Fetch the PDF and signature image
         Promise.all([
             fetch(pdfUrl).then(res => res.blob()),  // Fetch the PDF as a Blob
             fetch(signatureImageUrl).then(res => res.blob()) // Fetch the signature image as a Blob
-        ]).then(([pdfBlob, signatureBlob]) => {
-            // Create a jsPDF instance
-            const { jsPDF } = window.jspdf;
-            const pdf = new jsPDF();
+        ])
+        .then(([pdfBlob, signatureBlob]) => {
+            console.log("PDF and signature blobs fetched successfully.");
 
-            // Load the PDF with pdf.js
+            // Read the PDF using FileReader
             const fileReader = new FileReader();
             fileReader.onload = function(event) {
                 const pdfData = new Uint8Array(event.target.result);
 
-                // Initialize pdf.js
-                const loadingTask = pdfjsLib.getDocument(pdfData);
-                loadingTask.promise.then(function(pdfDoc) {
-                    // Get the first page of the PDF
-                    pdfDoc.getPage(1).then(function(page) {
-                        const viewport = page.getViewport({ scale: 1 });  // No scaling
+                let password = null;
 
-                        // Prepare the canvas to render the PDF page
-                        const canvas = document.createElement('canvas');
-                        const context = canvas.getContext('2d');
-                        canvas.height = viewport.height;
-                        canvas.width = viewport.width;
+                // Function to display a modal for entering the password
+                function askForPassword() {
+                    return new Promise((resolve) => {
+                        const modal = document.createElement('div');
+                        modal.style.position = 'fixed';
+                        modal.style.top = '0';
+                        modal.style.left = '0';
+                        modal.style.width = '100vw';
+                        modal.style.height = '100vh';
+                        modal.style.backgroundColor = 'rgba(0, 0, 0, 0.5)';
+                        modal.style.display = 'flex';
+                        modal.style.justifyContent = 'center';
+                        modal.style.alignItems = 'center';
+                        modal.style.zIndex = '1000';
 
-                        // Render the page onto the canvas
-                        page.render({
-                            canvasContext: context,
-                            viewport: viewport
-                        }).promise.then(function() {
-                            // Once the page is rendered, create the final PDF
+                        const dialog = document.createElement('div');
+                        dialog.style.backgroundColor = '#fff';
+                        dialog.style.padding = '20px';
+                        dialog.style.borderRadius = '8px';
+                        dialog.style.textAlign = 'center';
 
-                            // Convert canvas to image
-                            const imgData = canvas.toDataURL('image/png');
+                        const title = document.createElement('p');
+                        title.textContent = 'Dokument PDF jest chroniony hasłem. Proszę podaj hasło:';
+                        title.style.marginBottom = '10px';
 
-                            // Create a new jsPDF document with the exact same size as the original PDF
-                            const pdfWidth = canvas.width / 3; // Calculate based on 72 dpi (standard for jsPDF)
-                            const pdfHeight = canvas.height / 3; // 72 dpi is the default in jsPDF
-                            const pdf = new jsPDF({
-                                unit: 'mm',
-                                format: [pdfWidth, pdfHeight] // Set size to match the canvas size (PDF dimensions)
-                            });
+                        const passwordInput = document.createElement('input');
+                        passwordInput.type = 'password'; // Secure input
+                        passwordInput.placeholder = 'Enter password';
+                        passwordInput.style.width = '80%';
+                        passwordInput.style.padding = '10px';
+                        passwordInput.style.marginBottom = '10px';
+                        passwordInput.style.border = '1px solid #ccc';
+                        passwordInput.style.borderRadius = '4px';
 
-                            // Add the rendered image to the new PDF (without rescaling)
-                            pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+                        const submitButton = document.createElement('button');
+                        submitButton.textContent = 'Submit';
+                        submitButton.style.padding = '10px 20px';
+                        submitButton.style.border = 'none';
+                        submitButton.style.backgroundColor = '#007BFF';
+                        submitButton.style.color = '#fff';
+                        submitButton.style.borderRadius = '4px';
+                        submitButton.style.cursor = 'pointer';
 
-                            // Now load the signature image and add it to the PDF
-                            const signatureImage = new Image();
-                            signatureImage.src = URL.createObjectURL(signatureBlob);
-
-                            signatureImage.onload = function() {
-                                // Adjust the size of the signature
-                                const signatureWidth = 50;  // Adjust the width
-                                const signatureHeight = 30;  // Adjust the height
-
-                                // Position the signature in the bottom-right corner
-                                const signatureX = pdfWidth - signatureWidth - 10; // 10mm margin from the right
-                                const signatureY = pdfHeight - signatureHeight - 10; // 10mm margin from the bottom
-
-                                // Add the signature image to the PDF at the new position
-                                pdf.addImage(signatureImage, 'PNG', signatureX, signatureY, signatureWidth, signatureHeight);
-
-                                // Save the updated PDF
-                                pdf.save('updated_document.pdf');
-                            };
+                        submitButton.addEventListener('click', () => {
+                            const enteredPassword = passwordInput.value;
+                            modal.remove();
+                            resolve(enteredPassword);
                         });
+
+                        dialog.appendChild(title);
+                        dialog.appendChild(passwordInput);
+                        dialog.appendChild(submitButton);
+                        modal.appendChild(dialog);
+                        document.body.appendChild(modal);
                     });
-                });
+                }
+
+                function loadPdfWithPassword() {
+                    const loadingTask = pdfjsLib.getDocument({
+                        data: pdfData,
+                        password: password
+                    });
+
+                    loadingTask.promise.then(function(pdfDoc) {
+                        console.log("PDF loaded successfully.");
+                        pdfDoc.getPage(1).then(function(page) {
+                            const viewport = page.getViewport({ scale: 1 });
+
+                            const canvas = document.createElement('canvas');
+                            const context = canvas.getContext('2d');
+                            canvas.width = viewport.width;
+                            canvas.height = viewport.height;
+
+                            page.render({
+                                canvasContext: context,
+                                viewport: viewport
+                            }).promise.then(function() {
+                                console.log("Page rendered successfully onto canvas.");
+
+                                const pageImage = canvas.toDataURL('image/png');
+
+                                const { jsPDF } = window.jspdf;
+                                const pdf = new jsPDF({
+                                    unit: 'mm',
+                                    format: [canvas.width / 3, canvas.height / 3]
+                                });
+
+                                pdf.addImage(pageImage, 'PNG', 0, 0, canvas.width / 3, canvas.height / 3);
+
+                                const signatureImage = new Image();
+                                signatureImage.src = URL.createObjectURL(signatureBlob);
+                                signatureImage.onload = function() {
+                                    console.log("Signature image loaded successfully.");
+                                    const signatureWidth = 100;
+                                    const signatureHeight = 30;
+                                    const signatureX = canvas.width / 3 - signatureWidth - 10;
+                                    const signatureY = canvas.height / 3 - signatureHeight - 10;
+
+                                    pdf.addImage(signatureImage, 'PNG', signatureX, signatureY, signatureWidth, signatureHeight);
+                                    console.log("Signature added to PDF.");
+
+                                    const updatedPdfBlob = pdf.output('blob');
+                                    console.log("PDF saved successfully. Preparing to upload...");
+
+                                    const formData = new FormData();
+                                    formData.append('signature_file', updatedPdfBlob, 'updated_document.pdf');
+
+                                    fetch("{% url 'TI_Management_app:documents_database_save_signature_file' pk=document.pk %}", {
+                                        method: 'POST',
+                                        headers: {
+                                            'X-CSRFToken': getCookie('csrftoken'),
+                                        },
+                                        body: formData,
+                                    })
+                                    .then(response => {
+                                        console.log('Server response:', response);
+                                        if (!response.ok) throw new Error('Server error during upload');
+                                        return response.json();
+                                    })
+                                    .then(data => {
+                                        if (data.success) {
+                                            console.log('Signature saved successfully.');
+                                            alert("Dodano podpis do dokumentu.");
+                                            // location.reload();
+
+
+                                            clearInterval(countdownInterval);
+
+                                            // Create a form dynamically for the POST request
+                                            const form = document.createElement('form');
+                                            form.method = 'POST';
+                                            form.action = "{% url 'TI_Management_app:documents_database_encrypt_signature' pk=document.pk %}";
+
+                                            // Add the CSRF token as a hidden input
+                                            const csrfTokenInput = document.createElement('input');
+                                            csrfTokenInput.type = 'hidden';
+                                            csrfTokenInput.name = 'csrfmiddlewaretoken';
+                                            csrfTokenInput.value = '{{ csrf_token }}';
+                                            form.appendChild(csrfTokenInput);
+
+
+                                            // Append the form to the body and submit it
+                                            document.body.appendChild(form);
+                                            try {
+                                                form.submit();
+                                            } catch (error) {
+                                                console.error("Error submitting the form:", error);
+                                            }
+
+                                        } else {
+                                            console.error('Error saving signature:', data.error);
+                                        }
+                                    })
+                                    .catch(error => {
+                                        console.error('Error uploading the signature file:', error);
+                                    });
+                                };
+                            });
+                        });
+                    }).catch(function(error) {
+                        if (error.name === 'PasswordException') {
+                            console.error('The PDF is password-protected.');
+                            askForPassword().then(enteredPassword => {
+                                if (enteredPassword) {
+                                    password = enteredPassword;
+                                    loadPdfWithPassword(); // Retry with the provided password
+                                } else {
+                                    console.error('No password provided. Cannot process the PDF.');
+                                }
+                            });
+                        } else {
+                            console.error('Error loading the PDF:', error);
+                        }
+                    });
+                }
+
+                loadPdfWithPassword();
             };
             fileReader.readAsArrayBuffer(pdfBlob);
         }).catch(error => {
             console.error('Error loading PDF or signature image:', error);
         });
     }
+
+    function getCookie(name) {
+        let cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            const cookies = document.cookie.split(';');
+            for (let i = 0; i < cookies.length; i++) {
+                const cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
 </script>
 
-<!-- Button to trigger the signature adding process -->
-<button onclick="addSignatureToPdf()" class="btn btn-success btn-sm">
-    Dodaj podpis do PDF
-</button>
+    <br />
+    <br />
+    <button id="addSignatureButton" onclick="addSignatureToPdf()" class="btn btn-success btn-sm pull-left" disabled>
+        Dodaj podpis do PDF
+    </button>
+    <br />
+    <br />
+    <p id="countdown"></p>
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    {% else %}
-        <p>
-            <a href="{% url 'TI_Management_app:documents_database_signature' pk=document.pk %}"
-                onclick="openSignatureWindow(event)"
-                class="btn btn-primary btn-sm pull-left">
-                Okno podpisu
-            </a>
-        </p>
-        <br />
-        <br />
-        <script>
-            function openSignatureWindow(event) {
-                event.preventDefault(); // Prevent the default anchor click behavior
-                const url = event.currentTarget.href;
-                window.open(url, 'SignatureWindow', 'width=600,height=600,resizable=yes,scrollbars=yes');
-            }
-        </script>
     {% endif %}
 </div>
 
@@ -198,59 +562,67 @@
         Historia:
     </h4>
     {% for h in document.history.all %}
-        <div class="notepad">
-            <table width="100%" border="0">
-                <tr>
-                    <td>
-                        {{ h.history_id }}
-                    </td>
-                    <td>
-                        {{ h.history_type }}
-                    </td>
-                    <td>
-                        {{ h.history_user }}
-                    </td>
-                    <td>
-                        {{ h.history_date }}
-                    </td>
-                </tr>
-                <tr>
-                    <td colspan="4">
-                        <b>Ketegoria:</b> {{ h.category }}
-                    <br />
-                        <b>Tytuł:</b>
-                            {{ h.title }}
-                    <br />
-                        {% if h.file %}
-<!--                            <a href="../../media/{{ h.file|escape }}">-->
-<!--                            <a href="{{ h.file.url }}">-->
-<!--                            <a href="{{ h.file }}">-->
-<!--                            <a href="{{ MEDIA_URL }}{{ h.file }}">-->
+    <div class="notepad">
+        <table width="100%" border="0">
+            <tr>
+                <td>{{ h.history_id }}</td>
+                <td>{{ h.history_type }}</td>
+                <td>{{ h.history_user }}</td>
+                <td>{{ h.history_date }}</td>
+            </tr>
+            <tr>
+                <td colspan="4">
+                    <b>Kategoria:</b> {{ h.category }}<br />
+                    <b>Tytuł:</b> {{ h.title }}<br />
+                    {% if h.file %}
+                        <b>Dokument:</b>
+                        <a onclick="openNewPDFWindow()" style="cursor: pointer;">
                             {{ h.file|filename }}
-<!--                            </a>-->
-<!--                        <p>{{ MEDIA_URL }}{{ h.file }}</p>-->
+                        </a>
+                        <script>
+                            function openNewPDFWindow() {
+                                window.open(
+                                    "{{ MEDIA_URL }}{{ h.file }}",
+                                    "_blank",
+                                    "width=800,height=600,scrollbars=yes,resizable=yes"
+                                );
+                            }
+                        </script>
+                    {% else %}
+                        <b>Dokument:</b> Brak
+                    {% endif %}
+                    <br />
+                    <b>Złożono podpis:</b> {% if h.signature_image %}Tak{% else %}Nie{% endif %}
+                    <br />
+                    <b>Podpisano dokument:</b>
+                        {% if h.signature_file %}
+                            Tak -
+                            <a onclick="openNewPDFWindowOne()" style="cursor: pointer;">
+                                {{ h.file|filename }}
+                            </a>
+                            <script>
+                                function openNewPDFWindowOne() {
+                                    window.open(
+                                        "{{ MEDIA_URL }}{{ h.signature_file }}",
+                                        "_blank",
+                                        "width=800,height=600,scrollbars=yes,resizable=yes"
+                                    );
+                                }
+                            </script>
                         {% else %}
-<!--                            {{ h.file|cut:'documentsDatabase/' }}-->
-                            {{ h.file|filename }}
+                            Nie
                         {% endif %}
                     <br />
-                        {{ h.responsible }}
-                    </td>
-                </tr>
-            </table>
-        </div>
-    {% endfor %}
+                    <b>Odpowiedzialny:</b> {{ h.responsible }}
+                </td>
+            </tr>
+        </table>
+    </div>
+{% endfor %}
+
 </div>
 {% endblock %}
 
 {% block menu %}
 {% include 'TI_Management_app/menu.html' with active_tab='documents_database' %}
 {% endblock %}
-
-
-
-
-
-
-
-

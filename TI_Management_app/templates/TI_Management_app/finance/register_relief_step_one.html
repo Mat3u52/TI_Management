@@ -42,6 +42,9 @@
                 </h3>
 
                 <p>Brak Podpisu</p>
+                <a href="{% url 'TI_Management_app:register_relief_step_one_remove' pk=relife_process.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">
+                    Usuń
+                </a>
             {% else %}
                 <h3>
                     <a href="{% url 'TI_Management_app:register_relief_step_four' pk=relife_process.id %}">
@@ -49,6 +52,9 @@
                     </a>
                 </h3>
                 <p>Bark dokumentów</p>
+                <a href="{% url 'TI_Management_app:register_relief_step_one_remove' pk=relife_process.id %}" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">
+                    Usuń
+                </a>
             {% endif %}
             <div class="date">
 

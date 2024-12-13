@@ -798,5 +798,15 @@ urlpatterns = [
         views.voting_polls_competitions_search,
         name='voting_polls_competitions_search'
     ),
+    path(
+        'TI_Management_app/backup/backup-list/',
+        views.backup_list,
+        name='backup_list'
+    ),
+    path(
+        'TI_Management_app/backup/run-backup/',
+        views.run_backup,
+        name='run_backup'
+    ),
 ]
 

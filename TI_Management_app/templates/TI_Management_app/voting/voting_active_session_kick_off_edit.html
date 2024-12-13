@@ -1,63 +1,148 @@
 <!DOCTYPE html>
 {% load static %}
-{% load ti_management_tags %}
-{% load thumbnail %}
 <html lang="pl">
-    <head>
-        <meta charset="UTF-8">
-        <title>zzti LUMS</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="zzti LUMS">
-        <meta name="author" content="zzti LUMS">
-        <link rel="icon" type="image/x-icon" href="{% static 'img/zzti_png-3.png' %}">
-        <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
-        <link rel="stylesheet" href="{% static 'css/TI_Management_app.css' %}">
-        <link rel="stylesheet" href="{% static 'css/bootstrap-responsive.css' %}">
-        <script src="{% static 'js/jquery.min.js' %}"></script>
-        <script src="{% static 'js/TI_Management_app.js' %}"></script>
-    </head>
-    <body>
-        <div class="hero-unit">
-            <h2 class="fadeInUp-animation">{{ voting.title }}</h2>
-            <hr>
-            <br />
-            <form method="post">
-                {% csrf_token %}
-                {% if form_signature.errors %}
-                    <div class="alert alert-danger">
-                        <p>{{ form_signature.errors }}</p>
-                    </div>
-                {% endif %}
+<head>
+    <meta charset="UTF-8">
+    <title>Rozpoczęcie Sesji Głosowania</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="{% static 'css/bootstrap.css' %}">
+    <script src="{% static 'js/TI_Management_app.js' %}"></script>
+    <style>
+        #signature-canvas {
+            border: 2px solid #000;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            touch-action: none;
+        }
 
-                <p><b>Minimalna ilość podpisów Komisji Wyborczej:</b> {{ voting.min_amount_commission }}</p>
-                <br />
-                <ul>
-                    {% for commission in voting.election_commission.all %}
-                        <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
-                    {% endfor %}
-                </ul>
-                <br />
-                <p><b>Obecność:</b> {{voting_session_kick_off_signature|length}}</p>
-                <ul>
-                    {% for commission_signed in voting_session_kick_off_signature %}
-                    <li>
-                        <span style="color:green;">
-                        {{ commission_signed.member.member_nr }} -
-                        {{ commission_signed.member.forename }}
-                        {{ commission_signed.member.surname }}
-                        </span>
-                    </li>
-                    {% endfor %}
-                </ul>
-                <br />
-                {{ form_signature.commission_signature }}
-                <br />
-                <br />
-                <button type="submit" class="btn btn-primary btn-large pull-right">Dodaj</button>
-                <br />
-                <br />
-            </form>
+        .notepad {
+            margin-top: 20px;
+        }
+
+        .regulation {
+            margin-top: 20px;
+        }
+
+        .form-field {
+            display: none;
+            margin-top: 20px;
+        }
+    </style>
+    <script src="{% static 'js/jquery.min.js' %}"></script>
+</head>
+<body>
+<div class="hero-unit container mt-4">
+    <h2>{{ voting.title }}</h2>
+    <hr>
+
+    <p><strong>Minimalna ilość podpisów Komisji Wyborczej:</strong> {{ voting.min_amount_commission }}</p>
+    <ul>
+        {% for commission in voting.election_commission.all %}
+            <li>{{ commission.member_nr }} - {{ commission.forename }} {{ commission.surname }}</li>
+        {% endfor %}
+    </ul>
+    <br>
+    <p><strong>Obecność:</strong> {{ voting_session_kick_off_signature|length }}</p>
+    <ul>
+        {% for commission_signed in voting_session_kick_off_signature %}
+            <li>
+                <span style="color:green;">
+                    {{ commission_signed.member.member_nr }} -
+                    {{ commission_signed.member.forename }} {{ commission_signed.member.surname }}
+                </span>
+            </li>
+        {% endfor %}
+    </ul>
+    <br>
+
+    <form id="signature-form" method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <input type="hidden" name="signature_data" id="signature_data">
+
+        <div class="notepad">
+            <canvas id="signature-canvas"></canvas>
+            <br>
+            <button type="button" onclick="clearCanvas()" class="btn btn-secondary">Wyczyść</button>
+            <button id="confirm-button" type="button" onclick="saveSignature()" class="btn btn-primary" disabled>Potwierdzam</button>
         </div>
-    </body>
-</html>
 
+        <div class="regulation">
+            <input type="checkbox" id="rodo-checkbox">
+            <label for="rodo-checkbox">
+                Zapoznałem/am się z <a href="/regulamin-rodo/" target="_blank">Regulaminem RODO</a> dotyczącym przechowywania podpisu elektronicznego i wyrażam na to zgodę.
+            </label>
+        </div>
+        <br>
+
+        <div id="form-field" class="form-field">
+            {{ form_signature.commission_signature }}
+        </div>
+
+        <button type="submit" id="submit-button" onclick="saveSignature()" class="btn btn-success btn-large pull-left" disabled>Dodaj Podpis</button>
+    </form>
+</div>
+
+<script>
+    const canvas = document.getElementById('signature-canvas');
+    const ctx = canvas.getContext('2d');
+    const checkbox = document.getElementById('rodo-checkbox');
+    const confirmButton = document.getElementById('confirm-button');
+    const submitButton = document.getElementById('submit-button');
+    const signatureForm = document.getElementById('signature-form');
+    const formField = document.getElementById('form-field');
+
+    // Enable confirm button based on checkbox state
+    checkbox.addEventListener('change', function () {
+        confirmButton.disabled = !this.checked;
+    });
+
+    function resizeCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetWidth * 0.75; // 4:3 aspect ratio
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+        if (!drawing) return;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'black';
+
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function saveSignature() {
+        const signatureData = canvas.toDataURL('image/png');
+        console.log(signatureData);  // Add this to debug
+
+        document.getElementById('signature_data').value = signatureData;
+
+        // Show the form field and enable the submit button
+        formField.style.display = 'block';
+        submitButton.disabled = false;
+    }
+</script>
+</body>
+</html>

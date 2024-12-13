@@ -41,7 +41,7 @@
         <p><b>Uczestnicy:</b></p>
             <ul>
                 {% for member in vote.members.all %}
-                    <li>{{ member.forename }} {{ member.surname }} - {{ member.member_nr }}</li>
+                <li>{{ member.member_nr }} {{ member.forename }} {{ member.surname }} {% if member.card %}<span style="color:green; float:right;">zweryfikowany/a</span>{% else %}<span style="color:red; float:right;">Osoba nie została zweryfikowana</span>{% endif %}</li>
                 {% endfor %}
             </ul>
 

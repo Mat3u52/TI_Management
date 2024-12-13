@@ -45,7 +45,8 @@
                 </p>
             </div>
             <a href="{% url 'TI_Management_app:documents_database_category_delete' pk=category.pk %}"
-               class="btn btn-danger btn-sm pull-right">
+                class="btn btn-danger btn-sm pull-right"
+                onclick="return confirm('Czy na pewno chcesz usunąć WSZYSTKIE dokumenty powiązane z tą kategorią?')">
                 usuń
             </a>
         </div>

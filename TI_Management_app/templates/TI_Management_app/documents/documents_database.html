@@ -69,12 +69,36 @@
                 {{document.title}}
             </a>
         </h3>
-        <p>
-            <a href="{{ document.file.url }}">
-<!--                    {{document.file|cut:'documentsDatabase/'}}-->
-                {{ document.file|filename }}
-            </a>
-        </p>
+        <ul>
+            <li>
+                <a onclick="openNewWindow()" style="cursor: pointer;">{{ document.file|filename }}</a>
+                <script>
+                    function openNewWindow() {
+                        window.open(
+                            "{{ document.file.url }}",
+                            "_blank",
+                            "width=800,height=600,scrollbars=yes,resizable=yes"
+                        );
+                    }
+                </script>
+                {% if document.signature_file %}
+                <ul>
+                    <li>
+                        Podpisany dokument: <a onclick="openNewWindowOne()" style="cursor: pointer;"> {{ document.file|filename }}</a>
+                        <script>
+                            function openNewWindowOne() {
+                                window.open(
+                                    "{{ document.signature_file.url }}",
+                                    "_blank",
+                                    "width=800,height=600,scrollbars=yes,resizable=yes"
+                                );
+                            }
+                        </script>
+                    </li>
+                </ul>
+                {% endif %}
+            </li>
+        </ul>
         <div class="date">
             <p>
                 Data dodania: {{document.created_date}}
@@ -84,7 +108,8 @@
             </p>
         </div>
         <a href="{% url 'TI_Management_app:documents_database_delete' pk=document.pk %}"
-           class="btn btn-danger btn-sm pull-right">
+           class="btn btn-danger btn-sm pull-right"
+           onclick="return confirm('Czy na pewno chcesz usunąć ten dokument?')">
             usuń
         </a>
         <br />

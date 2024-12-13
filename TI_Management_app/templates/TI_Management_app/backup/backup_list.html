@@ -1,0 +1,42 @@
+{% extends 'TI_Management_app/base.html' %}
+
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:backup_list' %}"><b> / Kopie zapasowe </b></a>
+{% endblock %}
+
+{% block content %}
+
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Kopie zapasowe</h2>
+    <hr>
+    <br />
+    <div class="notepad">
+
+                <!-- Button to create a new backup -->
+        <form action="{% url 'TI_Management_app:run_backup' %}" method="post">
+            {% csrf_token %}
+            <button type="submit" class="btn btn-primary btn-large pull-left">Utwórz kopie zapasową</button>
+        <br />
+        <br />
+        </form>
+
+        <hr>
+
+        {% if files %}
+        <ul>
+            {% for file in files %}
+                <li>{{ file }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+            <p>Brak kopi zabasowych.</p>
+        {% endif %}
+    </div>
+</div>
+
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='backup_list' %}
+{% endblock %}

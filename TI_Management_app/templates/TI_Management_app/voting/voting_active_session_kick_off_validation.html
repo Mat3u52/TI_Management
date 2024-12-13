@@ -29,11 +29,18 @@
 
             let interval = setInterval(updateCountdown, 1000);
         </script>
+
+
     </head>
     <body>
         <div class="hero-unit">
             <h2>Autoryzacja Uczestnika głosowania - {{ voting.title }}</h2>
             <hr>
+            {% for msg in messages %}
+                <div class="alert alert-info" role="alert">
+                    {{msg}}
+                </div>
+            {% endfor %}
             <br />
                 <p><span id="countdown"></span></p>
                     {% for session_signature in session_signatures %}
@@ -72,11 +79,39 @@
             <br />
             <br />
             <br />
+            {% for participant in session_signatures_current %}
+                <p>{{ participant.member.member_nr }} start:{{participant.created_date}} {% if participant.complete %} oddał/a głos {{participant.date_complete}}
+                    {%else%}
+                    <a href="{% url 'TI_Management_app:voting_active_session_detail_remove' pk_vote=voting.id pk_kick_off=session_kick_off.id pk=participant.pk %}"
+                   class="btn btn-danger"
+                   onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?');">
+                   Usuń
+                </a>
+                    {% endif %}</p>
+            {% endfor %}
             <a href="{% url 'TI_Management_app:voting_active_session_close' pk_vote=voting.id pk_kick_off=session_kick_off.id %}" class="btn btn-primary btn-large pull-right">
                 Zamknij sessję głosowania
             </a>
+            <a onclick="openNewVotingWindow()" class="btn btn-primary btn-large pull-left">
+                Otwórz okno głosowania
+            </a>
+            <script>
+                function openNewVotingWindow() {
+                    window.open(
+                        "{% url 'TI_Management_app:voting_active_session' pk_vote=voting.id pk_kick_off=session_kick_off.id %}",
+                        "_blank",
+                        "width=800,height=600,scrollbars=yes,resizable=yes"
+                    );
+                }
+            </script>
             <br />
             <br />
+            <p><b>Wszystkie osoby, które oddały już swój głos w głosowaniu:</b></p>
+            <h4>Minimalna wymagana frekwencja: {{voting.turnout}}%</h4>
+            <small>Ważne głosy: {{accepted_count}}; Uczestników: {{attendance|floatformat:2}}% Uczestników z ważnymi głosami: {{attendance_only_accepted|floatformat:2}}% </small>
+            {% for participant in session_signatures %}
+                <p>{{ participant.member.member_nr }} start:{{participant.created_date}} {% if participant.complete %} oddał/a głos {{participant.date_complete}} {% endif %}</p>
+            {% endfor %}
         </div>
     </body>
 </html>

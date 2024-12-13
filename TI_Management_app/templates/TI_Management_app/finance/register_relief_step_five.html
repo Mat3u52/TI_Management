@@ -27,25 +27,109 @@
                 </div>
             {% endif %}
             <h5>Podpis:</h5>
-            <img src="{{ one_registered_relife.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 300px; display: block; margin-top: 10px;">
+<!--            <img src="{{ one_registered_relife.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 300px; display: block; margin-top: 10px;">-->
 
-            <form method="post" action="{% url 'TI_Management_app:register_relief_step_five_remove_signature' pk=one_registered_relife.pk %}" style="display:inline;">
-                {% csrf_token %}
-                <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
-            </form>
+
+
+
+
+
+            {% if request.GET.showed == 'True' %}
+                <form method="post" action="{% url 'TI_Management_app:register_relief_step_five_remove_signature' pk=one_registered_relife.pk %}" style="display:inline;">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
+                </form>
+
+                <form method="POST" action="{% url 'TI_Management_app:register_relief_step_five_encrypt_signature' pk=one_registered_relife.pk %}">
+                    {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Ukryj podpis</button>
+                </form>
+                <a href="{{ one_registered_relife.signature_image.url }}" target="_blank">
+                    <img src="{{ one_registered_relife.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 350px; display: block; margin-top: 10px;">
+                </a>
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+                <br />
+            {% else %}
+                <form method="POST" action="{% url 'TI_Management_app:register_relief_step_five_decrypt_signature' pk=one_registered_relife.pk %}">
+                    {% csrf_token %}
+                <button type="submit" class="btn btn-primary" >Zobacz podpis</button>
+                </form>
+            {% endif %}
+
+            <script>
+                document.addEventListener('DOMContentLoaded', () => {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const addSignatureButton = document.getElementById('addSignatureButton');
+                    const countdownElement = document.getElementById('countdown');
+
+                    // Check if the 'showed' parameter exists and is 'True'
+                    if (urlParams.get('showed') === 'True') {
+                        addSignatureButton.disabled = true;
+
+                        // Set countdown duration in seconds
+                        let countdown = 10;
+
+                        // Update the countdown text every second
+                        const countdownInterval = setInterval(() => {
+                            countdownElement.textContent = `Za ${countdown} sekund proszę przyłóż kartę HID`;
+                            countdown--;
+
+                            if (countdown < 0) {
+                                clearInterval(countdownInterval);
+
+                                // Create a form dynamically for the POST request
+                                const form = document.createElement('form');
+                                form.method = 'POST';
+                                form.action = "{% url 'TI_Management_app:register_relief_step_five_encrypt_signature' pk=one_registered_relife.pk %}";
+
+                                // Add the CSRF token as a hidden input
+                                const csrfTokenInput = document.createElement('input');
+                                csrfTokenInput.type = 'hidden';
+                                csrfTokenInput.name = 'csrfmiddlewaretoken';
+                                csrfTokenInput.value = '{{ csrf_token }}';
+                                form.appendChild(csrfTokenInput);
+
+                                // Append the form to the body and submit it
+                                document.body.appendChild(form);
+                                try {
+                                    form.submit();
+                                } catch (error) {
+                                    console.error("Error submitting the form:", error);
+                                }
+                            }
+                        }, 1000); // Update every second
+                    } else {
+                        addSignatureButton.disabled = false;
+                        countdownElement.textContent = "Kliknij przycisk 'Zobacz podpis' żeby zweryfikować podpis.";
+                    }
+                });
+            </script>
+
+
+
+
+
+
+
             <form method="post" class="post-form">
                 {% csrf_token %}
 
-                <br />
-                <br />
+
+                {% if request.GET.showed == 'False' %}
                 {{form.card}}
-                <br />
-                <br />
-                <button type="submit" class="btn btn-primary btn-large pull-right">
+                {% endif %}
+                <button id="addSignatureButton" type="submit" class="btn btn-primary btn-large pull-right" disabled>
                     Zapisz
                 </button>
                 <br />
             </form>
+            <p id="countdown"></p>
         {% else %}
             <p><em>Podpis nie został jeszcze dodany.</em></p>
             <p>
@@ -302,6 +386,9 @@
         </table>
         <br />
         <br />
+        <a href="{% url 'TI_Management_app:register_relief_step_five_edit' pk=one_registered_relife.pk %}" class="btn btn-primary btn-large pull-right">
+            Modyfikuj
+        </a>
         <br />
         <br />
     </div>

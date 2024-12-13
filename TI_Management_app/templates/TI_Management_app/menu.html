@@ -1,6 +1,6 @@
 <div class="no-print">
 <ul class="nav nav-list">
-    <li class="nav-header">Panel</li>
+    <li class="nav-header">Panel Sterowania</li>
     <hr>
     <li class="{% if active_tab == 'dashboard' %} active {% endif %}">
         <a href="#">
@@ -141,8 +141,8 @@
         </a>
     </li>
     <hr>
-    <li class="{% if active_tab == 'Backup' %} active {% endif %}">
-        <a href="#"><b>Backup</b></a>
+    <li class="{% if active_tab == 'backup_list' %} active {% endif %}">
+        <a href="{% url 'TI_Management_app:backup_list' %}"><b>Backup</b></a>
     </li>
 </ul>
 </div>

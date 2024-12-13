@@ -10,7 +10,7 @@
 {% endblock %}
 
 {% block content %}
-
+{% if validation_register_relief.complete %}
 <div class="hero-unit">
     <h2 class="fadeInUp-animation">Weryfikacja</h2>
     <hr>
@@ -263,9 +263,23 @@
                     </p>
                 </td>
                 <td>
-                    {% if validation_register_relief.complete %}
-                        <img src="{% thumbnail validation_register_relief.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                    {% if request.GET.showed == 'True' %}
+                        {% if validation_register_relief.complete %}
+                            <form method="POST" action="{% url 'TI_Management_app:register_relief_valid_encrypt_signature' pk=validation_register_relief.pk %}">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-primary">Ukryj podpis</button>
+                            </form>
+                            <img src="{{ validation_register_relief.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 350px; display: block; margin-top: 10px;">
+                        {% endif %}
+                    {% else %}
+                        <form method="POST" action="{% url 'TI_Management_app:register_relief_valid_decrypt_signature' pk=validation_register_relief.pk %}">
+                        {% csrf_token %}
+                        <button type="submit" class="btn btn-primary">Zobacz podpis</button>
+                        </form>
                     {% endif %}
+                    <p>{{validation_register_relief.member.forename}} {{validation_register_relief.member.surname}} {{validation_register_relief.member.member_nr}}</p>
+                    <p>Tczew, dnia {{validation_register_relief.date_of_signed_by_the_applicant}}</p>
+                    <p id="countdown"></p>
                 </td>
             </tr>
         </table>
@@ -280,6 +294,53 @@
         <br />
     </div>
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const urlParams = new URLSearchParams(window.location.search);
+        const countdownElement = document.getElementById('countdown');
+
+        // Check if the 'showed' parameter exists and is 'True'
+        if (urlParams.get('showed') === 'True') {
+
+            // Set countdown duration in seconds
+            let countdown = 5;
+
+            // Update the countdown text every second
+            const countdownInterval = setInterval(() => {
+                countdownElement.textContent = `${countdown} sekund`;
+                countdown--;
+
+                if (countdown < 0) {
+                    clearInterval(countdownInterval);
+
+                    // Create a form dynamically for the POST request
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{% url 'TI_Management_app:register_relief_valid_encrypt_signature' pk=validation_register_relief.pk %}";
+
+                    // Add the CSRF token as a hidden input
+                    const csrfTokenInput = document.createElement('input');
+                    csrfTokenInput.type = 'hidden';
+                    csrfTokenInput.name = 'csrfmiddlewaretoken';
+                    csrfTokenInput.value = '{{ csrf_token }}';
+                    form.appendChild(csrfTokenInput);
+
+                    // Append the form to the body and submit it
+                    document.body.appendChild(form);
+                    try {
+                        form.submit();
+                    } catch (error) {
+                        console.error("Error submitting the form:", error);
+                    }
+                }
+            }, 500); // Update every second
+        } else {
+            countdownElement.textContent = "";
+        }
+    });
+</script>
+{% endif %}
 
 {% endblock %}
 

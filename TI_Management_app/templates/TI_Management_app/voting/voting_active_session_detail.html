@@ -40,6 +40,11 @@
                             return false;">
                                 {{ member.forename }} {{ member.surname }}
                             </a>
+                            {% if member.card %}
+                                <span style="color:green; float:right;">zweryfikowany/a</span>
+                            {% else %}
+                                <span style="color:red; float:right;">Osoba nie została zweryfikowana</span>
+                            {% endif %}
                         </li>
                     {% endfor %}
                 </ul>
@@ -147,6 +152,8 @@
             <br />
             {% for session in sessions_status %}
                 <h4>Session: {{ session }}</h4>
+                <small>Start: {{session.session_start}} | Koniec: {{session.session_end}}</small>
+
                 {% for commission_signature in session.voteVotingSessionKickOffSignature.all %}
                     <ul>
                         <li>
@@ -168,8 +175,19 @@
             {% endfor %}
 
             <p>Wszystkie osoby, które oddały głos:</p>
+            <small>Ważne głosy: {{accepted_count}}; Uczestników: {{attendance|floatformat:2}}% Uczestników z ważnymi głosami: {{attendance_only_accepted|floatformat:2}}% </small>
             {% for member in member_already_participated %}
-                <p>{{ member.member.member_nr }} {% if member.reject %}<span style="color:red">nie ważny</span>{% else %}<span style="color:green">ważny</span>{% endif %}</p>
+                <p>{{ member.member.member_nr }}
+                    {% if member.reject %}
+                    <span style="color:red">nie ważny</span>
+                    {% else %}
+                    {% if member.complete %}
+                    <span style="color:green">ważny</span>
+                    {% else %}
+                    <span style="color:red">nie ważny</span>
+                    {% endif %}
+                    {% endif %}
+                </p>
             {% endfor %}
             <hr>
             <br />

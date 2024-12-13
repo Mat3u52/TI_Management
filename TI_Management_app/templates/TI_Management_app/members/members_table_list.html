@@ -26,6 +26,11 @@
                         csv
                     </a>
                 </td>
+                <td>
+                    <a href="{% url 'TI_Management_app:member_recommender_export_csv' %}" class="btn btn-primary btn-sm pull-left">
+                        Raport osób polecających csv
+                    </a>
+                </td>
             </tr>
         </table>
     </form>
@@ -104,6 +109,10 @@
                     <a href="?order_by=deactivate">&#8743;</a>&nbsp;<a href="?order_by=-deactivate">&#8744;</a>
                 </th>
                 <th scope="col">
+                    HID<br />
+                    <a href="?order_by=card">&#8743;</a>&nbsp;<a href="?order_by=-card">&#8744;</a>
+                </th>
+                <th scope="col">
                     Data dodania<br />
                     <a href="?order_by=created_date">&#8743;</a>&nbsp;<a href="?order_by=-created_date">&#8744;</a>
                 </th>
@@ -150,6 +159,15 @@
                         Dezaktywowany
                     {% else %}
                         Aktywny
+                    {% endif %}
+                </a>
+            </td>
+            <td>
+                <a href="{% url 'TI_Management_app:member_detail' pk=member.pk %}">
+                    {% if member.card %}
+                        Dodana
+                    {% else %}
+                        Brak
                     {% endif %}
                 </a>
             </td>

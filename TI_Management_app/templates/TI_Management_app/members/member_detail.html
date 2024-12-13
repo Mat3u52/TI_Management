@@ -537,12 +537,12 @@
                         {% endif %}
 
                         <p><b>Data modyfikacji:</b> {{ note.published_date }}</p>
-                          {% if note.importance == 'low' %}<p><b>Ważnośc:</b> Niski</p>
-                          {% elif note.importance == 'standard' %}<p><b>Ważnośc:</b> Umiarkowany</p>
-                          {% elif note.importance == 'important' %}<p><b>Ważnośc:</b> Ważny</p>
-                          {% elif note.importance == 'veryImportant' %}<p><b>Ważnośc:</b> Bardzo ważny</p>
-                          {% elif note.importance == 'critical' %}<p><b>Ważnośc:</b> Krytyczny</p>
-                          {% elif note.importance == 'none' %}<p><b>Ważnośc:</b> Nie dotyczy</p>
+                          {% if note.importance == 'low' %}<p><b>Ważność:</b> Niski</p>
+                          {% elif note.importance == 'standard' %}<p><b>Ważność:</b> Umiarkowany</p>
+                          {% elif note.importance == 'important' %}<p><b>Ważność:</b> Ważny</p>
+                          {% elif note.importance == 'veryImportant' %}<p><b>Ważność:</b> Bardzo ważny</p>
+                          {% elif note.importance == 'critical' %}<p><b>Ważność:</b> Krytyczny</p>
+                          {% elif note.importance == 'none' %}<p><b>Ważność:</b> Nie dotyczy</p>
                           {% else %}<p><b>Ważność:</b> None</p>
                           {% endif %}
                         <p>

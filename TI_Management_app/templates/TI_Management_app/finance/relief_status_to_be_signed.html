@@ -1,6 +1,6 @@
 {% extends 'TI_Management_app/base.html' %}
 {% load ti_management_tags %}
-
+{% load thumbnail %}
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
@@ -16,32 +16,34 @@
     <hr>
     <br />
     <div class="no-print">
-    <nav class="menu menu-1">
-      <ul>
-          <li>
-              <a onclick="openNewWindow()" style="cursor: pointer;">[&#10138;]</a>
-                <script>
-                    function openNewWindow() {
-                        window.open(
-                            "{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}",
-                            "_blank",
-                            "width=800,height=600,scrollbars=yes,resizable=yes"
-                        );
-                    }
-                </script>
-          </li>
-          <li>
-              <a href="{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}" target="_blank">
-                Wygeneruj PDF / drukuj
-              </a>
-          </li>
-<!--          <li>-->
-<!--              <a href="#" onclick="window.print()">-->
-<!--                Drukuj-->
-<!--              </a>-->
-<!--          </li>-->
-      </ul>
-    </nav>
+        {% if relief_to_be_signed.payment_confirmation is True %}
+        <nav class="menu menu-1">
+          <ul>
+              <li>
+                  <a onclick="openNewWindow()" style="cursor: pointer;">[&#10138;]</a>
+                    <script>
+                        function openNewWindow() {
+                            window.open(
+                                "{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}",
+                                "_blank",
+                                "width=800,height=600,scrollbars=yes,resizable=yes"
+                            );
+                        }
+                    </script>
+              </li>
+              <li>
+                  <a href="{% url 'TI_Management_app:relief_status_to_be_signed_pdf_advance' pk=relief_to_be_signed.pk %}" target="_blank">
+                    Wygeneruj PDF / drukuj
+                  </a>
+              </li>
+    <!--          <li>-->
+    <!--              <a href="#" onclick="window.print()">-->
+    <!--                Drukuj-->
+    <!--              </a>-->
+    <!--          </li>-->
+          </ul>
+        </nav>
+        {% endif %}
     </div>
     <div class="notepad">
         <div class="no-print">
@@ -314,7 +316,11 @@
                             {{relief_to_be_signed.member.member_nr}}<br />
                             Data: {{relief_to_be_signed.date_of_signed_by_the_applicant}}
                             <span style="color: green"><b>&#9745;</b></span><br />
-                            <img src="{{ relief_to_be_signed.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
+                            {% if request.GET.showed == 'True' %}
+                                <img src="{{ relief_to_be_signed.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
+                            {% else %}
+                                <p><em>Podpis ukryty!</em></p>
+                            {% endif %}
                         {% else %}
                             {{relief_to_be_signed.complete}}
                         {% endif %}
@@ -365,7 +371,11 @@
                             </p>
                             {% if signature.signature_image %}
                                 <h5>Podpis:</h5>
-                                <img src="{{ signature.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
+                                {% if request.GET.showed == 'True' %}
+                                    <img src="{{ signature.signature_image.url }}" alt="Signature" style="border: 1px solid #000; width: 150px; display: block; margin-top: 10px;">
+                                {% else %}
+                                    <p><em>Podpis ukryty!</em></p>
+                                {% endif %}
                                 <form method="post" action="{% url 'TI_Management_app:relief_status_to_be_signed_remove_signature' pk=signature.pk pk1=relief_to_be_signed.pk %}" style="display:inline;">
                                     {% csrf_token %}
                                     <button type="submit" class="btn btn-warning btn-sm" onclick="return confirm('Czy na pewno chcesz usunąć ten podpis?')">Usuń Podpis</button>
@@ -425,6 +435,66 @@
         </table>
         <br />
         <br />
+
+        {% if request.GET.showed == 'True' %}
+            <form method="POST" action="{% url 'TI_Management_app:relief_status_to_be_signed_encrypt_signature' pk=relief_to_be_signed.pk %}">
+            {% csrf_token %}
+                <button type="submit" class="btn btn-primary">Ukryj podpis</button>
+            </form>
+        {% else %}
+            <form method="POST" action="{% url 'TI_Management_app:relief_status_to_be_signed_decrypt_signature' pk=relief_to_be_signed.pk %}">
+            {% csrf_token %}
+                <button type="submit" class="btn btn-primary" >Zobacz podpis</button>
+            </form>
+        {% endif %}
+        <p id="countdown"></p>
+        <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const countdownElement = document.getElementById('countdown');
+
+                // Check if the 'showed' parameter exists and is 'True'
+                if (urlParams.get('showed') === 'True') {
+
+                    // Set countdown duration in seconds
+                    let countdown = 10;
+
+                    // Update the countdown text every second
+                    const countdownInterval = setInterval(() => {
+                        countdownElement.textContent = `${countdown} sekund`;
+                        countdown--;
+
+                        if (countdown < 0) {
+                            clearInterval(countdownInterval);
+
+                            // Create a form dynamically for the POST request
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = "{% url 'TI_Management_app:relief_status_to_be_signed_encrypt_signature' pk=relief_to_be_signed.pk %}";
+
+                            // Add the CSRF token as a hidden input
+                            const csrfTokenInput = document.createElement('input');
+                            csrfTokenInput.type = 'hidden';
+                            csrfTokenInput.name = 'csrfmiddlewaretoken';
+                            csrfTokenInput.value = '{{ csrf_token }}';
+                            form.appendChild(csrfTokenInput);
+
+                            // Append the form to the body and submit it
+                            document.body.appendChild(form);
+                            try {
+                                form.submit();
+                            } catch (error) {
+                                console.error("Error submitting the form:", error);
+                            }
+                        }
+                    }, 1000); // Update every second
+                } else {
+                    countdownElement.textContent = "";
+                }
+            });
+        </script>
+
+
         <div class="no-print">
         {% if relief_to_be_signed.payment_confirmation is False %}
         {% if relief_to_be_signed.registerReliefSignatureRelief.count >= 3 %}
@@ -435,11 +505,17 @@
                         <p>{{form_confirmation.errors}}</p>
                     </div>
                 {% endif %}
-                {{form_confirmation.payment_confirmation}}
 
-                <button type="submit" class="btn btn-primary btn-large pull-right">
-                    Potwierdź wypłatę
-                </button>
+                {% if request.GET.showed == 'True' %}
+                    <button type="submit" class="btn btn-primary btn-large pull-right" disabled>
+                        Potwierdź wypłatę
+                    </button>
+                {% else %}
+                    {{form_confirmation.payment_confirmation}}
+                    <button type="submit" class="btn btn-primary btn-large pull-right">
+                        Potwierdź wypłatę
+                    </button>
+                {% endif %}
             <br />
             </form>
         {% else %}

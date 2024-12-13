@@ -32,6 +32,30 @@
             p {
                 margin-left: 10px;
             }
+
+
+        #signature-canvas {
+            border: 2px solid #000;
+            border-radius: 5px;
+            width: 100%;
+            max-width: 400px;
+            height: auto;
+            touch-action: none;
+        }
+
+        .notepad {
+            margin-top: 20px;
+        }
+
+        .regulation {
+            margin-top: 20px;
+        }
+
+        .form-field {
+            display: none;
+            margin-top: 20px;
+        }
+
         </style>
 <script>
     function checkSessionStatus() {
@@ -59,7 +83,7 @@
             <img src="/static/img/votingSessionHeader.png" alt="zzti LUMS">
         </header>
 
-        <form method="post">
+        <form id="signature-form" method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {% if form.errors %}
             <div class="alert alert-danger">
@@ -80,14 +104,98 @@
             </table>
         </div>
         <br />
+
+         <input type="hidden" name="signature_data" id="signature_data">
+
+        <div class="notepad">
+            <canvas id="signature-canvas"></canvas>
+            <br>
+            <button type="button" onclick="clearCanvas()" class="btn btn-secondary">Wyczyść</button>
+            <button id="confirm-button" type="button" onclick="saveSignature()" class="btn btn-primary" disabled>Potwierdzam</button>
+        </div>
+
+        <div class="regulation">
+            <input type="checkbox" id="rodo-checkbox">
+            <label for="rodo-checkbox">
+                Zapoznałem/am się z <a href="/regulamin-rodo/" target="_blank">Regulaminem RODO</a> dotyczącym przechowywania podpisu elektronicznego i wyrażam na to zgodę.
+            </label>
+        </div>
+        <br>
+
+
+
+            <div id="form-field" class="form-field">
             {{ form.member_signature }}
+            </div>
         <br />
         <br />
-        <button type="submit" class="btn btn-primary btn-large pull-right">Dalej</button>
+        <button type="submit" id="submit-button" onclick="saveSignature()" class="btn btn-primary btn-large pull-right" disabled>Dalej</button>
         <br />
         <br />
         </form>
 
     </body>
+
+<script>
+    const canvas = document.getElementById('signature-canvas');
+    const ctx = canvas.getContext('2d');
+    const checkbox = document.getElementById('rodo-checkbox');
+    const confirmButton = document.getElementById('confirm-button');
+    const submitButton = document.getElementById('submit-button');
+    const signatureForm = document.getElementById('signature-form');
+    const formField = document.getElementById('form-field');
+
+    // Enable confirm button based on checkbox state
+    checkbox.addEventListener('change', function () {
+        confirmButton.disabled = !this.checked;
+    });
+
+    function resizeCanvas() {
+        canvas.width = canvas.offsetWidth;
+        canvas.height = canvas.offsetWidth * 0.75; // 4:3 aspect ratio
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    window.addEventListener('resize', resizeCanvas);
+    resizeCanvas();
+
+    let drawing = false;
+
+    canvas.addEventListener('mousedown', () => drawing = true);
+    canvas.addEventListener('mouseup', () => {
+        drawing = false;
+        ctx.beginPath();
+    });
+    canvas.addEventListener('mousemove', draw);
+
+    function draw(e) {
+        if (!drawing) return;
+        ctx.lineWidth = 2;
+        ctx.lineCap = 'round';
+        ctx.strokeStyle = 'black';
+
+        const rect = canvas.getBoundingClientRect();
+        ctx.lineTo(e.clientX - rect.left, e.clientY - rect.top);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.moveTo(e.clientX - rect.left, e.clientY - rect.top);
+    }
+
+    function clearCanvas() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+
+    function saveSignature() {
+        const signatureData = canvas.toDataURL('image/png');
+        console.log(signatureData);  // Add this to debug
+
+        document.getElementById('signature_data').value = signatureData;
+
+        // Show the form field and enable the submit button
+        formField.style.display = 'block';
+        submitButton.disabled = false;
+    }
+</script>
+
 </html>
 

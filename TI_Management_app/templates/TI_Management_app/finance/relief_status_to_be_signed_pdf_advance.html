@@ -58,11 +58,16 @@
             p {
                 margin: 5px 0;
             }
+            h1 {
+                text-align: center;
+                margin:0;
+                padding:0;
+            }
         </style>
 
     </head>
     <body data-new-gr-c-s-check-loaded="14.1139.0" data-gr-ext-installed="">
-
+    <H1>Wniosek</H1>
     <div class="notepad">
         <table style="margin-left: auto; margin-right: auto;">
             <tr>
@@ -313,7 +318,8 @@
                     </p>
                     {% if relief_to_be_signed.signature_image %}
                         <h5>Podpis:</h5>
-                        <img src="{% thumbnail relief_to_be_signed.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                        <img src="{{ relief_to_be_signed.signature_image.url }}" style="border: 0px solid #000; width: 50px; display: block; margin-top: 10px;">
+                        <br />
                     {% else %}
                         <p><em style="color:red;">Podpis nie został jeszcze dodany.</em></p>
                     {% endif %}
@@ -371,7 +377,7 @@
                             </p>
                             {% if signature.signature_image %}
                                 <h5>Podpis:</h5>
-                                <img src="{% thumbnail signature.signature_image 150x0  quality=100 %}" alt="Signature" style="border: 1px solid #000; display: block; margin-top: 10px;">
+                                <img src="{{ signature.signature_image.url }}"  style="border: 0px solid #000; width: 50px; display: block; margin-top: 10px;">
                             {% else %}
                                 <p><em style="color:red;">Podpis nie został jeszcze dodany.</em></p>
                             {% endif %}

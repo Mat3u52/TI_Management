@@ -157,7 +157,7 @@ import redis
 from django.views.decorators.csrf import csrf_exempt
 from django.core.files.base import ContentFile
 # from bleach.css_sanitizer import CSSSanitizer
-
+from TI_Management_app.management.commands.ti_management_backup import Command as BackupCommand
 from django.db import transaction
 
 from cryptography.fernet import Fernet
@@ -6550,3 +6550,44 @@ def dashboard_categories_edit(request, pk):
             'category': category
         }
     )
+
+
+@user_passes_test(lambda user: user.is_superuser)
+def backup_list(request):
+    # Define the path to the backups directory
+    backups_dir = os.path.join(settings.BASE_DIR, 'backups')
+
+    # Check if the directory exists
+    if not os.path.exists(backups_dir):
+        files = []
+    else:
+        # Get the list of files in the directory
+        files = [
+            file for file in os.listdir(backups_dir)
+            if os.path.isfile(os.path.join(backups_dir, file))
+        ]
+
+    # Render the template with the file list
+    return render(
+        request,
+        'TI_Management_app/backup/backup_list.html',
+        {
+            'files': files
+        }
+    )
+
+
+def run_backup(request):
+    try:
+        # Create an instance of the command and execute it
+        backup_command = BackupCommand()
+        backup_command.handle()  # This runs the command logic
+
+        # Notify the user that the backup was successful
+        messages.success(request, 'Kopia zapasowa wykonana.')
+    except Exception as e:
+        # Notify the user in case of an error
+        messages.error(request, f'Błąd: {e}')
+
+    # Redirect back to the backup list
+    return redirect('TI_Management_app:backup_list')

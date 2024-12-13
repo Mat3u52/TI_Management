@@ -1,10 +1,212 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'TI_Management_app/base.html' %}
+{% load ti_management_tags %}
+{% load thumbnail %}
 
-</body>
-</html>
+{% block breadcrumbs %}
+<a href="{% url 'TI_Management_app:finance_list' %}"><b> / Finanse</b></a>
+<a href="{% url 'TI_Management_app:relief_status_list' %}"><b> / Zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_one' %}"><b> / Rejestrowanie zapomogi</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_two' pk=one_registered_relife.pk %}"><b> / Krok [1/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_three' pk=one_registered_relife.pk %}"><b> / Krok [2/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_four' pk=one_registered_relife.pk %}"><b> / Krok [3/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_five' pk=one_registered_relife.pk %}"><b> / Krok [4/4]</b></a>
+<a href="{% url 'TI_Management_app:register_relief_step_five_edit' pk=member.pk %}"><b> / Modyfikacja</b></a>
+{% endblock %}
+
+{% block content %}
+
+<script>
+        $(document).ready(function () {
+            $('#relief_select').change(function () {
+                var relief_id = $(this).val();
+                $.ajax({
+                    url: "{% url 'TI_Management_app:get_relief_details' %}",
+                    data: {'relief_id': relief_id},
+                    dataType: 'json',
+                    success: function (data) {
+                        $('#author_name').text(data.author_name);
+                        $('#author_email').text(data.author_email);
+                        $('#figure').text(data.figure);
+                        $('#grace').text(data.grace);
+                    },
+                    error: function (xhr, status, error) {
+                        console.error(error);
+                    }
+                });
+            });
+        });
+</script>
+
+
+
+<div class="hero-unit">
+    <h2 class="fadeInUp-animation">Modyfikuj wniosek</h2>
+    <hr>
+    <br />
+    <div class="notepad">
+        <h4>Modyfikuj wniosek:</h4>
+        <br />
+        <form method="post" class="post-form" enctype="multipart/form-data">
+        {% csrf_token %}
+        {% if form.errors %}
+            <div class="alert alert-danger">
+                <p>{{form.errors}}</p>
+            </div>
+        {% endif %}
+
+        <table width="100%">
+            <tr>
+                <td>
+                    <p>
+                        Data wypełnienia wniosku:
+                    </p>
+<!--                    {{form.date_of_completing_the_application}}-->
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
+                            type="date"
+                            value="{{ one_registered_relife.date_of_completing_the_application|date:'Y-m-d' }}"
+                            name="date_of_completing_the_application"
+                            required
+                            autofocus>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>
+                        Data wpłyniecia wniosku:
+                    </p>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
+                            type="date"
+                            value="{{ one_registered_relife.date_of_receipt_the_application|date:'Y-m-d' }}"
+                            name="date_of_receipt_the_application"
+                            required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>
+                        Data zdarzenia, którego dotyczy wniosek:
+                    </p>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
+                            type="date"
+                            value="{{ one_registered_relife.date_of_accident|date:'Y-m-d' }}"
+                            name="date_of_accident"
+                            required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>
+                        Imię osoby powiązanej z wnioskiem:
+                    </p>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
+                            type="text"
+                            value="{{one_registered_relife.associate_forename}}"
+                            placeholder="Imię"
+                            aria-label="Imię osoby powiązanej z wnioskiem"
+                            name="associate_forename"
+                            required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>
+                        Nazwisko osoby powiązanej z wnioskiem:
+                    </p>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
+                            type="text"
+                            value="{{one_registered_relife.associate_surname}}"
+                            placeholder="Nazwisko"
+                            aria-label="Nazwisko osoby powiązanej z wnioskiem"
+                            name="associate_surname"
+                            required>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <p>
+                        Uzasadnienie:
+                    </p>
+                    {{ form.media }}
+                    {{ form.reason }}
+<!--                    <textarea-->
+<!--                            class="form-control me-2"-->
+<!--                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"-->
+<!--                            placeholder="Uzasadnienie"-->
+<!--                            aria-label="Uzasadnienie"-->
+<!--                            name="reason"></textarea>-->
+                </td>
+            </tr>
+        </table>
+        <p>
+            Zapomoga:
+        </p>
+        <select id="relief_select" class="form-select select-wrapper" style="width: 90%" name="relief">
+            <option value="{{one_registered_relife.relief.id}}">{{one_registered_relife.relief.title}}</option>
+
+                {% for relief in all_relief %}
+                    <option value="{{ relief.id }}">{{ relief.title }}</option>
+                {% endfor %}
+
+        </select>
+        <div>
+            <p>Kwota: <span id="figure"></span> zł</p>
+            <p>Karencja: <span id="grace"></span> miesiąc/e</p>
+        </div>
+        <p>
+            Relacja:
+        </p>
+        <select class="form-select select-wrapper" style="width: 90%" name="relation">
+            <option value="{{one_registered_relife.relation.id}}">{{one_registered_relife.relation.title}}</option>
+                {% for relation in all_relation %}
+                    <option value="{{ relation.id }}">{{ relation.title }}</option>
+                {% endfor %}
+        </select>
+        <div>
+             <p>
+                 Nr Konta:
+             </p>
+                    <input
+                            class="form-control me-2"
+                            style="min-width: 50%!important; width: 90%; height: 40px; overflow-y: visible;"
+                            type="number"
+                            value="{{one_registered_relife.account_number}}"
+                            placeholder="Nr konta"
+                            aria-label="Nr konta"
+                            name="account_number"
+                            required>
+        </div>
+        <div>
+            <p>Dokument:</p>
+            {% for file in one_registered_relife.registerReliefFileRegisterRelief.all  %}
+            <a href="{{ file.file.url }}" target="_blank">
+            {{file.title}}
+            </a>
+            <br/>
+            {% endfor %}
+        </div>
+        <br />
+        <br />
+        <button type="submit" class="btn btn-primary btn-large pull-right">
+            Zapisz
+        </button>
+        <br />
+        </form>
+    </div>
+
+</div>
+
+{% endblock %}
+
+{% block menu %}
+{% include 'TI_Management_app/menu.html' with active_tab='register_relief_step_one' %}
+{% endblock %}
