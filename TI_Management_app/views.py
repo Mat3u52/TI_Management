@@ -2460,7 +2460,7 @@ def documents_database_category(request):
             category = form.save(commit=False)
             category.author = request.user
             category.save()
-            messages.success(request, f"Dodano nową kategorie {category.title}!")
+            messages.success(request, f"Dodano nową kategorię {category.title}!")
             return redirect('TI_Management_app:documents_database_category')
     else:
         username = request.user.username
@@ -2490,7 +2490,7 @@ def documents_database_category_edit(request, pk):
             category_form = form.save(commit=False)
             category_form.author = request.user
             category_form.save()
-            messages.success(request, f"Zaktualizowano kategorie {category.title}!")
+            messages.success(request, f"Zaktualizowano kategorię {category.title}!")
             return redirect('TI_Management_app:documents_database_category')
     else:
         username = request.user.username
@@ -6512,7 +6512,7 @@ def dashboard_categories_add(request):
             category = form.save(commit=False)
             category.author = request.user
             category.save()
-            messages.success(request, f"Dodano nową kategorie {category.title}!")
+            messages.success(request, f"Dodano nową kategorię {category.title}!")
             return redirect('TI_Management_app:dashboard_categories_add')
     else:
         form = DashboardCategoriesForm()
@@ -6537,7 +6537,7 @@ def dashboard_categories_edit(request, pk):
             one_function = form.save(commit=False)
             one_function.author = request.user
             one_function.save()
-            messages.success(request, "Zaktualizowano kategorie!")
+            messages.success(request, "Zaktualizowano kategorię!")
             return redirect('TI_Management_app:dashboard_categories_add')
     else:
         form = DashboardCategoriesForm(instance=category)

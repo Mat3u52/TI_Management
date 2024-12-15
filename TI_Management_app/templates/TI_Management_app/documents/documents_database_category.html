@@ -2,12 +2,12 @@
 
 {% block breadcrumbs %}
 <a href="{% url 'TI_Management_app:documents_database' %}"><b> / Baza dokumentów</b></a>
-<a href="{% url 'TI_Management_app:documents_database_category' %}"><b> / Kategorie</b></a>
+<a href="{% url 'TI_Management_app:documents_database_category' %}"><b> / Kategorię</b></a>
 {% endblock %}
 
 {% block content %}
 <div class="hero-unit">
-    <h2 class="fadeInUp-animation">Dodaj kategorie do bazy dokumentów</h2>
+    <h2 class="fadeInUp-animation">Dodaj kategorię do bazy dokumentów</h2>
     <hr>
     <br />
     <form method="post" class="post-form">
@@ -17,7 +17,7 @@
                 <p>{{form.errors}}</p>
             </div>
         {% endif %}
-        <p><b>Dodaj kategorie:</b></p>
+        <p><b>Dodaj kategorię:</b></p>
         {{form.title}}
         {{form.responsible.as_hidden}}
         <br />

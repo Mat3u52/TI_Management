@@ -239,7 +239,7 @@
 
         <img src="{% static 'img/pdf-2610.png' %}" alt="pdf" width="20">
         <a href="{{ one_scholarship.file_university_regulations_of_the_grading_scale.url }}">
-            Regulamin uczeli z informacją o skali ocen
+            Regulamin uczelni z informacją o skali ocen
         </a>
             {% if one_scholarship.confirmation_of_scholarship is False %}
                 <label class="custom-file-upload-mod">
@@ -387,7 +387,7 @@
                                 <b>Dokument potwierdzający zaliczenie semestru:</b>
                                     {{ h.file_document_confirming_of_the_semester|filename }}
                                 <br />
-                                <b>Regulamin uczeli z informacją o skali ocen:</b>
+                                <b>Regulamin uczelni z informacją o skali ocen:</b>
                                     {{ h.file_university_regulations_of_the_grading_scale|filename }}
                                 <br />
                                 <b>Potwierdzam weryfikację legitymacji studenckiej:</b>

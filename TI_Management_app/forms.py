@@ -1898,7 +1898,7 @@ class ExportDataToTXTForm(forms.Form):
     DATA_CHOICES = [
         ('email', 'email'),
         ('phone_number', 'tel'),
-        ('forename', 'imie'),
+        ('forename', 'imię'),
         ('surname', 'nazwisko'),
         ('member_nr', 'id członka'),
         ('card_identity', 'nr karty'),
@@ -2729,8 +2729,8 @@ class KindOfFinanceDocumentForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
-                'placeholder': 'Rodaj dokumentu',
-                'aria-label': 'Rodaj dokumentu',
+                'placeholder': 'Rodzaj dokumentu',
+                'aria-label': 'Rodzaj dokumentu',
                 'list': 'kind_of_finance_document',
                 'autofocus': 'autofocus'
             }
@@ -3668,7 +3668,7 @@ class DashboardCategoriesForm(forms.ModelForm):
         widget=forms.TextInput(
             attrs={
                 'class': 'form-control me-2',
-                'placeholder': 'Nazwa ketegorii',
+                'placeholder': 'Nazwa kategorii',
                 'aria-label': 'Kategoria',
                 'list': 'kategoria_database',
                 'autofocus': 'autofocus'
