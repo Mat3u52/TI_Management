@@ -71,29 +71,14 @@
         </h3>
         <ul>
             <li>
-                <a onclick="openNewWindow()" style="cursor: pointer;">{{ document.file|filename }}</a>
-                <script>
-                    function openNewWindow() {
-                        window.open(
-                            "{{ document.file.url }}",
-                            "_blank",
-                            "width=800,height=600,scrollbars=yes,resizable=yes"
-                        );
-                    }
-                </script>
+                <a onclick="openNewWindow({{ forloop.counter }})" style="cursor: pointer;">{{ document.file|filename }}</a>
                 {% if document.signature_file %}
                 <ul>
                     <li>
-                        Podpisany dokument: <a onclick="openNewWindowOne()" style="cursor: pointer;"> {{ document.file|filename }}</a>
-                        <script>
-                            function openNewWindowOne() {
-                                window.open(
-                                    "{{ document.signature_file.url }}",
-                                    "_blank",
-                                    "width=800,height=600,scrollbars=yes,resizable=yes"
-                                );
-                            }
-                        </script>
+                        Podpisany dokument:
+                        <a onclick="openNewWindow({{ forloop.counter }}, 'signature')" style="cursor: pointer;">
+                            {{ document.file|filename }}
+                        </a>
                     </li>
                 </ul>
                 {% endif %}
@@ -117,6 +102,35 @@
     {% endif %}
 </div>
 {% endfor %}
+
+<script>
+    const documents = [
+        {% for document in documents %}
+        {
+            fileUrl: "{{ document.file.url }}",
+            signatureFileUrl: "{% if document.signature_file %}{{ document.signature_file.url }}{% else %}{% endif %}",
+        },
+        {% endfor %}
+    ];
+
+    function openNewWindow(index, type = 'file') {
+        const url = type === 'signature'
+            ? documents[index - 1].signatureFileUrl
+            : documents[index - 1].fileUrl;
+
+        if (url) {
+            window.open(
+                url,
+                "_blank",
+                "width=800,height=600,scrollbars=yes,resizable=yes"
+            );
+        } else {
+            alert("Brak pliku do otwarcia.");
+        }
+    }
+</script>
+
+
 
 {% endblock %}
 
