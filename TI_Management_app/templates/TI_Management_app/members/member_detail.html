@@ -132,13 +132,17 @@
           <tr>
             <td class="tableCredential"><p><b>Data rozwiązania umowy: </b></p></td>
             <td>
-              {% if member.date_of_contract|date:"Ymd" < "19800101" or member.expiration_date_contract is None%}
-                <p><span style="color:red;">Brak informacji</span></p>
-              {% else %}
-                <p>{{member.expiration_date_contract|date:"d.m.Y"}}</p>
-              {% endif %}
+
+            {% if member.type_of_contract == 'limited_duration' %}
+              <p>{{member.expiration_date_contract|date:"d.m.Y"}}</p>
+            {% else %}
+              <p><span style="color:red;">Brak informacji</span></p>
+            {% endif %}
+
             </td>
           </tr>
+
+
         </table>
   </div>
   <br />

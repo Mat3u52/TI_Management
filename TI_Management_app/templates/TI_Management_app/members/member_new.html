@@ -249,7 +249,7 @@
                     </div>
                 </td>
             </tr>
-            <tr>
+            <tr id="expiration_date_row" style="display: none;">
                 <td width="30%"><p><b>Data rozwiązania umowy: </b></p></td>
                 <td width="70%">
                     <p>{{form.expiration_date_contract}}</p>
@@ -423,6 +423,27 @@
         errorDiv.innerText = errorMessage;
         console.log('Displaying error: ', errorMessage);
     }
+</script>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+    const contractField = document.getElementById("id_type_of_contract");
+    const expirationRow = document.getElementById("expiration_date_row");
+
+    function toggleExpirationField() {
+        if (contractField.value === "limited_duration") {
+            expirationRow.style.display = "table-row";
+        } else {
+            expirationRow.style.display = "none";
+        }
+    }
+
+    // Run on page load in case of pre-selected value
+    toggleExpirationField();
+
+    // Listen for changes
+    contractField.addEventListener("change", toggleExpirationField);
+});
 </script>
 
 {% endblock %}
