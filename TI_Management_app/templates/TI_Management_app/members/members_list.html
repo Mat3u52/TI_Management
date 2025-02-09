@@ -57,14 +57,10 @@
     </a>
     </h3>
     <hr>
-<!--            <img src="{{ member.image.url }}" alt="image" width="150px">-->
-
-
         <div class="notepad">
             <a href="{{ member.image.url }}">
                 <img src="{% thumbnail member.image 150x0  quality=100 %}">
             </a>
-
             <table>
                 <tr>
                     <td><p class="tableCredential"><b>Funkcja:</b></p></td>
@@ -77,18 +73,34 @@
                 <tr>
                     <td><p class="tableCredential"><b>Płeć: </b></p></td>
                     <td>
-                        {% if member.sex == 'male' %}<p>M</p>
-                        {% elif member.sex == 'female' %}<p>K</p>
-                        {% else %}<p>None</p>{% endif %}
+                        {% if member.sex == 'male' %}
+                            <p>M</p>
+                        {% elif member.sex == 'female' %}
+                            <p>K</p>
+                        {% else %}
+                            <p> </p>
+                        {% endif %}
                     </td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>Numer kontaktowy: </b></p></td>
-                    <td><p>{{member.phone_number|phone_number}}</p></td>
+                    <td>
+                        {% if member.phone_number == None %}
+                            <p> </p>
+                        {% else %}
+                            <p>{{member.phone_number|phone_number}}</p>
+                        {% endif %}
+                    </td>
                 </tr>
                 <tr>
                     <td><p class="tableCredential"><b>e-mail: </b></p></td>
-                    <td><p>{{member.email}}</p></td>
+                    <td>
+                        {% if member.email == None %}
+                            <p> </p>
+                        {% else %}
+                            <p>{{member.email}}</p>
+                        {% endif %}
+                    </td>
                 </tr>
             </table>
             {% if member.deactivate %}
